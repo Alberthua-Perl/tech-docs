@@ -24,11 +24,11 @@
 
 - OCP 3.x 集群架构概述：
 
-  ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-arch.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-arch.png)
 
 - Origin 项目与 OCP 3.x 项目的对应关系：
 
-  ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-origion-developer.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-origion-developer.jpg)
 
 ##### OCP 3.x 集群的部署方法：
 
@@ -48,11 +48,11 @@
 
 - minikube 安装报错：
 
-  ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/minikube-error-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/minikube-error-1.jpg)
 
-  ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/minikube-error-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/minikube-error-2.jpg)
 
-  ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/minikube-error-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/minikube-error-3.jpg)
 
   ```bash
   $ minikube addons list
@@ -91,9 +91,9 @@
 
    ​      `etcd` 分布式键值型数据库，用于服务配置发现，OCP 集群中的数据存储与核心。
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-master-pod.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-master-pod.jpg)
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-master-etcd.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-master-etcd.jpg)
 
 2. compute 节点：
 
@@ -105,9 +105,9 @@
 
    > ✅注意：atomic-openshift-node 服务已集成 kubelet 功能。
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/atomic-openshift-node-error-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/atomic-openshift-node-error-1.jpg)
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/atomic-openshift-node-error-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/atomic-openshift-node-error-2.jpg)
 
 3. project：项目
 
@@ -162,11 +162,11 @@
    # 删除指定项目中 imagestream 中的 imagestreamtag，使其可重新上传。
    ```
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/imagestream-error-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/imagestream-error-1.jpg)
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/imagestream-error-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/imagestream-error-2.jpg)
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/imagestream-error-3.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/imagestream-error-3.jpg)
 
 5. build config（`bc`）：构建配置
 
@@ -216,7 +216,7 @@
 
     3）service 资源对象由 `kube-proxy` 组件实现，其虚拟 IP 地址存在于每个节点的 iptables NAT 表中，使用 `iptables -t nat -nvL` 命令即可查看指定的 ClusterIP。
     
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/kube-proxy-service-code.jpg" style="zoom: 67%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/kube-proxy-service-code.jpg" style="zoom: 67%;" />
 
     4）service 有反向代理与负载均衡的功能，默认以 Round Robin 轮询的方式将流量转发至 pod。
 
@@ -224,27 +224,27 @@
     >
     > 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` SDN 插件，同一项目的 pod 始终在同一个 flat 网络中，pod 间可直接通信，无需使用 service！
     > 
-    > <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-network-plugin.jpg" style="zoom:80%;" />    
+    > <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-network-plugin.jpg" style="zoom:80%;" />    
 
     6）若使用 ovs-multitenant SDN 插件，只是使用 `VNID` 实现不同项目间的 pod 二层隔离。
 
     7）OCP 3.x OVS 网络拓扑示意：
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-ovs-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-ovs-1.png)
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-ovs-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-ovs-2.png)
 
     8）同一节点上 pod 间的通信示意： 
     
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-ovs-3.png" style="zoom: 80%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-ovs-3.png" style="zoom: 80%;" />
 
     9）OCP 3.x OVS 流表分析示意：
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-ovs-openflow-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-ovs-openflow-1.jpg)
 
     10）访问使用 `NodePort` service 类型的 pod 跨节点流量分析：iptables NAT 表与 OVS 流表
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/NodePort-service-iptables-nat-ovs-analyze.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/NodePort-service-iptables-nat-ovs-analyze.jpg)
 
     11）service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod     部署的灵活性，即 OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 rc 部署相应副本数量的 pod，保证 pod 的服务高可用。
 
@@ -282,7 +282,7 @@
     >
     > 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 **`spec.externalTrafficPolicy`** 字段属性，否则创建失败！
     >
-    > ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/change-service-type-error.jpg)
+    > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/change-service-type-error.jpg)
 
     19）OCP 中建议将 service 整合入 dc 中，而 K8s 中建议将 service 定义在 DeploymentSet 中。
 
@@ -290,7 +290,7 @@
 
     21）使用原生 kube-proxy 实现的 service 与自研未使用 service 解决方案的响应对比：
     
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/service-performance.jpg"  />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/service-performance.jpg"  />
     
     22）因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
 
@@ -309,7 +309,7 @@
 
     7）router 路由原理架构示例：
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-route-infra.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-route-infra.jpg)
 
 12. pod：
 
@@ -329,15 +329,15 @@
     2）pv 资源定义中默认使用 NFS 服务端提供 NFS 存储，可为 pod 提供永久存储。
 
     3）pv 的访问模式：`NFS` 均支持以下三种模式
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/pv-access-mode.jpg" style="zoom:67%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/pv-access-mode.jpg" style="zoom:67%;" />
 
     4）持久卷存储等级（persistent volume storage class）定义后端存储的类型与等级，由 `storageClassName` 属性定义。
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/storageClassName.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/storageClassName.jpg)
 
     5）pv 回收策略：`PersistentVolume.spec.persistentVolumeReclaimPolicy` 属性
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/pv-recycle-policy.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/pv-recycle-policy.jpg)
 
     ​    a. `retain`（默认方式）：pv 中的数据将保留，管理员需手动处理该卷。
 
@@ -378,12 +378,12 @@
        d. 更改 dc 或 pod 资源定义的 `persistentVolumeClaim.claimName` 属性值以创建 pod 资源
 
     5）OCP 部署过程中定义 NFS 存储作为 OCP internal registry 的存储后端：
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-internal-registry-pvc-1.jpg" style="zoom: 80%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-internal-registry-pvc-1.jpg" style="zoom: 80%;" />
     
     6）OCP 集群 default 项目中定义的 pv 与 pvc 的关系：
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-internal-registry-pvc-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-internal-registry-pvc-2.jpg)
     
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-internal-registry-pvc-3.jpg"  />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-internal-registry-pvc-3.jpg"  />
 
 16. secret：
 
@@ -405,15 +405,15 @@
 
     ​      👉 从 OCP internal registry 中拉取已构建的容器镜像
 
-    ​      ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/service-account-secret-1.jpg)
+    ​      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/service-account-secret-1.jpg)
 
        d. pod 运行后将 secret 挂载至 /var/run/secrets/kubernetes.io/serviceaccount/ 目录中。
     
        e. 该目录中的 token 即为 sa 中的 secret 对应的 token。
     
-       <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/service-account-secret-2.jpg" style="zoom: 67%;" />
+       <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/service-account-secret-2.jpg" style="zoom: 67%;" />
     
-       <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/service-account-secret-3.jpg" style="zoom: 50%;" />
+       <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/service-account-secret-3.jpg" style="zoom: 50%;" />
 
 17. OCP 中特有的资源对象：bc、dc、route、template
 
@@ -421,7 +421,7 @@
 
 19. OCP 集群资源对象与工作流程：
 
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-resource-workflow.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-resource-workflow.jpg)
 
 ##### OCP 常用命令汇总：
 
@@ -503,9 +503,9 @@
    # 更改外部容器镜像 tag 为 OCP 内部容器镜像 tag，将其推送至 OCP 内部容器镜像仓库。
    ```
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/system-admin-logout.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/system-admin-logout.jpg)
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/docker-registry-route.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/docker-registry-route.jpg)
 
 3. 命令使用帮助相关：
 
@@ -574,9 +574,9 @@
    # 使用已有的容器镜像创建应用，并指定应用名称。
    ```
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/oc-new-app-container-image-stratgy-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/oc-new-app-container-image-stratgy-1.jpg)
 
-   <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/oc-new-app-container-image-stratgy-2.jpg" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/oc-new-app-container-image-stratgy-2.jpg" style="zoom:150%;" />
 
    2）使用 Dockerfile 构建应用容器镜像并创建 pod：
 
@@ -652,7 +652,7 @@
 
    👉 使用 S2I 源代码注入创建应用 pod 流程：
    
-   <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/s2i-application-build.jpg" style="zoom:67%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/s2i-application-build.jpg" style="zoom:67%;" />
 
    > ✅注意：
    >
@@ -677,7 +677,7 @@
 
       b. `-p` 选项：指定模板文件中的参数，命令行中定义的参数将覆盖模板文件中定义的参数。
 
-      ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/oc-new-app-template.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/oc-new-app-template.jpg)
 
 5. 操作资源对象：
 
@@ -730,9 +730,9 @@
    >
    > OCP 3.9 版本删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见参考链接。
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-delete-route-error-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-delete-route-error-1.jpg)
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-delete-route-error-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-delete-route-error-2.jpg)
    
    ```bash
    $ oc port-forward <pod> <localhost_port>:<pod_port> [-n <project>]
@@ -834,9 +834,9 @@
    >
    > 4. start-build 构建报错示例：
    >
-   >    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-start-build-error-1.jpg)
+   >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-start-build-error-1.jpg)
    >
-   >    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/ocp3-start-build-error-2.jpg)
+   >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-start-build-error-2.jpg)
    >
    > 5. 更改 buildconfig 中的 `BUILD_LOGLEVEL` 环境变量（env）可调整构建配置的日志等级，如该值为 5。
 
@@ -883,7 +883,7 @@
    >
    > 以上操作由于改变了 dc 配置，将触发新的 dc，部署全新的 pod。
    >
-   > ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/configmap-trigger-dc.jpg)
+   > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/configmap-trigger-dc.jpg)
 
    ```bash
    $ oc rollout latest dc/<deploymentconfig_name> [-n <project>]
@@ -906,23 +906,23 @@
 
    > ✅注意：region 为地理概念，zone 为不同的机柜/架或机房（故障恢复域）。
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/node-label.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/node-label.jpg)
 
    ```bash
    $ oc adm manage-node --schedulable=false <node_fqdn>
    # 设置 node 节点为 pod 不可调度状态
    ```
 
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/node-unscheduleable.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/node-unscheduleable.jpg)
 
    ```bash
    $ oc adm manage-node <node_fqdn> --evacuate --pod-selector='<key>'='<value>
    # 指定 pod 标签从 node 节点上迁移指定的 pod
    ```
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/pod-evacuate-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/pod-evacuate-1.jpg)
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/pod-evacuate-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/pod-evacuate-2.jpg)
 
    ```bash
    $ oc adm drain <node_fqdn> [--delete-local-data]
@@ -930,9 +930,9 @@
    # 若 pod 中已挂载使用相应的 pvc，在撤离时将报错，无法卸载已使用的 pvc！
    ```
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/evacuate-delete-local-data-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/evacuate-delete-local-data-1.jpg)
    
-   ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/evacuate-delete-local-data-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/evacuate-delete-local-data-2.jpg)
    
 10. OCP 用户（user）与基于角色的访问控制（RBAC）：
 
@@ -955,7 +955,7 @@
     >
     >    b. 本地项目策略（local policy）：project-related
     >
-    >    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/project-level-role.jpg)
+    >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/project-level-role.jpg)
     >
     > 5. 用户与组可同时绑定一个或多个本地项目角色与集群角色。
 
@@ -980,9 +980,9 @@
     # 查看集群角色的详细信息
     ```
     
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/clusterrole-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/clusterrole-demo.jpg)
     
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/verbose-examples.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/verbose-examples.jpg)
 
     ```bash
     $ oc describe clusterrole self-provisioner
@@ -993,7 +993,7 @@
     # 查看指定项目中用户的本地项目角色绑定信息
     ```
     
-    ![](https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/self-provisioner-desc.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/self-provisioner-desc.jpg)
 
     ```bash
     $ oc create serviceaccount <serviceaccount_name> [-n <project>]
@@ -1002,7 +1002,7 @@
     $ oc create serviceaccount wordpress -n farm
     ```
     
-    <img src="https://github.com/Alberthua-Perl/scripts-confs/blob/master/docs/images/serviceaccount-wordpress.jpg" style="zoom:150%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/serviceaccount-wordpress.jpg" style="zoom:150%;" />
 
     ```bash
     $ oc adm policy \
