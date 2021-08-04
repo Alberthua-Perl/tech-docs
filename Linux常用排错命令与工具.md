@@ -339,13 +339,13 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 # 注意：memtest86+ 内存测试通常在物理机上运行测试，而不是虚拟机上运行！
 ```
 
-![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/nic-pci-info.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nic-pci-info.jpg)
 
-<img src="https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/memtest86-test.jpg" style="zoom:;" />
+<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/memtest86-test.jpg" style="zoom:;" />
 
 #### 常见物理服务器及硬件示例：
 
-![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/general-hardware-info.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/general-hardware-info.png)
 
 #### Kernel module 与虚拟化相关命令示例：
 
@@ -389,7 +389,7 @@ $ virt-xml-validate <kvm_domain_filename>.xml
 # 判断 KVM 虚拟机 XML 定义文件的合法性（字段及标签等检查）
 ```
 
-![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/lsmod-cmd.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/lsmod-cmd.jpg)
 
 #### Linux 存储栈（storage stack）相关命令示例：
 
@@ -510,7 +510,7 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 1. RPM GPG 公钥保存目录：**`/etc/pki/rpm-gpg`**
 2. RPM 软件包中文件的状态标识：man rpm -> 搜索 -V
 
-![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/rpm-verify.JPG)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rpm-verify.jpg)
 
 ```bash
 rpm 命令常用选项：
@@ -624,11 +624,11 @@ $ rpm --setperms <package_name>
 
    3）yum 软件源优先级功能是否启用：**`/etc/yum/pluginconf.d/priorities.conf`**
 
-      ![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/yum-priority-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-1.png)
 
    4）编辑 **`/etc/yum.repos.d/*.repo`** 文件
 
-      <img src="https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/yum-priority-2.png" style="zoom:80%;" />
+      <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-2.png" style="zoom:80%;" />
 
    5）priority=*N*（取值 **`1~99`**），数值越大优先级越低。
 
@@ -724,7 +724,7 @@ $ yum verify-rpm vsftpd
 
 1. ping 与 ping6 命令常用选项：
 
-   <img src="https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/ping-ping6-options.JPG" style="zoom:80%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/ping-ping6-options.jpg" style="zoom:80%;" />
 
    > 💥注意💥：有时网络连通性问题由 MTU（最大传输单元）所致，需测试 MTU 大小并进行调整。
    
@@ -899,7 +899,7 @@ $ yum verify-rpm vsftpd
 
    4）以上 nc 测试的 iptarf-ng 如下所示：
 
-   ![](https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/nc-iptraf-ng.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nc-iptraf-ng.jpg)
 
 4. tcpdump 命令示例：
 
@@ -1071,7 +1071,7 @@ $ yum verify-rpm vsftpd
    3）库函数有可能包含有一个或多个系统调用，也可能没有系统调用，如有些操作不需要涉及内核的功能。
    4）无论是应用程序或库函数都有可能不调用系统调用而直接运行。
    
-   <img src="https://github.com/Alberthua-Perl/summary-scripts/blob/master/docs/images/system-library-call.jpg" style="zoom:80%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/system-library-call.jpg" style="zoom:80%;" />
    
 3. 系统调用的意义：
 
