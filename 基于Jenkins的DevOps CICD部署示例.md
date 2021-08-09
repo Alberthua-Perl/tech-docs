@@ -17,7 +17,7 @@
 
 1. 各节点硬件资源与角色：
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\node-hardware-role.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/node-hardware-role.png)
 
    1）192.168.0.111 节点：仅作为 Git 推送代码至 GitLab 代码仓库用
 
@@ -27,11 +27,11 @@
 
 2. DevOps 工具栈图谱：
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\devops-tools.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/devops-tools.jpg)
 
 3. 该示例架构：
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-based-devops-cicd-demo.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-based-devops-cicd-demo.jpg)
 
    1）该架构中未使用 Red Hat Quay 且未集成 Kubernetes 或 OpenShift 集群部署应用容器。
 
@@ -49,11 +49,11 @@
 
    4）godev 用户还将被作为 Jenkins 从 GitLab 上拉取代码的用户。
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\devuser-gitlab-user.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/devuser-gitlab-user.jpg)
 
 2. 该示例中使用的代码结构如下所示：
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\tomcat-jenkins-demo.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/tomcat-jenkins-demo.png" style="zoom:150%;" />
 
    🔊 GitHub 仓库地址：
 
@@ -95,7 +95,7 @@
    # 创建 docker-compose 软链接，否则启动 Harbor 失败。
    ```
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\install-docker-compose.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/install-docker-compose.png)
 
 7. 配置与启动 Harbor 容器镜像仓库：
 
@@ -107,7 +107,7 @@
    # 更改 Harbor 配置文件中默认参数
    ```
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-conf-yaml.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-conf-yaml.png)
    
    2）安装 Harbor 各容器组件：
    
@@ -116,17 +116,17 @@
    # 启动 Harbor 容器镜像仓库服务，各组件以容器方式运行。
    ```
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-install-1.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-install-1.png" style="zoom:150%;" />
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-install-2.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-install-2.png" style="zoom:150%;" />
    
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-install-3.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-install-3.png)
    
    > 💥注意：
    >
    > 若 /usr/local/harbor-v1.8.1/harbor.yml 配置文件中指定非法的 http 端口，nginx 容器将启动失败报错！
    >
-   > ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-nginx-error.jpg)
+   > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-nginx-error.jpg)
    
    3）查看 Harbor 容器镜像仓库状态：
    
@@ -135,11 +135,11 @@
    # 查看 docker-compose 启动的 Harbor 容器组件与状态
    ```
    
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-registry-status.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-registry-status.jpg)
    
    4）Web 登录验证：http://harbor.domain12.example.com:8880
    
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\harbor-web-login.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-web-login.jpg)
    
    5）停止 Harbor 容器镜像仓库：
    
@@ -170,7 +170,7 @@
    >
    > 虽然该示例中未安装 Maven，但该 Jenkins 版本所对应的 Maven 版本可在 Jenkins 安装成功后进行查看，保证两者的`兼容性`，即 "Manage Jenkins -> Global Tool Configuration -> Maven"。
    >
-   > ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-maven-compatibility.png)
+   > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-maven-compatibility.png)
 
 6. Java 环境部署：
 
@@ -182,14 +182,14 @@
    # 编辑系统全局环境配置文件，添加 Java 环境变量，即 JAVA_HOME、JRE_HOME。
    ```
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\java-env-var.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/java-env-var.png" style="zoom:150%;" />
 
    ```bash
    $ source /etc/profile
    $ java -version
    ```
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\java-version.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/java-version.png" style="zoom:150%;" />
 
 7. Tomcat 部署：
 
@@ -202,7 +202,7 @@
    $ tomcat-jenkins/bin/catalina.sh version
    ```
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\tomcat-version.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/tomcat-version.png)
 
    2）更改 Tomcat 配置文件并启动 Tomcat：
 
@@ -239,9 +239,9 @@
    # 可创建独立的目录用于存放不同的 Java Web 项目
    ```
 
-   <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-deploy-1.png" style="zoom:150%;" />
+   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-deploy-1.png" style="zoom:150%;" />
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-deploy-2.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-deploy-2.png)
 
    > ✅注意：
    >
@@ -249,7 +249,7 @@
    >
    > 2. Jenkins 的工作目录以隐藏文件的方式存储：/home/ciadmin/.jenkins
    >
-   >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-workdir.png)
+   >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-workdir.png)
 
 9. 初始化 Jenkins：
 
@@ -257,7 +257,7 @@
 
    2）输入 Web 页面中指定的密码以完成首次登录解锁。
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-initial.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-initial.jpg)
 
    3）安装插件：
 
@@ -267,19 +267,19 @@
 
       c. 该示例中使用推荐的插件安装。
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-plugins-install-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-plugins-install-1.jpg)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-plugins-install-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-plugins-install-2.jpg)
 
    4）创建 Jenkins 管理员用户：admin
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-admin-user.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-admin-user.jpg)
 
    5）配置 Jenkins Web 管理地址，并完成初始化。
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-initial-complete-1.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-initial-complete-1.jpg)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-initial-complete-2.jpg)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-initial-complete-2.jpg)
 
 10. Jenkins Pipeline 构建与部署：
 
@@ -287,15 +287,15 @@
 
     2）如下所示：Manage Jenkins -> Manage Plugins -> Installed
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\manage-plugins-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/manage-plugins-1.png)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\manage-plugins-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/manage-plugins-2.png)
 
     3）创建流水线（pipeline）类型的新项目：tomcat-java-demo
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-pipeline-project-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-pipeline-project-1.png)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-pipeline-project-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-pipeline-project-2.png)
 
     4）配置新建项目的构建 pipeline：
 
@@ -303,7 +303,7 @@
 
        b. 将 GitLab 中 devuser 用户 tomcat-jenkins-demo 仓库中的 `Jenkinsfile` 拷贝至 `Script` 中。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\jenkins-pipeline-config.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-pipeline-config.png)
 
        c. Jenkins 拉取 GitLab 代码必须使用 SSH 免密码方式实现。
     
@@ -313,17 +313,17 @@
     
     ​     👉 需预先将 godev 用户的 SSH 公钥添加至 GitLab devuser 用户的 `SSH keys` 中。
     
-    <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\passwordless-login-gitlab.png"  />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/passwordless-login-gitlab.png"  />
 
     ​     👉 将 godev 用户的 `SSH 私钥`添加至 `Jenkins 全局认证凭据`中，若认证失败直接显示报错信息。
     
     ​     👉 godev 用户认证通过后，可使用 `Generate Pipeline Script` 按钮生成 pipeline 语句。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\generate-pipeline-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/generate-pipeline-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\generate-pipeline-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/generate-pipeline-2.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\generate-pipeline-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/generate-pipeline-3.png)
 
        d. Jenkins 主机配置 insecure registry：
 
@@ -335,7 +335,7 @@
     
     ​     👉 若 Podman 未指定 insecure registry，将身份验证失败无法登录 Harbor 容器镜像仓库。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\podman-insecure-registry.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/podman-insecure-registry.png)
     
        e. 执行构建（build）：
     
@@ -343,21 +343,21 @@
     
     ​     👉 构建过程中若出现报错将中止构建，并可选择不同阶段（stage）查看构建日志。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\pipeline-build-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/pipeline-build-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\pipeline-build-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/pipeline-build-2.png)
     
        f. 查看及验证构建与部署结果：该示例将 tomcat-java-demo 容器部署于 Jenkins 主机上，并使用 podman 运行。 
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\pipeline-build-result.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/pipeline-build-result.png)
     
        g. 查看 Podman 容器与 Web 应用状态：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\podman-container-status-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/podman-container-status-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\podman-container-status-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/podman-container-status-2.png)
     
        h. pipeline script（Jenkinsfile）示例说明：必须登录 Harbor 容器镜像仓库才能拉取或推送镜像！
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\基于Jenkins的DevOps CICD部署示例\gitlab-pipeline.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/gitlab-pipeline.png)
 
