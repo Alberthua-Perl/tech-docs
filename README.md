@@ -1,15 +1,15 @@
 # tech-docs
 🔊 The directory includes shared docs involved all fields of Linux 🐧:
 
-🎉🎊 Linux kernel
+🎉 Linux kernel
 
-🎉🎊 SDN, NFV, IaaS
+🎉 SDN, NFV, IaaS
 
-🎉🎊 Container, Kubernetes, OpenShift, Istio⛵, Envoy, cloud-native
+🎉 Container, Kubernetes, OpenShift, Istio⛵, Envoy, cloud-native
 
-🎉🎊 Shell, Golang, Python
+🎉 Shell, Golang, Python
 
-🎉🎊 CI/CD, Jenkins, SonarQube
+🎉 CI/CD, Jenkins, SonarQube
 
 👏 All docs will be continuously updated from time to time.
 
