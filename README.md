@@ -1,5 +1,5 @@
 # tech-docs
-🔊 The directory includes shared docs involved all fields of Linux 🐧:
+📌📌 The directory includes shared docs involved all fields of Linux 🐧:
 
 🎉 Linux kernel
 
