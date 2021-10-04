@@ -56,7 +56,7 @@
 
 - Linux kernel 内核网络栈包括：物理或虚拟网卡、lo 回环设备、路由表、iptables 防火墙规则表
 
-  > 📌**注意：**刘超（网易云计算研究院）
+  > 📌注意：刘超（网易云计算研究院）
   >
   > 只要是在网络上传输的数据包，都是完整的，可以有下层协议没上层协议，但绝对不可能有上层协议没下层协议！ 
 
@@ -170,11 +170,12 @@
 
 
 - iptables 各个链（chain）与表（table）的关系：**四表五链**
+
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/netfilter-packet-flow.png)
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/iptables-for-all.jpg)
   
-  > 📌**注意：**各个 OS 版本之间的 iptables 表类型存在细微差别！
+  > 📌注意：各个 OS 版本之间的 iptables 表类型存在细微差别！
 
 
 
@@ -191,6 +192,7 @@
 - IPIP 隧道在 Linux 上的实现：
 
   - IPIP 隧道实验网络拓扑：
+  
     <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/ipip-tunnel.png" style="zoom:80%;" />
 
   - docker-arch 与 podman-arch 作为两端内部网络中的主机。
@@ -235,7 +237,7 @@
   
   - 隧道（tunnel）是一个虚拟的点对点（point to point）的连接，提供了一条通路使封装的数据报文能够在这个通路上传输，并且在一个 tunnel 的两端分别对数据报进行封装及解封装。
   
-    > 📌**注意：**GRE 隧道建立在隧道两端主机之间的`路由器`上，而不是主机上，隧道对两端的主机透明！
+    > 📌注意：GRE 隧道建立在隧道两端主机之间的`路由器`上，而不是主机上，隧道对两端的主机透明！
   
   - 要在 Linux 上创建GRE隧道，需要 `ip_gre` 内核模块，它是 GRE 通过 IPv4 隧道的驱动程序。
   
@@ -296,7 +298,7 @@
 
 - 在 `Linux kernel 3.12.x` 后该技术趋于完善，支持单播与组播、IPv4 与 IPv6。
 
-  > 📌**注意：**如果可以，尽量使用比较新版本的 kernel，以免出现因为内核版本太低导致功能或者性能上的问题。
+  > 📌注意：如果可以，尽量使用比较新版本的 kernel，以免出现因为内核版本太低导致功能或者性能上的问题。
 
 - 需要 VXLAN 的原因：
   - VLAN 的数量限制：`4096` 个 VLAN 网段远不能满足大规模云计算数据中心的需求
@@ -338,7 +340,7 @@
       - VLAN：VLAN type 设置为 `0x8100`，并可以设置 `VLAN id tag`（VXLAN 的 VLAN标签）。
       - ether type（以太网类型）：设置值为 `0x8000`，指明数据包为 IPv4 类型。
 
-  > 📌**注意：**VTEP 的作用
+  > 📌注意：VTEP 的作用
   >
   > 1. 用于对 VXLAN 报文进行封装与解封装，包括 ARP 请求报文和正常的 VXLAN 数据报文。
   > 2. 在一段封装报文后通过隧道向另一端 VTEP 发送封装报文，另一端 VTEP 接收到封装的报文解封装后根据封装的MAC 地址进行转发。
@@ -442,7 +444,7 @@
     
       ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-singlecast-demo-2.jpg)
     
-      > 📌**注意：**ip link add 命令选项说明
+      > 📌注意：ip link add 命令选项说明
       >
       > 1. id：VNI，该值范围在 `1~2^24` 之间。
       >
