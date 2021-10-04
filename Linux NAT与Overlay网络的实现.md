@@ -38,7 +38,7 @@
   >
   > 1. $ man ip-link：查看与配置网络设备
   >
-  >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\man-ip-link.png)
+  >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/man-ip-link.png)
   >
   > 2. 以上内核模块均需要 `tunnel4.ko` 模块所支持！
   > 3. GENEVE 隧道的实现与 VXLAN 隧道类似。
@@ -80,7 +80,7 @@
   
   - `net.ipv4.ip_forward` 内核参数作用于 `FORWARD` 链，POSTROUTING 链定义数据包从网口发出的规则。
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\linux-nat-gateway-dnat.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/linux-nat-gateway-dnat.jpg)
   
     ```bash
     $ iptables -t nat -A PREROUTING \
@@ -101,7 +101,7 @@
   
   - 客户端访问应用测试，该应用为提供 docker 官方文档的 nginx 容器（外部 -> 内部）。
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\linux-nat-gateway-dnat-client.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/linux-nat-gateway-dnat-client.jpg)
 
 
 
@@ -111,7 +111,7 @@
 
   - 可使用 SNAT 将 Linux 主机作为连接外部网络与内部网络的网关设备。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\linux-nat-gateway-snat.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/linux-nat-gateway-snat.jpg)
 
     ```bash
     $ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -126,7 +126,7 @@
 
   - 客户端将该 NAT 设备作为默认网关即可对外访问（内部 -> 外部）。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\linux-nat-gateway-snat-client.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/linux-nat-gateway-snat-client.jpg)
 
 
 
@@ -170,9 +170,9 @@
 
 
 - iptables 各个链（chain）与表（table）的关系：**四表五链**
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\netfilter-packet-flow.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/netfilter-packet-flow.png)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\iptables-for-all.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/iptables-for-all.jpg)
   
   > 📌**注意：**各个 OS 版本之间的 iptables 表类型存在细微差别！
 
@@ -191,7 +191,7 @@
 - IPIP 隧道在 Linux 上的实现：
 
   - IPIP 隧道实验网络拓扑：
-    <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\ipip-tunnel.png" style="zoom:80%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/ipip-tunnel.png" style="zoom:80%;" />
 
   - docker-arch 与 podman-arch 作为两端内部网络中的主机。
   
@@ -199,7 +199,7 @@
   
   - 两端内部网络中的主机设置对应的路由器网关，如下所示：
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\docker-arch-host-route-table.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/docker-arch-host-route-table.png)
   
   - IPIP 隧道创建：
   
@@ -214,11 +214,11 @@
     # IPIP 隧道创建与 GRE 隧道创建类似
     ```
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\ipip-tunnel-demo-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/ipip-tunnel-demo-1.jpg)
   
   - 在 docker-arch 主机上对 podman-arch 持续发送 ICMP 数据包，使用 tcpdump 对 bastion1 的 eth1 抓包，查看 IPIP 数据包信息。
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\ipip-tunnel-demo-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/ipip-tunnel-demo-2.jpg)
 
 
 
@@ -229,7 +229,7 @@
   - GRE 隧道全称通用路由封装协议（generic routing encapsulation），最初由Cisco开发。
 
   - GRE 是一种 `IP-in-IP` 的隧道，可以对某些网络层协议的数据报进行封装，使这些被封装的数据报能够在IPv4/IPv6 网络中传输。
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel.jpg)
   
     
   
@@ -247,13 +247,13 @@
 
   - GRE 隧道实现拓扑示意：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-1.jpg)
 
   - 两端内部网络中主机网络信息：docker-arch 主机、podman-arch 主机
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-2.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-3.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-3.jpg)
 
   - 配置 R1 路由器 GRE 隧道：R2 路由器配置与 R1 配置类似
 
@@ -278,13 +278,13 @@
 
   - R1 与 R2 路由器的 GRE 隧道与路由表信息：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-4.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-4.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-5.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-5.jpg)
 
   - 由于 GRE 隧道建立在路由器之间，因此在 docker-arch 主机上持续发送 ICMP 包，使用 tcpdump 在 R2 路由器上抓包，查看 GRE 数据包信息。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\gre-tunnel-demo-6.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/gre-tunnel-demo-6.jpg)
 
 
 
@@ -312,7 +312,7 @@
 
   - 报文格式如下所示：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-packet.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-packet.png)
     
     - VXLAN 报文头（VXLAN Header）：
     
@@ -360,12 +360,12 @@
 - VXLAN ARP 请求与应答：
 
   - VXLAN 初始化：
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-arp-request-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-arp-request-1.png)
     
     - VM1 和 VM2 连接到 VXLAN 网络 VNI 100，两个 VXLAN 主机加入 IP 多播组 239.119.1.1。
     - VTEP 的实现：Linux 原生的 VXLAN 设备、Flannel VXLAN 设备、OVS 网桥
   - ARP 请求（request）：
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-arp-request-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-arp-request-2.png)
     
     - VM1 以广播的形式发送 ARP 请求。
     - VTEP1 封装报文，VNI 为 100，外层 IP 头 DA 为 IP 多播组 239.119.1.1，SA 为 VTEP1_IP。
@@ -373,7 +373,7 @@
     - VTEP2 解析接收到多播报文，填写自身维护的映射表，包括 VNI、内层源 MAC 地址、外层源 VTEP 所在主机的IP 地址，并在本地 VXLAN 标识为 100 的范围内广播。
     - VM2 对接收到的 ARP 请求进行响应。
   - ARP 应答（response）：
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-arp-response.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-arp-response.png)
     - VM2 准备 ARP 响应报文后向 VM1 发送响应报文。
     - VTEP2 接收到 VM2 的响应报文后把它封装在 IP 单播报文中（VNI 依然为 100），然后向 VM1 发送单播。     
     - VTEP1 接收到单播报文后，学习内层源 MAC 到外层源 VTEP_IP 地址的映射，解封装并根据被封装内容的目的MAC 地址转发给 VM1。
@@ -389,7 +389,7 @@
 
   - 整个 VXLAN 相关的行为（可能穿越多个网关），对虚拟机而言是透明的，虚拟机不会感受传输的过程。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-communication-progress.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-communication-progress.png)
 
     > 📌**注意：**
     >
@@ -397,7 +397,7 @@
     > 2. 也就是说如果被 UDP 封装的是 TCP 连接，那么 UDP 和 TCP 将做为两个独立的协议栈各自工作，相互之间没有交互。
 
 - VXLAN 网关（VXLAN gateway）：
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-gateway.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-gateway.png)
   
   - 如果需要 VXLAN 网络和非 VXLAN 网络连接，必须使用 `VXLAN 网关`才能把 VXLAN 网络和外部网络进行桥接和完成VXLAN ID 和 VLAN ID 之间的映射和路由，和 VLAN 一样，VXLAN 网络之间的通信也需要三层设备的支持，即 VXLAN 路由的支持。
   - 同样 VXLAN 网关可由硬件和软件来实现。
@@ -426,7 +426,7 @@
 
     - 实现的网络拓扑：
     
-      <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-singlecast-demo-1.jpg"  />
+      <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-singlecast-demo-1.jpg"  />
       
     - 实现命令如下所示：
     
@@ -440,7 +440,7 @@
       # 启用 vxlan1 接口并分配内层网段 IP 地址
       ```
     
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-singlecast-demo-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-singlecast-demo-2.jpg)
     
       > 📌**注意：**ip link add 命令选项说明
       >
@@ -464,7 +464,7 @@
       >
       >       5）若需要使用 IANA 分配的 4789 端口，需要用 dstport 指定。
       >
-      >       <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-singlecast-demo-3.jpg"  />
+      >       <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-singlecast-demo-3.jpg"  />
       >
       > 4. dev：指定 VTEP 通过哪个物理设备来通信，此处使用 eth0。 
       
@@ -474,7 +474,7 @@
       $ tcpdump -i <nic> host <remote_ip_address> -vvv -w <capture_name>.pcap
       ```
     
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-singlecast-demo-4.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-singlecast-demo-4.jpg)
     
       
     
@@ -492,7 +492,7 @@
   
     - 实现的网络拓扑：
   
-      <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-1.png"  />
+      <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-1.png"  />
   
       - 使用 veth 对中的 veth0 接口模拟虚拟机的网络接口，将 veth1 与 vxlan100 网络接口桥接至 Linux 网桥 br0 上，以测试虚拟机通过 VXLAN 隧道的跨主机间通信。
       - 以上网络接口设备均工作于 `Linux kernel space`！
@@ -581,11 +581,11 @@
   
       - 通过 eth1 的数据包使用 VXLAN 隧道通信，数据包以 UDP 的方式发送。
   
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-2.png)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-2.png)
   
       - 通过 vxlan100 的数据包去除了 VXLAN 报文头，只具有原始的 ICMP 报文。
   
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-3.png)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-3.png)
   
     - 可将 tcpdump 命令的抓包结果写入 `.pcap` 结尾的文件中，以便该文件可使用 Wireshark 进一步分析。
   
@@ -596,19 +596,19 @@
       > 1. 主机间的 IP 地址在同一网段内，但首次通信未知对端 MAC 地址，需发送 ARP 请求广播获取对端MAC 地址！
       > 2. 使用 VXLAN 协议封装的 UDP 数据包在 Wireshark 中未能解析为 VXLAN 数据包时，可执行 `Analyze -> Decode As`，选择 VXLAN 即可转换。
   
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-4.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-4.png)
   
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-5.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-5.png)
   
     - UDP 数据包转换为 VXLAN 封装的数据包后，可直接查看 VXLAN 所封装的内层原始载荷数据，如 ARP 请求与ICMP 报文。
   
       - ARP 请求报文结构：目的地址为多播组地址
   
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-6.png)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-6.png)
   
       - ICMP 报文结构：目的地址为单播地址
   
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-7.png)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-7.png)
   
     - 多播其实就相当于 VTEP 之间的广播，报文会发给所有的 VTEP，但是只有一个会做出应答。
   
@@ -618,7 +618,7 @@
   
     - VM1 与 VM2 通信建立后，可分别查看 `fdb` 表项与 `ARP` 缓存：
   
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux NAT与Overlay网络的实现\vxlan-multicast-demo-8.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-nat-overlay/vxlan-multicast-demo-8.png)
 
 
 
