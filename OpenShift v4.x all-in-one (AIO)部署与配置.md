@@ -33,11 +33,11 @@
 
   - 使用 `cockpit` 查看该 KVM 虚拟机必须满足的最小硬件需求：4 vCPUs、8GB 内存、35GB 磁盘
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-1.png)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-2.png)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-3.png)
 
     > 📌**注意：**
     >
@@ -67,7 +67,7 @@
   # 查看 CRC 与 OpenShift 版本
   ```
   
-  <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-4.png" style="zoom:150%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-4.png" style="zoom:150%;" />
 
 - 部署 OCP 集群：
 
@@ -76,7 +76,7 @@
   # 设置主机系统环境以满足 CodeReady Containers 虚拟机运行
   ```
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-5.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-5.png)
 
   ```bash
   $ crc start
@@ -84,9 +84,9 @@
   # OCP 集群启动后，可使用预定义的 developer 开发者用户或 kubeadmin 管理员用户登录。
   ```
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-6.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-6.png)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-7.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-7.png)
 
   > 📌**注意：**
   >
@@ -98,7 +98,7 @@
   >
   >    登录该URL请启用 Red Hat Proxy，否则极可能登录失败！
   >
-  >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-8.png)
+  >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-8.png)
 
 - 该 pull secret 如下所示：
 
@@ -117,7 +117,7 @@
   $ source ~/.bashrc
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-9.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-9.png)
   
   ```bash
   $ cp /home/alberthua/.crc/machines/crc/kubeconfig ~/.kube/config
@@ -134,7 +134,7 @@
   # 使用 kubeadmin 管理员用户登录 OCP 集群
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-10.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-10.png)
 
   > 📌**注意：**
   >
@@ -142,21 +142,21 @@
   >
   >   $ cat ~/.crc/cache/crc\*/kubeadmin-password
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-11.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-11.png)
 
   ```bash
   $ oc cluster-info
   # 查看 OCP 集群信息
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-12.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-12.png)
   
   ```bash
   $ oc config view
   # 查看 OCP 集群配置
   ```
   
-  <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-13.png" style="zoom:150%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-13.png" style="zoom:150%;" />
   
   ```bash
   $ oc get clusteroperator
@@ -164,7 +164,7 @@
   # monitoring operator 默认情况下禁用
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-14.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-14.png)
   
 
 - 访问 OCP 集群 Web console：
@@ -174,9 +174,9 @@
   # 使用 Web console 登录 OCP 集群
   ```
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-15.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-15.png)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\OpenShift\pictures\OpenShift v4.3.0 all-in-one (AIO)部署与配置\aio-ocp43-install-16.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-16.png)
 
 - 停止与删除 OCP 集群：
 
