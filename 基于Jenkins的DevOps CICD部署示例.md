@@ -165,6 +165,8 @@
    2）Tomcat：apache-tomcat-9.0.30
 
    3）Jenkins：jenkins-2.204.2
+   
+   4）Podman：podman-1.4.4-4.el7.centos.x86_64
 
    > ✅注意：
    >
