@@ -131,7 +131,7 @@
 
 - [CNCF 云原生计算基金会的 Landscape 中容器 runtime 项目](https://github.com/cncf/landscape)：
 
-  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/cncf-container-runtime.jpg" style="zoom:50%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/cncf-container-runtime.jpg" style="zoom:33%;" />
 
 
 
