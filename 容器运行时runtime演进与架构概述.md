@@ -32,7 +32,7 @@
 
   包含的组件：docker、`dockerd`、`docker-containerd`、docker-containerd-shim、`docker-runc`
 
-  <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\docker-1.13.x-dockerd-dockerd-containerd.jpg" style="zoom:150%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-1.13.x-dockerd-dockerd-containerd.jpg" style="zoom:150%;" />
 
 - Docker 17.x 及以上版本组件关系示意：
 
@@ -40,17 +40,17 @@
 
   - dockerd 守护进程与 containerd 实现解耦拆分：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\docker-17.x-dockerd-containerd-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-17.x-dockerd-containerd-1.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\docker-17.x-dockerd-containerd-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-17.x-dockerd-containerd-2.jpg)
 
 - Docker 18.09.0 与 19.03.13 进程关系示意：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\dockerd-containerd-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/dockerd-containerd-1.jpg)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\dockerd-containerd-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/dockerd-containerd-2.jpg)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\dockerd-containerd-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/dockerd-containerd-3.jpg)
 
   > 📌**注意：**各版本之间的 dockerd 与 containerd 进程的调用存在差异！
 
@@ -88,7 +88,7 @@
 
 - containerd 架构示意：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\containerd-arch.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/containerd-arch.png)
 
 - containerd 的应用：
 
@@ -112,16 +112,16 @@
     # 查看 containerd 支持的插件
     ```
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\ctr-command-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/ctr-command-1.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\ctr-command-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/ctr-command-2.jpg)
 
     > 📌**注意：**
     >
     > 1. containerd 1.2.x 无法拉取 containerd 镜像的 issue，升级 containerd 后可正常使用。
     > 2. GitHub issue [参考链接](https://github.com/containerd/containerd/issues/1818)：
     >
-    > ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\ctr-pull-image-error-bug.jpg)
+    > ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/ctr-pull-image-error-bug.jpg)
 
 - 关于 Containerd 更加详实具体的文档可查看文末的参考链接。
 
@@ -131,7 +131,7 @@
 
 - [CNCF 云原生计算基金会的 Landscape 中容器 runtime 项目](https://github.com/cncf/landscape)：
 
-  <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cncf-container-runtime.jpg" style="zoom:50%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cncf-container-runtime.jpg" style="zoom:50%;" />
 
 
 
@@ -139,7 +139,7 @@
 
 - 以 `kubelet` 集成 Docker 容器 runtime 为例，解释 kubelet 如何创建容器。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\kubelet-dockershim-dockerd-containerd-runc.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/kubelet-dockershim-dockerd-containerd-runc.jpg)
 
 - 步骤 1：
   
@@ -240,19 +240,19 @@
 
     - Pod and container lifecycle management：
 
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-grpc-runtimeservice-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-grpc-runtimeservice-1.jpg)
 
     - exec/attach/port-forward requests：
 
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-grpc-runtimeservice-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-grpc-runtimeservice-2.jpg)
 
   - CRI 的工作原理：
 
-    - CRI 定义了一组关于 Pod、Container 与 Image 的 gRPC 接口，若 `cri-runtime` 与其对接，只需     开发出一套相应的 cri-runtime 连接 `shim` 即可，就能被 kubelet 所调用。
+    - CRI 定义了一组关于 Pod、Container 与 Image 的 gRPC 接口，若 `cri-runtime` 与其对接，只需开发出一套相应的 cri-runtime 连接 `shim` 即可，就能被 kubelet 所调用。
 
     - 如图所示：
 
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\how-cri-works.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/how-cri-works.jpg)
 
 - 因此，可以找到很多符合 OCI 标准或兼容 CRI 接口的项目，而这些项目大体构成了整个 Kuberentes 的 runtime 生态：
 
@@ -288,15 +288,15 @@
 
 - `Containerd 1.0` 中，对 CRI 的适配通过一个单独的进程 `CRI-containerd` 来完成。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-containerd-containerd-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-containerd-containerd-1.jpg)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-containerd-containerd-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-containerd-containerd-2.jpg)
 
 - `Containerd 1.1` 中直接去除 CRI-containerd 进程，将适配逻辑作为插件放进 Containerd 主进程中，调用链如下所示：
 
   kubelet --> CRI-plugin（在 containerd 主进程中）--> containerd
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\containerd1.1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/containerd1.1.jpg)
 
 - 但与此同时，社区就已经有了一个更为专注的 cri-runtime，即 `CRI-O`。
 
@@ -304,23 +304,23 @@
 
 - 其中 `conmon` 对应 `containerd-shim`，大体意图是一致的。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-o-runtime-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-o-runtime-1.jpg)
 
  
 
 - Docker 与 Containerd 架构演进总结：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\docker-containerd-runtime.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-containerd-runtime.jpg)
 
 - CRI-O 与 Podman 架构示意：
 
   - kubelet 与 CRI-O 的集成：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-o-runtime-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-o-runtime-2.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-o-runtime-3.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-o-runtime-3.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\cri-o-runtime-4.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/cri-o-runtime-4.jpg)
 
   - Podman 运行容器的方式：
 
@@ -328,7 +328,7 @@
     
     - Podman（Pod Manager）的目标是提供与 Docker 相似的 container CLI，提供給使用者创建与运行容器。
     
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\容器运行时runtime演进与架构概述\podman-arch.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/podman-arch.jpg)
     
     - 关于 Podman 更加详实具体的文档可查看文末的参考链接。
 
@@ -347,7 +347,7 @@
 - [白话 Kubernetes Runtime](https://mp.weixin.qq.com/s/PpKz9FBIo_GCnxquh9F5ow)
 - [容器运行时概述](https://insujang.github.io/2019-10-31/container-runtime/)
 - [Kubernetes 官方文档中对 CRI 的说明](https://kubernetes.io/blog/2016/12/container-runtime-interface-cri-in-kubernetes/)
-- [GitHub 中对 CRI 的说明]([https://github.com/kubernetes/kubernetes/blob/](https://github.com/kubernetes/kubernetes/blob/242a97307b34076d5d8f5bbeb154fa4d97c9ef1d/docs/devel/container-runtime-interface.md))
+- [GitHub 中对 CRI 的说明](https://github.com/kubernetes/kubernetes/blob/242a97307b34076d5d8f5bbeb154fa4d97c9ef1d/docs/devel/container-runtime-interface.md)
 - [GitHub Doc - CRI-O](https://github.com/cri-o/cri-o)
 - [Podman 容器使用与原理 - Alberthua]()
 - [Podman 官网](https://podman.io/)
