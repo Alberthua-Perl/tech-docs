@@ -52,7 +52,9 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/dockerd-containerd-3.jpg)
 
-  > 📌**注意：**各版本之间的 dockerd 与 containerd 进程的调用存在差异！
+  > 📌**注意：**
+  > 
+  > 各版本之间的 dockerd 与 containerd 进程的调用存在差异！
 
 
 
@@ -224,7 +226,7 @@
   - libcontainer 库直接使用 Linux kernel 提供的相关隔离技术，如 namespace、cgroups。
   - 它能按照标准将符合标准的容器镜像运行起来。
 
-  > 🔊**注意：**
+  > 📌**注意：**
   >
   > 1. 标准的好处就是方便搞创新，只要能符合标准，都能与生态圈中的其它工具一起工作。
   > 2. 那么镜像就可以用任意的工具去构建，容器就不一定非要用 namespace 和 cgroups 来隔离。
