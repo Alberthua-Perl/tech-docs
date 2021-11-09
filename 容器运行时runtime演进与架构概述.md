@@ -43,8 +43,6 @@
     ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-17.x-dockerd-containerd-1.jpg)
 
     ![](https://github.com/Alberthua-Perl/tech-docs/tree/master/images/container-runtime-introduce/docker-17.x-dockerd-containerd-2.jpg)
-
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/ocp3-arch.png)
     
 - Docker 18.09.0 与 19.03.13 进程关系示意：
 
