@@ -1,4 +1,4 @@
-### Red Hat Quay v3 registry 原理与实现
+## Red Hat Quay v3 registry 原理与实现
 
 ##### 文档目录：
 
@@ -45,31 +45,31 @@
 
    https://github.com/Alberthua-Perl/summary-scripts/blob/master/shell-examples/deploy-quay-registry.sh
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\deploy-quay-registry.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/deploy-quay-registry.png)
 
 4. 配置并生成 Quay 配置文件：
 
    1）登录 Quay 并完成认证：
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\first-login-config-quay.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/first-login-config-quay.png)
 
    2）生成 Quay 配置文件：
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-1.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-1.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-2.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-2.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-3.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-3.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-4.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-4.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-5.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-5.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-6.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-6.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-7.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-7.png)
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-8.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-8.png)
 
 5. 登录与验证 Quay 私有容器镜像仓库：
 
@@ -77,7 +77,7 @@
 
    2）密码：`1qazZSE$`
 
-   ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\normal-login-quay.png)
+   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/normal-login-quay.png)
 
 6. Podman 客户端登录 Quay：
 
