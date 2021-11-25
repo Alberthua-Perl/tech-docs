@@ -396,7 +396,7 @@
 
   👉 使用 podman 命令登录 `Quay` 公共容器镜像仓库并推送镜像：
 
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/Podman容器使用与原理\podman-push-quay.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-push-quay.jpg)
 
   👉 搜索并拉取 Red Hat 容器镜像仓库中的镜像列表：
 
