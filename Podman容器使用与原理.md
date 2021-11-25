@@ -606,6 +606,7 @@
       0
     ```
 
+  - 以上 gogs-postgres-podman-compose.yaml 文件可参考 [此处](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/blob/master/gogs-postgres-compose/gogs-postgres-podman-compose.yaml)。
     
 
 ##### Podman 报错示例：
