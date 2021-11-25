@@ -72,7 +72,7 @@
   | 1.6.4       | CentOS 7.9   | 5.14.0-1.el7.elrepo.x86_64  | yes               |
   | 3.2.3       | RHEL 8.0/8.2 | 4.18.0-193.el8.x86_64       | yes               |
 
-  > 📌**注意：**rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
+  > 📌注意：rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
 
   - 由于 `user namespace` 特性在 kernel `4.9.0` 之后出现，因此升级 kernel 即可解决 rootless 问题。
 
@@ -429,13 +429,13 @@
 
   ```bash
   $ podman run -d \
-  	--name <container_name> --pod new:<pod_name> \
-  	[-p <host_port>:<pod_port>] \
-  	<container_image>:<tag>
+    --name <container_name> --pod new:<pod_name> \
+    [-p <host_port>:<pod_port>] \
+    <container_image>:<tag>
   # 随创建容器时同时创建 pod
   $ podman run -d \
-  	--name <container_name> --pod <pod_name> \
-  	<container_image>:<tag>
+    --name <container_name> --pod <pod_name> \
+    <container_image>:<tag>
   # 在 pod 中创建新的容器
   ```
 
@@ -451,7 +451,7 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-2.jpg)
 
-  > 🔊**注意：**以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
+  > 🔊注意：以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-3.jpg)
 
@@ -473,7 +473,7 @@
 
   - 关于 podman-compose 的安装可参考 [GitHub 项目](https://github.com/containers/podman-compose)
 
-  > 📌**注意：**可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
+  > 📌注意：可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
 
   - 关于 Gogs 项目的详细内容可参考 [Gogs GitHub 项目](https://github.com/gogs/gogs)
 
@@ -723,7 +723,7 @@
 
   👉 由于从 `dockerbub` 上直接拉取的镜像为 `docker image format`，无法使用 `podman commit` 命令提交为新的容器镜像，该命令对于 `-m` 选项不能对 docker image format 镜像生效，默认只支持 `OCI image format`，因此使用 -m 选项对容器执行提交时需强制指定 `-f docker` 才能生效。
 
-  > 📌**注意：**可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
+  > 📌注意：可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-commit-warning.jpg)
 
