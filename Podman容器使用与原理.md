@@ -1,4 +1,4 @@
-### Podman 容器使用与原理
+## Podman 容器使用与原理
 
 ##### 文档说明：
 
@@ -62,7 +62,7 @@
 
 - 如下所示，kernel 不支持 rootless 容器：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\centos79-kernel-not-support-podman-rootless.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/centos79-kernel-not-support-podman-rootless.jpg)
 
 - 普通用户 rootless 容器兼容性比较：
 
@@ -72,7 +72,7 @@
   | 1.6.4       | CentOS 7.9   | 5.14.0-1.el7.elrepo.x86_64  | yes               |
   | 3.2.3       | RHEL 8.0/8.2 | 4.18.0-193.el8.x86_64       | yes               |
 
-  > 📌**注意：**rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
+  > 📌注意：rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
 
   - 由于 `user namespace` 特性在 kernel `4.9.0` 之后出现，因此升级 kernel 即可解决 rootless 问题。
 
@@ -97,9 +97,9 @@
 
   - 在 Web UI 中可查看并管理 podman 容器与镜像：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\cockpit-podman-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/cockpit-podman-1.jpg)
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\cockpit-podman-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/cockpit-podman-2.jpg)
 
 - `podman-compose` 旨在使用更轻量的方式实现`单机容器编排`，以用于替换 `docker-compose`，这种方式将不再依赖守护进程与 root 权限，同时可使用 rootless 容器，详细示例见下文。
 
@@ -156,7 +156,7 @@
 
 - Podman 支持的容器网络模式如下所示：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-network-mode.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-network-mode.jpg)
 
 - root 用户运行 rootfull 容器网络分析：
 
@@ -249,7 +249,7 @@
 
   - 🚀 示例：外部访问容器内 Web 服务时，涉及的宿主机 iptables：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\external-access-container-web-service-iptables.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/external-access-container-web-service-iptables.jpg)
     
     从外部访问容器内 Web 服务时，流量将通过 PREROUTING 链及自定义链（`CNI-HOSTPORT-DNAT`、`CNI-DN-xxxx`、`DNAT`），经由 FORWARD 链及自定义链（`CNI-FORWARD`）的三层转发与 `cni-podman0` 网桥的二层转发进入容器，容器对外响应的流量将经过 cni-podman0 网桥转发，并经过 CNI-FORWARD 链与 POSTROUTING 链及自定义链（`CNI-HOSTPORT-MASQ`）出容器宿主机。
     
@@ -257,7 +257,7 @@
 
     如下所示，相关的 DNAT 链无流量通过（蓝框），CNI-FORWARD 链均有流量通过（蓝框）。
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\container-access-external-iptables.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/container-access-external-iptables.jpg)
 
     > 📌 **Kubernetes 相关问题提示：**
     >
@@ -266,7 +266,7 @@
     
   - 使用 `iperf3` 工具的容器测试不同 rootfull 容器之间的网络性能，如下所示：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\rootfull-container-to-container-bandwidth.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootfull-container-to-container-bandwidth.jpg)
 
 - 普通用户运行 rootless 容器网络分析：
 
@@ -282,17 +282,17 @@
     
   - 每个普通用户运行 rootless 容器都将生成 slirp4netns 进程用于隔离该用户的 `network namespace`，以下分别使用 godev 与 hualf 用户运行 rootless 容器：
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\godev-rootless-container.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/godev-rootless-container.jpg)
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\hualf-rootless-container.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/hualf-rootless-container.jpg)
   
   - slirp4netns 实现的网络模式与带宽比较：
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\rootless-slirp4netns-networking.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-slirp4netns-networking.jpg)
   
   - 使用 `iperf3` 工具的容器测试不同 rootless 容器之间的网络性能，如下所示：
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\rootless-container-to-container-bandwidth.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-container-to-container-bandwidth.jpg)
   
     对比 rootfull 容器之间的网络性能来看，slirp4netns 实现的 rootless 容器在不同的网络命名空间内的通信性能损耗较大，而 rootfull 容器之间的网络性能相比前者在此次测试中高出近 5 倍。
   
@@ -319,7 +319,7 @@
   
   - 第三个参数（count）：用户命名空间内部与外部可映射 uid 数量（可理解为所有容器普通用户的 uid 数量和）
   
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\rootless-user-namespace-mapping.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-user-namespace-mapping.jpg)
   
   - 以上两个文件允许运行进程的 uid 映射范围，在 `/proc/<pid>/uid_map` 中定义。
   
@@ -346,9 +346,9 @@
 
   通过容器宿主机上每个普通用户的用户命名空间的 subuid 映射范围，可分配众多 uid 在 rootless 容器中运行应用进程。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\user-namespace-subuid-mapping-1-edited.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/user-namespace-subuid-mapping-1-edited.png)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\user-namespace-subuid-mapping-2-edited.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/user-namespace-subuid-mapping-2-edited.png)
 
 
 
@@ -386,7 +386,7 @@
 
 - 从与 rootfull 容器在同一广播域的其他节点上 ping 该容器，可正常通信：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-macvlan-network.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-macvlan-network.png)
 
 
 
@@ -396,11 +396,11 @@
 
   👉 使用 podman 命令登录 `Quay` 公共容器镜像仓库并推送镜像：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-push-quay.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-push-quay.jpg)
 
   👉 搜索并拉取 Red Hat 容器镜像仓库中的镜像列表：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-pull-image.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-pull-image.jpg)
 
 - 示例 2：
 
@@ -429,31 +429,31 @@
 
   ```bash
   $ podman run -d \
-  	--name <container_name> --pod new:<pod_name> \
-  	[-p <host_port>:<pod_port>] \
-  	<container_image>:<tag>
+    --name <container_name> --pod new:<pod_name> \
+    [-p <host_port>:<pod_port>] \
+    <container_image>:<tag>
   # 随创建容器时同时创建 pod
   $ podman run -d \
-  	--name <container_name> --pod <pod_name> \
-  	<container_image>:<tag>
+    --name <container_name> --pod <pod_name> \
+    <container_image>:<tag>
   # 在 pod 中创建新的容器
   ```
 
   如下所示，创建名为 nginx-docs 的容器并同时创建名为 docker-docs 的 pod，也可创建其他容器添加至 pod 中，使用该容器即可访问 nginx-docs 容器（两者共享网络命名空间）：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-run-pod-create.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-run-pod-create.jpg)
 
 - 示例 3：
 
   🤘 部署并使用云原生轻量级对象存储 `MinIO Server`：
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-1.jpg)
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-2.jpg)
 
-  > 🔊**注意：**以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
+  > 🔊注意：以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-3.jpg)
 
   关于 MinIO Server 分布式对象存储的详细内容，请 [参考官网](https://min.io/)
 
@@ -473,7 +473,7 @@
 
   - 关于 podman-compose 的安装可参考 [GitHub 项目](https://github.com/containers/podman-compose)
 
-  > 📌**注意：**可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
+  > 📌注意：可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
 
   - 关于 Gogs 项目的详细内容可参考 [Gogs GitHub 项目](https://github.com/gogs/gogs)
 
@@ -483,7 +483,7 @@
 
   - 部署用主机上必须先安装 podman 与 podman-compose，并拉取相应容器镜像加速部署过程，如下所示：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-image-list.jps.JPG)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-image-list.jps.JPG)
 
     > 📌**注意：**
     >
@@ -558,7 +558,7 @@
 
   - 所有容器正常运行后，使用 `http://<容器宿主机 IP 地址>:10800` 访问 Gogs 安装界面，需填入的值参考如下：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\gogs-settings.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/gogs-settings.jpg)
     
     - Run User 值：默认 `git`。
     - Domain 值：若要从其他主机连接至 Gogs 仓库，Domian 必须配置为容器宿主机的 IP 地址或主机名。
@@ -571,7 +571,7 @@
 
   - 如下所示，使用 `devops` 用户创建新代码库并完成 commit 提交：
 
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\gogs-git-repository.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/gogs-git-repository.jpg)
 
   - 如需关闭 Gogs 代码仓库，请使用以下方法停止 gogs 与 postgresql 容器服务即可：
 
@@ -606,6 +606,7 @@
       0
     ```
 
+  - 以上 gogs-postgres-podman-compose.yaml 文件可参考 [此处](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/blob/master/gogs-postgres-compose/gogs-postgres-podman-compose.yaml)。
     
 
 ##### Podman 报错示例：
@@ -717,15 +718,15 @@
 
   👉 容器镜像无任何运行或退出状态容器占用，但依然无法删除镜像，可尝试使用 `--force` 选项将其强制删除。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-rmi-error-no-container-use.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-rmi-error-no-container-use.jpg)
   
 - 示例 4：
 
   👉 由于从 `dockerbub` 上直接拉取的镜像为 `docker image format`，无法使用 `podman commit` 命令提交为新的容器镜像，该命令对于 `-m` 选项不能对 docker image format 镜像生效，默认只支持 `OCI image format`，因此使用 -m 选项对容器执行提交时需强制指定 `-f docker` 才能生效。
 
-  > 📌**注意：**可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
+  > 📌注意：可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-commit-warning.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-commit-warning.jpg)
 
 - 示例 5：
 
@@ -733,7 +734,7 @@
 
   👉 当然，运行容器时指定 `--privileged` 选项可使容器获得与宿主机 root 用户同样的与宿主机交互的权限能力，但赋予的权限过高，应当压制该权限，更好的选择是对运行容器添加适当的 `Linux capabilities`。
 
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-busybox-capability.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-busybox-capability.jpg)
 
 
 
