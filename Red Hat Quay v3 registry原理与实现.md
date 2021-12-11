@@ -43,7 +43,7 @@
 
 - 🚀 推荐：
   
-  使用 `podman` 运行单 `pod` 集成以上所有容器方式的部署脚本请 [参考此处]()（未集成 Clair）。
+  使用 `podman` 运行单 `pod` 集成以上所有容器方式的部署脚本请 [参考此处](https://github.com/Alberthua-Perl/scripts-confs/blob/master/shell-examples/quay-pod-manage.sh)（未集成 Clair）。
   
   该方式中 quay-aio pod 将所有容器限制在同一 `network namespace` 中，Quay 的配置、部署与访问涉及众多端口，使用单容器运行于宿主机上将生成多条 iptables `filter` 与 `nat` 表规则，而集成在单 pod 中更加便于管理。
 
@@ -57,31 +57,37 @@
     
     - 登录 Quay 并完成认证：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\first-login-config-quay.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/first-login-config-quay.png)
     
     - 生成 Quay 配置文件：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-1.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-2.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-3.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-3.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-4.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-4.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-5.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-5.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-6.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-6.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-7.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-7.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\config-quay-8.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/config-quay-8.png)
+
+- 下载 quay 的配置压缩文件后，可执行 `quay-pod-manage deploy` 命令完成 Quay 的部署。
+
+- 若部署失败可执行 `quay-pod-manage destroy` 命令销毁 pod。
+
+- 若运行 Quay 的 quay-master 容器状态异常，可执行 `quay-pod-manage recover` 命令恢复故障的容器。
 
 - 登录与验证 Quay 私有容器镜像仓库：
   
   用户名：`admin` 密码：`1qazZSE$`
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Red Hat Quay v3 registry原理与实现\normal-login-quay.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/normal-login-quay.png)
 
 - Podman 客户端登录 Quay：
   
