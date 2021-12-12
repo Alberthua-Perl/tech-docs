@@ -442,6 +442,8 @@
   如下所示，创建名为 nginx-docs 的容器并同时创建名为 docker-docs 的 pod，也可创建其他容器添加至 pod 中，使用该容器即可访问 nginx-docs 容器（两者共享网络命名空间）：
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-run-pod-create.jpg)
+  
+  👉 使用 Podman 在单个 pod 中集成多容器的方法，可参考 [之前发布的文档](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20Quay%20v3%20registry%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)，该文档中将 Quay、MySQL 与 Redis 的单容器集成在单个 pod 中，使用 pod 的 `network namespace` 方便 Quay 镜像仓库的管理。
 
 - 示例 3：
 
