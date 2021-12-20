@@ -51,7 +51,19 @@
 
 - 部署前首次配置 Quay 时，需通过 Web 页面将 Quay 与 MySQL 对接，指定仓库 FQDN 及对接的 Redis 数据库地址，若使用 pod 方式部署，其地址即为 pod 所在 `network namespace` 的 ip 地址，并最终下载 quay 的 `.tar.gz` 配置文件。
 
-- 以上过程如下所示：
+- 运行以上命令可能出现的报错（现已解决）：
+  
+  - 报错 1：由于 `/mnt/quay/config/ssl.key` 权限问题导致无法启动 quay-master 容器，更改其权限为 `0644` 即可。
+    
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/ssl-key-permission-run-quay-error.jpg)
+  
+  - 报错 2：由于 `/mnt/quay/storage/` 所有者问题导致无法从客户端推送容器镜像至镜像仓库中，更改目录的所有者为 `1001` 即可，该用户为 quay-master 容器中主进程的运行用户，必须对宿主机映射的目录具有写权限。
+    
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/podman-push-quay-permission-denied-1001-1.jpg)
+    
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/podman-push-quay-permission-denied-1001-2.jpg)
+
+- `Web UI` 中的配置过程如下所示：
   
   - 配置并生成 Quay 配置文件：
     
@@ -113,6 +125,10 @@
     --log-level=debug
   # 成功登录 Quay 私有容器镜像仓库，并开启 debug 模式。
   ```
+
+- Docker 客户端登录 Quay（可选）：
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/docker-client-login-quay-registry.jpg)
 
 ##### 参考链接：
 
