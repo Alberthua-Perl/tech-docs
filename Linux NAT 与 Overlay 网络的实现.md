@@ -503,10 +503,8 @@
   
     - 实现命令如下所示：
   
-      - 该脚本的 GitHub URL：
-  
-        https://github.com/Alberthua-Perl/scripts-confs/blob/master/ovn-arch/deploy-native-vxlan-tunnel.sh
-  
+      - 该脚本的 [GitHub URL](https://github.com/Alberthua-Perl/scripts-confs/blob/master/ovn-arch/deploy-native-vxlan-tunnel.sh)：
+           
         ```bash
         #!/bin/bash
         
