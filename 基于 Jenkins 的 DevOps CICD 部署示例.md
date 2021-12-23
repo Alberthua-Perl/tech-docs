@@ -122,7 +122,7 @@
    
    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/harbor-install-3.png)
    
-   > 💥注意：
+   > 💥 注意：
    >
    > 若 /usr/local/harbor-v1.8.1/harbor.yml 配置文件中指定非法的 http 端口，nginx 容器将启动失败报错！
    >
@@ -168,7 +168,7 @@
    
    4）Podman：podman-1.4.4-4.el7.centos.x86_64
 
-   > ✅注意：
+   > ✅ 注意：
    >
    > 虽然该示例中未安装 Maven，但该 Jenkins 版本所对应的 Maven 版本可在 Jenkins 安装成功后进行查看，保证两者的`兼容性`，即 "Manage Jenkins -> Global Tool Configuration -> Maven"。
    >
@@ -245,7 +245,7 @@
 
    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/jenkins-cicd-demo/jenkins-deploy-2.png)
 
-   > ✅注意：
+   > ✅ 注意：
    >
    > 1. 由于 Tomcat 以 ciadmin 用户运行，因此 Jenkins 的工作目录位于 ciadmin 用户家目录中。
    >
