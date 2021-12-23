@@ -72,7 +72,7 @@
   | 1.6.4       | CentOS 7.9   | 5.14.0-1.el7.elrepo.x86_64  | yes               |
   | 3.2.3       | RHEL 8.0/8.2 | 4.18.0-193.el8.x86_64       | yes               |
 
-  > 📌注意：rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
+  > 📌 注意：rootless 容器特性的支持取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
 
   - 由于 `user namespace` 特性在 kernel `4.9.0` 之后出现，因此升级 kernel 即可解决 rootless 问题。
 
@@ -420,7 +420,7 @@
   # 停止或删除 pod，将一并删除 pod 中的所有容器。
   ```
 
-  > 📌**注意：**
+  > 📌 注意：
   >
   > 1. `k8s.gcr.io/pause:3.5` 镜像拉取需要科学上网。
   > 2. 若无法拉取，可先拉取 `registry.aliyuncs.com/google_containers/pause:3.5` 镜像，再更改其 `tag` 即可。
@@ -453,7 +453,7 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-2.jpg)
 
-  > 🔊注意：以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
+  > 🔊 注意：以上示例已将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-3.jpg)
 
@@ -475,7 +475,7 @@
 
   - 关于 podman-compose 的安装可参考 [GitHub 项目](https://github.com/containers/podman-compose)
 
-  > 📌注意：可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
+  > 📌 注意：可考虑如何使用 podman-compose 部署轻量级 `Gitea + Drone` CI 平台
 
   - 关于 Gogs 项目的详细内容可参考 [Gogs GitHub 项目](https://github.com/gogs/gogs)
 
@@ -487,7 +487,7 @@
 
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-image-list.jps.JPG)
 
-    > 📌**注意：**
+    > 📌 注意：
     >
     > podman-compose 使用创建 `pod` 将多个容器组建成 pod 的方式进行容器编排，因此必须具有 `pause` 容器镜像提供 pod 的共享网络命名空间与挂载命名空间。
 
@@ -591,7 +591,7 @@
       b6df150a3a49  k8s.gcr.io/pause:3.5              30 hours ago  Up 39 minutes ago  0.0.0.0:10022->22/tcp, 0.0.0.0:10800->3000/tcp, 0.0.0.0:5432->5432/tcp  c3a10da46f18-infra  
     ```
 
-    > 💥**注意：**
+    > 💥 注意：
     >
     > 切不可直接使用 podman-compose 命令的 `down` 子命令，该子命令将所有相关的容器与 pod 全部删除，pod 删除后无法将其中的各容器映射至宿主机对应的目录中，即使原始数据依然保留于目录中。
 
@@ -726,7 +726,7 @@
 
   👉 由于从 `dockerbub` 上直接拉取的镜像为 `docker image format`，无法使用 `podman commit` 命令提交为新的容器镜像，该命令对于 `-m` 选项不能对 docker image format 镜像生效，默认只支持 `OCI image format`，因此使用 -m 选项对容器执行提交时需强制指定 `-f docker` 才能生效。
 
-  > 📌注意：可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
+  > 📌 注意：可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-commit-warning.jpg)
 
