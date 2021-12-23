@@ -34,17 +34,17 @@
 
 - 生产环境：
 
-  1. OCP 3.4、3.5 集群部署使用 RPM 软件包方式，OCP 3.9、3.11 集群部署使用容器镜像方式。 
+  - OCP 3.4、3.5 集群部署使用 RPM 软件包方式，OCP 3.9、3.11 集群部署使用容器镜像方式。 
 
-  2. OCP 3.x 中使用 Ansible 部署 OCP。
+  - OCP 3.x 中使用 Ansible 部署 OCP。
 
 - 开发与测试环境：
 
-  1. all-in-one：`AIO`（本地单节点集群）
+  - all-in-one：`AIO`（本地单节点集群）
 
-  2. OCP 二进制执行程序快速启动与部署
+  - OCP 二进制执行程序快速启动与部署
 
-  3. `minishift` 工具部署含 all-in-one 集群的虚拟机，与 `minikube` 非常类似。
+  - `minishift` 工具部署含 all-in-one 集群的虚拟机，与 `minikube` 非常类似。
 
 - minikube 安装报错：
 
@@ -121,7 +121,7 @@
 
    1）应用源代码注入时所使用的构建镜像（S2I builder image）的镜像流默认为 openshift 项目中的镜像流。
 
-   > 💥注意：
+   > 💥 注意：
    >
    > 若 openshift 项目中存在 imagestream 但不存在相应镜像，或不存在相应的 imagestream 时，需导入容器镜像至 imagestream 或手动创建 imagestream。
 
@@ -131,7 +131,7 @@
 
    4）image stream 的容器镜像可以来自 `OCP internal registry` 或 `OCP external registry`。
 
-   > ✅注意：
+   > ✅ 注意：
    >
    > 可作为 OCP internal registry 的组件：docker-registry pod、quay pod
    >
@@ -178,7 +178,7 @@
 
    4）S2I 可为 OpenShift 提供完整的 CI/CD 管道，可参考链接 "基于 S2I 的 Golang 应用构建与部署示例"。
 
-   > ✅注意：S2I 更多的使用于构建编译前端应用容器镜像。
+   > ✅ 注意：S2I 更多的使用于构建编译前端应用容器镜像。
 
 6. build：构建
 
@@ -220,7 +220,7 @@
 
     4）service 有反向代理与负载均衡的功能，默认以 Round Robin 轮询的方式将流量转发至 pod。
 
-    > 💥注意：
+    > 💥 注意：
     >
     > 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` SDN 插件，同一项目的 pod 始终在同一个 flat 网络中，pod 间可直接通信，无需使用 service！
     > 
@@ -260,7 +260,7 @@
 
     ​    <svc_name>_SERVICE_PORT：service 的 TCP 端口号
 
-    > 💥注意：
+    > 💥 注意：
     >
     > 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
 
@@ -272,13 +272,13 @@
 
     ​       <svc_name>.<project_name>.svc.cluster.local
 
-    > ✅注意：在应用 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找创建的 service。
+    > ✅ 注意：在应用 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找创建的 service。
 
     17）service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源对象进行暴露。
 
     18）service 的类型：ClusterIP、NodePort、LoadBalancer、ExternalIPs
 
-    > 💥注意：
+    > 💥 注意：
     >
     > 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 **`spec.externalTrafficPolicy`** 字段属性，否则创建失败！
     >
@@ -357,7 +357,7 @@
 
     ​       👉 目前只有 NFS 与 hostPath 支持该回收模式。
 
-    >  💥注意：pv 与 pvc 可绑定成功，但不代表 pv 使用的后端存储可正常使用！     
+    >  💥 注意：pv 与 pvc 可绑定成功，但不代表 pv 使用的后端存储可正常使用！     
 
 15. persistent volume claim（pvc）：持久卷声明
 
@@ -654,7 +654,7 @@
    
    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/s2i-application-build.jpg" style="zoom:67%;" />
 
-   > ✅注意：
+   > ✅ 注意：
    >
    > 1. oc new-app 命令使用 `List` 资源定义文件，该文件定义 is、bc、dc、service。   
    >
@@ -726,7 +726,7 @@
    # 使用 CA 私钥与 CA 签名的证书为 service 创建安全的边界型路由规则（secure edge-terminated）
    ```
    
-   > 💥注意：
+   > 💥 注意：
    >
    > OCP 3.9 版本删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见参考链接。
    
@@ -824,7 +824,7 @@
    # 查看构建配置过程日志
    ```
 
-   > ✅注意：
+   > ✅ 注意：
    >
    > 1. 由于应用源代码的更改或构建镜像（builder image）的改变将触发应用 pod 的重新部署。
    >
@@ -879,7 +879,7 @@
    # 将 configmap 定义的环境变量注入 deploymentconfig 中
    ```
 
-   > 💥注意：
+   > 💥 注意：
    >
    > 以上操作由于改变了 dc 配置，将触发新的 dc，部署全新的 pod。
    >
@@ -904,7 +904,7 @@
    # 设置的节点标签可被 pod 的节点选择器 Pod.spec.nodeSelector 使用，使其调度至该节点。
    ```
 
-   > ✅注意：region 为地理概念，zone 为不同的机柜/架或机房（故障恢复域）。
+   > ✅ 注意：region 为地理概念，zone 为不同的机柜/架或机房（故障恢复域）。
 
    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp3-arch-intro/node-label.jpg)
 
@@ -941,7 +941,7 @@
     # 为 admin 用户添加 cluster-role 集群管理员角色
     ```
 
-    > ✅注意：
+    > ✅ 注意：
     >
     > 1. OCP 的权限模型：用户与组（users and groups）、角色（roles）
     >
