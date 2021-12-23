@@ -349,7 +349,7 @@
 - [Kubernetes 官方文档中对 CRI 的说明](https://kubernetes.io/blog/2016/12/container-runtime-interface-cri-in-kubernetes/)
 - [GitHub 中对 CRI 的说明](https://github.com/kubernetes/kubernetes/blob/242a97307b34076d5d8f5bbeb154fa4d97c9ef1d/docs/devel/container-runtime-interface.md)
 - [GitHub Doc - CRI-O](https://github.com/cri-o/cri-o)
-- [Podman 容器使用与原理 - Alberthua]()
+- [Podman 容器使用与原理 - Alberthua](https://github.com/Alberthua-Perl/tech-docs/blob/master/Podman%20%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%8E%9F%E7%90%86.md)
 - [Podman 官网](https://podman.io/)
 - [GitHub Doc - Podman](https://github.com/containers/podman)
 - [GitHub Doc - OCI](https://github.com/opencontainers)
