@@ -52,9 +52,7 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/dockerd-containerd-3.jpg)
 
-  > 📌**注意：**
-  > 
-  > 各版本之间的 dockerd 与 containerd 进程的调用存在差异！
+  > 📌 注意：各版本之间的 dockerd 与 containerd 进程的调用存在差异！
 
 
 
@@ -118,7 +116,7 @@
 
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/ctr-command-2.jpg)
 
-    > 📌**注意：**
+    > 📌 注意：
     >
     > 1. containerd 1.2.x 无法拉取 containerd 镜像的 issue，升级 containerd 后可正常使用。
     > 2. GitHub issue [参考链接](https://github.com/containerd/containerd/issues/1818)：
@@ -203,7 +201,7 @@
 
 - 时至今日，尽管已经有 `CRI-O`、`containerd` 这种更精简轻量的 runtime，dockershim 作为经受最多生产环境考验的方案，迄今为止仍是 Kubernetes 默认的 runtime 实现。
 
-  > 📌**注意：**
+  > 📌 注意：
   >
   > dockershim 将在 Kubernetes v1.20 版本及更高版本中逐步废弃，不再使用 Docker 而全面使用 Containerd。
 
@@ -226,7 +224,7 @@
   - libcontainer 库直接使用 Linux kernel 提供的相关隔离技术，如 namespace、cgroups。
   - 它能按照标准将符合标准的容器镜像运行起来。
 
-  > 📌**注意：**
+  > 📌 注意：
   >
   > 1. 标准的好处就是方便搞创新，只要能符合标准，都能与生态圈中的其它工具一起工作。
   > 2. 那么镜像就可以用任意的工具去构建，容器就不一定非要用 namespace 和 cgroups 来隔离。
