@@ -39,7 +39,7 @@
 
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-3.png)
 
-    > 📌**注意：**
+    > 📌 注意：
     >
     > 1. 使用 RHEL 8 Web concole 查看 KVM 虚拟机详细信息时，需安装 `cockpit-machines` 软件包。         $ sudo dnf install -y cockpit-machines
     > 2. 该软件包安装成功后，将在 Web concole 上显示 KVM 虚拟机控制 Tab。
@@ -88,7 +88,7 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-7.png)
 
-  > 📌**注意：**
+  > 📌 注意：
   >
   > 1. 安装过程中需要合法的 `OpenShift user pull secret`。
   >
@@ -136,7 +136,7 @@
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ocp4-aio-deploy/aio-ocp43-install-10.png)
 
-  > 📌**注意：**
+  > 📌 注意：
   >
   >   查看kubeadmin管理员用户密码，如下所示：
   >
