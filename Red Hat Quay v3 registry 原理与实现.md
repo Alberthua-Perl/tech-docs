@@ -132,7 +132,7 @@
 
 ##### 参考链接：
 
-- https://www.cnblogs.com/ericnie/p/12233269.html
-- [https://docs.projectquay.io/deploy_quay.html](https://docs.projectquay.io/deploy_quay.html)
-- https://github.com/docker/docker.github.io/blob/master/registry/deploying.md#get-a-certificate
-- https://github.com/docker/docker.github.io/blob/master/registry/insecure.md
+- [Quay 基础版安装和部署](https://www.cnblogs.com/ericnie/p/12233269.html)
+- [Deploy Project Quay for proof-of-concept (non-production) purposes](https://docs.projectquay.io/deploy_quay.html)
+- [docker.github.io/registry/deploying.md](https://github.com/docker/docker.github.io/blob/master/registry/deploying.md#get-a-certificate)
+- [docker.github.io/registry/insecure.md](https://github.com/docker/docker.github.io/blob/master/registry/insecure.md)
