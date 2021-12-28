@@ -41,7 +41,7 @@
 - LXC、`LXD`（Go 语言开发）、`systemd-nspawn` 均可作为 Linux 容器，但缺少容器跨主机运行与应用打包的能力。
 - Docker 与 Podman 可使用容器镜像实现应用打包发布，快速且轻量。
 - Docker 与 Podman 都使用 `runC`（Go 语言开发）作为底层 `oci-runtime`。
-- Docker 与 Podman 都支持 `OCI Image Fromat`（Go 语言开发），都能使用 DockerHub 上的容器镜像，而 systemd-nspawn 无法使用它们的镜像。
+- Docker 与 Podman 都支持 `OCI Image Format`（Go 语言开发），都能使用 DockerHub 上的容器镜像，而 systemd-nspawn 无法使用它们的镜像。
 - 👉 Podman 使用 `CNI`（Go 语言开发）作为 rootfull 容器网络底层，实现比 Docker 网络层略微简单但原理相同。 
 - 相对于 LXD 与 systemd-nspawn，CNI 可以避免编写大量的网络规则。
 - 🚀 为了实现普通用户 rootless 容器网络，Podman 可以使用 `slirp4netns` 程序，避免 `kernel space` 中的大量 `veth pair` 虚拟接口的出现, 并且性能更好。
