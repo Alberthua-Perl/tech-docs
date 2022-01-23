@@ -1,5 +1,5 @@
 # tech-docs
-📌📌 Include shared docs involved some fields of Linux 🐧, as followings:
+🔊 Include shared docs involved some fields of Linux 🐧, as followings:
 
 👉 Linux kernel
 
