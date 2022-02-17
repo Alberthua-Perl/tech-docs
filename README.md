@@ -5,7 +5,7 @@
 
 👉 SDN, NFV, OpenStack
 
-👉 Container 🐳, Kubernetes 🕸, OpenShift ⭕️, Istio ⛵, Envoy, etc
+👉 Container 🐳, Kubernetes ☸, OpenShift ⭕️, Istio ⛵, Envoy, etc
 
 👉 Shell, Golang, Python
 
