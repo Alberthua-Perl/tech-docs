@@ -1,21 +1,93 @@
-### Red Hat Quay v3 registry 原理与实现
+## Red Hat Quay v3 registry 原理与实现
 
-##### 文档目录：
+### 文档目录：
 
 - 常用私有容器镜像仓库
 
+- Red Hat 支持的容器镜像仓库
+
 - Red Hat Quay v3 私有容器镜像仓库部署
+
+- 使用 Skopeo 管理容器镜像仓库
 
 - 参考链接
 
-##### 常用私有容器镜像仓库：
+### 常用私有容器镜像仓库：
 
 - Harbor v1/v2：由 `VMware` 主导开发，并从 `CNCF` 云原生计算基金会孵化成功。
 - **`Red Hat Quay v3`**：由 `Red Hat` 开源的私有容器镜像仓库，类似于 `CoreOS` 的 Quay。
 - registry v2：`Docker` 公司发布的 v2 版本容器镜像仓库镜像，可直接运行提供服务。
 - docker-distribution：由 `docker-distribution` RPM 软件包提供，`systemd` 方式运行。
 
-##### Red Hat Quay v3 私有容器镜像仓库部署：
+### Red Hat 支持的容器镜像仓库：
+
+- **Red Hat Container Registry**：`registry.access.redhat.com`
+  
+  - 该仓库为公共镜像仓库，用于托管 Red Hat 产品的镜像，无需身份验证。
+  
+  - 但请注意，虽然此容器镜像仓库是公共的，但 Red Hat 的大多数容器镜像规定要求用户拥有激活的 Red Hat 产品订阅，并且他们遵守产品的终端用户协议（EUA）。
+  
+  - 只有基于 Red Hat Enterprise Linux Universal Base Images (`UBI`) 的镜像可从该镜像仓库中自由地重新发布。
+
+- **Red Hat terms-based registry**：`registry.redhat.io`
+  
+  - 该仓库为私有镜像仓库，用于托管 Red Hat 产品的镜像，并且需要身份验证。
+  
+  - 从该仓库拉取镜像时，需提供 Red Hat Customer Portal 凭证（credential）进行身份验证。
+  
+  - 对于共享环境，如 OpenShift 或 CI/CD 管道，可创建 `service account` 或身份验证令牌（token），以避免暴露个人凭据。
+
+- **Red Hat partner registry**：`registry.connect.redhat.com`
+  
+  - 该仓库为私有镜像仓库，用于托管来自认证合作伙伴的第三方产品的镜像。
+  
+  - 它还需提供 Red Hat Customer Portal 凭证进行身份验证。
+  
+  - 它们可能受制于合伙伙伴的认购或许可。
+
+- **Quay.io**：
+  
+  - Red Hat 还管理 `Quay.io` 容器镜像仓库，任何人都可以注册一个免费帐户，并发布自己的容器镜像。
+  
+  - Red Hat 对任何托管在 Quay.io 上的容器镜像都没有提供保证。
+  
+  - 大多数用户使用 Quay.io 作为一个公共镜像仓库，但是组织（organization）也可以购买允许使用 Quay.io 作为私有镜像仓库。
+
+> 👉 关于 Red Hat 容器镜像仓库的说明可参考 [Red Hat Container Registry Authentication](https://access.redhat.com/RegistryAuthentication)
+
+### Red Hat 容器镜像安全：
+
+- [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/search)（RHCC）可提供构建 S2I 构建镜像的基础容器镜像，也可直接提供 S2I 构建镜像，Red Hat Container Catalog 通过 `https://registry.redhat.io` 作为容器镜像拉取与推送的 portal。
+
+- 该容器镜像仓库中的镜像通过 `Container Health Index` 进行安全性评估，可根据不同的评估结果选取开发者所需要的镜像，一般选择安全等级为 `A` 或 `B` 的镜像，以下以 `Go Toolset` 镜像为例确定其安全等级：
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/go-toolset-catalog.jpg)
+
+- 关于 [Red Hat 容器镜像安全等级说明](https://access.redhat.com/articles/2803031)，如下所示：
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/catalog-health-index.jpg)
+  
+  - Red Hat 安全评级说明文档可参考 [Understanding Red Hat security ratings](https://access.redhat.com/security/updates/classification)
+
+- 容器镜像的安全评分与分级可参考 [Security Scoring and Grading for Container Images](https://access.redhat.com/blogs/product-security/posts/container-security-scoring)
+
+### Red Hat Quay v3 私有容器镜像仓库部署：
+
+- Red Hat Quay 容器镜像仓库的高级特性：
+  
+  - 镜像安全扫描（image security scanning）
+  
+  - 基于角色的访问（role-based access）
+  
+  - 组织与团队管理（organization and team management）
+  
+  - 镜像自动化构建（image build automation）
+  
+  - 审计（auditing）
+  
+  - 异地复制（geo-replication）
+  
+  - 高可用（high availability）
 
 - 该文档使用 `basic` 方式容器部署，非 HA 方式。
 
@@ -103,6 +175,8 @@
 
 - Podman 客户端登录 Quay：
   
+  使用基于 `Docker registry API` 的 `OCI distribution API` 登录并访问 Quay 容器镜像仓库，Red Hat 推荐使用基于 RHEL 的容器工具，即 `Podman`、`Buildah` 与 `Skopeo` 来访问该 API。
+  
   ```bash
   $ sudo mkdir /etc/docker/certs.d/<quay_registry_fqdn>/
   # 创建 Podman 客户端 Quay CA 证书存储目录
@@ -130,7 +204,7 @@
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/deploy-quay-registry/docker-client-login-quay-registry.jpg)
 
-##### 参考链接：
+### 参考链接：
 
 - [Quay 基础版安装和部署](https://www.cnblogs.com/ericnie/p/12233269.html)
 - [Deploy Project Quay for proof-of-concept (non-production) purposes](https://docs.projectquay.io/deploy_quay.html)
