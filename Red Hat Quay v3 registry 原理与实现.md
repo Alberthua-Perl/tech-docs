@@ -6,6 +6,8 @@
 
 - Red Hat 支持的容器镜像仓库
 
+- Red Hat 容器镜像安全
+
 - Red Hat Quay v3 私有容器镜像仓库部署
 
 - 参考链接
