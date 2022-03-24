@@ -2,7 +2,7 @@
 
 * [关于 Alberthua 的技术文档](README.md)
 
-* [Linux 常用排错命令与工具](Linux 常用排错命令与工具.md)
+* [Linux 常用排错命令与工具](Linux常用排错命令与工具.md)
 
 * [Linux NAT 与 Overlay 网络的实现](Linux NAT 与 Overlay 网络的实现.md)
 
