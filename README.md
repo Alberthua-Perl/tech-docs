@@ -1,4 +1,4 @@
-# Alberthua 的技术文档
+## Alberthua 的技术文档
 
 👋 该共享文档目录中将涉及 Linux 的众多方面，包括但不限于：
 - Linux 内核（Linux kernel）🐧
