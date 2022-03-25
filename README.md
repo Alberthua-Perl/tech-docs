@@ -14,7 +14,7 @@
     - [Linux 常用排错命令与工具](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%B7%A5%E5%85%B7.md)
   - Linux 网络虚拟化
     - [Linux NAT 与 Overlay 网络的实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20NAT%20%E4%B8%8E%20Overlay%20%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9E%E7%8E%B0.md)
-    - [OVN 架构与进阶系列](https://github.com/Alberthua-Perl/tech-docs/blob/master/OVN%20%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97.md)
+    - [OVN 架构与进阶系列](https://github.com/Alberthua-Perl/scripts-confs/tree/master/ovn-arch)
   - 容器技术原理与实践
     - [虚拟化、云计算与云原生的联系与区别](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E8%99%9A%E6%8B%9F%E5%8C%96%E3%80%81%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E4%BA%91%E5%8E%9F%E7%94%9F%E7%9A%84%E8%81%94%E7%B3%BB%E4%B8%8E%E5%8C%BA%E5%88%AB.md)
     - [容器运行时 runtime 演进与架构概述](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C%E6%97%B6%20runtime%20%E6%BC%94%E8%BF%9B%E4%B8%8E%E6%9E%B6%E6%9E%84%E6%A6%82%E8%BF%B0.md)
