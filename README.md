@@ -1,18 +1,13 @@
 # Alberthua 的技术文档
 
 👋 该共享文档目录中将涉及 Linux 的众多方面，包括但不限于：
-
 - Linux 内核（Linux kernel）🐧
-
 - Linux 网络虚拟化
-
 - 容器与云原生：Container 🐳、Kubernetes ☸、OpenShift ⭕️、Istio ⛵、Envoy 等
-
 - 程序设计：Shell、Golang、Python 等
-
 - DevOps 技术栈：CI/CD ♾️、Jenkins、SonarQube 等
-
 > 💕 以上内容将不定时地更新于共享目录中。
+
 
 📝 **共享文档目录：**
   - Linux 的基础与进阶
