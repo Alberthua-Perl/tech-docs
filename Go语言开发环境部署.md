@@ -27,17 +27,17 @@
   
   - 输入 `install`，选择第一个 Install Package 以安装相关配色方案。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-1.png)
+    ![](images/install-golang/sublime-text-golang-1.png)
   
   - 输入相关配色方案名称，并选择安装，其安装过程显示在窗口最底端。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-2.png)
+    ![](images/install-golang/sublime-text-golang-2.png)
   
   - 配色方案安装完毕后，可在如下路径选择使用：
     
     Preferences -> Color Scheme... -> **`panda-syntax`**
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-3.png)
+    ![](images/install-golang/sublime-text-golang-3.png)
 
 - 安装 Golang 开发环境插件：
   
@@ -51,7 +51,7 @@
   
   - 为 Golang Build 插件定义 Golang 语言环境变量：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-4.png)
+    ![](images/install-golang/sublime-text-golang-4.png)
   
   - 配置自动编译运行 Golang：
     
@@ -63,15 +63,15 @@
     
     - 该定义文件名称可自定义。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-5.png)
+      ![](images/install-golang/sublime-text-golang-5.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-6.png)
+      ![](images/install-golang/sublime-text-golang-6.png)
   
   - 打开测试用 go 文件，使用 **`Ctrl+B`** 编译运行查看结果。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-7.png)
+    ![](images/install-golang/sublime-text-golang-7.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\sublime-text-golang-8.png)
+    ![](images/install-golang/sublime-text-golang-8.png)
 
 ### Linux 安装 Go 语言环境：
 
@@ -200,4 +200,4 @@
 
 - 若不添加 **`let g:go_version_warning = 0`**，报错如下，可直接回车继续使用 vim。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Golang\pictures\Go语言开发环境部署\vim-error.JPG)
+  ![](images/install-golang/vim-error.JPG)
