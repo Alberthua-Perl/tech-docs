@@ -12,7 +12,10 @@
     - [Linux 常用排错命令与工具](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%B7%A5%E5%85%B7.md)
   - **Linux 网络虚拟化**
     - [Linux NAT 与 Overlay 网络的实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20NAT%20%E4%B8%8E%20Overlay%20%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9E%E7%8E%B0.md)
-    - [OVN 架构与进阶系列](https://github.com/Alberthua-Perl/scripts-confs/tree/master/ovn-arch)
+    - [Open Virtual Network（OVN）概述与分析](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-arch-introduce.md)
+    - [配置 OVN 逻辑交换机](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-switch-demo.md)
+    - [配置 OVN 逻辑路由器](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-router-demo.md)
+    - [OVN 在 OpenStack 中的集成与流表分析](https://github.com/Alberthua-Perl/scripts-confs/blob/master/ovn-arch/docs/ovn-openstack-openflow-analysis.md)
   - **Go 程序设计语言**
     - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/Go%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
   - **容器技术原理与实践**
