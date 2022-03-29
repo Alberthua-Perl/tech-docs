@@ -10,6 +10,7 @@
 📝 **共享文档目录：**
   - **Linux 的基础与进阶**
     - [Linux 常用排错命令与工具](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%B7%A5%E5%85%B7.md)
+    - [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
   - **Linux 网络虚拟化**
     - [Linux NAT 与 Overlay 网络的实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20NAT%20%E4%B8%8E%20Overlay%20%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9E%E7%8E%B0.md)
     - [Open Virtual Network（OVN）概述与分析](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-arch-introduce.md)
