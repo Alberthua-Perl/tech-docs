@@ -31,7 +31,7 @@
 
 - 无氧铜材质网线含铜度高达 `99.9%`，杂质非常低，国标超 5 类线以上都是无氧铜。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\linux-network-cable-type.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/linux-network-cable-type.jpg)
 
 - RJ45 网线水晶头制作标准：
   
@@ -47,7 +47,7 @@
   
   网线两端分别使用 T568A 与 T568B 制作标准，常用于计算机与计算机互联。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\RJ45-connection-method.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/RJ45-connection-method.jpg)
 
 ### 物理网卡基础概念与分类：
 
@@ -69,13 +69,13 @@
       
       `Broadcom Corporation NetXtreme BCM5719 Gigabit Ethernet PCIe x4 (4 ports)`
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\Broadcom%20Corporation%20NetXtreme%20BCM5719%20Gigabit%20Ethernet%20PCIe%20x4.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/Broadcom%20Corporation%20NetXtreme%20BCM5719%20Gigabit%20Ethernet%20PCIe%20x4.jpg)
   
   - 光纤千兆以太网卡：光口（光电转换模块或称光模块）
   
   - 万兆以太网卡：电口（RJ45 接口）
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\Intel%20I210-X550.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/Intel%20I210-X550.jpg)
   
   - 🚀 光纤万兆以太网卡：光口（光电转换模块或称光模块）
     
@@ -93,11 +93,11 @@
       
       - `SFP/SFP+` 光模块: 光纤 LC 接口、支持发射（TX）与接收（RX）。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\three-in-one.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/three-in-one.jpg)
   
   - 千兆以太网卡与光纤万兆以太网卡示例：`Lenovo System x3650 M5 Server`
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\lenovo-suse12sp3-nic.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/lenovo-suse12sp3-nic.jpg)
 
 - FC 网卡（Fibre Channel Host Bus Adapter，`FC HBA`）：
   
@@ -109,7 +109,7 @@
   
   - `Emulex FC HBA` 示意：
     
-    <img src="file:///D:/Linux操作系统与编程语言汇总/Typora文档汇总/Linux/pictures/Linux物理网络基础配置/Emulex-FC-HBA.jpg" title="" alt="" width="279">
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/Emulex-FC-HBA.jpg" title="" alt="" width="279">
   
   - 🚀 常见 FC HBA 卡驱动：
     
@@ -123,7 +123,7 @@
   
   - iSCSI HBA 也可作为普通以太网卡使用，但成本过高。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\Qlogic-iSCSC-HBA.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/Qlogic-iSCSC-HBA.jpg)
 
 ### RJ45 网口指示灯含义：
 
@@ -133,7 +133,7 @@
   
   - 信号传输指示灯（Act）：呈黄色且不停闪烁，不亮或者不闪烁为无信号传输。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\nic-status.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/nic-status.jpg)
 
 - 百兆网口：
   
@@ -192,7 +192,7 @@
   
   - 命令执行如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\change-hostname.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/change-hostname.jpg)
 
 ### net-tools 软件包相关命令：
 
@@ -221,7 +221,7 @@
   #   ethX.n：表示网络接口 ethX 的第 n 个虚拟 VLAN 网络子接口。
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\ifconfig-eth-virtual-subnic.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/ifconfig-eth-virtual-subnic.jpg)
 
 ### 网口配置文件注意事项：
 
@@ -297,7 +297,7 @@
   
   - 物理网口的硬件信息，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\nic-detected-status.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/nic-detected-status.jpg)
   
   - 以上输出中 `Speed` 参数表示当前支持的网络速率，但该网口也可支持其他网络速率。
     
@@ -332,11 +332,11 @@
       # 网口配置文件中永久配置，系统重启依然生效。
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\nic-speed-options.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/nic-speed-options.jpg)
     
     - 端到端网络工作模式，如下所示：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\duplex-mode.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/duplex-mode.jpg)
 
 - 🚀 光纤万兆以太网卡双网口绑定：
   
@@ -344,7 +344,7 @@
   
   - 可根据不同网口的 MAC 地址判断不同网口是否在同一物理网卡上。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\physical-nic-bond.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/physical-nic-bond.jpg)
 
 - 查看系统上指定物理网口的 PCI 信息：
   
@@ -359,7 +359,7 @@
   #   -s   查看该设备的所在 PCI 槽位信息
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\physical-nic-pci-info.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/physical-nic-pci-info.jpg)
 
 - 查看指定网口的环形缓冲区大小（`ring buffer`）：
   
@@ -367,7 +367,7 @@
   $ sudo ethtool --show-ring <interface>
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\ethtool-nic-ring%20buffer.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/ethtool-nic-ring%20buffer.png)
 
 ### 关于网口调试的相关操作：
 
@@ -420,7 +420,7 @@
     
     - 若该配置文件中将同一网络接口绑定不同的物理 MAC 地址，重启网络子系统后，该网口名称将报错，返回为 `renameX` 名称。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\ethX-mac-renameX.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/ethX-mac-renameX.jpg)
   
   - 🚀 RHEL 7.x：
     
@@ -432,9 +432,9 @@
     
     - 💥 但请注意，以上方法在绝大多数物理服务器上均做过尝试，如 HPE、Huawei、H3C、Dell 等，只能将数个网口中的一部分使 ethX 成功命名，且在系统重启后依然与硬件 MAC 地址绑定，其余的网口并未生效，而在 `VMware` 虚拟机与 `KVM` 虚拟机中尝试绑定均可成功实现！
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\ethX-mac-binding-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/ethX-mac-binding-1.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\ethX-mac-binding-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/ethX-mac-binding-2.jpg)
 
 ### RHEL 7.x 更改网口 MAC 地址：
 
@@ -442,8 +442,8 @@
   
   HWADDR 可使用 dmesg 命令进行查看，为真正的网口 MAC 地址。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\HWADDR-MACADDR.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/HWADDR-MACADDR.jpg)
 
 - 查看网口实际使用的 MAC 地址：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux物理网络基础配置\MACADDR-ping-test.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/MACADDR-ping-test.jpg)
