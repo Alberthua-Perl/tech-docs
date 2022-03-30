@@ -38,7 +38,7 @@
     
     - Linux 资源限制的主配置文件：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-1.jpg)
       
       - RHEL 7.x 中的配置文件：
         
@@ -54,7 +54,7 @@
     
     - /etc/security/limits.conf 配置文件中的字段说明：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-3.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-3.jpg)
       
       - `domain` ：用户分类
         
@@ -96,31 +96,31 @@
     
     - 示例 1：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-2.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-4.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-4.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-5.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-5.jpg)
     
     - 示例 2：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-6.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-6.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-7.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-7.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-8.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-8.jpg)
     
     - 示例 3：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-9.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-9.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-10.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-10.jpg)
     
     - 示例 4：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-11.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-11.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\rhel-suse-resource-limit-12.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-12.jpg)
   
   - ulimit 命令行的方式：
     
@@ -130,7 +130,7 @@
     
     - ulimit 命令常用选项：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux配置资源限制\ulimit-options.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/ulimit-options.jpg)
       
       ```bash
       $ man bash -> 搜索 ulimit
