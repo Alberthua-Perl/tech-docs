@@ -1,5 +1,6 @@
 ## Alberthua 的共享技术文档
 ### 👋 **目录：**
+> 以下文档中的内容将根据实际情况进行不断更新补充！
   - 🐧 **Linux 的基础与进阶**
     - [Linux 常用排错命令与工具](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%B7%A5%E5%85%B7.md)
     - [Linux 配置资源限制](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
