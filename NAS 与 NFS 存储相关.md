@@ -47,7 +47,7 @@
     
     - 切换新的 NAS 存储路由，原先的 NAS 存储从生产网段切换至 NAS 存储网段，若不卸载可能将导致系统挂起死机！
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\NAS与NFS存储相关\nas-route-change-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/nas-nfs-demo/nas-route-change-1.jpg)
   
   - 配置新的 NAS 存储路由：
     
@@ -59,7 +59,7 @@
     
     - 原先的 NAS 存储使用其他网段挂载至系统, 在使用新的 NAS 存储网段后可能导致权限问题而无法访问挂载！
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\NAS与NFS存储相关\nas-route-change-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/nas-nfs-demo/nas-route-change-2.jpg)
   
   - mount 命令挂载 NAS 存储：
     
@@ -78,14 +78,14 @@
       # 使用 vers=3 参数指定 NFS v3 版本进行挂载。 
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\NAS与NFS存储相关\nas-route-change-3.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/nas-nfs-demo/nas-route-change-3.jpg)
 
 ### NAS 存储路由配置示例：
 
 - 示例 1：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\NAS与NFS存储相关\nas-route-example-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/nas-nfs-demo/nas-route-example-1.jpg)
 
 - 示例 2：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\NAS与NFS存储相关\nas-route-example-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/nas-nfs-demo/nas-route-example-2.jpg)
