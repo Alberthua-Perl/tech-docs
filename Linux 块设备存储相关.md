@@ -41,7 +41,7 @@ $ blockdev --setrw <device_path>
 # 块设备级别设置读写权限，该块设备可进行挂载访问。
 ```
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\块设备存储相关\blockdev-example.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/blockdev-example.png)
 
 ### 虚拟机或物理机不重启在线热添加磁盘：
 
@@ -63,9 +63,9 @@ $ less /var/log/messages
 # 查看系统日志中关于热添加 SCSI 磁盘的相关内容
 ```
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\块设备存储相关\add-scsi-device-online-1.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/add-scsi-device-online-1.jpg)
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\块设备存储相关\add-scsi-device-online-2.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/add-scsi-device-online-2.jpg)
 
 ### 案例：SLES 11 SP4 磁盘格式化失败故障排查
 
@@ -90,4 +90,4 @@ $ less /var/log/messages
   # 排除 HP RAID 卡故障后即可正常完成格式化
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\块设备存储相关\raid-error.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/raid-error.jpg)
