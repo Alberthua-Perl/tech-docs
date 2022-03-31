@@ -25,7 +25,7 @@
 
 - 根据数据传输过程采用的协议划分：`FC SAN`、`IP SAN`、`IB SAN`
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\fc-san-arch.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-san-arch.jpg)
 
 ### iSCSI 原理概述：
 
@@ -49,19 +49,19 @@
     
     - 当然，除了 TOE 网卡外，iSCSI 客户端也可直接使用 `iSCSI HBA` 卡，无需安装 iscsi-initiator 软件，由 iSCSI HBA 卡直接封装 iSCSI 协议、TCP/IP 协议等，大大降低 CPU 工作负载，但该方法成本较高。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-resolve-compare.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-resolve-compare.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\SAN-iSCSI-arch.JPG)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/SAN-iSCSI-arch.JPG)
 
 - iSCSI 协议的封包与解包过程：
   
   - iSCSI 数据包结构：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-data-packet.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-data-packet.jpg)
   
   - iSCSI 客户端与服务端都使用 iSCSI HBA 进行封包与解包：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-transport.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-transport.jpg)
 
 - iSCSI 工作流程：
   
@@ -81,9 +81,9 @@
 
 ### iSCSI 相关术语：
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-terminology-1.JPG)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-terminology-1.JPG)
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-terminology-2.JPG) 
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-terminology-2.JPG) 
 
 ### iSCSI target 与 initiator 部署与配置：
 
@@ -249,17 +249,17 @@
 
 - 如下所示，已配置的 iSCSI 服务端 target 示例：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-target-conf.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-target-conf.jpg)
 
 - 💥 由于客户端 /etc/fstab 文件中未添加 `_netdev` 选项而造成客户端系统无法正常启动，进入维护状态。
 
 - 如下所示，RHEL 6.8 中的错误引导过程：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\rhel6.8-iSCSI-error.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/rhel6.8-iSCSI-error.jpg)
 
 ### iSCSI 与 IP SAN 的区别：
 
-<img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\iSCSI-IP-SAN.jpg" style="zoom: 150%;" />
+<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-IP-SAN.jpg" style="zoom: 150%;" />
 
 ### SAN 存储使用配置注意（FC SAN）：
 
@@ -296,7 +296,7 @@
 
 ### SAN 多路径连接示意：
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\Typical-Multipath-Connectivity.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/Typical-Multipath-Connectivity.png)
 
 ### 🚀 案例：EMC SAN 共享存储识别与 multipath 部署
 
@@ -313,14 +313,14 @@
   # 查看系统开机过程中 FC HBA 卡的相关信息
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\dmesg-fc-hba.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/dmesg-fc-hba.jpg)
   
   ```bash
   $ modinfo lpfc
   # 查看该型号的 FC HBA 卡驱动程序（内核模块）信息，该模块在开机过程中已成功加载。
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\lpfc-module.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/lpfc-module.jpg)
   
   ```bash
   $ cd /sys/class/fc_host; ls -lh
@@ -328,9 +328,9 @@
   # 查看系统识别的 FC HBA 卡光纤链路信息
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\fc-hba-info-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-hba-info-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\fc-hba-info-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-hba-info-2.jpg)
   
   ```bash
   $ for i in $(seq 0 X); do echo "- - -" > /sys/class/scsi_hosts/host$i/scan; done
@@ -361,7 +361,7 @@
   # 查看盘符归并后的多路径状态
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\multipath-result.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/multipath-result.jpg)
 
 ### 🚀 案例：使用 Huawei OceanStor SAN 存储在线 LVM 扩容
 
@@ -382,9 +382,9 @@
     # 查看系统上已映射到的多路径 SAN 存储磁盘的盘符
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\sles11sp4-multipath-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/sles11sp4-multipath-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\sles11sp4-multipath-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/sles11sp4-multipath-2.jpg)
     
     ```bash
     $ ls -l /dev/mappper/mpath*
@@ -418,7 +418,7 @@
     # 退出 OceanStor UltraPath 交互式命令行
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\UltraPath.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/UltraPath.jpg)
 
 - 以上两种场景的难点在于寻找出新添加的 SAN 盘与对应的归并的逻辑盘符，主要将其找出即可非常方便的进行逻辑卷的动态扩容！
 
@@ -438,8 +438,8 @@
     
     - 该现象说明存储服务端的 I/O 请求队列已满，qla2xxx FC HBA卡驱动将降低 I/O 并发请求发送至存储服务端。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\ramping-down-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/ramping-down-1.jpg)
   
   - 系统日志信息显示 FC HBA 卡队列深度骤降并持续较长时间，说明 DB2 数据库 I/O 请求持续增高，使得 FC HBA 卡持续发送 I/O 并发请求至存储服务端，而导致 DB2 数据库物理机宕机！
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\SAN与iSCSI存储相关\ramping-down-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/ramping-down-2.jpg)
