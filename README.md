@@ -2,6 +2,7 @@
 ### 👋 **目录：**
 > 以下文档中的内容将根据实际情况进行不断更新补充！
   - 🐧 **Linux 的基础与进阶**
+    - [Linux 系统安装与启动引导及故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
     - [Linux 常用排错命令与工具](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%B7%A5%E5%85%B7.md)
     - [Linux 配置资源限制](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
     - [NAS 与 NFS 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/NAS%20%E4%B8%8E%20NFS%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
