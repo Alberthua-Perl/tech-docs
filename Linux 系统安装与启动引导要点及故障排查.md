@@ -90,7 +90,7 @@
   
   - 每台物理服务器均具有一个唯一的可识别序列号，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\physical-server-serial-number.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/physical-server-serial-number.jpg)
 
 - `Huawei FushionServer`：
   
@@ -108,21 +108,21 @@
       
       - 磁盘阵列如下所示：
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-disk-1.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-disk-1.jpg)
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-disk-2.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-disk-2.jpg)
       
       - RAID 阵列卡型号：
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-megaraid.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-megaraid.jpg)
       
       - 物理网卡型号与芯片类型：
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-nic.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic.jpg)
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-nic-1GbE-chip.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic-1GbE-chip.jpg)
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\huawei-fushionserver-2288h-v5-server-nic-10GbE-chip.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic-10GbE-chip.jpg)
       
       > ✅ 同一类 Linux 驱动程序识别相应的物理网卡芯片组（chipset）。
     
@@ -146,11 +146,11 @@
     
     - 因此，尝试进入 BOOT 引导界面更改为 `UEFI` 引导方式，在系统安装磁盘分区过程中，切换为 `anaconda` 文本交互模式，以 UEFI 引导方式重新安装。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\2288H-V5-disk-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-1.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\2288H-V5-disk-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-2.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\2288H-V5-disk-3.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-3.jpg)
     
     - 重新安装后即可正常引导启动。
 
@@ -162,9 +162,9 @@
   
   - 由于 RAID 阵列卡故障导致系统 `I/O` 错误并只读（read-only），更换 RAID 阵列卡后即可恢复正常。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\H3C-server-disk-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/H3C-server-disk-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\H3C-server-disk-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/H3C-server-disk-2.jpg)
 
 - `HPE ProLiant DL560 Gen10`：
   
@@ -244,41 +244,41 @@
 
 - RHEL 6.x 的方式（进入单用户模式）：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-2.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-3.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-4.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-4.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-5.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-5.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel6-break-root-password-6.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-6.jpg)
 
 - RHEL 7.x 与 RHEL 8.x 的方式：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel7-break-root-password-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel7-break-root-password-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-2.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel7-break-root-password-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-3.jpg)
 
 - SLES 11 SP4 的方式（进入单用户模式）：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles11sp4-break-root-password-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles11sp4-break-root-password-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-2.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles11sp4-break-root-password-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-3.jpg)
 
 - SLES 12 SP3 的方式：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles12sp3-break-root-password-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles12sp3-break-root-password-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-2.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\sles12sp3-break-root-password-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-3.jpg)
 
 ### 系统无故关机并重启原因排查方法：
 
@@ -300,25 +300,25 @@
   
   - `DELL R730` 物理机使用 `F11` 按键进入 BIOS 调整引导方式：系统 ISO 镜像引导
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\dell-r730-boot-method-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/dell-r730-boot-method-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\dell-r730-boot-method-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/dell-r730-boot-method-2.jpg)
   
   - 使用 `rescue` 救援模式的正确 shell 类型：`sh-4.2#`
     
     > 💥 注意：此时所在的环境为 ISO 镜像的 shell 环境！
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rescue-shell-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rescue-shell-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-2.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rescue-shell-3.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-3.jpg)
   
   - 从其他正常运行的节点上拷贝 `libselinux` 软件包文件至故障系统的 `/mnt/sysimage` 中的相应目录。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\recover-boot-error-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/recover-boot-error-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\recover-boot-error-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/recover-boot-error-2.jpg)
   
   - 切换至故障系统环境中验证系统是否恢复
   
@@ -360,14 +360,14 @@
   # 编辑 BIOS 引导安装的配置文件
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\ks-bios-isolinux-cfg.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-bios-isolinux-cfg.jpg)
   
   ```bash
   $ vim EFI/BOOT/BOOTX64.conf
   # 编辑 UEFI 引导安装的配置文件
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\ks-uefi-isolinux-cfg.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-uefi-isolinux-cfg.jpg)
   
   ```bash
   $ genisoimage -U -r -v -T -J -joliet-long \
@@ -387,15 +387,15 @@
   
   - 配置 RHEL 6.8 以 UEFI 引导方式启动：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel68-uefi-autoboot-test-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-1.jpg)
   
   - RHEL 6.8 自动化安装过程：UEFI 引导方式为例
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel68-uefi-autoboot-test-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-2.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel68-uefi-autoboot-test-3.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-3.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\rhel68-uefi-autoboot-test-4.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-4.jpg)
 
 ### 创建兼容 UEFI 与 BIOS 引导的 CentOS 7 自动化安装 ISO 镜像：
 
@@ -428,14 +428,14 @@
   # 编辑 BIOS 引导安装的配置文件
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\ks-centos74-bios-isolinux-cfg.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-centos74-bios-isolinux-cfg.jpg)
   
   ```bash
   $ vim EFI/BOOT/grub.cfg
   # 编辑 UEFI 引导安装的配置文件
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\ks-centos74-uefi-isolinux-cfg.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-centos74-uefi-isolinux-cfg.jpg)
   
   ```bash
   $ genisoimage -U -r -v -T -J -joliet-long \
@@ -453,17 +453,17 @@
 
 - CentOS 7.4 自动化安装过程：UEFI 引导方式为例
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\centos74-uefi-autoboot-test-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\centos74-uefi-autoboot-test-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-2.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\centos74-uefi-autoboot-test-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-3.jpg)
 
 - 使用 UEFI/BIOS 引导的 CentOS 7.x 自动化安装 ISO 镜像，`dracut` 报错如下：
   
   由于未发现安装引导介质所致，可使用 `inst.repo` 参数或添加 ISO 镜像标签解决。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux系统安装与启动引导要点及故障排查\kickstart-autoinstall-dracut-error.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/kickstart-autoinstall-dracut-error.jpg)
 
 ### 🚀 CentOS 7 的 kernel 升级方法：
 
