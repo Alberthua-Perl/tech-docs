@@ -1,0 +1,486 @@
+---
+# linux-basic-knowledge.yaml includes most of linux basic to help
+# you to use and understand rapidly
+course environment command:
+  kiosk@foundation0:
+    - cat /etc/rht
+      # 查看当前的课程环境代号(rh124/rh134/rh294)
+    - rht-clearcourse 0
+      # 清除当前的课程环境
+    - rht-setcourse rh124|rh134|rh294
+      # 设置对应的课程环境
+    - rht-vmctl start classroom
+      # 启动环境的 classroom 节点(软件仓库)
+    - rht-vmctl start all
+      # 启动所有的课程节点
+    - rht-vmctl status all
+      # 查看所有的课程节点状态
+    - rht-vmctl fullreset classroom|servera|serverb|workstation|utility
+      # 重置对应的节点
+    - rht-vmctl fullreset all
+      # 重置所有节点
+  password:
+    foundation0:
+      kiosk: redhat
+      root: Asimov
+    workstation,servera,serverb:
+      student: student
+      root: redhat
+ 
+shell types:
+  rhel,fedora,centos,opensuse,suse: bash(default)
+  debian,ubuntu: sh(default)
+  alpine: ash(default)
+  IBM AIX: ksh(default)
+  other types: csh,zsh
+
+shell command format: command + [subcommand] + [options] + arguements
+
+regular expressions:
+  - lower: [a-z]
+  - upper: [A-Z]
+  - digit: [0-9],\d
+  - alnum: [a-zA-Z0-9]
+  - space: \s,\t,\n,\r,\f,\v
+
+wirte file to disk:
+  # [user space]                                [kernel space]
+  write file -> /path/to/file -> system-call -> VFS(virtual filesystem) -> hardware-driver -> disk
+  #                                             fat,ext,xfs,gfs,ntfs driver
+
+Linux commands collection:
+  user:
+    - who
+    - whoami
+    - w
+    - id [username]
+  time:  
+    - date
+    - date -u
+    - date -s "2022-03-26 18:10:00"
+    - hwclock -w
+    - date +'%Y-%m-%d %H:%M:%S'
+  file:  
+    - file /path/to/file
+    - cat [-n] /path/to/file
+    - less /path/to/file
+    - more /path/to/file
+    - tail -n <num> /path/to/file
+    - tail -f /path/to/file
+      - 追踪即时日志刷新
+    - head -n <num> /path/to/file
+      - 默认查看文本文件的前 10 行
+    - wc -l|-w|-c /path/to/file 
+    - history
+      - 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
+      - 当前的命令历史被记录在内存中，退出窗口之后将写入 $HOME/.bash_history 文件中。
+    - history -c
+      - 清除当前 shell 会话窗口的历史记录 
+    - pwd
+    - cd /path/to/dir
+    - cd -
+    - ls -lhdRtaZi /path/to/file-or-dir
+    - touch /path/to/file
+    - mkdir -p /path/to/dir1/dir2
+    - cp /path/to/file /path/to/dir/
+    - cp --preserve=mode,ownership,timestamps /path/to/file /path/to/dir/
+    - cp -Rv --preserve=mode,ownership,timestamps /path/to/dir1 /path/to/dir2/
+    - mv /path/to/file /path/to/dir/
+    - rm -rf /path/to/dir
+    - rmdir /path/to/emptydir
+    - ln /path/to/file /path/to/file-hardlink
+    - ln -s /path/to/file /path/to/file-softlink
+      - 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
+      - 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
+  shell:
+    - head -n6 /etc/passwd > h6-passwd
+    - head -n6 /etc/passwd >> h6-passwd
+    - head -n6 /etc/paswd 2>> h6-passwd
+    - head -n6 /etc/paswd >> h6-passwd 2> /dev/null
+    - head -n6 /etc/paswd &>> h6-passwd
+    - head -n6 /etc/paswd >> h6-passwd 2>&1
+    - tail -n20 /etc/passwd | tee t20-passwd | less
+    - tail -n15 /etc/passwd | tee -a t20-passwd | less
+      - 最后的 less 命令显示的是前面的命令输出而不是重定向文件的内容。
+    - set
+      - 查看当前 shell 环境中的所有变量
+    - unset <shell-var>
+    - env
+    - export [-n] <env-var>
+  user:
+    - useradd chksys
+    - use other group as primary group:
+      - groupadd devgrp0
+      - useradd -u 2000 -g devgrp0 -m -d /opt/chkdev -s /bin/bash chkdev
+      - id chkdev
+      - password chkdev
+    - usermod -u 1100 chksys
+    - usermod -m -d /opt/chksys chksys
+      - chksys 用户的 /home/chksys 家目录将迁移至 /opt 中，原来的家目录将不复存在。
+      - 请务必确认该用户可迁移家目录，需提前与其他团队沟通告知！
+    - usermod -L chksys
+    - usermod -U chksys
+      
+Linux text editor:
+  - nano: text
+  - vim: text
+    - insert mode:
+        - a,i: go into 'insert mode'
+        - o: add line after where cursor is
+        - Esc: exit 'insert mode' and go in 'command mode'
+        - ':wq' or ':x': save file and exit vim
+        - ':!q': force exit vim and no-save anything
+    - command mode:
+        - <n>yy: copy <n> following lines from where cursor is
+        - p: paste <n> lines copied from where cursor is
+        - gg: cursor go to top of text
+        - Shift+g: cursor go to bottom of text
+        - Shift+a: cursor go to end of line and go into 'insert mode'
+        - u: revert old operte
+        - x: delete single character
+        - dd: delete one line
+    - visual edit mode:
+        - Shift+v: select one or multiple lines in 'visual edit mode'
+        - Ctrl+v: select block in 'visual edit mode'
+        - Esc: exit 'insert mode' and go in 'command mode'
+    - extended command:
+        - ':set nu': set line number for vim
+        - ':set nonu': unset line number for vim
+  - emacs: text
+  - geditor: gui
+
+remote login method:
+  kvm login: iLO,iBMC
+  telnet login: NO secure
+  ssh login: password,publickey-based,gssapi
+
+publickey-based ssh login:
+  - $HOME/.ssh/: 0700
+  - $HOME/.ssh/*key: 0600
+  - $HOME/.ssh/authorized_keys: 0600
+  - $HOME/.ssh/config: 0600
+
+GUI switch CLI:
+  - systemctl isolate multi-user.target
+  - systemctl isolate graphical.target
+
+user and group:
+  user:
+    rhel5/6:
+      UID 0: root(superuser)
+      UID 1~499: system or application users
+      UID 500+ included: regular user
+    rhel7/8:
+      UID 0: root(superuser)
+      UID 1~999: system or application users
+      UID 1000+ included: regular user
+      max user UID: 60000
+  group:
+    primary group:
+      - created with user created which of name is the same as user
+      - created by manual
+    secondary group:
+      - added by manual
+  su and sudo operate:
+    /etc/sudoers.d/appuser1:
+      - 'appuser1  ALL=(ALL)  ALL'
+      - 'appuser1  ALL=(ALL)  NOPASSWD: /usr/sbin/lvs,/usr/sbin/pvs'
+      - 'appuser1  ALL=(ALL)  NOPASSWD: ALL --> sudo -i'
+    su and su -: login shell yes or no
+    sudo -i and sudo su -: login shell yes or no
+  user passwordd encrypt method:
+    rhel5: md5
+    rhel6: sha256
+    rhel7/8: sha512
+  user envionment file:
+    /etc/passwd: local user information
+    /etc/group: local group information
+    /etc/profile: all users
+    /etc/bashrc: all users
+    $HOME/.bash_profile: current user
+    $HOME/.bashrc: current user
+    /etc/login.defs:
+      - define user action
+      - NOTE: Ubuntu can't create home dir for new user!
+    /etc/security/pwquality.conf: 'minlen = 8'
+
+file and dir permissions:
+  user: u,g,o,a
+  perm: r,w,x,X
+
+process model: fork/exec model
+process to process:
+  signal: kill
+  socket: 
+    - local,tcp,udp
+    - cockpit.socket,dbus.socket,/var/run/docker.socket
+  shared memory: parent and child process
+  rpc: remote progress call
+  gRPC: google remote process call
+
+upstream and redhat:
+  os:
+    upstream: fedora
+    enterprise GA: rhel 5,6,7,8,9
+  ansible: redhat ansible
+  ansible tower: 
+    upsream: awx
+    enterprise GA: redhat ansible tower
+  virtualization: RHV v4.1,v4.3
+  openstack GA: RHOSP v10,v13,v16
+  openshift:
+    upstream: orgin
+    enterprise GA: RHOCP v3.11,v4.8,v4.6,v4.5
+
+applied rpm packages:
+  - third party company
+    - redhat
+    - vmware
+    - aliyun
+    - huawei
+    - ucloud
+    - qincloud
+  - internet
+    - centos
+    - tinghua
+    - 163
+    - aliyun
+    - github
+  - developed
+    - company internal rpm repository
+
+Linux IMPORTANT tools: grep,sed,awk
+
+rpm commands:
+  - rpm -qf /path/to/file
+  - rpm -ql /path/to/rpmpackage
+  - rpm -qa | grep rpmpackage-name
+  - rpm -qi /path/to/rpmpackage
+  - rpm -qc /path/to/rpmpackage
+  - rpm -qd /path/to/rpmpackage
+  - rpm -q --changelog /path/to/rpmpackage
+  - rpm -q --scripts /path/to/rpmpackage
+
+package manage method:
+  rhel,centos,rocky,fedora,suse,opensuse: rpm package(*.rpm)
+  debian,ubuntu: deb package(*.deb)
+  alpine os: apk package(*.apk) --> community  ubi7,ubi8 <--> alpine
+
+yum and dnf:
+  rhel8: yum is the same as dnf-3 and yum is softlink to dnf-3
+  command:
+    - yum search "pattern"
+    - yum install packagename
+    - yum remove packagename
+    - yum update packagename
+    - yum upgrade 
+    - yum downgrade packagename
+    - yum repolist
+    - yum list packagename
+    - yum history undo
+    - yum info packagename
+    - yum group info groupname
+    - yum group list
+  package group:
+    - regular group: 
+        - group of packages
+        - mandatory packages(installed) and optional packages(non-installed)
+    - environment group: 
+        - set of regular groups
+
+repository:
+  package: local yum /etc/yum.repos.d/*.repo --> remote yum repository
+  software package manage: ruby,java,nodejs,golang,php,python,... package --> nexus repository
+  container image: local container image --> image registry
+
+yum repository service: 
+  - supported type: http,local(file:///path/to/repository),ftp
+  - classroom method: foundation0:/content --nfs4--> classroom --http--> other nodes
+
+storage device identity:
+  scsi driver:
+    - /dev/sdX: /dev/sd[a-z]
+  IDE driver:   
+    - /dev/hdX: /dev/hd[a-z]
+  nvme driver:
+    - /dev/nvmeX: /dev/nvmeXnM
+  virtio_blk:
+    - /dev/vdX: /dev/vd[a-z]
+
+partition:
+  MBR: 
+    - master boot record(512 bytes)
+    - boot loader(GRUB2 or iLILO) + partition tables(primary table1~4)
+    - 2048s ~ 1MiB
+  method1: /dev/vda: 20G -> p1:5G p2:3G p3:6G p4:6G
+  method2: primary1 + primary2 + primary3 + extented4(1K) + logical5 + logical6 + ... + logical 15
+              5G          3G         6G           1K            2G        2G
+  GPT: 
+    - GPT + partition tables(128)
+    - double GPT backup
+  system disk: 
+    - legency BIOS + MBR + partition + system data
+    - UEFI BIOS + GPT + partition + system data
+    - /boot:
+      - raw disk partition NOT LV
+      - btrfs,ext3,vfat,xfs
+    - other dir: support LV
+  data disk: 
+    - partition + application data
+  tools:
+    - fdisk: 
+        - IBM
+        - msdos(mbr)
+    - gdisk: msdos and gpt
+    - parted: 
+        - GNU 
+        - disk partition tool
+        - msdos and gpt
+        - CLI and human-machine
+  filesystem type:
+    rhel6/7: ext4(default),ext3,vfat,btrfs,gfs,ntfs
+    rhel8: xfs(default),ext3,ext4,vfat,ntfs
+  mount persistent fs:
+    - disk partition
+    - mkfs -t ext4|xfs|vfat /dev/vdc1
+    - mkdir /path/to/mountpoint
+    - vim /et/fstab
+      /dev/vdc1  /path/to/mountpoint   ext4  defaults   0 0
+    - mount -a
+    - df -Th
+
+LVM:
+  LVM: logical volume manager
+  component: 
+    - disk-partition or whole-disk
+    - PV: physical volume
+    - VG: 
+      - volume group
+      - physical extent: 4M(default), 8M, 16M, 32M
+    - LV: logical volume
+  devicemapper frame:
+    - from kernel 2.6.x
+    - kernel module(driver)
+    - lvm,stratis,vdo,crypt,docker-image-graph-driver,mutipath
+  ext4 extend: 
+    - nohup resize2fs /dev/mapper/vgname-lvname &
+    - active all devices exclude vdo device --> start service included vdo.service --> active vdo device
+    
+network configure:
+  verify network:
+    - ifconfig
+    - netstat -an
+    - netstat -tunlp
+    - route 
+    - ip link show
+    - ip address show
+    - ip a s
+    - ip address del 172.25.250.9/24 dev eth0
+    - ip address add 172.25.250.110/24 dev eth0
+    - ip address flush dev eth0  ==> clear all address 
+    - ip -br a s
+    - ip route show
+    - ss -tunlp
+  system time service:
+    - rhel5/6: ntpd
+    - rhel7/8: chronyd
+  network service change:
+    - rhel5/6: service network start|stop|restart
+    - rhel7: 
+      - network.service
+      - NetworkManager.service
+        /etc/sysconfig/network-scripts/ifcfg-eth0
+        NM_CONTROLLED=no
+    - rhel8:
+      - NetworkManager.service(python)
+        nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
+  ipv4 address configure and route:
+    - command line:
+        - ip 
+        - nmcli connection add con-name "System eth0" type ethernet dev eth0
+          nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254
+          ipv4.dns 172.25.250.254 ipv4.method manual
+          nmcli connection show
+          nmcli connection down "System eth0"  ==same as==> ifdown "System eth0"
+          nmcli connection up "System eth0"  ==same as==> ifup "System eth0"
+    - configure file: /etc/sysconfig/network-scripts/ifcfg-*
+    - problem:
+        serverb: 192.168.11.0/24 <--> servera: 192.168.8.0/24
+        route gateway: 192.168.0.10/16
+  hostname:
+    - command line:
+        - hostnamectl set-hostname rh199.lab.example.com
+    - configure file:
+        - echo "servera.lab.example.com" > /etc/hostname
+        - echo "servera.lab.example.com" > /proc/sys/kernel/hostname
+  resolv host:
+    - /etc/hosts
+    - /etc/resolv.conf
+
+selinux and firewalld:
+  selinux mode:
+    /etc/selinux/config: enforcing,permissive,disabled
+  selinux file context: file or dir label allow or drop process access
+  selinux boolean: 
+    - open or close selinux policy
+    - for example: php -> mysql (LAMP or LNMP)
+  selinux port access: non-standard port  
+
+  practice: How to use customized web documentroot for web server?
+    - install apache httpd:
+      # yum install -y httpd
+    - create customize web documentroot:
+      # mkdir -p /webapp/data
+      # mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+      # cat /etc/httpd/conf.d/webapp.conf
+      Listen 8882
+      <VirtualHost *:8882>
+        ServerName  serverb.lab.example.com
+        DocumentRoot "/webapp/data"
+        <Directory "/webapp/data">
+          AllowOverride None
+          Require all granted
+        </Directory>
+      </VirtualHost>
+    - configure listen 8882 port:
+      # semanage port -a -t http_port_t -p tcp 8882
+      # semanage port -l | grep http_port_t
+      # firewall-cmd --permanent --add-port=8882/tcp
+      # firewall-cmd --reload
+      # firewall-cmd --list-all
+    - access webserver: 
+      - verify selinux
+      - verify firewalld
+      - verify /var/log/messages
+      - verify /var/log/httpd/error_log
+      # semanage fcontext -a -t httpd_sys_content_t '/webapp/data(/.*)?'
+      # restorecon -Rvv /webapp/data
+      # systemctl enable httpd.service
+      # systemctl start httpd.service
+
+nfsv4 and autofs:
+  aufofs: 
+    - automation filesystem mount
+    - client --nfsv4--> nfs-server
+
+  practice: 
+    - How to configure nfs-server and nfs-client on RHEL8? 
+    - [*] Please use auid= to configure other user to access nfs?
+    root@serverb: as nfs-server
+      # mkdir -p /shared
+      # cat /etc/exports.d/shared.exports
+        /shared  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
+      # systemctl start nfs-server.service
+      # systemctl enable nfs-server.service
+      # showmount -e localhost
+      # firewall-cmd --permanent --add-service=nfs
+      # firewall-cmd --permanent --add-service=mountd
+      # firewall-cmd --permanent --add-service=rpc-bind
+      # firewall-cmd --reload
+      # firewall-cmd --list-all
+    root@servera: as nfs-client
+      # systemctl status rpcbind.service
+      # mkdir /mnt/shared
+      # mount 172.25.250.108:/shared /mnt/shared
+      # df -Th /mnt/shared
+
