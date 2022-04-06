@@ -85,7 +85,7 @@
       
       - `Intel Corporation Ethernet Controller X710 for 10GbE SFP+ (2 ports)`
 
-      - 🚀 `Intel XXV710 PCIe x8 Dual Port 25G SFP+ Server Card`：
+      - `Intel XXV710 PCIe x8 Dual Port 25G SFP+ Server Card`：
         
         - 双光口 25 Gbps 网卡（单口最大支持 `25 Gbps`）
         
