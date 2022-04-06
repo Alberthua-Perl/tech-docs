@@ -84,6 +84,14 @@
       - `Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection (2 ports)`
       
       - `Intel Corporation Ethernet Controller X710 for 10GbE SFP+ (2 ports)`
+
+      - 🚀 `Intel XXV710 PCIe x8 Dual Port 25G SFP+ Server Card`：
+        
+        - 双光口 25 Gbps 网卡（单口最大支持 `25 Gbps`）
+        
+        - 该网卡驱动为 `i40e`，该驱动最大支持的网络速率为 `40 Gbps`，双光口跑满速率理论可到 50 Gbps，但是由于网卡芯片支持最多不超过 40 Gbps，因此实际速率不超过该值。
+        
+        > 👉 网卡芯片处理能力提供的是这张网卡所有端口的总和能力，所以即使一张网卡有两个 25G 口，但是芯片只有 40G 处理能力的话，这张卡的两个端口是无法双向跑满的。
     
     - ✅ 注意:
       
@@ -94,6 +102,8 @@
       - `SFP/SFP+` 光模块: 光纤 LC 接口、支持发射（TX）与接收（RX）。
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/three-in-one.jpg)
+    
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/Intel%20XXV710%20PCIe%20x8%20Dual%20Port%2025G%20SFP+%20Server%20Card.jpg)
   
   - 千兆以太网卡与光纤万兆以太网卡示例：`Lenovo System x3650 M5 Server`
     
