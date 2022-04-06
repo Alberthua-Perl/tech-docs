@@ -1,6 +1,6 @@
-#### OpenShift v4.x all-in-one (AIO) 部署与配置
+## OpenShift v4.x all-in-one (AIO) 部署与配置
 
-###### 文档说明：
+### 文档说明：
 
 - OS 版本：Red Hat Enterprise Linux release 8.0 (Ootpa)
 
@@ -14,12 +14,12 @@
   
 - 若硬件资源无法满足 OCP 4.x 集群的部署，可采用 AIO 的方式部署并测试验证。
 
-###### 文档目录：
+### 文档目录：
 
 - 部署方法与资源概述
 - 部署与验证集群
 
-###### 部署方法与资源概述：
+### 部署方法与资源概述：
 
 - 该 OpenShift v4.3.0 集群使用 `Red Hat CodeReady Containers（CRC）`部署为最小化的开发或测试用 all-in-one 集群。
 
@@ -44,7 +44,7 @@
     > 1. 使用 RHEL 8 Web concole 查看 KVM 虚拟机详细信息时，需安装 `cockpit-machines` 软件包。         $ sudo dnf install -y cockpit-machines
     > 2. 该软件包安装成功后，将在 Web concole 上显示 KVM 虚拟机控制 Tab。
 
-###### 部署与验证集群：
+### 部署与验证集群：
 
 - 安装所需软件包：
 
