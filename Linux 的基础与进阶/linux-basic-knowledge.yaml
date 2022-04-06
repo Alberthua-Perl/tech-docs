@@ -1,31 +1,31 @@
 ---
 # linux-basic-knowledge.yaml includes most of linux basic to help
 # you to use and understand rapidly
-course environment command:
-  kiosk@foundation0:
-    - cat /etc/rht
-      # 查看当前的课程环境代号(rh124/rh134/rh294)
-    - rht-clearcourse 0
-      # 清除当前的课程环境
-    - rht-setcourse rh124|rh134|rh294
-      # 设置对应的课程环境
-    - rht-vmctl start classroom
-      # 启动环境的 classroom 节点(软件仓库)
-    - rht-vmctl start all
-      # 启动所有的课程节点
-    - rht-vmctl status all
-      # 查看所有的课程节点状态
-    - rht-vmctl fullreset classroom|servera|serverb|workstation|utility
-      # 重置对应的节点
-    - rht-vmctl fullreset all
-      # 重置所有节点
-  password:
-    foundation0:
-      kiosk: redhat
-      root: Asimov
-    workstation,servera,serverb:
-      student: student
-      root: redhat
+#course environment command:
+#  kiosk@foundation0:
+#    - cat /etc/rht
+#      # 查看当前的课程环境代号(rh124/rh134/rh294)
+#    - rht-clearcourse 0
+#      # 清除当前的课程环境
+#    - rht-setcourse rh124|rh134|rh294
+#      # 设置对应的课程环境
+#    - rht-vmctl start classroom
+#      # 启动环境的 classroom 节点(软件仓库)
+#    - rht-vmctl start all
+#      # 启动所有的课程节点
+#    - rht-vmctl status all
+#      # 查看所有的课程节点状态
+#    - rht-vmctl fullreset classroom|servera|serverb|workstation|utility
+#      # 重置对应的节点
+#    - rht-vmctl fullreset all
+#      # 重置所有节点
+#  password:
+#    foundation0:
+#      kiosk: redhat
+#      root: Asimov
+#    workstation,servera,serverb:
+#      student: student
+#      root: redhat
  
 shell types:
   rhel,fedora,centos,opensuse,suse: bash(default)
