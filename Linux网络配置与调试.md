@@ -103,7 +103,7 @@
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/three-in-one.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/Intel%20XXV710%20PCIe%20x8%20Dual%20Port%2025G%20SFP+%20Server%20Card.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/Intel%20XXV710%20PCIe%20x8%20Dual%20Port%2025G%20SFP%2B%20Server%20Card.jpg)
   
   - 千兆以太网卡与光纤万兆以太网卡示例：`Lenovo System x3650 M5 Server`
     
