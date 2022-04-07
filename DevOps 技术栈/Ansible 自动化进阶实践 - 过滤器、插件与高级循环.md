@@ -1,4 +1,4 @@
-## 💎 第四章 使用过滤器与插件转换数据
+## 💎 Ansible 自动化进阶实践 - 过滤器、插件与高级循环
 
 ### 章节：
 
@@ -165,7 +165,7 @@
     
     👉 [Jinja v2.10 引擎的 changelog](https://jinja.palletsprojects.com/en/2.11.x/changelog/#version-2-10-1)：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\jinja2-v2.10-changelog.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/jinja2-v2.10-changelog.jpg)
   
   - 检查变量是否已定义：
     
@@ -175,9 +175,9 @@
       
       - 使用该过滤器后，即使变量未定义 playbook 将继续运行。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\mandatory-filter-1.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/mandatory-filter-1.jpg)
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\mandatory-filter-2.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/mandatory-filter-2.jpg)
     
     - `default` 过滤器：
       
@@ -185,15 +185,15 @@
       
       - 若括号中的第二个参数为 `True`，那么当变量的初始值是空字符串或布尔值 False 时，过滤器也会将变量设置为默认值。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\default-filter-1.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/default-filter-1.jpg)
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\default-filter-2.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/default-filter-2.jpg)
       
       - default 过滤器也可以取特殊值 `omit`，将导致值在没有初始值时保留为未定义状态。
       
       - 若变量已具有值，则 omit 不会更改值。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\default-filter-3.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/default-filter-3.jpg)
   
   - 执行数学计算：
     
@@ -201,7 +201,7 @@
     
     - 可对数字进行基本的数学计算：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\arithmetic-operator.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/arithmetic-operator.jpg)
     
     - `int` 过滤器：将值转换为整数
       
@@ -298,7 +298,7 @@
               another list is "{{ [5, 9, 13, 27] | shuffle }}"
         ```
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\reverse-list-filter-error.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/reverse-list-filter-error.jpg)
         
         👉 reverse 过滤器必须与 list 过滤器搭配使用，否则报错！
     
@@ -477,11 +477,11 @@
       > 
       > 1. 使用正则表达式时，需额外在反斜杠前再添加反斜杠，否则 playbook 语法报错！
       >    
-      >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\replace-regular-expression-error-1.jpg)
+      >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/replace-regular-expression-error-1.jpg)
       > 
       > 2. 由过滤器处理的字符串需使用单引号或双引号圈引，否则使用 eq 测试将报错！
       >    
-      >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\replace-regular-expression-error-2.jpg)
+      >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/replace-regular-expression-error-2.jpg)
   
   - 操作 JSON 数据：
     
@@ -563,7 +563,7 @@
           hosts: "{{ lookup('file', '/etc/hosts', '/etc/issue') }}"
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\lookup-file-plugin-result.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-file-plugin-result.jpg)
     
     - query 函数调用：
       
@@ -574,7 +574,7 @@
         hosts: "{{ query('file', '/etc/hosts', '/etc/issue') }}"
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\query-file-plugin-result.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/query-file-plugin-result.jpg)
     
     - 两种调用方法的区别：
       
@@ -589,7 +589,7 @@
   # 查看特定插件用途和使用方法的详细信息
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\ansible-doc-lookup.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/ansible-doc-lookup.jpg)
 
 - `file` 插件：
   
@@ -607,13 +607,13 @@
     
     - 以下示例使用循环和 `+` 运算符将字符串附加到模板中，以便查找 files/fred.key.pub 和 files/naoko.key.pub 文件。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\authorized_key-lookup-loop.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/authorized_key-lookup-loop.jpg)
     
     > 💥 注意：
     > 
     > 可直接在 ansible 命令行中使用 authorized_key 模块，以实现指定用户的 SSH 公钥分发，但必须在交互式命令行中输入登录用户的密码。
     > 
-    > ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\authorized_key-deliver-user-ssh-pubkey.jpg)
+    > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/authorized_key-deliver-user-ssh-pubkey.jpg)
   
   - 若文件为 YAML 或 JSON 格式，可使用 `from_yaml` 或 `from_json` 过滤器将其解析为正确结构化的数据。
     
@@ -652,7 +652,7 @@
   > 
   > 2. 因此，template 查找插件不可使用事实变量，否则报错，只可使用自定义变量！
   >    
-  >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\template-plugin-error.jpg)
+  >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/template-plugin-error.jpg)
 
 - `env` 插件：
   
@@ -732,15 +732,15 @@
       
       - `strict` 值：默认值，即基础脚本失败，lookup 插件会引发严重错误。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\lookup-error-strict.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-error-strict.jpg)
       
       - `warn` 值：lookup 插件会在基础脚本失败时记录警告并返回空字符串或空列表。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\lookup-error-warn.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-error-warn.jpg)
       
       - `ignore` 值：lookup 插件会以静默方式忽略错误，并返回空字符串或空列表。
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\lookup-error-ignore.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-error-ignore.jpg)
 
 ### 第三节 实施高级循环
 
@@ -768,7 +768,7 @@
     
     - 对于简单的列表，loop 是可使⽤的最佳语法。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\loop-with_list.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/loop-with_list.jpg)
     
     > 👉 [loop 关键字与 with_* 关键字的语法转化](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#migrating-to-loop)
   
@@ -788,13 +788,13 @@
   
   - 可将各变量定义的列表组成的嵌套列表转换成扁平化列表，逐一迭代各列表项。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\with_items-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/with_items-demo.jpg)
   
   > 💥 注意：
   > 
   > 1. 该示例中，直接简单地将 with_items 关键字替换为 loop 关键字，执行 playbook 时，无法迭代各个变量定义的列表项。
   >    
-  >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\loop-replace-with_items-no-result.jpg)
+  >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/loop-replace-with_items-no-result.jpg)
   > 
   > 2. 由于 loop 不执行隐式的一级扁平化，因此它不完全等效于 with_items，而与 with_list 的行为相同。
   > 
@@ -925,7 +925,7 @@
       loop: "{{ users_dict | dict2items }}"
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\witch_dict-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/witch_dict-demo.jpg)
 
 - `with_fileglob` 关键字与 `fileglob` 查找插件：
   
@@ -950,7 +950,7 @@
         - "~/.bash*"
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\with_fileglob-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/with_fileglob-demo.jpg)
 
 ### 第四节 使用过滤器处理网络地址
 
@@ -970,7 +970,7 @@
   
   - 若 enp11s0 是系统上的接口，则具有名为 ansible_facts['enp11s0'] 的事实，其为包含 MAC 地址、IPv4 和 IPv6 地址、内核模块等值的字典。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\ansible-network-facts.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/ansible-network-facts.jpg)
 
 - 网络信息过滤器：
   
@@ -1006,7 +1006,7 @@
             CIDR netmask is {{ '10.0.0.1/255.255.254.0' | ipaddr('prefix') }}
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter04\ipaddr-filter-demo.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/ipaddr-filter-demo.jpg)
   
   - ipaddr 过滤器的部分（验证用）参数：
     
