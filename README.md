@@ -32,4 +32,4 @@
     - [S2I 基本原理与应用构建部署示例](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/golang-s2i)
   - ♾️ **DevOps 技术栈**
     - [基于 Jenkins 的 DevOps CICD 部署示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20Jenkins%20%E7%9A%84%20DevOps%20CICD%20%E9%83%A8%E7%BD%B2%E7%A4%BA%E4%BE%8B.md) 
-
+    - [Ansible 自动化进阶实践 - 过滤器、插件与高级循环](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8F%92%E4%BB%B6%E4%B8%8E%E9%AB%98%E7%BA%A7%E5%BE%AA%E7%8E%AF.md)
