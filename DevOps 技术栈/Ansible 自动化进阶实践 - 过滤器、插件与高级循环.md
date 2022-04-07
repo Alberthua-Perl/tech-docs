@@ -1,6 +1,6 @@
 ## 💎 Ansible 自动化进阶实践 - 过滤器、插件与高级循环
 
-### 章节：
+### 文档目录：
 
 - 使用过滤器处理变量
 
@@ -10,7 +10,7 @@
 
 - 使用过滤器处理网络地址
 
-### 第一节 使用过滤器处理变量
+### 使用过滤器处理变量
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
@@ -529,7 +529,7 @@
             hosts_json: '[{"name": "bastion", "ip": ["172.25.250.254", "172.25.252.1"]}]'
         ```
 
-### 第二节 使用查找模板化外部数据
+### 使用查找模板化外部数据
 
 > 1. 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：[jinja2_plugins.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_plugins.yml)
 > 
@@ -742,7 +742,7 @@
         
         ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-error-ignore.jpg)
 
-### 第三节 实施高级循环
+### 实施高级循环
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
@@ -952,7 +952,7 @@
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/with_fileglob-demo.jpg)
 
-### 第四节 使用过滤器处理网络地址
+### 使用过滤器处理网络地址
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
