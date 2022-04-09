@@ -67,15 +67,15 @@ Linux commands collection:
     - more /path/to/file
     - tail -n <num> /path/to/file
     - tail -f /path/to/file
-      - 追踪即时日志刷新
+      # 追踪即时日志刷新
     - head -n <num> /path/to/file
-      - 默认查看文本文件的前 10 行
+      # 默认查看文本文件的前 10 行
     - wc -l|-w|-c /path/to/file 
     - history
-      - 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
-      - 当前的命令历史被记录在内存中，退出窗口之后将写入 $HOME/.bash_history 文件中。
+      # 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
+      # 当前的命令历史被记录在内存中，退出窗口之后将写入 $HOME/.bash_history 文件中。
     - history -c
-      - 清除当前 shell 会话窗口的历史记录 
+      # 清除当前 shell 会话窗口的历史记录 
     - pwd
     - cd /path/to/dir
     - cd -
@@ -90,8 +90,8 @@ Linux commands collection:
     - rmdir /path/to/emptydir
     - ln /path/to/file /path/to/file-hardlink
     - ln -s /path/to/file /path/to/file-softlink
-      - 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
-      - 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
+      # 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
+      # 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
   shell:
     - head -n6 /etc/passwd > h6-passwd
     - head -n6 /etc/passwd >> h6-passwd
@@ -101,26 +101,70 @@ Linux commands collection:
     - head -n6 /etc/paswd >> h6-passwd 2>&1
     - tail -n20 /etc/passwd | tee t20-passwd | less
     - tail -n15 /etc/passwd | tee -a t20-passwd | less
-      - 最后的 less 命令显示的是前面的命令输出而不是重定向文件的内容。
+      # 最后的 less 命令显示的是前面的命令输出而不是重定向文件的内容。
     - set
-      - 查看当前 shell 环境中的所有变量
+      # 查看当前 shell 环境中的所有变量
     - unset <shell-var>
     - env
     - export [-n] <env-var>
-  user:
+  user and group:
     - useradd chksys
     - use other group as primary group:
       - groupadd devgrp0
       - useradd -u 2000 -g devgrp0 -m -d /opt/chkdev -s /bin/bash chkdev
       - id chkdev
       - password chkdev
+    - useradd -u 900 -r -m -d /opt/nginx -s /sbin/nologin nginx
+      # 使用非登录用 shell 创建系统用户
     - usermod -u 1100 chksys
     - usermod -m -d /opt/chksys chksys
-      - chksys 用户的 /home/chksys 家目录将迁移至 /opt 中，原来的家目录将不复存在。
-      - 请务必确认该用户可迁移家目录，需提前与其他团队沟通告知！
+      # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中，原来的家目录将不复存在。
+      # 请务必确认该用户可迁移家目录，需提前与其他团队沟通告知！
     - usermod -L chksys
     - usermod -U chksys
-      
+    - usermod -G devgrp0 operator0
+    - usermod -aG wheel operator0
+    - gpasswd -d operator0 wheel
+    - groupadd -g 900 -r nginx
+    - groupmod -n webapp nginx
+    - groupmod -g 905 webapp
+    - groupdel webapp
+    - userdel [-r] <username>
+      # 加 -r: 同时删除家目录与邮件信息不做保留，有可能其中包含重要数据，造成数据丢失。
+      # 不加 -r: 不会删除家目录数据并且持久保留，但是源目录的 uid 与 gid 会被之后新创建的同 uid 与 gid 的用户所占用。
+  password:
+    - chage -m 2 -M 90 -W 5 -I 2 chksys
+    - chage -l chksys
+      # 密码的最大过期日期随上次密码修改日期而定！
+    - chage -E 2022-08-01 chksys
+    - chage -d 0 chkdev
+      # 强制用户下次登录时更改密码
+  permission:
+    - chown [-R] <username>:<groupname> /path/to/file-or-dir      
+      # 建议使用 ":" 作为分隔符，防止用户名与所有组名称中出现 "." 而造成命令解析的歧义！
+    - chgrp <groupname> /path/to/file-or-dir
+    - chmod u+s /sbin/parted
+      # suid: 4---
+    - chmod u-s /sbin/parted
+    - chmod g+s /path/to/dir
+      # sgid: 2---
+    - chmod g-s /path/to/dir
+    - chmod o+t /path/to/dir
+      # sbit: 1---
+    - chmod o-t /path/to/dir  
+  process:
+    - pstree -p
+    - ps aux
+    - ps -efL
+      # 查看系统进程及其子线程的信息(NLWP)
+    - ps -L p <pid>
+    - jobs
+    - fg %<job-number>
+    - bg %<job-number>
+    - killall <process-name>
+    - pkill -SIGNALNAME -u <username>
+    - pkill -P <ppid>
+
 Linux text editor:
   - nano: text
   - vim: text
@@ -194,6 +238,12 @@ user and group:
     rhel7/8: sha512
   user envionment file:
     /etc/passwd: local user information
+    /etc/shadow: local user passwd stored file
+      - password:
+          first $: sha512
+          second $: salt value
+          third $: sha512(salt+plain password)
+      - days: '$ date -d "1970-01-01 UTC 18389 day"'
     /etc/group: local group information
     /etc/profile: all users
     /etc/bashrc: all users
@@ -205,18 +255,20 @@ user and group:
     /etc/security/pwquality.conf: 'minlen = 8'
 
 file and dir permissions:
-  user: u,g,o,a
-  perm: r,w,x,X
+  - chmod:
+    symbolic method:
+      user: u,g,o,a
+      perm: r(4),w(2),x(1),X
 
 process model: fork/exec model
-process to process:
+process to process communication method:
   signal: kill
   socket: 
-    - local,tcp,udp
+    - raw,unix domain,tcp,udp
     - cockpit.socket,dbus.socket,/var/run/docker.socket
   shared memory: parent and child process
-  rpc: remote progress call
-  gRPC: google remote process call
+  rpc: remote progress call(rpcbind)
+  gRPC: google remote process call(golang,java,python)
 
 upstream and redhat:
   os:
