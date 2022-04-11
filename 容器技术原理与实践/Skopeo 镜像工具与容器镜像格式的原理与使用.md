@@ -78,7 +78,7 @@
 
 - Skopeo 与 Buildah 可使用 Podman 保存的认证 `token`（位于 `/run/user/<UID>/containers/auth.json`），但是无法执行交互式的登录密码输入，因此，若在 skopeo 命令行中指定明文登录密码可在 history 命令历史记录中查看到，存在一定的安全风险，可使用如下以变量形式传递密码的方法优化：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-inspect-creds.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-inspect-creds.jpg)
 
 > 若未使用 Podman 作为容器运行时，而依然使用 Docker 容器运行时的话，其认证 token 依然可被 Skopeo 使用与认证，该认证 token 位于 `$HOME/.docker/config.json`。
 
@@ -163,7 +163,7 @@
     # 分别指定源仓库与目标仓库的认证用户与明文密码，并在仓库间拷贝容器镜像。
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-dest-creds.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-dest-creds.jpg)
 
 - `skopeo delete`：删除容器镜像的镜像 tag
   
@@ -178,9 +178,9 @@
   
   - 💥 指定镜像 `tag` 时将删除特定 tag，即使将最后一个 tag 删除后也不删除整个镜像仓库，若需要删除整个镜像仓库需登录指定仓库。此处为 Quay.io 为例，在 `Web 控制台` 上删除，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-delete-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-delete-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-delete-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-delete-2.jpg)
   
   - 💥 该命令也可删除本地容器运行时缓存中的镜像 tag，但需注意，若具有多个不同 tag 的容器镜像（实际为同一容器镜像），只具有同一个 image ID（该值来自于镜像的 manifest 中 `.config.digest`），那么在执行删除时即使指定了镜像的 tag，也会将其他具有相同 image ID 的镜像一并删除，该行为与容器镜像仓库中相区别！
 
@@ -194,11 +194,11 @@
     dir:<dir_of_container_image>
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-docker-format-image-dir.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-docker-format-image-dir.jpg)
   
   除了使用 docker load 或 podman load 直接将容器镜像的 tar 归档导入本地镜像缓存中，也可使用已经保存至本地的目录以 dir 或 oci 模式存在的容器镜像，如下所示：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\podman-load-dir-from-skopeo-copy.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/podman-load-dir-from-skopeo-copy.jpg)
   
   也可以使用 Skopeo 将本地镜像目录拷贝至容器镜像仓库，用以替代 docker push 或 podman push 的功能：
   
@@ -208,7 +208,7 @@
     docker://<uri_for_registry>/<user_or_org>/<repository>:[tag]
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-dir-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-dir-2.jpg)
 
 - `skopeo copy`：oci 模式示例
   
@@ -220,11 +220,11 @@
     oci:<dir_of_container_image>
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-oci-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-oci-1.jpg)
   
   其中拷贝至本地的 OCI 格式目录结构如下所示，包含了容器镜像的各层（layer）。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-oci-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-oci-2.jpg)
   
   也可使用本地 OCI 格式目录将镜像拷贝至容器镜像仓库中。
 
@@ -241,7 +241,7 @@
   
   > 💥 该模式只能在以 Podman 或 CRI-O 为容器运行时的情况下使用，若使用 Docker 容器运行时将报错！
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-docker-daemon.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-docker-daemon.jpg)
   
   ```bash
   $ skopeo copy \
@@ -278,7 +278,7 @@
   
   - 如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-copy-transform-image-format.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-transform-image-format.jpg)
 
 - `skopeo sync`：
   
@@ -286,19 +286,19 @@
   
   - skopeo sync 命令可指定的 src 与 dest 类型如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-sync-help.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-help.jpg)
   
   - 👉 示例 1：
     
     将远程容器镜像仓库中的镜像同步至本地目录，本地存储容器镜像的目录无需创建。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-sync-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-demo.jpg)
   
   - 👉 示例 2：
     
     skopeo 命令分别使用两个容器镜像仓库的 token 认证文件将容器镜像同步至另一个仓库中，并且目标仓库只需指定仓库 `URI` 即可，将自动生成对应的镜像名称与标签。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-sync-between-registry.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-between-registry.jpg)
   
   - 也可使用 skopeo sync 命令将本地 dir 模式存储的容器镜像同步至远程容器镜像仓库中。
 
@@ -415,15 +415,15 @@
     
     关于容器镜像目录中 `image manifest` 与其 `digest` 的关系，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-docker-image-format-digest-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-docker-image-format-digest-1.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-docker-image-format-digest-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-docker-image-format-digest-2.jpg)
   
   - 👉 示例 2：OCI 镜像格式的容器镜像目录
     
     关于容器镜像目录中 `image manifest` 与其 `digest` 的关系，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Skopeo镜像工具与容器镜像格式的原理与使用\skopeo-oci-image-format-digest.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-oci-image-format-digest.jpg)
 
 ### 🐳 容器镜像格式比较：
 
