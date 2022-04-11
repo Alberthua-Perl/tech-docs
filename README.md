@@ -24,6 +24,7 @@
     - [Podman 容器使用与原理](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Podman%20%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%8E%9F%E7%90%86.md)
     - [部署 loganalyzer 管理集中式日志](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/%E9%83%A8%E7%BD%B2%20loganalyzer%20%E7%AE%A1%E7%90%86%E9%9B%86%E4%B8%AD%E5%BC%8F%E6%97%A5%E5%BF%97.md)
     - [Red Hat Quay v3 registry 原理与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Red%20Hat%20Quay%20v3%20registry%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
+    - [Skopeo 镜像工具与容器镜像格式的原理与使用](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Skopeo%20%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8.md)
   - ☸ **Kubernetes**
     - [Ansible 快速部署 Kubernetes 及相关组件](https://github.com/Alberthua-Perl/kani) 
   - ⭕️ **Red Hat OpenShift Container Platform**
