@@ -32,7 +32,7 @@ shell types:
   debian,ubuntu: sh(default)
   alpine: ash(default)
   IBM AIX: ksh(default)
-  other types: csh,zsh
+  other types: zsh,csh
 
 shell command format: command + [subcommand] + [options] + arguements
 
