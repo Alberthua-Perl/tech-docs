@@ -164,6 +164,28 @@ Linux commands collection:
     - killall <process-name>
     - pkill -SIGNALNAME -u <username>
     - pkill -P <ppid>
+    - pgrep -l -u <username>
+      # 查看指定用户的进程列表
+    - pkill -SIGNAME -u <username>
+      # 向指定用户的所有进程发送特定的信号
+    - pstree -p <username>
+      # 查看指定用户的进程树
+  systemd:
+    - systemctl -t help
+      # 查看系统上支持的单元类型
+    - systemctl enable <name>.service
+    - systemctl enable --now <name>.service
+    - systemctl start <name>.service
+    - systemctl stop <name>.service
+    - systemctl disable <name>.service
+    - systemctl status <name>.service
+    - systemctl is-active <name>.service
+    - systemctl is-enabled <name>.service
+    - systemctl is-failed <name>.service
+    - systemctl --failed --type=<type>
+    - systemctl reload <name>.service
+    - systemctl mask <name>.service
+    - systemctl umask <name>.service
 
 Linux text editor:
   - nano: text
@@ -269,6 +291,29 @@ process to process communication method:
   shared memory: parent and child process
   rpc: remote progress call(rpcbind)
   gRPC: google remote process call(golang,java,python)
+OS load average:
+  - CPU utility
+  - load average:
+    - running state processes: 3
+    - runnable state processes: 2
+    - deep sleeping state processes: 3
+
+systemd:
+  - RHEL 5/6: init(PID 1)
+  - RHEL 7/8: systemd(PID 1)
+  - systemd managed: rhel,fedora,centos,centos-stream,rocky,opensuse,suse,debian,ubuntu
+  - systemd unit:
+    - target: top level
+    - service: system service,application service
+    - socket: process communication
+    - device: general device
+    - mount: mount operator
+    - automount: autofs
+    - swap: swap device
+    - timer: 定时器单元文件(可以用于取代 cronjob)
+    - path: printer
+    - slice: cgroup manage
+    - scope: cgroup manage
 
 upstream and redhat:
   os:
@@ -437,24 +482,24 @@ network configure:
     - rhel5/6: ntpd
     - rhel7/8: chronyd
   network service change:
-    - rhel5/6: service network start|stop|restart
-    - rhel7: 
-      - network.service
-      - NetworkManager.service
-        /etc/sysconfig/network-scripts/ifcfg-eth0
-        NM_CONTROLLED=no
+    - rhel5/6: service network [start|stop|restart]
+    - rhel7:
+        - network.service: scripts manage
+        - NetworkManager.service:
+        - /etc/sysconfig/network-scripts/ifcfg-*: NM_CONTROLLED=no
     - rhel8:
-      - NetworkManager.service(python)
-        nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
+        - NetworkManager.service(python):
+          nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
   ipv4 address configure and route:
     - command line:
         - ip 
         - nmcli connection add con-name "System eth0" type ethernet dev eth0
-          nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254
-          ipv4.dns 172.25.250.254 ipv4.method manual
-          nmcli connection show
-          nmcli connection down "System eth0"  ==same as==> ifdown "System eth0"
-          nmcli connection up "System eth0"  ==same as==> ifup "System eth0"
+        - nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.254 ipv4.method manual
+        - nmcli connection show
+        - nmcli connection down "System eth0"
+          # 等同于 ifdown "System_eth0"
+        - nmcli connection up "System eth0"
+          # 等同于 ifup "System_eth0"
     - configure file: /etc/sysconfig/network-scripts/ifcfg-*
     - problem:
         serverb: 192.168.11.0/24 <--> servera: 192.168.8.0/24
