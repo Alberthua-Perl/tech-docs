@@ -65,10 +65,10 @@ Linux commands collection:
     - cat [-n] /path/to/file
     - less /path/to/file
     - more /path/to/file
-    - tail -n <num> /path/to/file
+    - tail -n <number> /path/to/file
     - tail -f /path/to/file
-      # 追踪即时日志刷新
-    - head -n <num> /path/to/file
+      # 追踪实时日志刷新
+    - head -n <number> /path/to/file
       # 默认查看文本文件的前 10 行
     - wc -l|-w|-c /path/to/file 
     - history
@@ -158,16 +158,18 @@ Linux commands collection:
     - ps -efL
       # 查看系统进程及其子线程的信息(NLWP)
     - ps -L p <pid>
+      # 查看进程子线程的信息
     - jobs
     - fg %<job-number>
     - bg %<job-number>
-    - killall <process-name>
-    - pkill -SIGNALNAME -u <username>
+    - killall -<SIGNALNAME> <process-name>
+      # 向指定的所有进程发送信号
+    - pkill -<SIGNALNAME> -u <username>
+      # 向指定用户运行的所有进程发送信号
     - pkill -P <ppid>
+      # 终止由父进程生成的所有子进程
     - pgrep -l -u <username>
       # 查看指定用户的进程列表
-    - pkill -SIGNAME -u <username>
-      # 向指定用户的所有进程发送特定的信号
     - pstree -p <username>
       # 查看指定用户的进程树
   systemd:
@@ -335,14 +337,10 @@ applied rpm packages:
     - vmware
     - aliyun
     - huawei
-    - ucloud
-    - qincloud
   - internet
     - centos
-    - tinghua
-    - 163
+    - tsinghua
     - aliyun
-    - github
   - developed
     - company internal rpm repository
 
@@ -361,7 +359,7 @@ rpm commands:
 package manage method:
   rhel,centos,rocky,fedora,suse,opensuse: rpm package(*.rpm)
   debian,ubuntu: deb package(*.deb)
-  alpine os: apk package(*.apk) --> community  ubi7,ubi8 <--> alpine
+  alpine os: apk package(*.apk)
 
 yum and dnf:
   rhel8: yum is the same as dnf-3 and yum is softlink to dnf-3
@@ -447,7 +445,7 @@ partition:
     - df -Th
 
 LVM:
-  LVM: logical volume manager
+  description: logical volume manager
   component: 
     - disk-partition or whole-disk
     - PV: physical volume
@@ -465,34 +463,37 @@ LVM:
     
 network configure:
   verify network:
-    - ifconfig
+    - ifconfig [-a]
     - netstat -an
-    - netstat -tunlp
-    - route 
-    - ip link show
+    - netstat -antulp
+    - route -n
+      # 以上的命令来自于 net-tools 软件包已被弃用
+    - ip [-s] link show
     - ip address show
-    - ip a s
+      # 与 ip a s 命令相同
+    - ip -br a s
+      # 以简要的形式查看 ip 信息
     - ip address del 172.25.250.9/24 dev eth0
     - ip address add 172.25.250.110/24 dev eth0
-    - ip address flush dev eth0  ==> clear all address 
-    - ip -br a s
+    - ip address flush dev eth0
+      # clear all address 
     - ip route show
-    - ss -tunlp
+    - ss -antulp
   system time service:
     - rhel5/6: ntpd
     - rhel7/8: chronyd
   network service change:
-    - rhel5/6: service network [start|stop|restart]
+    - rhel5/6: 
+        - service network [start|stop|restart]
     - rhel7:
-        - network.service: scripts manage
+        - network.service: 
+            - initscripts manage
         - NetworkManager.service:
         - /etc/sysconfig/network-scripts/ifcfg-*: NM_CONTROLLED=no
     - rhel8:
-        - NetworkManager.service(python):
-          nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
+        - NetworkManager.service(python): nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
   ipv4 address configure and route:
     - command line:
-        - ip 
         - nmcli connection add con-name "System eth0" type ethernet dev eth0
         - nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.254 ipv4.method manual
         - nmcli connection show
@@ -501,9 +502,6 @@ network configure:
         - nmcli connection up "System eth0"
           # 等同于 ifup "System_eth0"
     - configure file: /etc/sysconfig/network-scripts/ifcfg-*
-    - problem:
-        serverb: 192.168.11.0/24 <--> servera: 192.168.8.0/24
-        route gateway: 192.168.0.10/16
   hostname:
     - command line:
         - hostnamectl set-hostname rh199.lab.example.com
