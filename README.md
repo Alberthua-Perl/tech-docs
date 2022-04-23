@@ -26,7 +26,7 @@
     - [Red Hat Quay v3 registry 原理与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Red%20Hat%20Quay%20v3%20registry%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
     - [Skopeo 镜像工具与容器镜像格式的原理与使用](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Skopeo%20%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8.md)
   - ☸ **Kubernetes**
-    - [Ansible 快速部署 Kubernetes 及相关组件](https://github.com/Alberthua-Perl/kani) 
+    - [Kani - Ansible 快速部署与管理 Kubernetes v1.22.1](https://github.com/Alberthua-Perl/kani) 
   - ⭕️ **Red Hat OpenShift Container Platform**
     - [OpenShift v4.x all-in-one (AIO) 部署与配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/OpenShift%20v4.x%20all-in-one%20(AIO)%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E9%85%8D%E7%BD%AE.md) 
     - [Red Hat OpenShift v3 与 v4 基础架构与应用构建](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20v3%20%E4%B8%8E%20v4%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA.md)
