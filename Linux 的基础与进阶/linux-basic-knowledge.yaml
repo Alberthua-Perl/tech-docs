@@ -301,7 +301,7 @@ OS load average:
     - deep sleeping state processes: 3
 
 systemd:
-  - RHEL 5/6: init(PID 1)
+  - RHEL 5/6: SysV, init(PID 1)
   - RHEL 7/8: systemd(PID 1)
   - systemd managed: rhel,fedora,centos,centos-stream,rocky,opensuse,suse,debian,ubuntu
   - systemd unit:
@@ -312,7 +312,7 @@ systemd:
     - mount: mount operator
     - automount: autofs
     - swap: swap device
-    - timer: 定时器单元文件(可以用于取代 cronjob)
+    - timer: replace cronjob
     - path: printer
     - slice: cgroup manage
     - scope: cgroup manage
@@ -365,17 +365,22 @@ yum and dnf:
   rhel8: yum is the same as dnf-3 and yum is softlink to dnf-3
   command:
     - yum search "pattern"
-    - yum install packagename
-    - yum remove packagename
-    - yum update packagename
-    - yum upgrade 
-    - yum downgrade packagename
+    - yum install [-y] packagename
+    - yum remove [-y] packagename
+    - yum update [-y] packagename
+    - yum upgrade [-y]
+    - yum downgrade [-y] packagename
     - yum repolist
+    - yum makecache
+    - yum clean all
     - yum list packagename
     - yum history undo
     - yum info packagename
+    - yum provides /path/to/file
+      # 查看文件来自于哪个 RPM 软件包
     - yum group info groupname
-    - yum group list
+    - yum group list hidden
+      # 查看所有包组列表
   package group:
     - regular group: 
         - group of packages
@@ -490,12 +495,16 @@ network configure:
             - initscripts manage
         - NetworkManager.service:
         - /etc/sysconfig/network-scripts/ifcfg-*: NM_CONTROLLED=no
+          # 该参数可使 network.service 与 NetworkManager.service 服务共存，并且后者不会影响前者配置 IP 的状态。
     - rhel8:
         - NetworkManager.service(python): nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
   ipv4 address configure and route:
     - command line:
         - nmcli connection add con-name "System eth0" type ethernet dev eth0
         - nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.254 ipv4.method manual
+          # 同一台主机上可以存在多个默认路由，但是在这种情况下，可能发生间断性的访问中断。
+          # 在生产的节点上，强烈建议只配置一个默认路由，而 ipv4.gateway 是默认路由的配置选项，因此，我们建议在 nmcli connection modify 过程中不要加入
+          # ipv4.gateway 配置，并且将对应网口配置 /etc/sysconfig/network-scripts/ifcfg-* 中的 DEFROUTE=yes 去除！
         - nmcli connection show
         - nmcli connection down "System eth0"
           # 等同于 ifdown "System_eth0"
