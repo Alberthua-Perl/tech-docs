@@ -12,6 +12,7 @@
     - [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
   - 🚀 **Linux 网络虚拟化**
     - [Linux NAT 与 Overlay 网络的实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%BD%91%E7%BB%9C%E8%99%9A%E6%8B%9F%E5%8C%96/Linux%20NAT%20%E4%B8%8E%20Overlay%20%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9E%E7%8E%B0.md)
+    - [Linux 路由转发与 SNAT 故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%BD%91%E7%BB%9C%E8%99%9A%E6%8B%9F%E5%8C%96/Linux%20%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E4%B8%8E%20SNAT%20%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
     - [Open Virtual Network（OVN）概述与分析](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-arch-introduce.md)
     - [配置 OVN 逻辑交换机](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-switch-demo.md)
     - [配置 OVN 逻辑路由器](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-router-demo.md)
