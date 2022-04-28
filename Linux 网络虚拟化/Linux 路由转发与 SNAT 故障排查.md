@@ -12,7 +12,7 @@
 
 - 故障节点的架构与抓包示意：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux路由转发与SNAT故障排查\linux-gateway-snat-or-masquerade.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-firewall-route-troubleshoot/linux-gateway-snat-or-masquerade.jpg)
 
 - 如上所示，server 节点访问 Internet 需要通过 Linux-router1 节点、Linux-router2 节点与 foundation 节点的路由转发。
 
@@ -90,7 +90,7 @@
     # 使用 iptables 的类似的语法添加 SNAT 规则 
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\SDN\pictures\Linux路由转发与SNAT故障排查\firewall-cmd-man-doc.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-firewall-route-troubleshoot/firewall-cmd-man-doc.jpg)
     
     通过上述命令其中任意一种方法即可实现 SNAT。由于在 RHEL 8 中默认使用 `firewalld` 守护进程作为 `nftables` 的前端管理程序，nftables 默认作为用户空间层（user space）firewalld 的后端实现（内核空间层 kernel space 由 `netfilter` 实现），因此，在 nftables 的 NAT 表中可查看 firewalld 配置的 SNAT 规则，如下所示：
     
