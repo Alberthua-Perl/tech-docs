@@ -1,4 +1,4 @@
-## Ansible 自动化进阶实践 - 使用 Ansible 与 API 通信
+## 🤘 Ansible 自动化进阶实践 - 使用 Ansible 与 API 通信
 
 ### 使用 Ansible Tower API 启动作业
 
