@@ -1,6 +1,11 @@
 ## 🤘 Ansible 自动化进阶实践 - 使用 Ansible 与 API 通信
 
-### 使用 Ansible Tower API 启动作业
+### 文档目录：
+
+- 使用 Ansible Tower API 启动作业
+- 使用 Ansible Playbook 与 API 交互
+
+### 使用 Ansible Tower API 启动作业：
 
 - 红帽 `Ansible Tower REST API`：
   
@@ -370,7 +375,7 @@
     >    
     >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/job-template-not-extra-var-error.jpg)
 
-### 使用 Ansible Playbook 与 API 交互
+### 使用 Ansible Playbook 与 API 交互：
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
