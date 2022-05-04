@@ -1,6 +1,6 @@
-## 第三章 管理任务执行
+## Ansible 自动化进阶实践 - 管理任务执行
 
-### 章节：
+### 文档目录：
 
 - 控制特权升级
 
@@ -10,7 +10,7 @@
 
 - 优化执行速度
 
-### 第一节 控制特权升级
+### 控制特权升级
 
 - 特权升级策略：  
   
@@ -30,7 +30,7 @@
   
   - 配置指令和命令行选项：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\privileged-escalation-directives-options.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/privileged-escalation-directives-options.jpg)
   
   > 若 Ansible 配置文件指定 `become: false`，但命令行中包含 `-b` 选项，则 Ansible 将忽略配置文件，并且默认使用特权升级。
 
@@ -155,7 +155,7 @@
   
   - playbook 和配置指令与连接变量名称的比较：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\connection-variables.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/connection-variables.jpg)
   
   - 👉 连接变量的特权升级优先级⾼于配置和 playbook 指令，将覆盖配置文件、play、task、block 和 role 中的 become 设置。
   
@@ -229,7 +229,7 @@
   
   - 👉 这种情况下，可为这些主机或其所在的组设置 `ansible_become_method` 等清单变量，同时在 playbook 中通过 become 来指定是否使用特权升级。
 
-### 第二节 控制任务执行
+### 控制任务执行
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
@@ -318,7 +318,7 @@
           when: ansible_facts['architecture'] == "amd"
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\import_roles-include_roles.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/import_roles-include_roles.jpg)
   
   > 与 import_tasks 及 include_tasks 指令比较。
 
@@ -585,7 +585,7 @@
   > 
   > 2. 若清单配置为按字母顺序列出主机，而 play 按清单顺序在受管主机上运行（默认行为）。
 
-### 第三节 运行选定的任务
+### 运行选定的任务
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
@@ -749,22 +749,6 @@
           yum:
             name: postfix
             state: latest
-    
-    
-    ```
-
-    ```
-    
-    ```
-    
-    ```
-    
-    ```
-    
-    ```
-    
-    ```
-    
     ```
     
     ```bash
@@ -826,7 +810,7 @@
   # 交互式运行使用 ansible 加密的 playbook，提示输入密码。
   ```
 
-### 第四节 优化执行速度
+### 优化执行速度
 
 - ✅ 优化 Ansible playbook 执行速度可参考的方式：
   
@@ -946,7 +930,7 @@
             state: present    # 不使用 loop 循环以增加执行效率
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\yum-module-no-loop.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/yum-module-no-loop.jpg)
     
     👉 以上示例相当于在 shell 命令行中只执行一次 yum 命令与依赖包解析，而使用 loop 循环，相当于执行多次 yum 命令与依赖包解析，运行速度慢且效率低。
   
@@ -976,7 +960,7 @@
   
   - 当目录很大并含有许多文件时，可能需要花费很长时间才能完成复制。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\copy-module-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/copy-module-demo.jpg)
   
   - 若多次运行 playbook，由于该模块仅复制不同的文件，后续的复制将花费较少时间。
   
@@ -988,7 +972,7 @@
     
     - 因此，受管主机必须安装 rsync 命令，否则报错！
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\synchronize-module-demo.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/synchronize-module-demo.jpg)
 
 - 使用 Jinja2 模板（template）：
   
@@ -1162,7 +1146,7 @@
     # 指定 cgroup_perf_recap 回调插件使用的控制组名称
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\cgroup_perf_recap-callback-demo-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/cgroup_perf_recap-callback-demo-1.jpg)
     
     ```bash
     $ cgexec -g cpuacct,memory,pids:ansible_profile \
@@ -1170,9 +1154,9 @@
     # 使用指定的控制组监控与收集 playbook 执行时进程的性能指标
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\cgroup_perf_recap-callback-demo-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/cgroup_perf_recap-callback-demo-2.jpg)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter03\cgroup_perf_recap-callback-demo-3.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/cgroup_perf_recap-callback-demo-3.jpg)
 
 - 任务和角色计时：
   
