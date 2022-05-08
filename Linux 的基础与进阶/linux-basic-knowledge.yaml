@@ -448,6 +448,31 @@ partition:
       /dev/vdc1  /path/to/mountpoint   ext4  defaults   0 0
     - mount -a
     - df -Th
+  swap:
+    - linux disk partition
+    - linux virtual memory(VIRT): physical-memory(RES) + swap
+      # top command: VIRT, RES
+      # ps command: VSZ, RSS
+    - create swap partition:
+        - mkswap /dev/sdXn
+        - vim /etc/fstab: /dev/sdXn  swap  swap  defaults  0 0
+        - swapon -a
+        - swapon -s
+    - change swap priority:
+        - sync: 换出 swap 中非活动页面至物理内存中
+        - swapoff -a
+        - vim /etc/fstab: /dev/sdXn  swap  swap  defaults,pri=N  0 0
+          # 添加 pri=N 参数以更改 swap 优先级
+        - swapon -a
+        - swapon -s
+          # EXAMPLE:
+          #   [root@serverb ~]# cat /etc/fstab
+          #   /dev/vdb2  swap      swap defaults  0 0
+          #   /dev/vdb3  swap      swap defaults,pri=5  0 0
+          #   [root@serverb ~]# swapon -s
+          #   Filename                                Type            Size    Used    Priority
+          #   /dev/vdb2                               partition       511996  0       -2
+          #   /dev/vdb3                               partition       1048572 0       5
 
 LVM:
   description: logical volume manager
@@ -456,16 +481,28 @@ LVM:
     - PV: physical volume
     - VG: 
       - volume group
-      - physical extent: 4M(default), 8M, 16M, 32M
+      - physical extent(PE): 4M(default), 8M, 16M, 32M
     - LV: logical volume
   devicemapper frame:
     - from kernel 2.6.x
     - kernel module(driver)
-    - lvm,stratis,vdo,crypt,docker-image-graph-driver,mutipath
+    - solutions: vm,stratis,vdo,crypt,docker-image-graph-driver,mutipath
   ext4 extend: 
     - nohup resize2fs /dev/mapper/vgname-lvname &
     - active all devices exclude vdo device --> start service included vdo.service --> active vdo device
     
+VDO:
+  - description: virtual data optimizor
+  - use vdo:
+      - dnf install -y vdo kmod-kvdo
+        # install vdo components
+      - vdo create --device=/dev/vdb --name=vdo0 --vdoLogicalSize=50G
+        # create vdo device
+      - vim /etc/fstab
+        # /dev/mapper/vdo0  /mnt/vdo  xfs  defaults,x-systemd.requires=vdo.service  0 0
+      - systemctl status vdo.service
+        # 查看 VDO 激活程序的状态，而非守护进程！
+
 network configure:
   verify network:
     - ifconfig [-a]
@@ -563,28 +600,55 @@ selinux and firewalld:
       # systemctl start httpd.service
 
 nfsv4 and autofs:
-  aufofs: 
-    - automation filesystem mount
-    - client --nfsv4--> nfs-server
-
-  practice: 
+  nfs-practice: 
     - How to configure nfs-server and nfs-client on RHEL8? 
-    - [*] Please use auid= to configure other user to access nfs?
-    root@serverb: as nfs-server
-      # mkdir -p /shared
-      # cat /etc/exports.d/shared.exports
-        /shared  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
-      # systemctl start nfs-server.service
-      # systemctl enable nfs-server.service
-      # showmount -e localhost
-      # firewall-cmd --permanent --add-service=nfs
-      # firewall-cmd --permanent --add-service=mountd
-      # firewall-cmd --permanent --add-service=rpc-bind
-      # firewall-cmd --reload
-      # firewall-cmd --list-all
-    root@servera: as nfs-client
-      # systemctl status rpcbind.service
-      # mkdir /mnt/shared
-      # mount 172.25.250.108:/shared /mnt/shared
-      # df -Th /mnt/shared
+      # Note: [*] How use 'auid=' to configure other user to access nfs-server?
+    - root@serverb: as nfs-server
+        # 创建 nfs-server 并被 nfs-client 挂载共享
+        - mkdir -p /shared 
+        - mkdir -p /mnt/tp1/data{1..10}
+        - vim /etc/exports.d/shared.exports
+          /shared  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
+          /mnt/tp1  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
+        - systemctl start nfs-server.service
+        - systemctl enable nfs-server.service
+        - exportfs -a
+        - showmount -e localhost
+        - firewall-cmd --zone=public --permanent --add-service=nfs
+        - firewall-cmd --zone=public --permanent --add-service=mountd
+        - firewall-cmd --zone=public --permanent --add-service=rpc-bind
+        - firewall-cmd --zone=public --reload
+        - firewall-cmd --zone=public --list-all
+    - root@servera: as nfs-client
+        - systemctl status rpcbind.service
+        - mkdir /mnt/shared
+        - mount 172.25.250.11:/shared /mnt/shared
+        - df -Th /mnt/shared
+
+  aufofs-practice: 
+    - automation nfs mount on client
+    - client -- nfsv4 --> nfs-server
+    - How configure autofs client to direct mount or indirect mount nfs share?
+    - root@servera: as nfs-client
+        # autofs 自动挂载直接映射的共享
+        - yum install -y autofs
+        - vim /etc/auto.master.d/direct.autofs
+          /- /etc/auto.direct
+        - vim /etc/auto.direct
+          /shared -rw,sync,fstype=nfs4 serverb.lab.example.com:/shared
+        - systemctl enable --now autofs.service
+        - cd /shared
+          # 触发自动挂载 nfs-server 的 /shared 共享
+        - df -Th
+          # serverb.lab.example.com:/shared nfs4      9.9G  1.6G  8.4G  16% /shared
+        
+        # autofs 自动挂载通配符支持的间接映射的共享
+        - vim /etc/auto.master.d/indirect.autofs
+          /tp-data /etc/auto.indirect
+        - vim /etc/auto.indirect
+          * -rw,sync,fstype=nfs4 serverb.lab.example.com:/mnt/tp1/&
+        - systemctl restart autofs.service
+        - cd /tp-data/data3
+        - cd /tp-data/data5
+          # 触发自动挂载 nfs-server 的间接映射共享目录
 
