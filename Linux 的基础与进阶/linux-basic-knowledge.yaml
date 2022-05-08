@@ -228,9 +228,14 @@ publickey-based ssh login:
   - $HOME/.ssh/authorized_keys: 0600
   - $HOME/.ssh/config: 0600
 
-GUI switch CLI:
+GUI mode and CLI mode:
+  - systemctl get-default
+    # 查看系统当前开机启动模式
   - systemctl isolate multi-user.target
   - systemctl isolate graphical.target
+    # 切换不同的系统登录方式
+  - systemctl set-default [multi-user.target|graphical.target]
+    # 设置不同的开机启动登录模式
 
 user and group:
   user:
@@ -652,3 +657,17 @@ nfsv4 and autofs:
         - cd /tp-data/data5
           # 触发自动挂载 nfs-server 的间接映射共享目录
 
+rhel7/8 boot progress:
+  - power on system
+  - system POST
+  - UEFI or BIOS search boot device in boot list including NIC, disk, USB, etc
+  - [*] If boot device is disk, UEFI or BIOS transform system control to GRUB2 (boot loader).
+  - GRUB2 read grub2 kernel options (verify where is kernel and initramfs)
+  - [*] load kernel and initramfs into memory as memory rootfs
+  - kernel and initramfs load all available devices through kernel module, initramfs include different device drivers.
+  - /sbin/init (systemd) in memory load initrd.target including /sysroot (real system rootfs)
+  - /etc/fstab in /sysroot used to mount devices (*.mount, *.device)
+  - [*] kernel transform system control to systemd (initramfs --> real-disk-fs)
+  - systemd load and start all available *.target
+  - load and start all available unit file
+  - login system through multi-user.target or graphical.target
