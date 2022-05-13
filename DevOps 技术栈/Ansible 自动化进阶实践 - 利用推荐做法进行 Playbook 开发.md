@@ -1,12 +1,10 @@
-## 第一章 利用推荐做法进行开发
+## Ansible 自动化进阶实践 - 利用推荐做法进行 Playbook 开发
 
-### 章节：
+### 文档目录：
 
 - 实施推荐做法
 
-- 使用 Git 管理 Ansible 项目资料
-
-### 第一节 实施推荐做法
+### 实施推荐做法
 
 > 该小节涉及的 python 脚本可参考该链接：[simple_inventory.py](https://github.com/Alberthua-Perl/scripts-confs/blob/master/python-examples/simple_inventory.py)
 
@@ -196,7 +194,7 @@
           print("Requires an argument, please use --list or --host <host>")
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter01\python-simple-inventory.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-playbook-develop-recommend/python-simple-inventory.png)
     
     - 动态清单在与云提供商、容器和虚拟机管理系统结合使用时尤其强大。
     
@@ -334,7 +332,7 @@
   
   - 🤘 通常，如果 Ansible 中的某一功能已启用或有变化，则该项目会在删除或更改功能之前提早四个小版本（minor releases）提供启用通知。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter01\ansible-playbook-deprecation-warning.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-playbook-develop-recommend/ansible-playbook-deprecation-warning.png)
   
   > yum 模块从 2.11 版本开始，将移除使用循环的语法，可使用列表形式安装多个软件包。
 
@@ -359,8 +357,5 @@
     
     该工具不关心 Ansible，只是用于识别并分析 YAML 文件语法相关的问题。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter01\yamllint-demo.png)
-
-### 第二节 使用 Git 管理 Ansible 项目资料
-
-- 该小节请参看 [Git 原理及常规使用配置]()
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-playbook-develop-recommend/yamllint-demo.png)
+    
