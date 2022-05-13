@@ -25,8 +25,6 @@
 
 - 从本地仓库的版本回退
 
-- 参考链接
-
 ### 基础架构即代码（infrastructure as code）：
 
 - 一个关键的 `DevOps` 概念是基础架构即代码。
@@ -97,7 +95,7 @@
   
   Local Working Tree -> Staging Area -> Local Repository -> Remote Repositiry (upstream) 
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-manage-files-foue-areas.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-manage-files-foue-areas.png)
 
 - Git 目录结构示例：
   
@@ -164,7 +162,7 @@
   #   $ git config --global --edit：直接进入 Vim 编辑 ~/.gitconfig 文件 
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-config-user-info.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-config-user-info.png)
 
 - git 软件包附带的 `git-prompt.sh` 脚本可报告工作树状态。
 
@@ -196,7 +194,7 @@
   
   > 🤘 除了使用 git-prompt.sh 脚本设置 PS1 环境变量外，也可使用如 `oh-my-bash` 等 shell 命令行配置工具更改 theme 以获得不同的 PS1 环境变量的样式。
   > 
-  > ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\oh-my-bash-ps1.jpg)
+  > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/oh-my-bash-ps1.jpg)
 
 ### Git 工作流：
 
@@ -212,9 +210,9 @@
 
 - 🚀 Git 目录结构与 Git 命令对应关系：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-workflow-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-workflow-1.png)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-workflow-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-workflow-2.png)
 
 - 初始化 Git 仓库：
   
@@ -234,7 +232,7 @@
   #      还必须设置服务器，以便用户使用 HTTPS 或 SSH 协议来克隆、拉取和推送到仓库。
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-init-clone.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-init-clone.png)
 
 - 🤘 查看当前分支的 Git 工作区、暂存区的状态：
   
@@ -282,9 +280,9 @@
   
   👉 示例：`git rm` 与 `git rm --cached` 的区别
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-rm-working-tree-and-staged.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-working-tree-and-staged.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-rm-f-cached-staged.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-f-cached-staged.jpg)
 
 - 本地仓库相关操作：
   
@@ -312,9 +310,9 @@
   # --set-upstream 选项：关联本地分支与远程代码库分支
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-add-commit.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-add-commit.png)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-pull-push.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-pull-push.png)
 
 - ✨ git push 推送代码的故障排查：
   
@@ -322,9 +320,9 @@
   
   远程代码仓库的分支中已存在其他开发者提交的新代码，而在本地工作区与本地仓库中无这些更新，因此本地仓库推送更新的代码至远程代码仓库的分支中时会由于两者的状态不一致而产生冲突（`conflict`），此时可将远程的更新拉取（`pull`）至本地工作区与本地仓库，同步两者的状态后即可重新推送，如下所示：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-push-error-resolv-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-error-resolv-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-push-error-resolv-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-error-resolv-2.jpg)
   
   👉 示例 2：
   
@@ -332,7 +330,7 @@
   
   💥 远程代码仓库中的分支无需手动创建，使用上述选项后将自动创建！
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-push-set-upstream-branch.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-set-upstream-branch.jpg)
   
   👉 示例 3：
   
@@ -403,7 +401,7 @@
     # 查看指定提交的更改内容（或指定 tag 的详细信息）
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-log-commit-info.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-log-commit-info.png)
   
   - 命令中不需要输入完整的哈希，只需其中的足够部分来唯一标识仓库中的特定提交。
   
@@ -431,7 +429,7 @@
   
   - 引用可指向提交（`commit`）、标签（`tag`）或分支（`branch`）
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-head-log.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-head-log.jpg)
 
 - 若在工作区中进行更改，使用 git add 命令进行暂存，并使用 git commit 命令进行提交，则将创建一个新的提交，以最新的提交作为其父项，并且 `HEAD` 将转为指向新的提交。
 
@@ -455,11 +453,11 @@
   
   - 各分支间的关系如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-branch-workflow.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-workflow.png)
 
 - Git 分支工作流示意：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-branch-workflow-from-github.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-workflow-from-github.png)
 
 ### 创建与删除 Git 分支：
 
@@ -500,13 +498,13 @@
   
   👉 示例：从 `master` 主分支当前的 `38fe8f9` commit 上创建 `feature` 分支
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-different-branch-checkout.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-different-branch-checkout.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-branch-checkout.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-checkout.png)
   
   👉 示例：删除并更新远程代码仓库分支
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\delete-remote-repository-branch.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/delete-remote-repository-branch.png)
 
 > 💥 注意：
 > 
@@ -534,7 +532,7 @@
   # 注意：分支合并入原始分支后，其更改将全部还原。
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-merge-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-demo.png)
 
 ### 从旧 commit 创建分支：
 
@@ -547,7 +545,7 @@
   # 创建并切换至新分支中
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Git原理及常规使用配置\git-create-new-branch-from-previous-commit.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-create-new-branch-from-previous-commit.png)
 
 ### 从本地仓库的版本回退：
 
@@ -607,30 +605,3 @@
   1ae7ef00d8657bc6802b657a4dcd88ceb6e256f6 Init master branch 
   # 此时的 HEAD 引用也指向 3f9bd69 commit
   ```
-
-### 参考链接：
-
-### 需整理的 Git 命令：
-
-```bash
-git checkout --orphan <new_branch>
-# 用于创建一个全新的分支，不包含原分支的提交历史。
-git checkout <commit> <filename>
-# 根据之前的 commit 提交恢复文件至暂存区（stage）与工作区，可用于还原误操作的文件。
-git branch -D <branch_name>
-# 强制删除本地分支
-git tag -d <tag_name>
-# 删除本地仓库 tag
-git blame <filename>
-# 查看文件最后一次更改的时间戳与提交者
-git push
-# 其他分支合并入 master 主线后需推送本地的 master 主线至远程仓库的 master 主线中
-git reset --soft <commit>
-# 重置当前分支的 HEAD 为指定 commit，但保持暂存区和工作区不变。
-
-git bisect
-git fetch
-git rebase
-git stash
-# 搁置更改过的代码
-```
