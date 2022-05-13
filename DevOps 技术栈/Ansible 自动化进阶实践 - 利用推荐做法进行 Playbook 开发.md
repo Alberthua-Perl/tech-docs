@@ -6,7 +6,7 @@
 
 ### 实施推荐做法
 
-> 该小节涉及的 python 脚本可参考该链接：[simple_inventory.py](https://github.com/Alberthua-Perl/scripts-confs/blob/master/python-examples/simple_inventory.py)
+> 该小节涉及的 python 脚本可参考该链接：[simple_inventory.py](https://github.com/Alberthua-Perl/scripts-confs/blob/master/python-examples/simple_inventory.py)、[haproxy-lamp 角色](https://github.com/Alberthua-Perl/ansible-demo/tree/master/haproxy-lamp)
 
 - 保持简单：
   
