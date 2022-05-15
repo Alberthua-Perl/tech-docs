@@ -385,7 +385,7 @@
             characters_dict:
               Douglas: Human
               Marvin: Robot
-            Arthur: Human
+              Arthur: Human
             characters_items:
               - key: Douglas
                 value: Human
