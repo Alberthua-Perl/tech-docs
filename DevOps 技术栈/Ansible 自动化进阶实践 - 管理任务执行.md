@@ -45,7 +45,7 @@
   - 👉 若 play 中明确指定 become 升级特权，将忽略配置文件或命令行中的 become 特权升级。
   
   - 根据所涉及的 play 或主机，可能需要在配置设置或清单变量中指定升级方法或特权用户。
-
+  
   - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/play_level_privileged.yaml)：
     
     ```yaml
@@ -102,12 +102,12 @@
   - 👉 block 中的所有任务都共享相同的特权升级，而且此设置将覆盖 play 级别上的设置。
   
   - 与 `become_user` 搭配，使用特权升级来以应用所使用的某个普通用户，而不是以 root 执行一部分任务。
-
+  
   - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/block_level_privileged.yaml)：
     
     ```yaml
     ---
-    - name: Deploy web services
+    - name: Deploy apache web services
       hosts: webservers
       become: false
       tasks:
@@ -129,6 +129,9 @@
           register: webpage
           failed_when: webpage.status != 200
           # 若返回码不为 200 时，将该任务设置为 failed。
+        - name: Check webpage variable content
+          debug:
+            var: webpage
     ```
 
 - 角色（role）中的特权升级：
@@ -192,15 +195,21 @@
     
     - 在 playbook 中设置连接变量（对 play 本身进行设置）：
       
-      该方法将覆盖清单变量（通过正常的变量优先顺序），以及任何 become 指令的设置。
+      该方法将覆盖清单变量（通过正常的变量优先顺序），以及任何 become 指令的设置，[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/connection_variable_in_play.yaml)：
       
       ```yaml
       ---
-      - name: Example play using connection variables
+      - name: Example play using connection variable
         hosts: webservers
+        become: false
         vars:
           ansible_become: true
+          # ansible 连接变量的优先级比 play 级别的 become 指令高。
         tasks:
+          - name: Verify current username
+            debug:
+              var: ansible_user_id
+      
           - name: Play will use privilege escalation even if inventory says no
             yum:
               name: perl
@@ -234,10 +243,6 @@
   - 👉 这种情况下，可为这些主机或其所在的组设置 `ansible_become_method` 等清单变量，同时在 playbook 中通过 become 来指定是否使用特权升级。
 
 ### 控制任务执行
-
-> 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
-> 
-> [include_import_role.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/include_import_role.yml)、[listen_handlers.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/listen_handlers.yml)
 
 - 控制执行顺序：
   
@@ -302,7 +307,7 @@
     
     - 使用 include_role 模块时，Ansible 会在 play 执行期间到达 include_role 任务时解析角色并插入到 play 中，若 Ansible 检测到角色中存在语法错误，则中止执行 playbook。
   
-  - 使用 include_role 或 import_role 任务时，若 when 指令中的条件为 false，则 Ansible 不解析角色（直接 `skipping`）。
+  - 使用 include_role 或 import_role 任务时，若 when 指令中的条件为 false，则 Ansible 不解析角色（直接 `skipping`），[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/include_import_role.yaml)：
     
     ```yaml
     ---
@@ -324,7 +329,7 @@
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/import_roles-include_roles.jpg)
   
-  > 与 import_tasks 及 include_tasks 指令比较。
+  > ✨ 与 import_tasks 及 include_tasks 指令比较。
 
 - 定义 Pre 与 Post 任务：
   
@@ -476,7 +481,7 @@
     
     - 使多个不同名称的处理程序（handler）都订阅相同的通知名称（notify），订阅通知触发运行。
   
-  - 示例：
+  - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/notify_listen_handlers.yaml)：
     
     ```yaml
     ---
@@ -591,10 +596,6 @@
 
 ### 运行选定的任务
 
-> 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
-> 
-> [block_tags.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/block_tags.yml)、[use_tags.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/use_tags.yml)
-
 - 标记 Ansible 资源：
   
   - 在处理大型或复杂的 playbook 时，可能希望仅运行一部分 play 或任务。
@@ -685,12 +686,12 @@
     
     - 块中的所有任务都与此标记关联
     
-    - 示例：将所有 httpd 相关任务组合到 webserver 标记下
+    - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/block_tags.yaml)：将所有 httpd 相关任务组合到 webserver 标记下
       
       ```yaml
       ---
       - name: Setup httpd service
-        hosts: all
+        hosts: managed_nodes
         order: reverse_sorted
       
         tasks:
@@ -732,7 +733,7 @@
   
   - 以逗号分隔列表的形式使用 --tags 指定多个标记。
   
-  - 示例：
+  - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/use_tags.yaml)：
     
     ```yaml
     ---
@@ -808,10 +809,7 @@
   # 执行全部标记 tag 的任务
   
   $ ansible-playbook <playbook>.yml --tags untagged
-  # 执行全部未标记 tag 的任务  
-  
-  $ ansible-playbook --ask-vault-pass <playbook>.yml
-  # 交互式运行使用 ansible 加密的 playbook，提示输入密码。
+  # 执行全部未标记 tag 的任务
   ```
 
 ### 优化执行速度
@@ -1111,7 +1109,7 @@
     ```bash
     $ ansible-doc -t callback -l
     # 查看可用的回调插件列表
-     
+    
     $ ansible-doc -t callback <plug_in_name>
     # 查看指定回调插件的详细信息
     ```
@@ -1178,4 +1176,4 @@
       
       在结束时显示每个角色所用的时间，按降序排列。
   
-  - 👉 callback_whitelist = timer,profile_tasks,profile_roles 回调插件可根据需求加以使用，而不必同时激活使用。
+  - 👉 `callback_whitelist = timer,profile_tasks,profile_roles` 回调插件可根据需求加以使用，而不必同时激活使用。
