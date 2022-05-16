@@ -45,6 +45,8 @@
   - 👉 若 play 中明确指定 become 升级特权，将忽略配置文件或命令行中的 become 特权升级。
   
   - 根据所涉及的 play 或主机，可能需要在配置设置或清单变量中指定升级方法或特权用户。
+
+  - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/play_level_privileged.yaml)：
     
     ```yaml
     ---
@@ -72,7 +74,7 @@
 
 - 任务（task）中的特权升级：
   
-  可为 play 中的一个任务打开（或关闭）特权升级，可将 become 指令添加到任务中。
+  可为 play 中的任务打开（或关闭）特权升级，可将 become 指令添加到任务中，[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/task_level_privileged.yaml)：
   
   ```yaml
   ---
@@ -100,6 +102,8 @@
   - 👉 block 中的所有任务都共享相同的特权升级，而且此设置将覆盖 play 级别上的设置。
   
   - 与 `become_user` 搭配，使用特权升级来以应用所使用的某个普通用户，而不是以 root 执行一部分任务。
+
+  - [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/block_level_privileged.yaml)：
     
     ```yaml
     ---
