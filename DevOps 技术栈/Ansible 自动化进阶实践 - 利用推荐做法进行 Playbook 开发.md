@@ -6,8 +6,6 @@
 
 ### 实施推荐做法
 
-> 该小节涉及的 python 脚本可参考该链接：[simple_inventory.py](https://github.com/Alberthua-Perl/scripts-confs/blob/master/python-examples/simple_inventory.py)、[haproxy-lamp 角色](https://github.com/Alberthua-Perl/ansible-demo/tree/master/haproxy-lamp)
-
 - 保持简单：
   
   - Ansible 的一大优势是简洁性。
@@ -82,7 +80,7 @@
     
     - 构造 Ansible 项目的文件时，使用统一的模式。
     
-    - 👉 示例 1：HAProxy LAMP 集群项目结构示例
+    - 👉 示例 1：[HAProxy LAMP 集群项目结构示例](https://github.com/Alberthua-Perl/ansible-demo/tree/master/haproxy-lamp)
       
       ```bash
       ┌─[devops][workstation][±][master ✓][~/gitlab/haproxy-lamp]
@@ -163,7 +161,7 @@
     
     - 动态清单支持从一个真实的中央来源集中管理主机和组，并确保清单自动更新。
     
-    - python 动态清单示例：
+    - [python 动态清单示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter01/simple-dynamic-inventory.py)：
       
       ```python
       #!/usr/bin/env python
@@ -358,4 +356,6 @@
     该工具不关心 Ansible，只是用于识别并分析 YAML 文件语法相关的问题。
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-playbook-develop-recommend/yamllint-demo.png)
+    
+  > 👉 yamllint 工具位于 [epel8 软件源](https://github.com/Alberthua-Perl/scripts-confs/blob/master/yum-repo/epel8.repo) 中！  
     
