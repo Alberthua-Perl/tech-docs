@@ -14,7 +14,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [jinja2_vars.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_vars.yml)、[jinja2_filter.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_filter.yml)
+> [jinja2_vars.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_vars.yaml)、[jinja2_filter.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_filter.yaml)
 
 - Ansible 过滤器：
   
@@ -531,7 +531,7 @@
 
 ### 使用查找模板化外部数据：
 
-> 1. 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：[jinja2_plugins.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_plugins.yml)
+> 1. 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：[jinja2_plugins.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_plugins.yaml)
 > 
 > 2. 可使用 `lookup 函数 + 过滤器` 重构 `with_*` 关键字！
 
@@ -746,7 +746,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [advanced_loop.yml]()
+> [advanced_loop.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/advanced_loop.yaml)
 
 - `with_list` 关键字与 `loop` 关键字：
   
@@ -956,7 +956,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [filter_network.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/filter_network.yml)
+> [filter_network.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/filter_network.yaml)
 
 - 收集和处理网络信息：
   
