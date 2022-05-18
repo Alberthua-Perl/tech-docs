@@ -34,7 +34,7 @@
     - [S2I 基本原理与应用构建部署示例](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/golang-s2i)
   - ♾️ **DevOps 技术栈**
     - [Git 原理及常规使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
-    - [基于 Jenkins 的 DevOps CICD 部署示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20Jenkins%20%E7%9A%84%20DevOps%20CICD%20%E9%83%A8%E7%BD%B2%E7%A4%BA%E4%BE%8B.md)
+    - [基于 Jenkins 的 DevOps CI/CD 部署示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20Jenkins%20%E7%9A%84%20DevOps%20CICD%20%E9%83%A8%E7%BD%B2%E7%A4%BA%E4%BE%8B.md)
     - [Ansible 自动化进阶实践（1）- 利用推荐做法进行 Playbook 开发](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E5%88%A9%E7%94%A8%E6%8E%A8%E8%8D%90%E5%81%9A%E6%B3%95%E8%BF%9B%E8%A1%8C%20Playbook%20%E5%BC%80%E5%8F%91.md)
     - [Ansible 自动化进阶实践（2）- 管理清单](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E7%AE%A1%E7%90%86%E6%B8%85%E5%8D%95.md)
     - [Ansible 自动化进阶实践（3）- 管理任务执行](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C.md) 
