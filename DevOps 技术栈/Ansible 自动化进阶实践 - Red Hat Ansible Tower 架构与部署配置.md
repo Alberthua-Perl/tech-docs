@@ -1,4 +1,4 @@
-## Red Hat Ansible Tower 架构与部署配置
+## Ansible 自动化进阶实践（6）- Red Hat Ansible Tower 架构与部署配置
 
 ### 文档说明：
 
@@ -44,13 +44,13 @@
 
 - Ansible 的优点在于它是去中心化的工具，可以直接通过 ssh 管理远程主机，实现无 `Agent` 的部署（ssh + python 环境已经原生集成在 Linux 中）。
 
-- 💥 Ansible 的缺点也在于其去中心化的特点，​​本身不支持高可用和分布式架构，无法实现 `Server-Proxy-Client` 的架构，在比较复杂或者多区域的网络区域中，无法实现统一的集中式管理（如多个 ansible 管理端的配置同步），也没有前端 `UI`，对 ansible 的技能要求比较高。
+- 💥 Ansible 的缺点也在于其去中心化的特点，本身不支持高可用和分布式架构，无法实现 `Server-Proxy-Client` 的架构，在比较复杂或者多区域的网络区域中，无法实现统一的集中式管理（如多个 ansible 管理端的配置同步），也没有前端 `UI`，对 ansible 的技能要求比较高。
 
 - Red Hat 为 Ansible 提供了一个 `Web UI`，即 `Ansible Tower`，使用它可以免费管理 `10` 台以内的主机。
 
 - Ansible Tower 是 `Django` Web 应用，可在 Linux 服务器上作为企业内自托管方案运行，架设于企业的现有 Ansible 基础架构之上。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\ansible-tower-logical-architecture.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/ansible-tower-logical-architecture.png)
 
 - 用户通过 Ansible Tower 的 `Web UI` 或 `RESTful API` 与其底层 Ansible 基础架构交互。
   
@@ -106,9 +106,9 @@
   
   - Ansible Tower 高可用架构示意：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\Ansible-Tower-HA-cluster-architecture-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/Ansible-Tower-HA-cluster-architecture-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\Ansible-Tower-HA-cluster-architecture-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/Ansible-Tower-HA-cluster-architecture-2.jpg)
     
     - 如上所示，三个 Ansible Tower 节点组成的集群共享一个 `PostgreSQL` 数据库。
     
@@ -227,7 +227,7 @@
   
   该 inventory 清单文件如下所示：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\ansible-tower-setup-inventory-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/ansible-tower-setup-inventory-demo.png)
   
   ```bash
   $ ./setup.sh
@@ -235,7 +235,7 @@
   # 配置部署过程需执行 15 分钟左右
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\ansible-tower-install-success.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/ansible-tower-install-success.jpg)
   
   - 该脚本创建 Ansible Tower 安装所需的 yum 源。
   
@@ -246,17 +246,17 @@
   # 查看 Ansible Tower 服务组件的监听端口（Nginx、RabbitMQ、PostgreSQL、Postfix）
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\ansible-tower-service-listen-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/ansible-tower-service-listen-port.jpg)
 
 - 登录 Ansible Tower：
   
   - Ansible Tower 使用 `Nginx` 监听前端 Web 请求，登录 URL 访问。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\login-ansible-tower.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/login-ansible-tower.png)
   
   - 首次登录 Ansible Tower 需要验证 `License`。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\login-ansible-tower-license.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/login-ansible-tower-license.png)
     
     - 登录 Ansible Tower 必须导入 License 才能使用。
     
@@ -264,7 +264,7 @@
     
     - 申请 License 后，将向注册邮箱发送邮件，其中包含 License。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\require-ansible-tower-license.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/require-ansible-tower-license.png)
     
     > 🤘 该示例使用反编译的方式破解 License。
   
@@ -276,7 +276,7 @@
     $ tree -F .
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\change-license-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/change-license-1.png)
     
     ```bash
     $ pip install uncompyle
@@ -294,7 +294,7 @@
     # 允许无 License 访问。
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\change-license-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/change-license-2.png)
     
     ```bash
     $ python -m py_compile __init__.py
@@ -316,7 +316,7 @@
   
   - 重新登录 Ansible Tower 则无需 License，部署完成。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\login-ansible-tower-again-success.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/login-ansible-tower-again-success.png)
 
 ### Ansible Tower 常见故障排查：
 
@@ -330,7 +330,7 @@
     
     更改相应项目目录的所有者与所属组都为 `awx`，在 Ansible Tower 中再次刷新查看即可。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\Red%20Hat%20Ansible%20Tower架构与部署配置\sync-ansible-tower-project-status-failed.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-tower-install/sync-ansible-tower-project-status-failed.png)
 
 ### 参考链接：
 
