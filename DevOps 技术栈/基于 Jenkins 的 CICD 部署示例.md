@@ -1,4 +1,4 @@
-## ♾ 基于 Jenkins 的 DevOps CI/CD 部署示例
+## ♾ 基于 Jenkins 的 CI/CD 部署示例
 
 ##### 文档说明：
 
