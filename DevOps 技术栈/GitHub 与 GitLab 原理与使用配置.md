@@ -52,7 +52,7 @@
     
     - 分支合作的整个流程，以创建 `feature` 子分支为例，如下所示：
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\github-master-other-branch.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-master-other-branch.png)
   
   - 更改文件并将它提交（commit）到 GitHub：
     
@@ -80,7 +80,7 @@
   
   - 添加 GitHub profile 的 `README.md` 文件以设置个人主页信息：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\personal-github-profile-readme.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/personal-github-profile-readme.jpg)
   
   - 本地用户使用 SSH 登录 GitHub 账号：
     
@@ -91,15 +91,15 @@
       $ ssh-keygen -t rsa -C "<your_email_address>"
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\local-login-github-ssh-keypair.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/local-login-github-ssh-keypair.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\add-ssh-pubkey-into-github-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-1.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\add-ssh-pubkey-into-github-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-2.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\add-ssh-pubkey-into-github-3.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-3.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\add-ssh-pubkey-into-github-4.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-4.png)
     
     - 本地登录 GitHub 测试：
       
@@ -121,7 +121,7 @@
       $ ssh-add <ssh_private_key>
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\login-github-error.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-github-error.jpg)
     
     - 若不使用 SSH 公钥免密码登录 GitHub，将在推送本地仓库代码至远程代码仓库时，需交互式输入用户名与密码来完成身份验证。
     
@@ -129,9 +129,9 @@
     
     - GitLab 也使用本地用户的 `SSH pubkey` 认证方法，远程登录 GitLab Shell。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\login-gitlab-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-gitlab-1.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\login-gitlab-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-gitlab-2.png)
   
   - 本地用户使用 SSH 登录 GitLab 私有代码仓库报错：
     
@@ -141,11 +141,11 @@
   
   - 💥 GitHub 的仓库中不允许创建空目录，需在创建的目录中再创建文件，导入其他文件后删除该文件即可。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\github-new-dir.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-new-dir.png)
   
   - 💥 GitHub 推送代码大小限制：单个文件 `50MB`
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\github-upload-file-limit.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-upload-file-limit.png)
 
 ### GitLab 基本概念与架构：
 
@@ -163,7 +163,7 @@
   
   若无特殊指定，所有 GitLab 组件之间使用 `Unix socket` 通信！
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-application-architecture-v12.7.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-application-architecture-v12.7.png)
 
 - GitLab 各组件服务构成：
   
@@ -281,7 +281,7 @@
   
   此处已提前下载 `gitlab-ce-12.7.0-ce.0.el7.x86_64.rpm` 软件包，该软件包具有所有服务组件，无需安装数据库与缓存数据库，直接安装该软件包即可，如下所示：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-install-success.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-install-success.png)
   
   ```bash
   $ sudo gitlab-ctl reconfigure
@@ -289,7 +289,7 @@
   # 注意：系统中不应存在 git 用户，若存在需将其删除，否则报错！
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-ctl-reconfigure-error.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-ctl-reconfigure-error.png)
   
   ```bash
   $ sudo gitlab-ctl status
@@ -316,7 +316,7 @@
   # 查看 gitlab 各组件服务状态
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-runsvdir-service-status.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-runsvdir-service-status.png)
   
   ```bash
   $ sudo ss -ntulp | grep 80
@@ -324,7 +324,7 @@
   # 若 80 端口已被占用，可修改配置的端口或使用 Docker 容器方式运行 gitlab。
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-listen-port.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-listen-port.png)
 
 ### GitLab 常规配置使用：
 
@@ -355,13 +355,13 @@
   
   - root 密码设置完成后即可登录，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-root-login.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-root-login.png)
   
   - 创建项目（仓库）、用户与组：
     
     👉 使用管理员区域（`Admin Area`）按钮设置
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-root-admin-area.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-root-admin-area.png)
   
   - 更改已存在用户的信息：
     
@@ -369,9 +369,9 @@
     
     - 创建的密码可由 root 管理员或用户自身进行更改。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-create-user-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-create-user-1.png)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-create-user-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-create-user-2.png)
 
 - 更改 GitLab 的远程拉取地址：
   
@@ -460,11 +460,7 @@
     gitlab-shell> exit
   ```
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\pictures\GitHub与GitLab原理与使用配置\gitlab-rails-change-root-password.png)
-
-- ❓ GitLab 各模块数据的备份、恢复与迁移？
-
-- ❓ GitLab 替换单个组件为自定义组件，如替换为自定义编译的 Nginx 组件?
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-rails-change-root-password.png)
 
 ### 参考链接：
 
