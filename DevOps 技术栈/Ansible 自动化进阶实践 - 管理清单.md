@@ -383,7 +383,9 @@
             vars:
               service: httpd
         ```
-      
+  
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-tasks/include_role-define-variable-error.jpg)
+  
       - `register` 注册变量或 `set_fact` 模块设置的 `key=value` 变量
       
       - ✨ `include_vars` 模块动态加载的变量
