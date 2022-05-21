@@ -283,6 +283,12 @@
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-working-tree-and-staged.jpg)
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-f-cached-staged.jpg)
+  
+  👉 git add 针对于工作区已删除文件的操作：
+  
+  由于工作区中将已提交至本地仓库的文件删除，该文件进入未跟踪的状态（`untracked`），若要跟踪该已删除的文件可使用 `git add --all <pathspec>` 将其添加至暂存区中，待 commit 提交至本地仓库。
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-add-removed-file-in-working-tree.jpg)
 
 - 本地仓库相关操作：
   
