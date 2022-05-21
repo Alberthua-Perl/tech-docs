@@ -562,8 +562,12 @@
         vars:
           hosts: "{{ lookup('file', '/etc/hosts', '/etc/issue') }}"
       ```
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-file-plugin-result.jpg)
+         
+      ```yaml
+      hosts: "127.0.0.1   localhost localhost.localdomain localhost4
+       localhost4.localdomain4\n::1         localhost localhost.localdomain localhost6
+       localhost6.localdomain6\n\n,\\S\nKernel \\r on an \\m (\\l)"
+      ```
     
     - query 函数调用：
       
@@ -574,7 +578,13 @@
         hosts: "{{ query('file', '/etc/hosts', '/etc/issue') }}"
       ```
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/query-file-plugin-result.jpg)
+      ```yaml
+      hosts:
+        - "127.0.0.1   localhost localhost.localdomain localhost4
+       localhost4.localdomain4\n::1         localhost localhost.localdomain localhost6
+       localhost6.localdomain6\n\n"
+        - "\\S\nKernel \\r on an \\m (\\l)"
+      ```
     
     - 两种调用方法的区别：
       
