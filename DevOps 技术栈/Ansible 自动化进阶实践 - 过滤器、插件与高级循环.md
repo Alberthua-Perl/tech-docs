@@ -617,7 +617,23 @@
     
     - 以下示例使用循环和 `+` 运算符将字符串附加到模板中，以便查找 files/fred.key.pub 和 files/naoko.key.pub 文件。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/authorized_key-lookup-loop.jpg)
+      ```yaml
+      ---
+      - name: Add authorized keys
+        hosts: all
+        vars:
+          users:
+            - fred
+            - naoko
+        tasks:
+          - name: Add authorized keys
+            authorized_key:
+              user: "{{ item }}"
+              # 远程受管主机上的用户
+              key: "{{ lookup('file', item + '.key.pub') }}"
+              # 控制节点上的用户的 SSH 公钥文件
+            loop: "{{ users }}"
+      ```
     
     > 💥 注意：
     > 
@@ -778,7 +794,22 @@
     
     - 对于简单的列表，loop 是可使⽤的最佳语法。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/loop-with_list.jpg)
+      ```yaml
+      ### 三种等效的方法 ###
+        - name: using loop
+          debug:
+            msg: "{{ item }}"
+          loop: "{{ mylist }}"
+          # 首选方法
+        - name: using with_list
+          debug:
+            msg: "{{ item }}"
+          with_list: "{{ mylist }}"
+        - name: using lookup plugin
+          debug:
+            msg: "{{ item }}"
+          loop: "{{ lookup('list', mylist) }}"
+      ```  
     
     > 👉 [loop 关键字与 with_* 关键字的语法转化](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#migrating-to-loop)
   
