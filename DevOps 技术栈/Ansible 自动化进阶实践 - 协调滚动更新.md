@@ -1,12 +1,12 @@
-## 协调滚动更新
+## Ansible 自动化进阶实践（5）- 协调滚动更新
 
-### 章节：
+### 文档目录：
 
 - 委派任务和事实
 
 - 管理滚动更新
 
-### 第一节 委派任务和事实
+### 委派任务和事实
 
 - 委派任务（task）：
   
@@ -54,7 +54,7 @@
     
     该 playbook 执行结果如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter05\delegate_to-demo.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/delegate-rolling-update/delegate_to-demo.png)
   
   - ✅ 示例 2：
     
@@ -123,7 +123,7 @@
   
   > 💥 `delegate_to` 与 `delegate_facts` 指令必须同时使用！
 
-### 第二节 管理滚动更新
+### 管理滚动更新
 
 - 概述：  
   
@@ -211,7 +211,7 @@
     
     - 若向下舍入后的值为 `0`，Ansible 会将批处理大小更改为 `1` 个主机。
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter05\serial-percent-demo.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/delegate-rolling-update/serial-percent-demo.png)
   
   - 🚀 设置要更改的批处理大小：
     
