@@ -146,6 +146,10 @@
   - 💥 GitHub 推送代码大小限制：单个文件 `50MB`
     
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-upload-file-limit.png)
+    
+  - GitLab 中新建项目后可执行以下步骤实现代码库的初始化：
+    
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/git-push-new-gitlab-master-branch.jpg)  
 
 ### GitLab 基本概念与架构：
 
