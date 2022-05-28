@@ -1,4 +1,4 @@
-## 💎 Ansible 自动化进阶实践 - 过滤器、插件与高级循环
+## 💎 Ansible 自动化进阶实践（4）- 过滤器、插件与高级循环
 
 ### 文档目录：
 
@@ -14,7 +14,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [jinja2_vars.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_vars.yml)、[jinja2_filter.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_filter.yml)
+> [jinja2_vars.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_vars.yaml)、[jinja2_filter.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_filter.yaml)
 
 - Ansible 过滤器：
   
@@ -385,7 +385,7 @@
             characters_dict:
               Douglas: Human
               Marvin: Robot
-            Arthur: Human
+              Arthur: Human
             characters_items:
               - key: Douglas
                 value: Human
@@ -531,7 +531,7 @@
 
 ### 使用查找模板化外部数据：
 
-> 1. 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：[jinja2_plugins.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_plugins.yml)
+> 1. 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：[jinja2_plugins.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_plugins.yaml)
 > 
 > 2. 可使用 `lookup 函数 + 过滤器` 重构 `with_*` 关键字！
 
@@ -562,8 +562,12 @@
         vars:
           hosts: "{{ lookup('file', '/etc/hosts', '/etc/issue') }}"
       ```
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/lookup-file-plugin-result.jpg)
+         
+      ```yaml
+      hosts: "127.0.0.1   localhost localhost.localdomain localhost4
+       localhost4.localdomain4\n::1         localhost localhost.localdomain localhost6
+       localhost6.localdomain6\n\n,\\S\nKernel \\r on an \\m (\\l)"
+      ```
     
     - query 函数调用：
       
@@ -574,7 +578,13 @@
         hosts: "{{ query('file', '/etc/hosts', '/etc/issue') }}"
       ```
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/query-file-plugin-result.jpg)
+      ```yaml
+      hosts:
+        - "127.0.0.1   localhost localhost.localdomain localhost4
+       localhost4.localdomain4\n::1         localhost localhost.localdomain localhost6
+       localhost6.localdomain6\n\n"
+        - "\\S\nKernel \\r on an \\m (\\l)"
+      ```
     
     - 两种调用方法的区别：
       
@@ -607,7 +617,23 @@
     
     - 以下示例使用循环和 `+` 运算符将字符串附加到模板中，以便查找 files/fred.key.pub 和 files/naoko.key.pub 文件。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/authorized_key-lookup-loop.jpg)
+      ```yaml
+      ---
+      - name: Add authorized keys
+        hosts: all
+        vars:
+          users:
+            - fred
+            - naoko
+        tasks:
+          - name: Add authorized keys
+            authorized_key:
+              user: "{{ item }}"
+              # 远程受管主机上的用户
+              key: "{{ lookup('file', item + '.key.pub') }}"
+              # 控制节点上的用户的 SSH 公钥文件
+            loop: "{{ users }}"
+      ```
     
     > 💥 注意：
     > 
@@ -746,7 +772,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [advanced_loop.yml]()
+> [advanced_loop.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/advanced_loop.yaml)
 
 - `with_list` 关键字与 `loop` 关键字：
   
@@ -768,7 +794,22 @@
     
     - 对于简单的列表，loop 是可使⽤的最佳语法。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/filter-plugin-loop/loop-with_list.jpg)
+      ```yaml
+      ### 三种等效的方法 ###
+        - name: using loop
+          debug:
+            msg: "{{ item }}"
+          loop: "{{ mylist }}"
+          # 首选方法
+        - name: using with_list
+          debug:
+            msg: "{{ item }}"
+          with_list: "{{ mylist }}"
+        - name: using lookup plugin
+          debug:
+            msg: "{{ item }}"
+          loop: "{{ lookup('list', mylist) }}"
+      ```  
     
     > 👉 [loop 关键字与 with_* 关键字的语法转化](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#migrating-to-loop)
   
@@ -956,7 +997,7 @@
 
 > 该小节涉及的 Ansible Playbook 的 demo 片段可参考以下链接：
 > 
-> [filter_network.yml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/filter_network.yml)
+> [filter_network.yaml](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/filter_network.yaml)
 
 - 收集和处理网络信息：
   
