@@ -618,6 +618,7 @@ nfsv4 and autofs:
         - systemctl start nfs-server.service
         - systemctl enable nfs-server.service
         - exportfs -a
+        # 可不重启 nfs-server 服务而直接导出共享目录
         - showmount -e localhost
         - firewall-cmd --zone=public --permanent --add-service=nfs
         - firewall-cmd --zone=public --permanent --add-service=mountd
@@ -629,6 +630,7 @@ nfsv4 and autofs:
         - mkdir /mnt/shared
         - mount 172.25.250.11:/shared /mnt/shared
         - df -Th /mnt/shared
+    - Note: Must start rpcbind service brfore all nfs service!
 
   aufofs-practice: 
     - automation nfs mount on client
@@ -671,3 +673,33 @@ rhel7/8 boot progress:
   - systemd load and start all available *.target
   - load and start all available unit file
   - login system through multi-user.target or graphical.target
+
+selinux demo:
+  - description: How to use customized documentroot and port to apply web service?
+  - progress:
+      # root@serverb: web server
+      - yum install -y httpd
+      - mkdir /webapp
+      - echo "<b>Test Customized Web Page.</b>" > /webapp/index.html
+      - mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+      - vim /etc/httpd/conf.d/webapp.conf
+        Listen 8182
+        <VirtualHost *:8182>
+          ServerName  serverb.lab.example.com
+          DocumentRoot  "/webapp"
+          <Directory "/webapp">
+            AllowOverride none
+            Require all granted
+          </Directory>
+        </VirtualHost>
+      - semanage port -a -t http_port_t -p tcp 8182
+        # allow selinux to use tcp 8182 port
+      - firewall-cmd --permanent --zone=public --add-port=8182/tcp
+      - firewall-cmd --reload
+      - chcon -Rt httpd_sys_content_t /webapp
+        # set selinux httpd file context
+      - systemctl enable --now httpd.service
+
+      # root@servera: web client
+      - curl http://serverb.lab.example.com:8182
+        <b>Test Customized Web Page.</b>
