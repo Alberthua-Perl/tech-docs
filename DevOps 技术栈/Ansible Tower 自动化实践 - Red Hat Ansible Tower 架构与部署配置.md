@@ -1,4 +1,4 @@
-## Ansible 自动化进阶实践（6）- Red Hat Ansible Tower 架构与部署配置
+## Ansible Tower 自动化实践（1）- Red Hat Ansible Tower 架构与部署配置
 
 ### 文档说明：
 
