@@ -52,7 +52,7 @@
 
 - 默认情况下，CRUSH 算法将复制的对象放置到不同主机上的 OSD 中。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\object-pg-crush-osd-mapping.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/object-pg-crush-osd-mapping.png)
 
 - 👉 可以配置 `CRUSH map` 与 `CRUSH rules`，使得对象复制到位于不同房间或不同 PDU（配电装置）供电的主机上的 OSD。例如，将带有 `SSD` 驱动器的 OSD 分配给需要极快存储的应用使用的池，并将带有传统 `SATA` 硬盘驱动器的 OSD 分配给支持较低需求工作负载的池。
 
@@ -208,7 +208,7 @@
 
 - 对于 Ceph 集群的大型部署，可创建如下所示的具体层次结构：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\crush-map-bucket-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/crush-map-bucket-1.jpg)
 
 - 重要的 bucket 属性：
   
@@ -252,7 +252,7 @@
 
 - CRUSH map 默认层次结构，如下所示：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\crush-map-bucket-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/crush-map-bucket-2.jpg)
 
 ### ✨ CRUSH 规则（rule）：
 
@@ -363,7 +363,7 @@
         # 使用 crush_test_replicated 规则创建 tc-pool-firstn-1 存储池
         ```
         
-        ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\ceph-crush-rule-firstn-1.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-crush-rule-firstn-1.jpg)
         
         如上所示，创建的池中 pg 状态始终为 `active+undersized+degraded`，提示 pg 数量小于池中定义的副本数量，这是由于自定义的 CRUSH 规则中定义从 1 个 host bucket 中选取 1 个 osd 进行 pg 的映射，因此只有 1 个副本存储于 osd 中，调整池的副本数 2 为 1 即可恢复 pg 状态。
     
@@ -430,9 +430,9 @@
       # 创建的池中 pg 将处于 active+undersized+degraded 状态
       ```
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\ceph-crush-rule-firstn--1-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-crush-rule-firstn--1-1.jpg)
       
-      ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Storage\Ceph%20CRUSH%20map概述与实现\pictures\ceph-crush-rule-firstn--1-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-crush-rule-firstn--1-2.jpg)
       
       重新 `peering` 与 `remapped` 的 pg 依然可被 Ceph 客户端读写。
   
