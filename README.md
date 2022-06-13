@@ -33,7 +33,7 @@
     - [OpenShift v4.x all-in-one (AIO) 部署与配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/OpenShift%20v4.x%20all-in-one%20(AIO)%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E9%85%8D%E7%BD%AE.md) 
     - [Red Hat OpenShift v3 与 v4 基础架构与应用构建](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20v3%20%E4%B8%8E%20v4%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA.md)
     - [S2I 基本原理与应用构建部署示例](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/golang-s2i)
-  - **分布式存储**
+  - 🐙 **分布式存储**
     - [Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md) 
   - ♾️ **DevOps 技术栈**
     - [Git 原理及常规使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
