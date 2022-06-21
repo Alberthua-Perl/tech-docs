@@ -358,7 +358,11 @@
 
 - 查看系统上指定物理网口的 PCI 信息：
   
-  物理网口的 PCI 地址可通过 `dmesg` 命令在系统开机引导过程中的硬件加载信息中查询。
+  物理网口的 PCI 地址可通过 `dmesg` 命令在系统开机引导过程中的硬件加载信息中查询，也可通过 `lshw` 命令查看具体硬件的 PCI 信息，如下所示：
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-network-debug/verify-system-network-pci-info.jpg)
+  
+  根据 PCI 地址通过 `lspci` 命令查询指定硬件更为详细的信息，如下所示：
   
   ```bash
   $ sudo lspci -v -k -nn -s <bus>:<slot>.<function>
