@@ -1,33 +1,52 @@
 ## Linux 常用排错命令与工具
 
-#### 文档说明：
+### 文档说明：
 
 - 该文档中涉及的命令与参考链接仅作为工具资料提供排错思路或依据。
+
 - 若更深层次的分析与追踪故障原因需配合业务应用代码与 kernel 源码等进一步分析。
+
 - 该文档将根据所使用的命令持续更新其用法与使用案例。
 
-#### 文档目录：
+### 文档目录：
 
 - journalctl 命令使用示例
+
 - sosreport 命令使用示例
+
 - Performance Co-Pilot (PCP) 软件包使用示例
+
 - systemctl 命令使用示例
+
 - 物理 CPU 个数、CPU 核心数、逻辑 CPU 个数、超线程的关系
+
 - CPU 信息查看相关命令示例
+
 - dmidecode 命令使用示例
+
 - 硬件设备调试相关命令示例
+
 - 常见物理服务器及硬件示例
+
 - Kernel module 与虚拟化相关命令示例
+
 - Linux 存储栈（storage stack）相关命令示例
+
 - rpm 命令使用示例
+
 - yum 命令使用示例
+
 - 基础网络调试相关命令示例
+
 - 内存泄漏与内存溢出
+
 - 共享库相关命令示例
+
 - 系统调用与库调用
+
 - strace 与 ltrace 命令使用示例
 
-#### journalctl 命令使用示例：
+### journalctl 命令使用示例：
 
 ```bash
 $ journalctl -n <number>
@@ -64,7 +83,7 @@ $ journalctl -b <number>
 # 查看指定重启的详细信息 
 ```
 
-#### sosreport 命令使用示例：
+### sosreport 命令使用示例：
 
 ```bash
 $ sosreport -l
@@ -78,7 +97,7 @@ $ sosreport -k xfs.logprint
 # 使用 xfs.logprint 选项以收集 XFS 文件系统的相关信息 
 ```
 
-#### Performance Co-Pilot (PCP) 软件包使用示例：
+### Performance Co-Pilot (PCP) 软件包使用示例：
 
 ```bash
 $ yum install -y pcp pcp-gui
@@ -134,7 +153,7 @@ PCP 软件包除提供命令行模式的性能指标输出外，还提供 `GUI` 
 - Introduction to storage performance analysis with PCP：
   https://access.redhat.com/articles/2450251
 
-#### systemctl 命令使用示例：
+### systemctl 命令使用示例：
 
 ```bash
 $ systemctl list-dependencies <unit_name>
@@ -155,7 +174,7 @@ $ systemctl enable debug-shell.service
 
 关于 systemd 更为详尽的指导可参考 https://access.redhat.com/articles/754933
 
-#### 物理 CPU 个数、CPU 核心数、逻辑 CPU 个数、超线程的关系：
+### 物理 CPU 个数、CPU 核心数、逻辑 CPU 个数、超线程的关系：
 
 Linux 内核会将多核 CPU 当做多个单核 CPU 来识别，如 Linux 会将 2 个 4 核的 CPU 当做 8 个单核 CPU 来识别，但两者的性能并不完全等价！
 
@@ -169,7 +188,7 @@ Linux 内核会将多核 CPU 当做多个单核 CPU 来识别，如 Linux 会将
 
 CPU 在同一时刻只能处理一个任务，相当于一个 CPU 核心在同一时刻只能执行一个线程，而采用超线程技术，就可以将单个核心当做多个核心来使用，即同一时刻可处理多个任务，提高 CPU 性能。安装的CPU数量越多，从超线程获得的性能方面的提高就越少，这种情况下反而会造成系统资源浪费。
 
-#### CPU 信息查看相关命令示例：
+### CPU 信息查看相关命令示例：
 
 ```bash
 $ grep 'model name' /proc/cpuinfo | cut -d ':' -f 2 | uniq -c
@@ -196,7 +215,7 @@ $ grep 'flags' /proc/cpuinfo | grep 'lm' | wc -l
 # lm 指 long mode，支持 lm 则支持 64-bit。
 ```
 
-#### dmidecode 命令使用示例：
+### dmidecode 命令使用示例：
 
 ```bash
 $ man dmidecode
@@ -286,7 +305,7 @@ $ dmidecode -t 0,1
 
   http://www.linuxidc.com/Linux/2015-12/126814.htm
 
-#### 硬件设备调试相关命令示例：
+### 硬件设备调试相关命令示例：
 
 ```bash
 # ----- Detect different driver disk device ----- 
@@ -343,11 +362,11 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/memtest86-test.jpg" style="zoom:;" />
 
-#### 常见物理服务器及硬件示例：
+### 常见物理服务器及硬件示例：
 
 ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/general-hardware-info.png)
 
-#### Kernel module 与虚拟化相关命令示例：
+### Kernel module 与虚拟化相关命令示例：
 
 ```bash
 # ----- Kernel module command -----
@@ -391,7 +410,7 @@ $ virt-xml-validate <kvm_domain_filename>.xml
 
 ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/lsmod-cmd.jpg)
 
-#### Linux 存储栈（storage stack）相关命令示例：
+### Linux 存储栈（storage stack）相关命令示例：
 
 ```bash
 # ----- Linux memory manage -----
@@ -505,7 +524,7 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 
   https://access.redhat.com/solutions/1543373
 
-#### rpm 命令使用示例：
+### rpm 命令使用示例：
 
 1. RPM GPG 公钥保存目录：**`/etc/pki/rpm-gpg`**
 2. RPM 软件包中文件的状态标识：man rpm -> 搜索 -V
@@ -528,6 +547,7 @@ rpm 命令常用选项：
   -l，--list               列出软件包中的文件
   --info                   查询软件包的详细信息
   --nodeps                 忽略软件包的依赖关系
+  --requires               列出软件包的依赖项目
   --import                 导入软件包的 GPG 公钥
   --allmatches             卸载匹配的全部软件包
   --scripts                列出软件包安装、升级与卸载过程中的所有脚本文件
@@ -614,7 +634,7 @@ $ rpm --setperms <package_name>
 # 恢复文件为软件包中定义的权限
 ```
 
-#### yum 命令使用示例：
+### yum 命令使用示例：
 
 1. 配置 yum 软件源优先级：
 
@@ -720,7 +740,7 @@ $ yum verify-rpm vsftpd
 # 更改 /etc/vsftpd/vsftpd.conf 配置文件后，可被 yum verify-rpm 命令检测出更改的属性。  
 ```
 
-#### 基础网络调试相关命令示例：
+### 基础网络调试相关命令示例：
 
 1. ping 与 ping6 命令常用选项：
 
@@ -949,7 +969,7 @@ $ yum verify-rpm vsftpd
    
    ​     https://mp.weixin.qq.com/s/D2jipFrVOluHGcIB9izKVQ
 
-#### 内存泄漏与内存溢出：
+### 内存泄漏与内存溢出：
 
 1. 内存泄漏（memory leak）：
 
@@ -1012,7 +1032,7 @@ $ yum verify-rpm vsftpd
    > 1. 内存泄漏与内存溢出应注重从应用代码角度去解决问题。
    > 2. 泄漏虚拟内存虽然不好，但是泄漏物理内存更加不好。
 
-#### 共享库相关命令示例：
+### 共享库相关命令示例：
 
 共享库（shared library）的查询过程：
 
@@ -1054,7 +1074,7 @@ $ yum verify-rpm vsftpd
 
    > 💥 注意：若相应应用程序缺少指定的共享库，安装共享库后，需使用 ldconfig 命令更新共享库缓存文件。
 
-#### 系统调用与库调用：
+### 系统调用与库调用：
 
 1. 系统调用（system call）：
 
@@ -1128,7 +1148,7 @@ $ yum verify-rpm vsftpd
 >
 > **Command-line utility -> Invokes functions from system libraries (glibc) -> Invokes system calls -> Invokes kernel** 
 
-#### strace 与 ltrace 命令使用示例：
+### strace 与 ltrace 命令使用示例：
 
 1. 操作系统的两种模式：
 
@@ -1240,7 +1260,7 @@ $ ltrace -t -f -p <pid>
 # 跟踪已运行进程所创建的子进程/线程的 C 库函数调用
 ```
 
-参考链接：
+### 参考链接：
 
 - Understanding system calls on Linux with strace：
 
