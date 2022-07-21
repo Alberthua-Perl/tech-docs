@@ -353,13 +353,13 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 # 注意：memtest86+ 内存测试通常在物理机上运行测试，而不是虚拟机上运行！
 ```
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\nic-pci-info.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nic-pci-info.jpg)
 
-<img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\memtest86-test.JPG" style="zoom:;" />
+<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/memtest86-test.jpg" style="zoom:;" />
 
 ### 常见物理服务器及硬件示例：
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\general-hardware-info.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/general-hardware-info.png)
 
 ### Kernel module 与虚拟化相关命令示例：
 
@@ -403,7 +403,7 @@ $ virt-xml-validate <kvm_domain_filename>.xml
 # 判断 KVM 虚拟机 XML 定义文件的合法性（字段及标签等检查）
 ```
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\lsmod-cmd.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/lsmod-cmd.jpg)
 
 ### 🔥 Linux 存储栈（storage stack）相关命令示例：
 
@@ -511,7 +511,7 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 
 - RPM 软件包中文件的状态标识：man rpm -> 搜索 -V
 
-![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\rpm-verify.JPG)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rpm-verify.jpg)
 
 ```bash
 rpm 命令常用选项：
@@ -626,11 +626,11 @@ $ rpm --setperms <package_name>
   
   - yum 软件源优先级功能是否启用：**`/etc/yum/pluginconf.d/priorities.conf`**
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\yum-priority-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-1.png)
   
   - 编辑 **`/etc/yum.repos.d/*.repo`** 文件
     
-    <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\yum-priority-2.png" style="zoom:80%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-2.png" style="zoom:80%;" />
   
   - priority=*N*（取值 **`1~99`**），数值越大优先级越低。
   
@@ -726,7 +726,7 @@ $ rpm --setperms <package_name>
 
 - ping 与 ping6 命令常用选项：
   
-  <img src="D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\ping-ping6-options.JPG" style="zoom:80%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/ping-ping6-options.jpg" style="zoom:80%;" />
 
 > 💥注意💥：有时网络连通性问题由 MTU（最大传输单元）所致，需测试 MTU 大小并进行调整。
 
@@ -986,7 +986,7 @@ $ rpm --setperms <package_name>
   
   - 以上 nc 测试的 iptarf-ng 如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\nc-iptraf-ng.JPG)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nc-iptraf-ng.jpg)
 
 - tcpdump 命令示例：
   
@@ -1151,7 +1151,7 @@ $ rpm --setperms <package_name>
   
   - 无论是应用程序或库函数都有可能不调用系统调用而直接运行。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\Linux常用排错命令与工具\system-library-call.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/system-library-call.jpg)
 
 - 系统调用的意义：
   
@@ -1321,95 +1321,3 @@ $ ltrace -t -f -p <pid>
 ### 参考链接：
 
 - [Understanding system calls on Linux with strace](https://opensource.com/article/19/10/strace)
-
----
-
-- Chapter 7 网络故障
-  
-  sar -f sa14 -b：查看系统状态历史信息
-  
-  hypervisor 之间的网络速率实际为 IO 速率，使用 ethtool 命令查看不到真实的速率。
-  
-  qperf 探测网络速率，可探测万兆网络的光口与电口的真实速率。
-
-- Chapter 8 应用故障
-  
-  valgrind 工具包包含众多工具组
-  
-  valgrind --tool=cachegrind ls：查看 cache 命中率可作为程序执行效率的重要指标
-  
-  /proc/meminfo: Commited_AS 为申请的虚拟内存大小
-  
-  man systemd.exec -> /LimitRSS 限制物理内存，LimitAS 限制虚拟内存。
-  
-  lscpu --online --extended：查看 CPU 的 cache 命中率
-  
-  ps axo comm,pid,psr | grep httpd：查看 httpd 运行在哪个 CPU 核心上
-  
-  ps axo comm,pid
-  
-  vim /usr/lib/systemd/system/httpd.service
-  
-  LimitRSS=512M
-  
-  CPUAffinity=0
-  
-  服务器多核 CPU 的 NUMA 架构:
-  
-  cpu1 cpu2
-  
-  ------ ------ => 内存组（多个不同的内存插槽）
-  
-  CPU 分别被不同的内存组包围，同一 CPU 使用相同组的内存。
-  
-  如果在物理机上运行程序，该程序运行于 CPU 0 核上，在不同的 CPU 组上切换将重新进行 cache 命中，损失性能。
-  
-  一般而言，物理服务器都是多核 CPU 架构，需要安装 numad 软件包，并且启动 numad 服务来优化 NUMA 架构。
-  
-  bigmem 命令: 透明大页可以将 kernel space 全部存放到同一个透明大页中
-
-- Chapter 9 SELinux 故障
-  
-  => setroubleshoot-server 软件包
-  
-  man -k password-auth; man -k pam_
-  
-  => Kerberos/LDAP 故障修复（难点）
-  
-  yum install sssd krb5-workstation authconfig-gtk
-  
-  authconfig-gtk：RHEL 7 中支持
-  
-  Kerberos 认为凡是密码在网上传输总是不安全的。
-  
-  => Kerberos认证原理
-  
-  TGT具有较短的有效期
-  
-  /etc/krb5.keytab 传输需注意 selinux 标签, 不能用 mv 命令。
-  
-  krb5 版本的问题
-
-- Chapter 10 Kdump
-  
-  kexec 工具启动第二个 Linux kernel, 称为 capture kernel。
-  
-  kexec-tools 软件包, 需要保留内存。
-  
-  vmcore-dmesg.txt
-  
-  kdumpctl propagate 命令生成 SSH 的连接
-  
-  cd /proc//; cat oom_score：该值越高越容易在 OOM 时被杀掉
-  
-  oom_score_adj 可以调整 oom_score 的值
-  
-  Kernel crash dump 基于事件的激发情况将 vmcore 压缩后再发送给红帽进行分析, 使用 xz 工具压缩。
-  
-  kernel-debuginfo 软件包不随光盘发布, 需要订阅。
-  
-  SystemTap软件包: 非常实用
-  
-  ps axo pid,ppid,comm | grep dd：查看进程不正常的反复重启, 考虑是否存在脚本父进程不断启动或计划任务执行。
-  
-  非 root 用户执行 staprun 命令运行模块
