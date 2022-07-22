@@ -1023,7 +1023,7 @@ $ rpm --setperms <package_name>
     
     - [超详细的网络抓包神器 tcpdump 使用指南（米开朗基杨）](https://mp.weixin.qq.com/s/J3Rdrof9ts9b6_paJk1KJw)
     
-    - []Linux 网络分析必备技能：tcpdump 实战详解](https://mp.weixin.qq.com/s/vzNgYRZigR1Buay17gcfrg)
+    - [Linux 网络分析必备技能：tcpdump 实战详解](https://mp.weixin.qq.com/s/vzNgYRZigR1Buay17gcfrg)
     
     - [可能是目前最简单易懂且实用的 tcpdump 和 Wireshark 抓包及分析教程](https://mp.weixin.qq.com/s/9OvL5VXrGad2q-Hxf9wGRw)
     
