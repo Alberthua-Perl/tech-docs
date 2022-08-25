@@ -99,7 +99,7 @@
       
       - DHCP agent 的高可用示意：
         
-        ![](pictures/neutron-dhcp-agent-ha.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-dhcp-agent-ha.jpg)
     
     - `neutron-l3-agent`：
       
@@ -113,13 +113,13 @@
 
 - Neutron agent 组件概述：
   
-  ![](pictures/neutron-service-elements.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-service-elements.jpg)
   
-  ![](pictures/neutron-architecture-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-architecture-2.png)
   
   👉 `ML2` 插件、`L2 agent`、`L3 agent` 与 `DHCP agent` 之间的关系：
   
-  ![](pictures/neutron-component-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-component-2.jpg)
 
 - Neutron 配置文件：
   
@@ -184,17 +184,17 @@
     
     - `/etc/neutron/plugins/ml2/sriov_agent.ini` 位于控制节点、计算节点
     
-    ![](pictures/neutron-conf-plugin-short-name.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-conf-plugin-short-name.jpg)
   
   - 示例：
     
     👉 计算节点上使用 `journalctl -ef` 命令在实例创建的实时日志中相关的虚拟网络接口的创建信息如下所示：
     
-    ![](pictures/compute-node-create-qbr-qvb-qvo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute-node-create-qbr-qvb-qvo.jpg)
     
-    ![](pictures/compute-node-create-tap-device.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute-node-create-tap-device.jpg)
     
-    ![](pictures/compute-node-create-instance-and-vxlan-device.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute-node-create-instance-and-vxlan-device.jpg)
     
     以上实时日志信息在 `/var/log/messages` 中可见，而关于 neutron-openvswitch-agent 的日志在 `/var/log/neutron/openvswitch-agent.log` 中可见。
     
@@ -221,7 +221,7 @@
     
     计算节点上实时日志显示只创建与 OVS br-int 集成网桥直连的 tun 设备。
     
-    ![](pictures/change-openvswitch-agent-securitygroup-firewall-driver-log.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/change-openvswitch-agent-securitygroup-firewall-driver-log.jpg)
 
 ### 🤘 Neutron HA 架构：
 
@@ -245,11 +245,11 @@
 
 - Neutron LBaaS 服务逻辑组件：
   
-  ![](pictures/openstack-octavia-arch-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/openstack-octavia-arch-1.jpg)
 
 - Neutron LBaaS 服务的部署拓扑示意：
   
-  ![](pictures/openstack-octavia-lbaas-demo.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/openstack-octavia-lbaas-demo.jpg)
 
 - LBaaS 负载均衡服务部署示例：
   
@@ -453,17 +453,17 @@
 
 - 如下所示，三种 VLAN 网络类型在集群中的分布：
   
-  ![](pictures/external-internal-local-boundaries.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/external-internal-local-boundaries.jpg)
 
 ### OpenStack 网络模型分类：
 
 - 1️⃣ 自服务网络（self-service network）：使用隧道网络（overlay network）通信
   
-  ![](pictures/vxlan-self-service-network-on-compute-node.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/vxlan-self-service-network-on-compute-node.jpg)
 
 - 2️⃣ 供应商网络（provider network）：租户内实例直接使用供应商网络与外部网络连接
   
-  ![](pictures/provider-network-on-compute-node.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/provider-network-on-compute-node.jpg)
 
 ### OpenStack 网络排查常用命令：
 
@@ -595,11 +595,11 @@
 
 - 集群逻辑网络拓扑示意，如下所示：
   
-  ![](pictures/neutron-legacy-router-and-dvr-router.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/neutron-legacy-router-and-dvr-router.jpg)
 
 - OpenStack Neutron agent 虚拟网络连接与流量类型分析示意：
   
-  ![](pictures/openstack-neutron-agent-virtual-network-flows-analyze-demo.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/openstack-neutron-agent-virtual-network-flows-analyze-demo.jpg)
 
 ### 🚀 使用 VLAN 网络类型的实例与外部网络通信流表分析：
 
@@ -643,33 +643,33 @@
   
   1️⃣ 计算节点：从 finance-vlan-server1 实例发出的数据包通过其连接的 qbr 网桥、qvb 端口、qvo 端口进入 br-int 网桥的流表中进行过滤跳转，最终从 `int-br-ex` 端口转发至 br-ex 网桥。
   
-  ![](pictures/OUTPUT_COMPUTE1-packets-from-instance-into-br-int-qvo-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_COMPUTE1-packets-from-instance-into-br-int-qvo-port.jpg)
   
   2️⃣ 计算节点：通过 `phy-br-ex` 端口进入 br-ex 网桥的数据包使用如下规则将租户内的 `VLAN tag 3` 修改为 `VLAN id 99`，该值与 br-ex 网桥对接的网络 `172.25.250.0/24` 的 VLAN id 相同（该 VLAN id 由 ML2 插件创建）。 
   
-  ![](pictures/OUTPUT_COMPUTE1-packets-into-br-ex-phy-br-ex-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_COMPUTE1-packets-into-br-ex-phy-br-ex-port.jpg)
   
   3️⃣ 计算节点：通过 br-ex 网桥的数据包最终通过 `eth2` 网口出计算节点经由 172.25.250.0/24 网络连接至控制节点，计算节点上对 eth2 网口抓包。
   
-  ![](pictures/compute1-capture-packets-eth2-icmp-request-reply.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute1-capture-packets-eth2-icmp-request-reply.jpg)
   
   4️⃣ 控制节点：在 eth2 网口上抓包，可确认与计算节点间的 VLAN 99 的流量。
   
-  ![](pictures/controller0-capture-packets-eth2-icmp-request-replay.jpg) 
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/controller0-capture-packets-eth2-icmp-request-replay.jpg) 
   
   5️⃣ 控制节点：租户路由器的网口与 iptables 信息
   
-  ![](pictures/controller0-finance-router1-qr-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/controller0-finance-router1-qr-port.jpg)
   
   6️⃣ 控制节点：从 eth2 进入的流量进入 br-ex 网桥后再通过 int-br-ex 端口进入 br-int 网桥，其中的 OpenFlow 规则将源数据包的 `VLAN id 99` 修改为租户内 `VLAN tag 8` 后，数据包通过 `qr` 端口进入 qrouter namespace，进入的数据包再通过 `iptables SNAT` 转换后从 `qg` 端口流出，此时数据包带有 `VLAN tag 5`，因此，数据包再次进入 br-ex 网桥时 OpenFlow 规则将匹配 VLAN tag 5。
   
-  ![](pictures/INPUT_CONTROLLER0-packets-into-br-int-int-br-ex-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/INPUT_CONTROLLER0-packets-into-br-int-int-br-ex-port.jpg)
   
-  ![](pictures/controller0-finance-router1-snat-rules.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/controller0-finance-router1-snat-rules.jpg)
   
   7️⃣ 控制节点：进入 br-ex 网桥的数据包匹配租户内 VLAN tag 5，去除该 tag 后由 eth2 将数据包发往外部目标地址。
   
-  ![](pictures/OUTPUT_CONTROLLER0-packets-into-br-ex-phy-br-ex-port.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_CONTROLLER0-packets-into-br-ex-phy-br-ex-port.jpg)
 
 ### 🚀 使用 GRE 隧道网络的实例与外部网络通信流表分析：
 
@@ -700,7 +700,7 @@
   
   1️⃣ 计算节点：来自于实例的数据包从 qvo 端口（`in_port=7`）进入 br-int 网桥，经过 OpenFlow 规则处理，最终从 br-int 网桥的 `patch-tun` 端口流出再通过 br-tun 网桥的 `patch-int` 端口进入。
   
-  ![](pictures/OUTPUT_COMPUTE0-packets-into-br-int-qvo-output-patch-tun.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_COMPUTE0-packets-into-br-int-qvo-output-patch-tun.jpg)
   
   2️⃣ 计算节点：进入 br-tun 网桥的 `patch-int` 端口的数据包，其目标 MAC 地址为租户内路由器对内网关的端口 `MAC` 地址，将去除租户的 `VLAN tag 3` 并添加隧道 ID `27`，再从 `gre` 端口发出通过 `eth1` 发送至控制节点。
   
@@ -728,23 +728,23 @@
   # 查看 OpenFlow 规则的字段定义，如搜索 dl_dst 关键字。
   ```
   
-  ![](pictures/OUTPUT_COMPUTE0-packets-into-br-tun-patch-int-port-output-gre-port-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_COMPUTE0-packets-into-br-tun-patch-int-port-output-gre-port-1.jpg)
   
-  ![](pictures/OUTPUT_COMPUTE0-packets-into-br-tun-patch-int-port-output-gre-port-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/OUTPUT_COMPUTE0-packets-into-br-tun-patch-int-port-output-gre-port-2.jpg)
   
   3️⃣ 计算节点：在 eth1 网口抓包显示目标地址的 ICMP 响应数据包
   
-  ![](pictures/compute0-capture-packets-eth1-gre-tunnel.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-capture-packets-eth1-gre-tunnel.jpg)
   
   4️⃣ 控制节点：通过 gre 端口进入 br-tun 网桥的数据包被去除隧道 ID `27`，并被添加 `VLAN tag 9`，经过 OpenFlow 规则的转发，数据包从 patch-int 端口发出进入 br-int 网桥，在该网桥中带有 VLAN tag 9 的数据包可进入 `qr-f4376fd3-71` 端口，通过租户内路由器的 `iptables SNAT` 规则处理可转发至目标网络 172.25.250.0/24 中的主机。
   
-  ![](pictures/INPUT_CONTROLLER0-packets-into-br-tun-gre-port-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/INPUT_CONTROLLER0-packets-into-br-tun-gre-port-1.jpg)
   
-  ![](pictures/INPUT_CONTROLLER0-packets-into-br-tun-gre-port-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/INPUT_CONTROLLER0-packets-into-br-tun-gre-port-2.jpg)
   
   5️⃣ 控制节点：使用 `watch` 命令可实时监测使用 ping 命令发送 ICMP 请求与响应的流量影响的具体 OpenFlow 规则，其 `n_packets` 与 `n_bytes` 在实时变化。
   
-  ![](pictures/br-int-patch-tun-port-accept-packets-and-int-br-ex-accept-return-packets.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/br-int-patch-tun-port-accept-packets-and-int-br-ex-accept-return-packets.jpg)
 
 ### Neutron 中心化与分布式虚拟路由器的使用场景：
 
@@ -819,17 +819,17 @@
   
   该场景中的实例要使用 `SNAT` 以访问外网，因此，实例请求的数据包使用其所在计算节点的 `DVR` 路由并将数据包通过 `VXLAN` 隧道转发至控制节点的 `snat namespace` 中，最终通过控制节点的 `br-ex` 网桥发送与响应外部网络的数据包，如前文 "OpenStack Neutron agent 虚拟网络连接与流量类型分析示意" 图中所示。
   
-  ![](pictures/compute0-qrouter-dvr-without-fip-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-without-fip-1.jpg)
   
-  ![](pictures/compute0-qrouter-dvr-without-fip-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-without-fip-2.jpg)
   
   一般情况下，`ip route show` 命令只能查看 kernel 中路由策略（routing policy）定义的 `main` 路由表的规则而其他自定义的规则无法查到，因此，可使用 `ip rule list` 命令查看是否具有自定义路由策略。
   
   如上图所示，通过 `qr-fe3b4198-d2` 端口进入 DVR 的数据包根据默认的路由规则已无法确定其下一跳网关的地址，因此查看路由策略中自定义规则 `3232236033`，该规则定义的路由表中包含 `192.168.2.4` 下一跳网关地址，即控制节点上 `snat namespace` 的 `sg-cc29fc83-48` 端口的 IP 地址。
   
-  ![](pictures/controller0-qrouter-dvr-snat-namespace-without-fip-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/controller0-qrouter-dvr-snat-namespace-without-fip-1.jpg)
   
-  ![](pictures/controller0-qrouter-dvr-snat-namespace-without-fip-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/controller0-qrouter-dvr-snat-namespace-without-fip-2.jpg)
   
   `snat namespace` 的 iptables NAT 表中已定义 SNAT 规则，可将数据包转发出控制节点。
 
@@ -837,14 +837,14 @@
   
   该场景中实例运行的计算节点上已运行 DVR，并在分配 FIP 的过程中将在同一计算节点上创建 `fip namespace`，DVR 中也将创建自定义路由策略可将数据包转发至 fip namespace，并且也具有 DNAT 与 SANT 规则将实例的租户内地址转换为 FIP，直接可将数据包从计算节点本地的 `br-ex` 网桥实现接收与发送，以此完成分布式路由的功能。
   
-  ![](pictures/compute0-qrouter-dvr-fip-namespace-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-fip-namespace-1.jpg)
   
-  ![](pictures/compute0-qrouter-dvr-fip-namespace-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-fip-namespace-2.jpg)
   
-  ![](pictures/compute0-qrouter-dvr-fip-namespace-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-fip-namespace-3.jpg)
   
-  ![](pictures/compute0-qrouter-dvr-fip-namespace-4.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-fip-namespace-4.jpg)
   
-  ![](pictures/compute0-qrouter-dvr-fip-namespace-5.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/openstack-newton-network-architecture/compute0-qrouter-dvr-fip-namespace-5.jpg)
   
   DVR 与 fip namespace 的连接方式如前文 "OpenStack Neutron agent 虚拟网络连接与流量类型分析示意" 图中所示。
