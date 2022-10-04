@@ -19,8 +19,6 @@
     - [配置 OVN 逻辑交换机](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-switch-demo.md)
     - [配置 OVN 逻辑路由器](https://github.com/Alberthua-Perl/summary-scripts/blob/master/ovn-arch/docs/ovn-logical-router-demo.md)
     - [OVN 在 OpenStack 中的集成与流表分析](https://github.com/Alberthua-Perl/scripts-confs/blob/master/ovn-arch/docs/ovn-openstack-openflow-analysis.md)    
-  - ⛵ **Go 程序设计语言**
-    - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/Go%20%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)    
   - 🐳 **容器技术原理与实践**
     - [虚拟化、云计算与云原生的联系与区别](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/%E8%99%9A%E6%8B%9F%E5%8C%96%E3%80%81%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%8E%E4%BA%91%E5%8E%9F%E7%94%9F%E7%9A%84%E8%81%94%E7%B3%BB%E4%B8%8E%E5%8C%BA%E5%88%AB.md)
     - [容器运行时 runtime 演进与架构概述](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C%E6%97%B6%20runtime%20%E6%BC%94%E8%BF%9B%E4%B8%8E%E6%9E%B6%E6%9E%84%E6%A6%82%E8%BF%B0.md)
@@ -29,6 +27,7 @@
     - [Red Hat Quay v3 registry 原理与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Red%20Hat%20Quay%20v3%20registry%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
     - [Skopeo 镜像工具与容器镜像格式的原理与使用](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Skopeo%20%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8.md)    
   - ☸ **Kubernetes**
+    - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/Go%20%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
     - [Kani - Ansible 快速部署与管理 Kubernetes v1.22.1](https://github.com/Alberthua-Perl/kani)    
   - ⭕️ **Red Hat OpenShift Container Platform**
     - [OpenShift v4.x all-in-one (AIO) 部署与配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/OpenShift%20v4.x%20all-in-one%20(AIO)%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E9%85%8D%E7%BD%AE.md) 
