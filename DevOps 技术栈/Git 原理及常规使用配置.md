@@ -270,10 +270,12 @@
   
   $ git rm --force <file>
   # 同时删除工作区与暂存区中的同名文件
-  $ git rm --cache <file>
+  $ git rm --cached <file>
   # 删除暂存区中的文件，不删除工作区中的同名文件。
+  # 注意：暂存区中的文件状态变为 deleted 状态，但是暂存区为 "Changes to be committed" 状态，而工作区中的文件状态变为 Untracked。
   $ git reset HEAD <file>
   # 该命令与上述命令具有相同的作用
+  # 注意：暂存区中的文件被删除，工作区中的文件状态变为 modified。 
   $ git rm --force --cache <file>
   # 若工作区与暂存区中的同名文件内容发生变化，将删除暂存区中的文件，不删除工作区中的
   # 同名文件，内容为工作区中文件的更改。
