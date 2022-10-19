@@ -40,6 +40,8 @@
 
 - podman 与 podman-compose 使用示例
 
+- Docker 与 Podman 进程管理方式比较
+
 - Podman 使用报错示例
 
 - Podman 有待测试功能
@@ -334,10 +336,10 @@
   
   - 若要使用 rootless 容器，需确认 OS 是否开启 user namespace 功能：
   
-  ```bash
-  $ sudo sysctl -a | grep user\.max_user_namespaces
-    user.max_user_namespaces = 47494
-  ```
+    ```bash
+    $ sudo sysctl -a | grep user\.max_user_namespaces
+      user.max_user_namespaces = 47494
+    ```
   
   - 系统上每创建一个用户就会在 `/etc/subuid` 与 `/etc/subgid` 中生成对应用户在其用户命名空间中的映射规则，以 /etc/subuid 为例，参数以冒号分隔，每个参数含义如下所示：
   
@@ -634,6 +636,100 @@
 
   - 以上 gogs-postgres-podman-compose.yaml 文件可参考 [此处](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/blob/master/gogs-postgres-compose/gogs-postgres-podman-compose.yaml)。
 
+### 🤘 Docker 与 Podman 进程管理方式比较：
+
+- Docker v20.10.8 使用 `dockerd` 与 `containerd` 守护进程管理容器与镜像的生命周期，运行状态如下所示：
+  
+  ```bash
+  $ sudo systemctl status docker.service
+  ● docker.service - Docker Application Container Engine
+     Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-10-19 10:53:04 CST; 6min ago
+       Docs: https://docs.docker.com
+   Main PID: 79556 (dockerd)
+      Tasks: 21
+     Memory: 42.6M
+     CGroup: /system.slice/docker.service
+             ├─79556 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+             ├─79677 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 4000 -container-ip 172.17.0.2 -container-port 4000
+             └─79683 /usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 4000 -container-ip 172.17.0.2 -container-port 4000
+  
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.197803867+08:00" level=info msg="scheme \"unix\" not registered, fallback to default scheme" module=grpc
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.197837924+08:00" level=info msg="ccResolverWrapper: sending update to cc: {[{unix:///run/containerd/containerd.sock  <nil> 0 <nil>}] <nil> <nil>}" module=grpc
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.197860326+08:00" level=info msg="ClientConn switching balancer to \"pick_first\"" module=grpc
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.220416627+08:00" level=info msg="Loading containers: start."
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.347884960+08:00" level=info msg="Default bridge (docker0) is assigned with an IP address 172.17.0.0/16. Daemon option --bip can be used to set a preferred IP address"
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.725361851+08:00" level=info msg="Loading containers: done."
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.755449128+08:00" level=info msg="Docker daemon" commit=75249d8 graphdriver(s)=overlay2 version=20.10.8
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.755527994+08:00" level=info msg="Daemon has completed initialization"
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com systemd[1]: Started Docker Application Container Engine.
+  Oct 19 10:53:04 cloud-ctl.domain12.example.com dockerd[79556]: time="2022-10-19T10:53:04.776865058+08:00" level=info msg="API listen on /var/run/docker.sock"
+  # dockerd 守护进程的运行状态
+  
+  $ sudo systemctl status containerd
+  ● containerd.service - containerd container runtime
+     Loaded: loaded (/usr/lib/systemd/system/containerd.service; enabled; vendor preset: disabled)
+     Active: active (running) since Tue 2022-10-18 15:08:06 CST; 20h ago
+       Docs: https://containerd.io
+   Main PID: 1892 (containerd)
+      Tasks: 20
+     Memory: 103.4M
+     CGroup: /system.slice/containerd.service
+             ├─ 1892 /usr/bin/containerd
+             └─79696 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 3ea752c1cce6a65b39af7f68c971186e020992514b663ab7a917f47da70450fa -address /run/containerd/containerd.sock
+  # containerd 通过调用 containerd-shim-runc-v2 运行指定容器
+  $ sudo ps -ef | grep -E "dockerd|containerd|containerd-shim-runc-v2"
+    root       1892      1  0 Oct18 ?        00:05:01 /usr/bin/containerd
+    root      79556      1  0 10:53 ?        00:00:03 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+    root      79696      1  0 10:53 ?        00:00:01 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 3ea752c1cce6a65b39af7f68c971186e020992514b663ab7a917f47da70450fa -address /run/containerd/containerd.sock
+  # PID 79696 为实际的容器运行进程
+  ```
+
+- Podman 不使用守护进程的方式运行或管理容器，对于 rootfull 容器或 rootless 容器的运行方式存在差异：
+  
+  - rootfull 容器的进程：
+    
+    👉 以交互式方式运行的容器进程状态如下所示：
+    
+    ```bash
+    $ sudo ps -ef | egrep "podman|slirp4netns|conmon"
+      root        3879    3476  1 06:31 pts/3    00:00:00 podman run -it --name=mydebian docker.io/library/debian:latest /bin/sh
+      root        3945       1  0 06:31 ?        00:00:00 /usr/bin/conmon --api-version 1 -c 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba -u 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba -r /usr/bin/crun -b /var/lib/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata -p /run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/pidfile -n mydebian --exit-dir /run/libpod/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/oci-log -t --conmon-pidfile /run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/lib/containers/storage --exit-command-arg --runroot --exit-command-arg /run/containers/storage --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/libpod --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg cni --exit-command-arg --volumepath --exit-command-arg /var/lib/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --storage-opt --exit-command-arg overlay.mountopt=nodev,metacopy=on --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba
+    # 由于具有交互式命令行运行依然保留 podman 进程
+    ```
+    
+    👉 以 `detach` 方式（后台）运行的容器进程状态如下所示：
+    
+    ```bash
+    $ sudo ps -ef | egrep "podman|slirp4netns|conmon"
+      root        3744       1  0 06:25 ?        00:00:00 /usr/bin/conmon --api-version 1 -c b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272 -u b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272 -r /usr/bin/crun -b /var/lib/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata -p /run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/pidfile -n apache-rhce8.2-alpine --exit-dir /run/libpod/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/oci-log --conmon-pidfile /run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/lib/containers/storage --exit-command-arg --runroot --exit-command-arg /run/containers/storage --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/libpod --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg cni --exit-command-arg --volumepath --exit-command-arg /var/lib/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --storage-opt --exit-command-arg overlay.mountopt=nodev,metacopy=on --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272
+    # podman 在调用 conmon 程序创建并运行容器后退出，而 rootfull 容器的 CNI 插件
+    # 可直接使用 iptables 的方式实现。
+    ```
+  
+  - rootless 容器的进程：
+    
+    👉 以交互式方式运行的容器进程状态如下所示：
+    
+    ```bash
+    $ ps -ef | egrep "podman|slirp4netns|conmon"
+      core        3418    2762  0 06:17 pts/2    00:00:05 podman run -it --name=mybusybox docker.io/library/busybox:latest /bin/sh
+      core        3430    3418  0 06:17 pts/2    00:00:00 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable-seccomp --enable-ipv6 -c -e 3 -r 4 --netns-type=path /run/user/1000/netns/netns-19eb5630-c0a8-4ea9-8790-76ecdcdf2dbc tap0
+      core        3433       1  0 06:17 ?        00:00:00 /usr/bin/conmon --api-version 1 -c 5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160 -u 5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160 -r /usr/bin/crun -b /var/home/core/.local/share/containers/storage/overlay-containers/5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160/userdata -p /run/user/1000/containers/overlay-containers/5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160/userdata/pidfile -n mybusybox --exit-dir /run/user/1000/libpod/tmp/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/user/1000/containers/overlay-containers/5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160/userdata/oci-log -t --conmon-pidfile /run/user/1000/containers/overlay-containers/5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/home/core/.local/share/containers/storage --exit-command-arg --runroot --exit-command-arg /run/user/1000/containers --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/user/1000/libpod/tmp --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg netavark --exit-command-arg --volumepath --exit-command-arg /var/home/core/.local/share/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg 5acc7fc4127d5492866b966d6c0c04dce880995c49eddb8421c11e7efc661160
+    # 由于具有交互式命令行运行依然保留 podman 进程，并且由 podman 进程创建 slirp4netns 子进程
+    # 用于 rootless 容器的网络命名空间之间的通信。
+    ```
+    
+    👉 以 `detach` 方式（后台）运行的容器进程状态如下所示：
+    
+    ```bash
+    $ ps -ef | egrep "podman|slirp4netns|conmon"
+      core        3308       1  0 06:15 pts/2    00:00:00 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable-seccomp --enable-ipv6 -c -e 3 -r 4 --netns-type=path /run/user/1000/netns/netns-f9f6f9dd-bf80-f6ca-6f39-7c9d9cd6beea tap0
+      core        3325       1  0 06:15 ?        00:00:00 /usr/bin/conmon --api-version 1 -c 91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab -u 91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab -r /usr/bin/crun -b /var/home/core/.local/share/containers/storage/overlay-containers/91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab/userdata -p /run/user/1000/containers/overlay-containers/91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab/userdata/pidfile -n apache-rhce8.2-alpine --exit-dir /run/user/1000/libpod/tmp/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/user/1000/containers/overlay-containers/91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab/userdata/oci-log --conmon-pidfile /run/user/1000/containers/overlay-containers/91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/home/core/.local/share/containers/storage --exit-command-arg --runroot --exit-command-arg /run/user/1000/containers --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/user/1000/libpod/tmp --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg netavark --exit-command-arg --volumepath --exit-command-arg /var/home/core/.local/share/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg 91b49d5726023b9ca1c4e30a6665fc21c9b3c3182a1accddb0adb259d0ba20ab
+    # podman 在调用 conmon 程序创建并运行容器后退出，并且由 podman 进程创建 slirp4netns 子进程
+    # 用于 rootless 容器的网络命名空间之间的通信。
+    ```
+    
 ### Podman 报错示例：
 
 - podman 容器镜像仓库的配置方式：
