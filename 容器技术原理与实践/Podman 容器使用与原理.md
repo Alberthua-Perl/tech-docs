@@ -3,11 +3,15 @@
 ### 文档说明：
 
 - 实验用 OS 版本：
+
   - CentOS 7.9、RHEL 8.0、RHEL 8.2、Ubuntu 20.04.3 LTS
   
 - 实验用 kernel 版本：
+
   - 3.10.0-1160.41.1.el7.x86_64
+  
   - 4.18.0-193.el8.x86_64
+  
   - 5.14.0-1.el7.elrepo.x86_64
   
 - 实验用 Podman 版本：1.6.4、3.2.3、3.3.1
@@ -18,43 +22,61 @@
 
 - 该文档中未涉及 podman 命令的基础使用方法，可参阅 [该文档](https://mp.weixin.qq.com/s/MDi4RB5V60EGl3ii9usD0Q) 加以熟悉。
 
-  
-
 ### 文档目录：
 
 - Podman 的特性概述
+
 - Podman 版本兼容性比较
+
 - Podman 的扩展功能
+
 - Podman 在不同 OS 版本中的安装
+
 - Podman 的网络实现原理（rootfull 与 rootless）
+
 - Podman rootless 容器用户映射实现方式
+
 - Podman 的 macvlan 网络实现
+
 - podman 与 podman-compose 使用示例
+
 - Podman 使用报错示例
+
 - Podman 有待测试功能
+
 - 参考链接
-
-
 
 ### Podman 的特性概述：
 
 - LXC、`LXD`（Go 语言开发）、`systemd-nspawn` 均可作为 Linux 容器，但缺少容器跨主机运行与应用打包的能力。
+
 - Docker 与 Podman 可使用容器镜像实现应用打包发布，快速且轻量。
+
 - Docker 与 Podman 都使用 `runC`（Go 语言开发）作为底层 `oci-runtime`。
+
 - Docker 与 Podman 都支持 `OCI Image Format`（Go 语言开发），都能使用 DockerHub 上的容器镜像，而 systemd-nspawn 无法使用它们的镜像。
+
 - 👉 Podman 使用 `CNI`（Go 语言开发）作为 rootfull 容器网络底层，实现比 Docker 网络层略微简单但原理相同。 
+
 - 相对于 LXD 与 systemd-nspawn，CNI 可以避免编写大量的网络规则。
+
 - 🚀 为了实现普通用户 rootless 容器网络，Podman 可以使用 `slirp4netns` 程序，避免 `kernel space` 中的大量 `veth pair` 虚拟接口的出现, 并且性能更好。
+
 - Docker 运行容器必须使用守护进程且使用 root 权限，存在系统安全问题，而 Podman 针对此问题使用以下两个特性加以解决，如下所示：
+
   - Podman 支持无守护进程（`no-daemon`）运行容器。
+  
   - Podman 支持普通用户运行 `rootless` 容器，即，普通用户直接运行容器无需提权具有 root 权限。
+
 - 虽然 Docker 与 Podman 的实现原理不同，但对于使用者而言其 CLI 十分相似，可平滑地从 Docker 过渡至 Podman。
+
 - Podman 的目标不是容器的编排，编排可以使用更加专业的 Kubernetes、OpenShift、Rancher 等，使用 Podman 可以更轻量的运行容器且不受 root 权限的安全问题，即便是 root 用户也无法查看其它普通用户空间下的容器，Podman 通过 `user namespace` 进行隔离。
+
 - 👉 Podman 可使用 `systemd service` 单元文件直接管理容器，实现容器服务随系统启动而启动。
+
 - 👉 Podman 里集成了 `CRIU`，因此 Podman 中的容器可以在单机上热迁移。
+
 - 由于 Kubernetes 将从 `v1.24.x` 版本后放弃使用 `dockershim` 接口层，容器运行时可选择使用 `Containerd` 或者 `CRI-O`，两者虽然均支持 OCI image 规范，但它们不是面向使用者或开发者直接管理容器或镜像的工具，而 Podman 可直接面向使用者或开发者操作容器或镜像。
-
-
 
 ### Podman 版本兼容性比较：
 
@@ -77,8 +99,6 @@
   - 由于 `user namespace` 特性在 kernel `4.9.0` 之后出现，因此升级 kernel 即可解决 rootless 问题。
 
   - 关于 rootless 特性在 RHEL 8 中的设置，可 [点击此处](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/assembly_starting-with-containers_building-running-and-managing-containers#proc_setting-up-rootless-containers_assembly_starting-with-containers) 参考 Red Hat 的官方配置说明。
-
-
 
 ### Podman 的扩展功能：
 
@@ -106,8 +126,6 @@
 - podman-compose 使用 `Python` 开发，因此可直接使用 `pip3` 安装该组件，或使用 rpm 软件包方式安装。
 
 - 由于 podman-compose 依然处于 `dev` 阶段，仅作为功能测试使用，暂未受到 GA 环境支持。
-
-
 
 ### Podman 在不同 OS 版本中的安装：
 
@@ -149,8 +167,6 @@
   - [Podman Doc - installation](https://podman.io/getting-started/installation)
   - [Easy to Install Podman on Ubuntu 20.04](https://www.hostnextra.com/kb/easy-to-install-podman-on-ubuntu-20-04/)
   - [podman from devel:kubic:libcontainers:stable project](https://software.opensuse.org//download.html?project=devel%3Akubic%3Alibcontainers%3Astable&package=podman)
-
-
 
 ### Podman 的网络实现原理（rootfull 与 rootless）：
 
@@ -312,8 +328,6 @@
   
   - 关于 slirp4netns 更加详细的内容，请参考 [Github 项目](https://github.com/rootless-containers/slirp4netns)。
 
-
-
 ### Podman rootless 容器用户映射实现方式：  
 
   - Podman rootless 容器的实现核心在于解决 network namespace（NetNS） 与 user namespace（UserNS） 的问题，前文已介绍 NetNS 的实现方式，后文将介绍 UserNS 的实现方式。
@@ -364,8 +378,6 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/user-namespace-subuid-mapping-2-edited.png)
 
-
-
 ### Podman 的 macvlan 网络实现:
 
 - `macvlan` 作为 CNI 在 Kubernetes 与 OpenShift v4 中作为 `Multus CNI` 支持的额外插件类型使用愈加广泛，集群中除了常规使用的 Flannel、Calico 等作为 `slow path` 的插件外，要求高性能的业务流量可使用 macvlan 直连 pod 宿主机物理网口实现 `fast path`。
@@ -401,8 +413,6 @@
 - 从与 rootfull 容器在同一广播域的其他节点上 ping 该容器，可正常通信：
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-macvlan-network.png)
-
-
 
 ### podman 与 podman-compose 使用示例：
 
@@ -623,12 +633,13 @@
     ```
 
   - 以上 gogs-postgres-podman-compose.yaml 文件可参考 [此处](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/blob/master/gogs-postgres-compose/gogs-postgres-podman-compose.yaml)。
-    
 
 ### Podman 报错示例：
 
 - podman 容器镜像仓库的配置方式：
+
   - 全局配置：/etc/containers/registries.conf
+
   - 局部配置：$HOME/.config/containers/registroes.conf
   
 - 若 podman 安装后在以上配置中未唯一指定的容器镜像仓库，那么在拉取容器镜像时，将交互式提示用户选择容器镜像仓库。
@@ -752,26 +763,33 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-busybox-capability.jpg)
 
-
-
 ### Podman 有待测试功能：
 
 - 前文所述，使用 podman pod 命令或使用 podman-compose 组件单机编排容器，而且 Podman 支持 `podman play kube` 命令基于 YAML 资源定义文件创建 pod，该方法类似 Kubernetes 或 OpenShift，有待测试。
+
 - Podman 日志驱动目前只支持 `k8s-file`、`journald` 与 `none`，暂时不支持容器日志的 `JSON `格式输出，因此不能与日志收集引擎 `fluentd` 集成，由其实现 ELK/EFK 集中式的存储、索引等。
+
 - Podman 与 `Linux capabilities` 的关系与应用在最后一个示例中有所提及，但更全面的关系有待测试。
-
-
 
 ### 参考链接：
 
 - [Reintroduction of Podman](https://projectatomic.io/blog/2018/02/reintroduction-podman/)
+
 - [Using pods with Podman on Fedora](https://fedoramagazine.org/podman-pods-fedora-containers/)
+
 - [Configuring container networking with Podman](https://www.redhat.com/sysadmin/container-networking-podman)
+
 - [RedHat docs - Building, running, and managing Linux containers on Red Hat Enterprise Linux 8](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/index)
+
 - [容器安全拾遗 - Rootless Container初探](https://developer.aliyun.com/article/700923)
+
 - [Documentation for /proc/sys/user/](https://www.kernel.org/doc/html/latest/admin-guide/sysctl/user.html)
+
 - [docker docs - Overview of Docker Compose](https://docs.docker.com/compose/)
+
 - [CNI docs - firewall plugin](https://www.cni.dev/plugins/current/meta/firewall/)
+
 - [CNI docs - Port-mapping plugin](https://www.cni.dev/plugins/current/meta/firewall/)
+
 - https://fossies.org/linux/podman/docs/tutorials/basic_networking.md
 
