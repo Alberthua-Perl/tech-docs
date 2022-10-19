@@ -1,26 +1,30 @@
 ## 🐳 容器运行时 runtime 演进与架构概述
 
-##### 文档说明：
+### 文档说明：
 
 - 该文档未说明 `Kata Container`、`gVisor` 等强隔离的容器 runtime。
+
 - 该文档中具有较多概念与技术点，难免存在疏忽与纰漏，欢迎交流与指正！
 
-
-
-##### 文档目录：
+### 文档目录：
 
 - Docker 架构的技术演进
+
 - Containerd 简要概述
+
 - 容器运行时 runtime 分类
+
 - Kubernetes 中 Docker 容器 runtime 示例
+
 - 容器发展史简要回顾
+
 - OCI、runC 与 CRI 概述
+
 - Kubernetes 中 Containerd 及 CRI-O 为容器 runtime 的架构演进
+
 - 参考链接
 
-
-
-##### Docker 架构的技术演进：
+### Docker 架构的技术演进：
 
 - Docker 项目早先已由 DotCloud 公司贡献于社区成立 `Moby` 项目（Docker CE）。
 
@@ -54,9 +58,7 @@
 
   > 📌 注意：各版本之间的 dockerd 与 containerd 进程的调用存在差异！
 
-
-
-##### Containerd 简要概述：
+### Containerd 简要概述：
 
 - 2016 年 12 月 14 日，DotCloud 公司宣布将 containerd 从 Docker Engine 中分离，并捐赠到一个新的开源社区独立发展和运营，"一个工业标准的容器运行时，注重简单、健壮性、可移植性"。
 
@@ -65,7 +67,9 @@
 - 需要独立的 containerd 的原因：
 
   - 继续从整体 Docker Engine 中分离（开源项目的思路）
+  
   - 可以被 Kubernetes CRI 等项目使用（通用化）
+  
   - 为广泛的行业合作打下基础（像 runC 一样）
 
 - Docker 对容器的管理和操作基本都是通过 containerd 完成的。
@@ -73,9 +77,13 @@
 - containerd 可以在宿主机中管理完整的容器生命周期：
 
   - 拉取、推送容器镜像
+  
   - 存储管理：管理镜像及容器数据的存储
+  
   - 管理容器网络接口及网络：使用 CNI 容器网络接口
+  
   - 管理容器的生命周期：从创建容器到销毁容器
+  
   - 调用 runC 运行容器
 
 - containerd 并不是直接面向开发人员或终端用户使用，而是主要用于集成到更上层的系统里，如 Swarm、Kubernetes、Mesos 等容器编排系统。
@@ -125,17 +133,13 @@
 
 - 关于 Containerd 更加详实具体的文档可查看文末的参考链接。
 
-
-
-##### 容器运行时 runtime 分类：
+### 容器运行时 runtime 分类：
 
 - [CNCF 云原生计算基金会的 Landscape 中容器 runtime 项目](https://github.com/cncf/landscape)：
 
   <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/cncf-container-runtime.jpg" style="zoom:33%;" />
 
-
-
-##### Kubernetes 中 Docker 容器 runtime 示例：
+### Kubernetes 中 Docker 容器 runtime 示例：
 
 - 以 `kubelet` 集成 Docker 容器 runtime 为例，解释 kubelet 如何创建容器。
 
@@ -144,7 +148,9 @@
 - 步骤 1：
   
   - kubelet 通过 `CRI` 接口（`gRPC`）调用 `dockershim`，请求创建容器。
+  
   - CRI 即容器运行时接口（container runtime interface），这步中，kubelet 可视作简单的 `CRI Client`，而 dockershim 就是接收请求的 `CRI Server`。
+  
   - 目前 dockershim 的代码内嵌在 kubelet 中，所以接收调用的就是 kubelet 进程。
 
 - 步骤 2：
@@ -158,22 +164,24 @@
 - 步骤 4：
 
   - containerd 收到请求后，并不会直接去操作容器，而是创建 `containerd-shim` 的进程，让 containerd-shim去操作容器。
+  
   - 因为容器进程需要一个父进程来做诸如收集状态、维持 `STDIN` 等 `fd` 打开等工作。
 
 - 步骤 5：
 
   - 创建容器需要设置 `namespaces` 和 `cgroups`，挂载 `rootfs` 等操作，而这些操作需通过 `OCI`（开放容器标准，open container initiative）。
+  
   - OCI 的一个参考实现称为 `runC`。
+  
   - containerd-shim 需要调用 runc 命令行启动容器。
 
 - 步骤 6：
 
   - runc 启动完容器后本身会直接退出，`containerd-shim` 则会成为容器进程的父进程，负责收集容器进程的状态，上报给 containerd。
+  
   - 在容器中 PID 为 1 的进程退出后接管容器中的子进程进行清理，确保不会出现僵尸进程。
 
-
-
-##### 容器发展史简要回顾：
+### 容器发展史简要回顾：
 
 - 容器生态中的各类组件与名词在技术演进的过程中形成，因此，了解容器发展史有助于对各类组件与名词的理解，如下所示。
 
@@ -205,23 +213,29 @@
   >
   > dockershim 将在 Kubernetes v1.20 版本及更高版本中逐步废弃，不再使用 Docker 而全面使用 Containerd。
 
-
-
-##### OCI、runC 与 CRI 概述：
+### OCI、runC 与 CRI 概述：
 
 - OCI：开放容器标准，其实就是一系列文档，其中主要规定了两点。
   - `ImageSpec`：
+
     - 规定容器镜像
+    
     - 主要定义一个 `OCI image`，该镜像由 manifest、image index（optional）、filesystem layers、以及 configuration 组成。
+    
     - 该规范的目的在于确保构建一套不同容器引擎间可互操作的工具，用于镜像的构建、传输，以及镜像运行准备工作。
+  
   - `RuntimeSpec`：
+    
     - 主要定义如何配置容器、执行环境以及容器生命周期中需要能接收哪些指令，这些指令的行为是什么等。
+    
     - 其中的大致内容为容器要能执行 create、start、stop、delete 等命令，且行为要规范。
 
 - runC：OCI 的一种参考实现
 
   - 由 libcontainer 库演变而来，并且由 Docker 捐献给 Linux 基金会。
+  
   - libcontainer 库直接使用 Linux kernel 提供的相关隔离技术，如 namespace、cgroups。
+  
   - 它能按照标准将符合标准的容器镜像运行起来。
 
   > 📌 注意：
@@ -276,9 +290,7 @@
 
 - 其中 Kuberentes 已经是 Orchestration API 的事实标准，而 Container API 的接口标准就是 CRI，由 cri-runtime 实现，Kernel API 的规范是 OCI，由 oci-runtime 实现。
 
-
-
-##### Kubernetes 中 Containerd 及 CRI-O 为容器 runtime 的架构演进：
+### Kubernetes 中 Containerd 及 CRI-O 为容器 runtime 的架构演进：
 
 - 之前使用 Docker 的架构确实有点复杂，而复杂是万恶之源（其本质就是替代 Docker）。
 
@@ -306,8 +318,6 @@
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/cri-o-runtime-1.jpg)
 
- 
-
 - Docker 与 Containerd 架构演进总结：
 
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/docker-containerd-runtime.jpg)
@@ -332,25 +342,38 @@
     
     - 关于 Podman 更加详实具体的文档可查看文末的参考链接。
 
-
-
-##### 参考链接：
+### 参考链接：
 
 - [容器技术生态概览](https://www.jianshu.com/p/453021b7c1ff?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation)
-- [GitHub Doc - Moby](https://github.com/moby/moby)
-- [Containerd 简述](https://www.cnblogs.com/embedded-linux/p/10850491.html)
-- [初识 Containerd](https://mp.weixin.qq.com/s?__biz=MzA3MDM1NjE0NA==&mid=2247483826&idx=1&sn=8fefccc0dabf9aac5650b7a14263fae0&chksm=9f3f5c6da848d57b17917a9983e97a57e33e5ca596b8becca7c0c581ea6a1098efe27be9358a&mpshare=1&scene=24&srcid=0504zxZIFifH8YLeoc6PdG9O&sharer_sharetime=1620116918211&sharer_shareid=6f52fcf5de1f55a8e68dc61bb30e3bc1#rd)
-- [Containerd 的前世今生和保姆级入门教程 - 米开朗基杨](https://mp.weixin.qq.com/s/lyccCunbaKCsgotrl2lLug)
-- [一文搞定 Containerd 的使用 - 阳明](https://mp.weixin.qq.com/s/--t74RuFGMmTGl2IT-TFrg)
-- [可以像 Docker 一样方便的使用 Containerd 吗？- 阳明](https://mp.weixin.qq.com/s/1o4ec6m4LANHt1wgPrwZDA)
-- [GitHub Doc - Containerd](https://github.com/containerd/containerd)
-- [白话 Kubernetes Runtime](https://mp.weixin.qq.com/s/PpKz9FBIo_GCnxquh9F5ow)
-- [容器运行时概述](https://insujang.github.io/2019-10-31/container-runtime/)
-- [Kubernetes 官方文档中对 CRI 的说明](https://kubernetes.io/blog/2016/12/container-runtime-interface-cri-in-kubernetes/)
-- [GitHub 中对 CRI 的说明](https://github.com/kubernetes/kubernetes/blob/242a97307b34076d5d8f5bbeb154fa4d97c9ef1d/docs/devel/container-runtime-interface.md)
-- [GitHub Doc - CRI-O](https://github.com/cri-o/cri-o)
-- [Podman 容器使用与原理 - Alberthua](https://github.com/Alberthua-Perl/tech-docs/blob/master/Podman%20%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%8E%9F%E7%90%86.md)
-- [Podman 官网](https://podman.io/)
-- [GitHub Doc - Podman](https://github.com/containers/podman)
-- [GitHub Doc - OCI](https://github.com/opencontainers)
 
+- [GitHub Doc - Moby](https://github.com/moby/moby)
+
+- [Containerd 简述](https://www.cnblogs.com/embedded-linux/p/10850491.html)
+
+- [初识 Containerd](https://mp.weixin.qq.com/s?__biz=MzA3MDM1NjE0NA==&mid=2247483826&idx=1&sn=8fefccc0dabf9aac5650b7a14263fae0&chksm=9f3f5c6da848d57b17917a9983e97a57e33e5ca596b8becca7c0c581ea6a1098efe27be9358a&mpshare=1&scene=24&srcid=0504zxZIFifH8YLeoc6PdG9O&sharer_sharetime=1620116918211&sharer_shareid=6f52fcf5de1f55a8e68dc61bb30e3bc1#rd)
+
+- [Containerd 的前世今生和保姆级入门教程 - 米开朗基杨](https://mp.weixin.qq.com/s/lyccCunbaKCsgotrl2lLug)
+
+- [一文搞定 Containerd 的使用 - 阳明](https://mp.weixin.qq.com/s/--t74RuFGMmTGl2IT-TFrg)
+
+- [可以像 Docker 一样方便的使用 Containerd 吗？- 阳明](https://mp.weixin.qq.com/s/1o4ec6m4LANHt1wgPrwZDA)
+
+- [GitHub Doc - Containerd](https://github.com/containerd/containerd)
+
+- [白话 Kubernetes Runtime](https://mp.weixin.qq.com/s/PpKz9FBIo_GCnxquh9F5ow)
+
+- [容器运行时概述](https://insujang.github.io/2019-10-31/container-runtime/)
+
+- [Kubernetes 官方文档中对 CRI 的说明](https://kubernetes.io/blog/2016/12/container-runtime-interface-cri-in-kubernetes/)
+
+- [GitHub 中对 CRI 的说明](https://github.com/kubernetes/kubernetes/blob/242a97307b34076d5d8f5bbeb154fa4d97c9ef1d/docs/devel/container-runtime-interface.md)
+
+- [GitHub Doc - CRI-O](https://github.com/cri-o/cri-o)
+
+- [Podman 容器使用与原理 - Alberthua](https://github.com/Alberthua-Perl/tech-docs/blob/master/Podman%20%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%8E%9F%E7%90%86.md)
+
+- [Podman 官网](https://podman.io/)
+
+- [GitHub Doc - Podman](https://github.com/containers/podman)
+
+- [GitHub Doc - OCI](https://github.com/opencontainers)
