@@ -20,7 +20,9 @@
 
 - OCI、runC 与 CRI 概述
 
-- Kubernetes 中 Containerd 及 CRI-O 为容器 runtime 的架构演进
+- Kubernetes 中 Containerd 及 CRI-O 为 runtime 的架构演进
+
+- 容器运行时 runtime 总览
 
 - 参考链接
 
@@ -290,7 +292,7 @@
 
 - 其中 Kuberentes 已经是 Orchestration API 的事实标准，而 Container API 的接口标准就是 CRI，由 cri-runtime 实现，Kernel API 的规范是 OCI，由 oci-runtime 实现。
 
-### Kubernetes 中 Containerd 及 CRI-O 为容器 runtime 的架构演进：
+### Kubernetes 中 Containerd 及 CRI-O 为 runtime 的架构演进：
 
 - 之前使用 Docker 的架构确实有点复杂，而复杂是万恶之源（其本质就是替代 Docker）。
 
@@ -341,6 +343,12 @@
       ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/podman-arch.jpg)
     
     - 关于 Podman 更加详实具体的文档可查看文末的参考链接。
+
+### 容器运行时 runtime 总览：
+
+- 以下是从高层次与低层次的视角对容器运行时的总览：
+  
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/container-runtime-introduce/high-or-low-level-runtime.jpg)
 
 ### 参考链接：
 
