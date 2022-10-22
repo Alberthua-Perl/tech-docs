@@ -4,6 +4,8 @@
 
 - 实施推荐做法
 
+- 使用 Git 管理 Ansible 项目资料
+
 ### 实施推荐做法
 
 - 保持简单：
@@ -358,4 +360,7 @@
     ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-playbook-develop-recommend/yamllint-demo.png)
     
   > 👉 yamllint 工具位于 [epel8 软件源](https://github.com/Alberthua-Perl/scripts-confs/blob/master/yum-repo/epel8.repo) 中！  
-    
+  
+### 使用 Git 管理 Ansible 项目资料：
+
+- 该小节请参看 [Git 原理及常规使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
