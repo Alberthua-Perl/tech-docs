@@ -423,7 +423,7 @@
               service: nginx
         ```
       
-      - role 指令调用的角色下直接定义的 `key=value` 变量
+      - roles 指令调用的角色下直接定义的 `key=value` 变量
         
         ```yaml
         roles:
@@ -433,7 +433,7 @@
             # 同名变量
         ```
       
-      - role 指令调用的角色下 vars 指令定义的变量
+      - roles 指令调用的角色下 vars 指令定义的变量
         
         ```yaml
         roles:
