@@ -32,13 +32,13 @@
   
   - 角色决定了用户和团队是否可以查看、使用、更改或删除清单和项目等对象（`CRUD` 权限）。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter07\rbac-in-ansible-tower.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/rbac-in-ansible-tower.png)
 
 - Ansible Tower 组织：
   
   - Ansible Tower 组织（organization）：团队、项目、清单的逻辑集合
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter07\ansible-awx-object-hierarchy.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-awx-object-hierarchy.jpg)
   
   - 🤘 所有用户都必须属于某一组织。
   
