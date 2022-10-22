@@ -121,6 +121,20 @@
               name: httpd
               state: started
               enabled: yes
+          - name: Create new index.html
+            file:
+              path: /var/www/html/index.html
+              state: touch
+          - name: Insert hello content into index.html
+            lineinfile:
+              path: /var/www/html/index.html
+              line: "Hello DO447 candidates!"
+          - name: Enable httpd service in firewalld
+            firewalld:
+              service: http
+              permanent: yes
+              state: enabled
+              immediate: yes    
           become: true
         - name: Test website from itself, do not become
           uri:
@@ -128,6 +142,7 @@
             return_content: yes
           register: webpage
           failed_when: webpage.status != 200
+          ignore_errors: yes
           # 若返回码不为 200 时，将该任务设置为 failed。
         - name: Check webpage variable content
           debug:
