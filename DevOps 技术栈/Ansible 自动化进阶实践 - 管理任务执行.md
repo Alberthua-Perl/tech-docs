@@ -322,7 +322,7 @@
     
     - 使用 include_role 模块时，Ansible 会在 play 执行期间到达 include_role 任务时解析角色并插入到 play 中，若 Ansible 检测到角色中存在语法错误，则中止执行 playbook。
   
-  - 使用 include_role 或 import_role 任务时，若 when 指令中的条件为 false，则 Ansible 不解析角色（直接 `skipping`），[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter03/include_import_role.yaml)：
+  - 使用 include_role 或 import_role 任务时，若 when 指令中的条件为 false，则 Ansible 不解析角色（直接 `skipping`），[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/include_import_role.yaml)：
     
     ```yaml
     ---
