@@ -44,7 +44,7 @@
       
       以验证新的或最近修改的代码不会对现有功能（函数）产生负面影响。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\devops-cicd-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/devops-cicd-1.png)
   
   - CI/CD 管道具有很多优点：
     
@@ -88,11 +88,11 @@
   
   - 理想情况下，runner 会独立于任何已连接的系统执行管道中定义的代码。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\gitlab-ci-gitlab-runner.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/gitlab-ci-gitlab-runner.png)
   
   - GitLab CI/CD 工作流程详细示意：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\gitlab-workflow-example-details.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/gitlab-workflow-example-details.png)
 
 - 🤘 CI/CD 与红帽 Ansible Tower：
   
@@ -138,13 +138,13 @@
   > 
   > 2. 此命令包含在适用于 RHEL 7 的 EPEL 和当前版本的 Fedora 中，有关 RHEL 与 Fedora 版本间的对比可参考 [Fedora and Red Hat Enterprise Linux](https://docs.fedoraproject.org/en-US/quick-docs/fedora-and-red-hat-enterprise-linux/) 与 [Fedora 和红帽企业 Linux 有什么区别？](https://www.redhat.com/zh/topics/linux/fedora-vs-red-hat-enterprise-linux)，如下所示：
   >    
-  >    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\rhel-fedora-version-match.jpg)
+  >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/rhel-fedora-version-match.jpg)
   > 
   > 3. 有关在其他操作系统上安装的说明，请访 [Ansible Lint 文档](https://docs.ansible.com/ansible-lint/)。
   
   - Ansible Lint 以 Python 模块的形式使用 `${PYTHON_PATH}/site-packages/ansiblelint/rules/` 中的规则，可以按原样使用，或者根据自己的需求编辑。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\ansible-lint-rules.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-lint-rules.jpg)
   
   - 与 `ansible-playbook --syntax-check` 命令相比，ansible-lint 命令更能验证 playbook 的健全性，因此，在使用 ansible-lint 命令时无需使用 ansible-playbook --syntax-check。
   
@@ -152,7 +152,7 @@
     
     许多团队或组织具有自身的编码风格，因此可自行编写 ansible-lint 对应的 Python 模块以实现自定义的编码风格检查，样式的一致性可提高 playbook 的可读性，也可提高 playbook 运行故障时的排查效率。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\Ansible高级自动化最佳实践\pictures\Chapter13\ansible-lint-flow.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-lint-flow.jpg)
     
     ```bash
     $ ansible-lint --help
