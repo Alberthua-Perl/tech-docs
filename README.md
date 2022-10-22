@@ -91,4 +91,16 @@
     
     - [Ansible Tower 自动化实践（1）- Red Hat Ansible Tower 架构与部署配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20Red%20Hat%20Ansible%20Tower%20%E6%9E%B6%E6%9E%84%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE.md)
     
-    - [Ansible Tower 自动化实践（2）- 使用 Ansible 与 API 通信](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E4%BD%BF%E7%94%A8%20Ansible%E4%B8%8E%20API%20%E9%80%9A%E4%BF%A1.md)
+    - [Ansible Tower 自动化实践（2） - 使用用户和团队管理访问权限（1）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E4%BD%BF%E7%94%A8%E7%94%A8%E6%88%B7%E5%92%8C%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90%EF%BC%881%EF%BC%89.md)
+    
+    - [Ansible Tower 自动化实践（2） - 使用用户和团队管理访问权限（2）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E4%BD%BF%E7%94%A8%E7%94%A8%E6%88%B7%E5%92%8C%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90%EF%BC%882%EF%BC%89.pdf)
+    
+    - [Ansible Tower 自动化实践（3） - 管理清单与凭据](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E7%AE%A1%E7%90%86%E6%B8%85%E5%8D%95%E4%B8%8E%E5%87%AD%E6%8D%AE.pdf)
+    
+    - [Ansible Tower 自动化实践（4） - 管理项目和启动 Ansible 作业](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E7%AE%A1%E7%90%86%E9%A1%B9%E7%9B%AE%E5%92%8C%E5%90%AF%E5%8A%A8%20Ansible%20%E4%BD%9C%E4%B8%9A.pdf)
+    
+    - [Ansible Tower 自动化实践（5） - 构建高级作业工作流](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E6%9E%84%E5%BB%BA%E9%AB%98%E7%BA%A7%E4%BD%9C%E4%B8%9A%E5%B7%A5%E4%BD%9C%E6%B5%81.pdf)
+    
+    - [Ansible Tower 自动化实践（6）- 使用 Ansible 与 API 通信](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E4%BD%BF%E7%94%A8%20Ansible%E4%B8%8E%20API%20%E9%80%9A%E4%BF%A1.md)
+    
+    - [Ansible Tower 自动化实践（7）- 使用 Ansible Tower 创建简单的 CI/CD 管道](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20Tower%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E8%B7%B5%20-%20%E4%BD%BF%E7%94%A8%20Ansible%20Tower%20%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95%E7%9A%84%20CICD%20%E7%AE%A1%E9%81%93.md)
