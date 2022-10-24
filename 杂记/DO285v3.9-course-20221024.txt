@@ -1,0 +1,50 @@
+DO285v3.9: 
+	1. all name: RedHat OpenShift Container Platform
+	2. v3.9 and v4.10:
+		 cluster introduction: content and features
+		 user authentication and authorization: RBAC and SCC
+		 network field: ovs-subnet,ovs-multitenant,ovs-networkpolicy and OVN-kubernetes(4.6 or above)
+		 application build and deploy: buildconfig,deploymentconfig and deployment
+		 ocp specified: s2i(source-to-image)
+		 storage: persistent volume(pv) and persistent volume claim(pvc)
+		 operator: ocp v4 appeared(CRD+controller)
+		 helm v3: ocp v4 appeared
+		 helm v2: ocp v3.6 or above supported
+		 kustomize: ocp v4 appeared
+	3. DO180(container basic, chapter1~6) + DO280(openshift basic, chapter7~16) = DO285
+	4. user and password:
+		 foundationX:
+		   kiosk: redhat
+		   root: Asimov
+		 other nodes:
+			 student: student
+			 root: redhat
+	5. RedHat and Docker:
+		 redhat use docker v1.13.x in ocp v3.x in default
+		 redhat also use cri-o in ocp v3.11
+		 * redhat has deprecated docker from ocp v4.x and use cri-o in ocp v4
+
+OpenShift architecture:
+	master node:
+		api-server: 
+			1. client: worker node openshift-node process including kubelet and kube-proxy
+			2. client: etcd key-value database
+			3. client: developer or operator(human)
+			4. client: customized application call api-server
+	  authentication:
+			1. OAuth: http basic
+			2. X509 CA certification
+			3. OpenStack Keystone
+			4. OpenLDAP,FreeIPA
+		authoritation:
+			1. ABRC: attribute-based access control
+			2. RBAC: role-based access control(*), ocp v3.6 or above
+		
+Method of pulling images:
+	1. Internet: RESTful API v1
+		 docker search <image-pattern>
+		 docker pull docker.io/library/alpine:latest
+	2. Offline: RESTful API v2
+		 docker-registry-cli registry.lab.example.com list all ssl
+		 		 		 
+
