@@ -69,6 +69,8 @@
     
   - ⭕️ **Red Hat OpenShift Container Platform**
   
+    - [Fedora CoreOS 与 RHCOS 概述与应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Fedora%20CoreOS%20%E4%B8%8E%20RHCOS%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%BA%94%E7%94%A8.md)
+  
     - [OpenShift v4.x all-in-one (AIO) 部署与配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/OpenShift%20v4.x%20all-in-one%20(AIO)%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E9%85%8D%E7%BD%AE.md)
     
     - [Red Hat OpenShift v3 与 v4 基础架构与应用构建](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20v3%20%E4%B8%8E%20v4%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA.md)
