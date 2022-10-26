@@ -74,7 +74,7 @@
 
 - [FCOS 发布版本](https://getfedora.org/en/coreos/download?tab=metal_virtualized&stream=stable&arch=x86_64)：
   
-  ![](pictures/fedora-coreos-release-version.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/fedora-coreos-rhcos-intro/fedora-coreos-release-version.png)
   
   - `testing stream`：
     
@@ -193,7 +193,7 @@
   
   - 可在自己指定的节点（非 FCOS 主机）上安装 butane，安装方式包括 butane 容器镜像（`quay.io/coreos/butane:release`）、rpm 软件包或独立的二进制文件（standalone binary），此处使用以上链接的独立二进制文件进行安装。
     
-    ![](pictures/quay-coreos-butane-release.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/fedora-coreos-rhcos-intro/quay-coreos-butane-release.png)
   
   - butane 的使用方法可参考该 [链接](https://github.com/coreos/butane/blob/main/docs/getting-started.md)。
 
@@ -315,9 +315,9 @@
 
 - 创建 FCOS 虚拟机并使用 FCOS live ISO 引导安装，如下所示：
   
-  ![](pictures/use-fedora-coreos-live-to-install.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/fedora-coreos-rhcos-intro/use-fedora-coreos-live-to-install.png)
   
-  ![](pictures/login-fedora-coreos-live.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/fedora-coreos-rhcos-intro/login-fedora-coreos-live.png)
   
   👉 `core` 用户可 `sudo` 免密提权为 root 用户。
   
@@ -330,7 +330,7 @@
   
   👉 使用 FCOS live ISO 自带的 `coreos-installer` 工具根据 Ignition 配置文件安装部署，如下所示：
   
-  ![](pictures/coreos-installer-customized-install.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/fedora-coreos-rhcos-intro/coreos-installer-customized-install.png)
   
   ```bash
   $ sudo coreos-installer install \
