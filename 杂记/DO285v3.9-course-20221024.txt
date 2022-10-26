@@ -47,4 +47,44 @@ Method of pulling images:
 	2. Offline: RESTful API v2
 		 docker-registry-cli registry.lab.example.com list all ssl
 		 		 		 
+Container registry:
+	1. public registry:
+		   online: docker.io, registry.access.redhat.com, quay.io, aliyun.com
+			 offline: RedHat Quay, Harbor, registry(container image), docker-distribution(rpm)
+  2. private registry:
+			 online: docker.io, registry.access.redhat.com, quay.io, aliyun.com
+			 offline: RedHat Quay, Harbor, registry(container image)
+	* Difference: when you pull container images using username and password or not!
+
+Container image layering:
+	1. container image have several layers which can't be writeable!
+	2. When container running loaded container image, container adds upper layer on basic image.
+
+Customized container image:
+	1. docker commit used in NO GA environment
+	2. Dcokerfile: docker build, podman build
+		 Containerfile: podman build
+  3. S2I: source-to-image
+		 basic image --> builder image --> application image(push into registry which is in ocp)
+                           |
+                       source code
+  4. buildah
+
+Dockerfile ADD and COPY:
+	$ mkdir app-dockerfile
+  $ cd app-dockerfile
+  $ ls -lh
+    app/
+  $ vim Dockerfile
+	  FROM rhscl/rhel7.5:latest
+	  ADD ./app/ /opt/app
+	  RUN chown -R app:app /opt/app && \
+		    chmod -R 0775 /opt/app
+	  WORKDIR /opt/app
+	  USER app-runner
+	  ENTRYPOINT ["./runapp", "para1", "para2"]
+
+
+
+
 
