@@ -84,7 +84,43 @@ Dockerfile ADD and COPY:
 	  USER app-runner
 	  ENTRYPOINT ["./runapp", "para1", "para2"]
 
+OpenShift network type:
+  * following types in all openshift SDN!
+	1. pod and node: pod attach ovs intergrated bridge(br0)
+	2. pod and pod on the same node: 
+		   * no network isolated: pod to pod indirectly
+			 *network isolated: no allowed in default
+	3. node and node: VXLAN tunnel(ovs or ovn-kubernetes) or Geneve(ovn-kubernetes)
+	4. pod and pod on different node:
+			 * pod to pod directly: depand on tunnel
+			 * pod to pod indirectly: depand on service and tunnel
+	5. pod and service: iptables NAT rules, service works as iptables rules
+	6. service and external:
+			 * NodePort type service 
+			 * LoadBalance type service
+			 * exposed service to route
 
+Service resource functions:
+	1. apply fixed ip address allow packets proxy to pods
+	2. load balance packets to pods
 
+Analyze sdn-multitenant:
+	from project: sdn-multitenant project
+		pod: httpd-debian, 10.128.0.13 (VNID:0xe9cd1d->reg0)
+	to project: smoke-test project
+		pod: hello, 10.128.0.12 (VNID:0x8a84cd->reg1)
 
+External packets into ocp cluster:
+	* using NodePort Service: 
+		student@workstation:
+			external request -> [master -> PREROUTING -> KUBE-SERVICES -> KUBE-NODEPORT -> 
+			KUBE-SVC-KFF2GHTQXTTRUCUG(dpt:30800) -> 172.30.142.91:8080 -> KUBE-SEP-OP2GFVQMP7QGRMAP -> 
+			DNAT -> tcp to:10.130.0.23:8080 -> ROUTE -> tun0] -> OVS br0 OpenFlow rules -> vxlan0 ->
+			eth0 -> node2
+
+	* Note:
+		Kubernetes service model:
+			1. userspace: deprecated
+			2. iptables: common
+			3. ipvs(+iptables POSTROUTING): current
 
