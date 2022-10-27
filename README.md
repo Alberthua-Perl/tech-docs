@@ -4,7 +4,7 @@
 
 > 以下文档中的内容将根据实际情况进行不断更新补充！
 
-  - 🐧 **Linux 的基础与进阶** 
+  - 🐧 **Linux 基础与进阶** 
     - [Linux 基础快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/linux-basic-knowledge.yaml)
     
     - [Linux 系统安装与启动引导及故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
