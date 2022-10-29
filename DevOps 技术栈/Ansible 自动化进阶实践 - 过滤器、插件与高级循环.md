@@ -153,7 +153,7 @@
                 - my_dict['Marvin'] == 'Robot'
       ```
       
-      - 该 playbook 可参考 [该 jinja2_vars.yml 的链接](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_vars.yml)。
+      - 该 playbook 可参考 [该 jinja2_vars.yml 的链接](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_vars.yaml)。
       
       - 也可使用语法 `my_dict.Marvin` 来访问 `my_dict['Marvin']`。
       
