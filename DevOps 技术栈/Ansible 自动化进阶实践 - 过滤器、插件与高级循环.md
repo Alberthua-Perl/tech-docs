@@ -153,7 +153,7 @@
                 - my_dict['Marvin'] == 'Robot'
       ```
       
-      - 该 playbook 可参考 [该 jinja2_vars.yml 的链接](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/jinja2_vars.yml)。
+      - 该 playbook 可参考 [该 jinja2_vars.yml 的链接](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do447-course-demo/chapter04/jinja2_vars.yaml)。
       
       - 也可使用语法 `my_dict.Marvin` 来访问 `my_dict['Marvin']`。
       
@@ -869,7 +869,7 @@
             - "{{ app_c_tmp_files }}"
       ```
 
-- `with_subelements` 关键字与 `subelements` 过滤器：
+- 🤔 `with_subelements` 关键字与 `subelements` 过滤器：
   
   - 功能：迭代字典组成的列表
   

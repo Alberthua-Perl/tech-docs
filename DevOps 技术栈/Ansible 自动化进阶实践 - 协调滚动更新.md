@@ -403,7 +403,7 @@
       tasks:
         - name: 'List: show all hosts in play'
           debug:
-            var: ansible_plsy_hosts
+            var: ansible_play_hosts
     
         - name: 'List: show all hosts in each batch'
           debug:
