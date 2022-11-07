@@ -22,7 +22,7 @@
 
 		  - 课程环境中的用户名与密码：
 
-				```yaml
+				```bash
 		 		foundation 节点：
 					root: Asimov
 					kiosk: redhat
@@ -39,7 +39,7 @@
 
 				- kubelet 守护进程的和解循环与资源的 watch 反馈
 
-			  > 注意：OCP 中 kubelet 守护进程已经集成至 `openshift-node` 守护进程中。
+			  - 注意：OCP 中 kubelet 守护进程已经集成至 `openshift-node` 守护进程中。
 
 				- 运维、测试或开发人员对集群资源的管理，可通过 `oc` 或 `kubectl` 标准命令亦或是其他自研的命令。
 
