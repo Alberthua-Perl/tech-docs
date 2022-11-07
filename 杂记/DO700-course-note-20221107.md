@@ -23,12 +23,14 @@
 		  - 课程环境中的用户名与密码：
 
 				```bash
+				
 		 		foundation 节点：
 					root: Asimov
 					kiosk: redhat
 				其余所有节点：
 					student: student
 					root: redhat
+					
 				```
 
 		  - Docker 17.x~20.x: 使用 dockerd 守护进程与 containerd 守护进程协同运行的方式管理容器镜像、容器生命周期以及容器网络与存储。
@@ -36,12 +38,12 @@
 		- 第三节：Kubernetes 与 OpenShift 的架构基础
 
 		  - OCP 3.x/4.x 的 master 节点 API server 的客户端：
+		   
+		  - kubelet 守护进程的和解循环与资源的 watch 反馈
 
-				- kubelet 守护进程的和解循环与资源的 watch 反馈
+		  - 注意：OCP 中 kubelet 守护进程已经集成至 `openshift-node` 守护进程中。
 
-			  - 注意：OCP 中 kubelet 守护进程已经集成至 `openshift-node` 守护进程中。
-
-				- 运维、测试或开发人员对集群资源的管理，可通过 `oc` 或 `kubectl` 标准命令亦或是其他自研的命令。
+		  - 运维、测试或开发人员对集群资源的管理，可通过 `oc` 或 `kubectl` 标准命令亦或是其他自研的命令。
 
 			  - 第三方组件实现的 API server 调用。
 
