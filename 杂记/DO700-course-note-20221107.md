@@ -82,9 +82,13 @@
 
     - 容器镜像名称的命名方式：
 
-      - `<registry_uri>/<user>/<image_name>:[tag]`：该命名方式常见于 docker-distribution 中，甚至可省略中间的 `<user>` 部分。
+      - `<registry_uri>/<user>/<image_name>:[tag]`：
+      
+        该命名方式常见于 docker-distribution 中，甚至可省略中间的 `<user>` 部分。
 
-      - `<reigstry_uri>/<orgnization>/<repositiry>:[tag]`：该命令方式常见于 Harbor 或 Quay 中，中间的 `<orgnization>` 部分不可省略。
+      - `<reigstry_uri>/<orgnization>/<repositiry>:[tag]`：
+      
+        该命令方式常见于 Harbor 或 Quay 中，中间的 `<orgnization>` 部分不可省略。
 
     - 创建容器的两种方式：
 
