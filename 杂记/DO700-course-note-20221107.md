@@ -157,7 +157,5 @@
     $ ssh -i ~/fcos_id/bootstrap_fedora_coreos core@fedora-coreos-36
     ```
 
-
-
-
+	- 更具体的内容请见腾讯会议聊天记录
 
