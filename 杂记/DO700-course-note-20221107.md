@@ -108,4 +108,52 @@
 
     - `docker search` 命令：只能用于在线镜像仓库中的镜像搜索，而不能够用于离线镜像仓库的镜像搜素，这取决于该命令使用的 RESTful API 的版本。
 
+		- Docker 1.13.x 配置文件路径：`/etc/sysconfig/docker`
+
+		- Docker 20.x 配置文件路径：`/etc/docker/daemon.json`
+
+		- 更改配置后，需要执行以下步骤：
+
+      ```bash
+      $ sudo systemctl daemon-reload
+      $ sudo systemctl restart docker.service
+      $ sudo docker search mysql
+      ```
+
+### 第二天：
+
+- 第三章：管理容器
+
+  - 第二、三节：
+
+		- 创建 MySQL 的目录映射实现数据持久化存储：
+
+      ```bash
+      $ sudo mkdir -p /data/mysql
+      $ sudo chown -R 27:27 /data/mysql
+      $ sudo chcon -t svirt_sandbox_file_t /data/mysql
+      $ sudo docker run -d --name=mysqldb -v /data/mysql:/var/lib/mysql/data -p 3306:3306 registry.lab.example.com/rhscl/mysql-56-rhel7:latest
+      ```
+
+    - 查看容器的分层结构：
+
+      ```bash
+      $ sudo docker inspect mysqldb | less
+        ...
+        LowerDir: ...   # 容器使用的最底层容器镜像层，该层对于 Docker 引擎而言是只读层。
+        UpperDir: ...   # 容器当前运行的最顶层，该层可被 Docker 引擎读写。
+        MergedDir: ...  # 容器使用的最底层容器镜像层与最顶层的合并视图。
+        ...
+      ```
+ 
+  - 登录 Fedora CoreOS 36 节点：
+
+    ```bash
+    studnet@workstation:
+    $ ssh -i ~/fcos_id/bootstrap_fedora_coreos core@fedora-coreos-36
+    ```
+
+
+
+
 
