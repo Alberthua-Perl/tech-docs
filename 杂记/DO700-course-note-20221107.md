@@ -26,7 +26,7 @@
 
       - 其余所有节点：`student: student`, `root: redhat`
 				
-      - Docker 17.x~20.x: 使用 dockerd 守护进程与 containerd 守护进程协同运行的方式管理容器镜像、容器生命周期以及容器网络与存储。
+    - Docker 17.x~20.x: 使用 dockerd 守护进程与 containerd 守护进程协同运行的方式管理容器镜像、容器生命周期以及容器网络与存储。
 
   - 第三节：Kubernetes 与 OpenShift 的架构基础
 
@@ -82,9 +82,13 @@
 
     - 容器镜像名称的命名方式：
 
-      - `<registry_uri>/<user>/<image_name>:[tag]`：该命名方式常见于 docker-distribution 中，甚至可省略中间的 `<user>` 部分。
+      - `<registry_uri>/<user>/<image_name>:[tag]`：
+      
+        该命名方式常见于 docker-distribution 中，甚至可省略中间的 `<user>` 部分。
 
-      - `<reigstry_uri>/<orgnization>/<repositiry>:[tag]`：该命令方式常见于 Harbor 或 Quay 中，中间的 `<orgnization>` 部分不可省略。
+      - `<reigstry_uri>/<orgnization>/<repositiry>:[tag]`：
+      
+        该命令方式常见于 Harbor 或 Quay 中，中间的 `<orgnization>` 部分不可省略。
 
     - 创建容器的两种方式：
 
