@@ -26,7 +26,7 @@
 
       - 其余所有节点：`student: student`, `root: redhat`
 				
-      - Docker 17.x~20.x: 使用 dockerd 守护进程与 containerd 守护进程协同运行的方式管理容器镜像、容器生命周期以及容器网络与存储。
+    - Docker 17.x~20.x: 使用 dockerd 守护进程与 containerd 守护进程协同运行的方式管理容器镜像、容器生命周期以及容器网络与存储。
 
   - 第三节：Kubernetes 与 OpenShift 的架构基础
 
