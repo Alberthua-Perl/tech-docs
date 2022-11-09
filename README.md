@@ -67,6 +67,10 @@
     
     - [Kani - Ansible 快速部署与管理 Kubernetes v1.22.1](https://github.com/Alberthua-Perl/kani)
     
+    - [使用 NFS-Client Privisioner 实现 StorageClass 的 PV 动态分配](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/nfs-provisioned-storageclass)
+    
+    - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 数据库实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
+    
   - ⭕️ **Red Hat OpenShift Container Platform**
   
     - [Fedora CoreOS 与 RHCOS 概述与应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Fedora%20CoreOS%20%E4%B8%8E%20RHCOS%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%BA%94%E7%94%A8.md)
@@ -76,6 +80,8 @@
     - [Red Hat OpenShift v3 与 v4 基础架构与应用构建](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20v3%20%E4%B8%8E%20v4%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA.md)
     
     - [S2I 基本原理与应用构建部署示例](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/golang-s2i)
+    
+    - [Red Hat OpenShift v3 中 WordPress-MySQL Blog 应用的部署实现](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/wordpress-mysql-blog-app)
     
   - 🐙 **分布式存储**
   
