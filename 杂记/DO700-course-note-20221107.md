@@ -159,3 +159,47 @@
 
 	- 更具体的内容请见腾讯会议聊天记录
 
+### 第三天：
+
+- OCP 3 与 OCP 4 的部署方式与差异：
+
+  - OCP 3：
+
+    - all-in-one 节点：minishift，所有的组件都在一个节点上，master、worker 与 infra 节点都运行于单节点之上。
+
+    - (高可用)集群：各个节点的类型分开独立部署，通过 ansible playbook 的方式完成集群的部署。
+
+  - OCP 4：
+
+   - 公有云部署：Azure, AWS, Google
+
+   - 私有云或虚拟化平台部署
+
+   - UPI 裸金属部署：不依托于 ansible 部署，需要手动触发点火 ignition 文件实现集群的各节点部署。
+
+- 课程环境中 OCP 3 集群部署：
+
+  ```bash
+  ### OCP 集群快速部署参考步骤：
+  $ ssh student@workstation
+  $ lab install-prepare setup
+  $ cd ~/do285-ansible
+  $ vim inventory
+    ...
+    # 在 openshift_master_default_subdomain 下方添加
+    os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' 
+    # 将 OCP 集群的 OVS sdn 模式调整为多租户隔离模式，而标准课程环境中使用最基础的 ovs-subnet 的扁平化网络模式。
+    ...
+  $ ./install.sh
+
+  ### OCP 集群验证
+  $ ssh student@workstation
+  $ oc login -u admin -p redhat https://master.lab.example.com
+  $ oc get nodes
+  # 确认所有集群节点处于 Ready 状态
+  $ oc get pods -o wide --all-namespaces
+  # 确认所有项目中的 Pod 资源对象运行状态
+ 
+  ```
+
+
