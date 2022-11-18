@@ -153,6 +153,13 @@
   $ git config --global color.ui true
   $ git config --global push.default simple
   # 定义 simple 的推送方式
+  
+  $ git config --global credential.helper cache
+  # 缓存用户所有访问代码仓库的认证凭据（token），首次认证后，再次 commit 无需输入凭据。
+  # 该 token 可为常用的 GitHub Personal access tokens，需提前于 GitHub 配置。
+  $ git credential-cache exit
+  # 清除用户认证凭据缓存
+  
   $ git config --global -l
   # 查看 git 全局配置信息
   $ cat ~/.gitconfig
