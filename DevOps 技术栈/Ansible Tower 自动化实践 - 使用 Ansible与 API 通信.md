@@ -547,7 +547,7 @@
               return_content: yes 
             register: gitlab_api_result
       
-          - name: Pring gitlab_api_result variable
+          - name: Print gitlab_api_result variable
             debug:
               var: gitlab_api_result
       
