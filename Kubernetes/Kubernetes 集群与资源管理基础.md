@@ -22,11 +22,11 @@
   
   - 单 master 节点的 Kubernetes 集群架构示意：
     
-    ![](kubernetes-advanced-practice/basic-concent/kubernetes-single-master-arch.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubernetes-single-master-arch.jpg)
   
   - 多 master 节点的 Kubernetes 集群架构示意：
     
-    ![](kubernetes-advanced-practice/basic-concent/kubernetes-ha-arch-demo.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubernetes-ha-arch-demo.jpg)
   
   > 👉 该示例中将 etcd 集群分别部署于 3 个 master 节点上。
 
@@ -44,9 +44,9 @@
   
   - 以上各接口规范在集群中组件之间的调用示意：
     
-    ![](kubernetes-advanced-practice/basic-concent/kubernetes-interface-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubernetes-interface-1.jpg)
     
-    ![](kubernetes-advanced-practice/basic-concent/kubernetes-interface-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubernetes-interface-2.jpg)
 
 - Kubernetes 集群中的网络概述：
   
@@ -98,7 +98,7 @@
 
 - Pod 资源对象的名称：`<replicaset_name>-<random_char>`
   
-  ![](kubernetes-advanced-practice/basic-concent/pod-name.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/basic-concent/pod-name.jpg)
 
 - Pod资源对象的状态：
   
@@ -134,7 +134,7 @@
   
   - 🚀 若集群使用 `kubeadm` 组件部署，可修改控制平面（control plan）各节点的 `/etc/kubernetes/manifests/kube-apiserver.yaml` 文件，在其中添加 `--feature-gates=RemoveSelfLink=false` 选项以启用该字段，如下所示：
     
-    ![](kubernetes-advanced-practice/basic-concent/kubernetes-apiserver-manifest.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubernetes-apiserver-manifest.jpg)
     
     - 关于 selfLink 的说明可参考 [该链接](https://kuboard.cn/install/faq/selfLink.html)
     
@@ -174,7 +174,7 @@
       
       - kubectl get 命令行方式：
         
-        ![](kubernetes-advanced-practice/basic-concent/kubectl-get-raw-json.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/kubectl-get-raw-json.jpg)
       
       - kubectl proxy 命令行方式：
         
