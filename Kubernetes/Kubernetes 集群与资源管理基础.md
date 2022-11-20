@@ -4,6 +4,8 @@
 
 - 该文档使用的 Kubernetes 版本为 `1.12.x`
 
+- 文档所示的命令可能与当前 Kubernetes 版本存在差异，请以实际使用的版本为基准！
+
 ### 文档目录：
 
 - Kubernetes 集群架构概览
@@ -98,7 +100,7 @@
 
 - Pod 资源对象的名称：`<replicaset_name>-<random_char>`
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/basic-concent/pod-name.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/kubernetes-basic-content/pod-name.jpg)
 
 - Pod资源对象的状态：
   
