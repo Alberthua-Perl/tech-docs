@@ -185,15 +185,15 @@
         # 启动本地主机为代理网关，使其能够访问 API Server 的 REST API，该端口不可被占用。
         ```
         
-        - kubectl 打开本地 `unix socket`，使 curl 命令通过进程间通信（IPC）的方式与代理网关通信，实现与 API Server 的交互。
+      - kubectl proxy 方式使用 kubectl 打开本地 `unix socket`，使 curl 命令通过进程间通信（IPC）的方式与代理网关通信，实现与 API Server 的交互。
         
-        - Kubernetes 集群默认使用 `HTTPS` 的方式访问 API Server 的 REST API。
+      - Kubernetes 集群默认使用 `HTTPS` 的方式访问 API Server 的 REST API。
         
-        - 使用 kubectl proxy 命令启动本地主机为代理网关后，在另一终端中即可使用 curl 命令以 HTTP 的方式访问，如下所示：
+      - 使用 kubectl proxy 命令启动本地主机为代理网关后，在另一终端中即可使用 curl 命令以 HTTP 的方式访问，如下所示：
           
-          ```bash
-          $ curl -s http://localhost:8080/api/v1/namespaces/default
-          ```
+        ```bash
+        $ curl -s http://localhost:8080/api/v1/namespaces/default
+        ```
 
 - Kubernetes 的 API 资源分类：
   
