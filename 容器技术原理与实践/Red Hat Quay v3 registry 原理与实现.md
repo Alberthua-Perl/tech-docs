@@ -15,8 +15,11 @@
 ### 常用私有容器镜像仓库：
 
 - Harbor v1/v2：由 `VMware` 主导开发，并从 `CNCF` 云原生计算基金会孵化成功。
+
 - **`Red Hat Quay v3`**：由 `Red Hat` 开源的私有容器镜像仓库，类似于 `CoreOS` 的 Quay。
+
 - registry v2：`Docker` 公司发布的 v2 版本容器镜像仓库镜像，可直接运行提供服务。
+
 - docker-distribution：由 `docker-distribution` RPM 软件包提供，`systemd` 方式运行。
 
 ### Red Hat 支持的容器镜像仓库：
@@ -207,6 +210,9 @@
 ### 参考链接：
 
 - [Quay 基础版安装和部署](https://www.cnblogs.com/ericnie/p/12233269.html)
+
 - [Deploy Project Quay for proof-of-concept (non-production) purposes](https://docs.projectquay.io/deploy_quay.html)
+
 - [docker.github.io/registry/deploying.md](https://github.com/docker/docker.github.io/blob/master/registry/deploying.md#get-a-certificate)
+
 - [docker.github.io/registry/insecure.md](https://github.com/docker/docker.github.io/blob/master/registry/insecure.md)
