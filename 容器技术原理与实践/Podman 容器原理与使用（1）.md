@@ -24,6 +24,8 @@
 
 - 该文档中未涉及 podman 命令的基础使用方法，可参阅 [该文档](https://mp.weixin.qq.com/s/MDi4RB5V60EGl3ii9usD0Q) 加以熟悉。
 
+- 💥 重要提示：Podman 项目正在不断演进与完善中，请以自身使用的版本为准进行测试与使用！ 
+
 ### 文档目录：
 
 - Podman 的特性概述
