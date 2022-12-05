@@ -24,23 +24,23 @@
   
   👉 使用 podman 命令登录 `Quay` 公共容器镜像仓库并推送镜像：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-push-quay.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-push-quay.jpg)
   
   👉 搜索并拉取 Red Hat 容器镜像仓库中的镜像列表：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-pull-image.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-pull-image.jpg)
 
 - 示例 2：
   
   🤘 部署并使用云原生轻量级对象存储 `MinIO Server`：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-1.jpg)
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-2.jpg)
   
   以上示例将 podman 与 systemd 集成实现普通用户的 rootless 容器开机自启动。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\minio-server-cloud-native-object-storage-demo-3.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/minio-server-cloud-native-object-storage-demo-3.jpg)
   
   关于 MinIO Server 分布式对象存储的详细内容，请 [参考官网](https://min.io/)。
 
@@ -66,7 +66,7 @@
   
   - 部署用主机上必须先安装 podman 与 podman-compose，并拉取相应容器镜像加速部署过程，如下所示：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-image-list.jps.JPG)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-image-list.jps.JPG)
     
     > 📌**注意：**
     > 
@@ -141,7 +141,7 @@
   
   - 所有容器正常运行后，使用 `http://<容器宿主机 IP 地址>:10800` 访问 Gogs 安装界面，需填入的值参考如下：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\gogs-settings.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/gogs-settings.jpg)
     
     - Run User 值：默认 `git`。
     - Domain 值：若要从其他主机连接至 Gogs 仓库，Domian 必须配置为容器宿主机的 IP 地址或主机名。
@@ -154,7 +154,7 @@
   
   - 如下所示，使用 `devops` 用户创建新代码库并完成 commit 提交：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\gogs-git-repository.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/gogs-git-repository.jpg)
   
   - 如需关闭 Gogs 代码仓库，请使用以下方法停止 gogs 与 postgresql 容器服务即可：
     
@@ -238,7 +238,7 @@
   
   如下所示，创建名为 `nginx-docs` 的容器并同时创建名为 `docker-docs` 的 pod，也可创建其他容器添加至 pod 中，pod 中的容器共享 `network namespace`：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-run-pod-create.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-run-pod-create.jpg)
 
 - 🤘 示例 2：
   使用 podman 在单个 pod 中集成多容器的方法，可参考 [之前发布的文档](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20Quay%20v3%20registry%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)，该文档中将 Quay、MySQL 与 Redis 的单容器集成在单个 pod 中，使用 pod 的 `network namespace` 方便 Quay 镜像仓库的管理。
@@ -373,7 +373,7 @@
   
   - 使用 `podman login` 子命令登录指定的容器镜像仓库时，Podman 将访问 token 默认存储于 `/run/user/<UID>/containers/auth.json` 文件中，当 logout 仓库时，该 token 将被移除，并且该文件中可存储多个登录的仓库 token。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-login-token.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-login-token.jpg)
     
     ```bash
     $ podman logout --all
@@ -485,7 +485,7 @@
   
   👉 容器镜像无任何运行或退出状态容器占用，但依然无法删除镜像，可尝试使用 `--force` 选项将其强制删除。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-rmi-error-no-container-use.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-rmi-error-no-container-use.jpg)
 
 - 示例 4：
   
@@ -495,7 +495,7 @@
   > 
   > 可使用 `skopeo` 工具转换 docker image format 与 OCI image format。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-commit-warning.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-commit-warning.jpg)
 
 - 示例 5：
   
@@ -503,7 +503,7 @@
   
   👉 当然，运行容器时指定 `--privileged` 选项可使容器获得与宿主机 root 用户同样的与宿主机交互的权限能力，但赋予的权限过高，应当压制该权限，更好的选择是对运行容器添加适当的 `Linux capabilities`。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Container\pictures\Podman容器使用与原理\podman-busybox-capability.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-busybox-capability.jpg)
 
 ### Podman 有待测试功能：
 
