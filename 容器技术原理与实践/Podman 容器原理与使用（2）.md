@@ -499,7 +499,7 @@
 
 - 示例 5：
   
-  👉 podman 运行 rootfull 或 rootless busybox 容器后，`ping` 外网报错权限问题无法 ping 通外网，但使用其他工具可与外网通信，通过 [该文档](https://www.redhat.com/sysadmin/container-networking-podman) 中可知，ping 命令对`capability`敏感，容器可能缺少 `CAP_NET_RAW `capability 无法通过宿主机 ping 通外网。
+  👉 podman 运行 rootfull 或 rootless busybox 容器后，`ping` 外网报错权限问题无法 ping 通外网，但使用其他工具可与外网通信，通过 [该文档](https://www.redhat.com/sysadmin/container-networking-podman) 中可知，ping 命令对 `capability` 敏感，容器可能缺少 `CAP_NET_RAW `capability 无法通过宿主机 ping 通外网。
   
   👉 当然，运行容器时指定 `--privileged` 选项可使容器获得与宿主机 root 用户同样的与宿主机交互的权限能力，但赋予的权限过高，应当压制该权限，更好的选择是对运行容器添加适当的 `Linux capabilities`。
   
