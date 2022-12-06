@@ -28,7 +28,7 @@
 
 - Podman 更加侧重于容器的生命周期管理，同时具备部分容器镜像管理与构建功能，而 Buildah 支持分别使用命令行从头构建容器镜像与 `Dockerfile` 或 `Containerfile` 的构建方式，同时兼容 Docker 与 OCI 镜像格式。
 
-> 👉 关于 Podman 更加详细的信息可参考之前写的 [Podman 容器使用与原理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Podman%20%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%8E%9F%E7%90%86.md)。
+> 👉 关于 Podman 更加详细的信息可参考之前写的 [Podman 容器原理与使用（1）](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Podman%20%E5%AE%B9%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%881%EF%BC%89.md) 与 [Podman 容器原理与使用（2）](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Podman%20%E5%AE%B9%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%882%EF%BC%89.md)。
 
 - Skopeo 安装方法可参考 [该 GitHub 链接](https://github.com/containers/skopeo/blob/main/install.md)，此处不再赘述。
 
