@@ -73,7 +73,7 @@
     
     - [使用 NFS-Client Privisioner 实现 StorageClass 的 PV 动态分配](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/nfs-provisioned-storageclass)
     
-    - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 数据库实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
+    - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
     
   - ⭕️ **Red Hat OpenShift Container Platform**
   
