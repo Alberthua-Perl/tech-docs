@@ -267,7 +267,7 @@
   
   - 🚀 验证过程与原理，如下所示：
     
-    ![](pictures/一文厘清HTTPS原理与应用/ca-signed-certification-verify.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/ca-signed-certification-verify.jpg)
 
 ### SSL/TLS 与 CA 相关术语：
 
@@ -339,7 +339,7 @@
 
 - SSL/TLS 协议在网络模型中的位置：
   
-  ![](pictures/一文厘清HTTPS原理与应用/ssl-tls-in-network-stack.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/ssl-tls-in-network-stack.png)
 
 - SSL/TLS 协议分为两部分：
   
@@ -363,7 +363,7 @@
 
 - 服务端本地与客户端本地的 SSL 套接字与 TCP 套接字的关系，如下所示：
   
-  ![](pictures/一文厘清HTTPS原理与应用/client-server-tcp-ssl-socket.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/client-server-tcp-ssl-socket.png)
 
 ### 🚀 基于 SSL/TLS 加密连接的 HTTPS 单/双向认证：
 
@@ -383,7 +383,7 @@
 
 - ✨ 以下从 HTTPS 抓包的角度说明 SSL/TLS 四次握手与 HTTPS 单/双向认证的详细过程：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\ssl-four-handshakes-https-single-and-mutual-authentication.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/ssl-four-handshakes-https-single-and-mutual-authentication.png)
   
   上图中 **黑色箭头** 表示双向认证过程中多出的步骤，其余过程为单向认证过程。
 
@@ -479,11 +479,11 @@
 
 - HTTPS 加密通信 - 抓包整体示意：
   
-  ![](pictures/一文厘清HTTPS原理与应用/wireshark-https-single-progress.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/wireshark-https-single-progress.png)
 
 - 🤝 HTTPS 加密通信 - 4 次握手过程示意：
   
-  ![](pictures/一文厘清HTTPS原理与应用/ssl-tls-single-authentication-progress.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/ssl-tls-single-authentication-progress.png)
   
   👨‍💻 以下将握手过程分为 4 个阶段进行描述。
 
@@ -513,15 +513,15 @@
     
     - 扩展字段 Extensions，支持协议与算法的相关参数以及其它辅助信息等，常见的 SNI 就属于扩展字段。
       
-      ![](pictures/一文厘清HTTPS原理与应用/client-hello-body-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/client-hello-body-1.png)
   
   - 客户端支持的 17 种加密套件供服务端选择使用。
     
-    ![](pictures/一文厘清HTTPS原理与应用/client-hello-body-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/client-hello-body-2.png)
 
 - 2️⃣ HTTPS 加密通信 - 第 2 次握手过程：服务端给客户端回复的 4 条 SSL 握手信息
   
-  ![](pictures/一文厘清HTTPS原理与应用/server-response-to-client-ssl.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/server-response-to-client-ssl.png)
   
   - `Server Hello`：
     
@@ -539,23 +539,23 @@
   
   - `Certificate`：该 SSL 握手信息中包含服务端 CA 数字签名证书
     
-    ![](pictures/一文厘清HTTPS原理与应用/server-ca-signed-certification.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/server-ca-signed-certification.png)
   
   - `Server Key Exchange`：
     
     使用 `EC Diffie-Hellman` 算法（`ECDHE`）实现服务端与客户端的密钥交换算法协商。
     
-    ![](pictures/一文厘清HTTPS原理与应用/server-key-exchange.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/server-key-exchange.png)
     
     💥 对于使用 `DHE/ECDHE` 非对称密钥协商算法的 SSL 握手，将发送该类型握手。`RSA`、`DH`、`ECDH` 算法不会进行该 server key exchange 握手流程。
   
   - `Server Hello Done`：通知客户端 Server Hello 信息发送结束
     
-    ![](pictures/一文厘清HTTPS原理与应用/server-hello-done.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/server-hello-done.jpg)
 
 - 3️⃣ HTTPS 加密通信 - 第 3 次握手过程：客户端给服务端回复 3 条 SSL 握手信息
   
-  ![](pictures/一文厘清HTTPS原理与应用/client-response-to-server-ssl.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/client-response-to-server-ssl.jpg)
   
   - 🛡 `Client Key Exchange`：
     
@@ -577,7 +577,7 @@
 
 - 4️⃣ HTTPS 加密通信 - 第 4 次握手过程：服务端给客户端回复 2 条 SSL 握手信息
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\server-response-to-client-4-phase.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/server-response-to-client-4-phase.png)
   
   - `Change Cipher Spec`：
     
@@ -597,23 +597,23 @@
   
   - 开始使用会话密钥与加密算法进行加密通信。
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\ssl-tls-handshake-end.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/ssl-tls-handshake-end.png)
 
 ### HTTPS 单向认证测试：
 
 - 服务端启用 HTTPS 单向认证后，可从浏览器客户端进行访问测试：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\https-single-auth-chrome-error-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/https-single-auth-chrome-error-1.png)
 
 - 该服务端 CA 数字签名使用未经认证的 CA 签发，因此客户端浏览器无法验证其安全性而发出警告，可点击 "高级" 按钮接受该证书继续访问。若拒绝该证书，即断开此次认证连接，可在如下 Wireshark 抓包中显示安全告警信息：
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\https-single-auth-chrome-error-2.png) 
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/https-single-auth-chrome-error-2.png) 
 
 ### HTTPS 双向认证的 Wireshark 抓包与测试：
 
 - HTTPS 双向认证的 Wireshark 抓包过程如下所示，其中具体的步骤参见前文 "SSL/TLS 四次握手与 HTTPS 单/双向认证的详细过程" 与单向认证的过程。
   
-  ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\wireshark-https-single-progress.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/wireshark-https-single-progress.png)
 
 - HTTPS 双向认证过程的客户端测试：
   
@@ -639,23 +639,23 @@
   
   - 将 p12 格式的文件导入 Firefox 浏览器客户端：   
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\firefox-import-pc12-certs-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/firefox-import-pc12-certs-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\firefox-import-pc12-certs-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/firefox-import-pc12-certs-2.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\firefox-import-pc12-certs-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/firefox-import-pc12-certs-3.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\firefox-import-pc12-certs-4.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/firefox-import-pc12-certs-4.png)
   
   - 打开 Firefox 浏览器访问服务端，此时需接受客户端证书来标记自己：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\firefox-import-pc12-certs-5.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/firefox-import-pc12-certs-5.png)
   
   - 💥 若双向认证客户端配置错误，将无法正常访问服务端，并且浏览器直接返回如下信息，且 Wireshark 抓包显示 `Encrypted Alert`：
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\https-mutual-no-client-cert-error-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/https-mutual-no-client-cert-error-1.png)
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\Linux\pictures\一文厘清HTTPS原理与应用\https-mutual-no-client-cert-error-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ssl-tls-handshake-https-auth/https-mutual-no-client-cert-error-2.png)
 
 ### openssl 常用命令汇总：
 
