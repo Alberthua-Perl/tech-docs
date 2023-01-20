@@ -8,6 +8,10 @@
 
 - OpenSSL 版本：`openssl-1.0.2k-21.el7_9.x86_64.rpm`
 
+- Docker 版本：`20.10.8`
+
+- Nginx 版本：`1.22.1`
+
 - ✨ HTTPS 在常规 Web 服务器、中间件服务器及 `RESTful API` 等通信中广泛大量使用，因此理解 HTTPS 及相关概念显得尤为重要。
 
 - 该文档使用 openssl 工具创建与管理相关私钥与证书，当然也可使用 cfssl 或 certtool（来源于 gnutls-utils 软件包）工具创建与管理。
