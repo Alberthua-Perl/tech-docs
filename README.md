@@ -23,6 +23,8 @@
     
     - [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
     
+    - [Linux 进程权限的各类 UID 探讨](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%9A%84%E5%90%84%E7%B1%BB%20UID%20%E6%8E%A2%E8%AE%A8.md)
+    
     - [一文厘清 HTTPS 原理与应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8.md)
     
   - 🚀 **Linux 网络虚拟化**
