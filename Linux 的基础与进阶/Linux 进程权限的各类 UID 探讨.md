@@ -72,7 +72,7 @@
 
 - 进程启动过程中三者的赋值关系，如下图所示：
   
-  ![](pictures/Linux进程权限的各类UID探讨/linux-process-uid-mapping.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-process-uid/linux-process-uid-mapping.png)
   
   - 1️⃣2️⃣ 假定最初登录 Shell 的用户启动运行可执行文件，启动进程。
   
@@ -202,7 +202,7 @@
 
 - 以上验证源码与文件的权限如下所示：
   
-  ![](pictures/Linux进程权限的各类UID探讨/linux-ruid-euid-test.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-process-uid/linux-ruid-euid-test.png)
 
 ### 各类 UID 在 Audit 审计系统中的说明：
 
