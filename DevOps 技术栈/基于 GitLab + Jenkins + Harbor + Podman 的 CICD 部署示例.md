@@ -1,19 +1,24 @@
 ## ♾ 基于 GitLab + Jenkins + Harbor + Podman 的 CI/CD 部署示例
 
-##### 文档说明：
+### 文档说明：
 
 - OS 版本：CentOS Linux release 7.4.1708 (Core)
+
 - 该示例将构建的 Tomcat 应用容器镜像部署于 Podman 主机上，未部署于 Kubernetes 或 OpenShift 集群。
+
 - 最终交付的容器镜像可为不同编程语言及其依赖的环境（Java、Python、Golang、NodeJS、Ruby等）。
 
-##### 文档目录：
+### 文档目录：
 
 - 示例环境说明
+
 - GitLab 代码仓库部署
+
 - Harbor 容器镜像仓库部署
+
 - Jenkins CI 环境集成
 
-##### 示例环境说明：
+### 示例环境说明：
 
 1. 各节点硬件资源与角色：
 
@@ -37,7 +42,7 @@
 
    2）生产环境中可将上述流程与 Kubernetes 或 OpenShift 集群集成，或将上述组件以 Pod 的方式部署在集群中，并额外部署应用管理工具（Helm）及监控工具（Promethus）加固集群功能。
 
-##### GitLab 代码仓库部署：
+### GitLab 代码仓库部署：
 
 1. 用户相关说明：
 
@@ -59,7 +64,7 @@
 
    https://github.com/Alberthua-Perl/jenkins-pipeline-demo/tree/master/tomcat-jenkins-demo
 
-##### Harbor 容器镜像仓库部署：
+### Harbor 容器镜像仓库部署：
 
 1. 该示例中使用 Harbor 容器镜像仓库作为私有 registry。
 
@@ -148,7 +153,7 @@
    # 停止 Harbor 容器镜像仓库，即停止 docker-compose 服务。
    ```
 
-##### Jenkins CI 环境集成：
+### Jenkins CI 环境集成：
 
 1. Jenkins 可通过多种方式部署：容器镜像、rpm 软件包、war 包
 
