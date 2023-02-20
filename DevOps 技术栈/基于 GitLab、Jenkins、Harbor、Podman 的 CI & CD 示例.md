@@ -366,4 +366,4 @@
 
 - [war 包的目录结构](https://blog.csdn.net/jxq0816/article/details/46775769)
 
-- [GitHub 与 GitLab 原理与使用配置]([tech-docs/GitHub 与 GitLab 原理与使用配置.md at master · Alberthua-Perl/tech-docs · GitHub](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/GitHub%20%E4%B8%8E%20GitLab%20%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md))
+- [GitHub 与 GitLab 原理与使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/GitHub%20%E4%B8%8E%20GitLab%20%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
