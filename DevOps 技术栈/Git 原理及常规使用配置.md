@@ -394,6 +394,25 @@
   Branch 'master' set up to track remote branch 'master' from 'origin'.
   ```
 
+  👉 示例 4：
+  
+  在使用 `GitHub Personal Access Token` 推送代码至远程代码仓库时，显示如下 WARNING 信息，虽然不影响代码的推送，但是任需将其排除：
+  
+  ```bash
+  $ git push
+  
+  (gnome-ssh-askpass:7218): Gtk-WARNING **: 04:16:33.711: cannot open display: 
+  error: unable to read askpass response from '/usr/libexec/openssh/gnome-ssh-askpass'
+  Username for 'https://github.com': 
+  ```
+  
+  可执行如下命令重置 `SSH_ASKPASS` 环境变量加以解决：
+  
+  ```bash
+  $ echo "unset SSH_ASKPASS" >> $HOME/.bashrc
+  $ source $HOME/.bashrc
+  ```
+
 - 检查 Git 日志：
   
   - 版本控制系统的部分要点是跟踪提交历史记录。
