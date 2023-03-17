@@ -18,7 +18,7 @@
 
 - 进程级别（process level）：
   
-  资源限制配置文件与 `ulimit` 命令对用户 shell 环境资源的限制。
+  资源限制配置文件与 `ulimit` 命令对用户资源的限制。
 
 ### Linux 中针对不同用户对系统资源限制：
 
@@ -32,7 +32,7 @@
 
 - Linux 资源限制的方式：
   
-  - 对于 Linux 资源限制可使用配置文件的方式与 ulimit 命令行的方式实现。
+  - 对 Linux 资源限制可使用配置文件的方式与 ulimit 命令行的方式实现。
   
   - 配置文件的方式：
     
@@ -77,78 +77,69 @@
     - `/etc/security/limits.d/[20|90]-nproc.conf`：
       
       针对用户 nproc 最大进程数的限制，在 RHEL 5.x 中不存在。
-  
-  - `/etc/security/limits.d/[20|90]-nproc.conf` 优先级大于 `/etc/security/limits.conf`
-  
-  - 关于以上两个配置文件的重要说明：
     
-    - 若 [20|90]-nproc.conf 中，root、全局用户、指定用户的 soft 值小于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户均使用 [20|90]-nproc.conf 中的 soft 值。
+    - `/etc/security/limits.d/[20|90]-nproc.conf` 优先级大于 `/etc/security/limits.conf`
     
-    - 若 [20|90]-nproc.conf 中, root、全局用户、指定用户的 soft 值（可设置为 unlimited）大于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户使用 limits.conf 中的 hard 值。
-    
-    - 👉 [20|90]-nproc.conf 具有优先权，而 limits.conf 具有决定权。
-    
-    - 👉 指定用户/组不受全局用户限制的影响。
-    
-    - 可将 /etc/security/limits.d/[20|90]-nproc.conf 移除, 只由 limits.conf 进行限制，降低配置复杂度。
-    
-    - 其他限制选项不受 [20|90]-nproc.conf 影响。
-    
-    - 示例 1：
+    - 关于以上两个配置文件的重要说明：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-2.jpg)
+      - 若 [20|90]-nproc.conf 中，root、全局用户、指定用户的 soft 值小于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户均使用 [20|90]-nproc.conf 中的 soft 值。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-4.jpg)
+      - 若 [20|90]-nproc.conf 中, root、全局用户、指定用户的 soft 值（可设置为 unlimited）大于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户使用 limits.conf 中的 hard 值。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-5.jpg)
-    
-    - 示例 2：
+      - 👉 [20|90]-nproc.conf 具有优先权，而 limits.conf 具有决定权。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-6.jpg)
+      - 👉 指定用户/组不受全局用户限制的影响。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-7.jpg)
+      - 可将 /etc/security/limits.d/[20|90]-nproc.conf 移除, 只由 limits.conf 进行限制，降低配置复杂度。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-8.jpg)
-    
-    - 示例 3：
+      - 其他限制选项不受 [20|90]-nproc.conf 影响。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-9.jpg)
+      - 示例 1：
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-2.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-4.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-5.jpg)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-10.jpg)
-    
-    - 示例 4：
+      - 示例 2：
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-6.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-7.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-8.jpg)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-11.jpg)
+      - 示例 3：
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-9.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-10.jpg)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-12.jpg)
+      - 示例 4：
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-11.jpg)
+        
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-12.jpg)
   
   - ulimit 命令行的方式：
     
     - ulimit 命令能临时使当前登录用户的 shell 环境资源限制立即生效，但仅对当前环境有效，退出重新登陆后将失效。
     
-    - 可以将对用户的 ulimit 命令写入 `$HOME/.bash_profile` 中，实现永久资源限制。
+    - 可将指定用户的 ulimit 命令写入 `$HOME/.bash_profile` 中，实现永久资源限制。
     
     - ulimit 命令常用选项：
       
       ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/ulimit-options.jpg)
       
       ```bash
-      $ man bash -> 搜索 ulimit
-        -H                      设置用户 shell 环境的资源硬限制
-        -S                      设置用户 shell 环境的资源软限制
-                                若 -H 与 -S 同时指定或不指定，两者默认设置为相同的值。
-        -a                      查看用户 shell 环境的当前全部资源限制
-        -n [<file_handle_num>]  查看或设置打开的文件句柄的最大数量
-        -u [<proc_num>]         查看或设置用户的最大可用进程数
-        -T <thread_num>         设置用户的最大线程数
+      # ulimit 命令常用选项：
+      -H                 设置用户 shell 环境的资源硬限制
+      -S                 设置用户 shell 环境的资源软限制
+                         若 -H 与 -S 同时指定或不指定，两者默认设置为相同的值。
+      -a                 查看用户 shell 环境的当前全部资源限制
+      -n [<file_handle_num>]
+                         查看或设置打开的文件句柄的最大数量
+      -u [<proc_num>]    查看或设置用户的最大可用进程数
+      -T <thread_num>    设置用户的最大线程数
       ```
-
-- Linux 资源限制的使用场景：
-  
-  - 高并发应用：
-    
-    - nofile（用户打开最大的文件句柄数），若设置过小将报错。
-    
-    - nproc（用户打开的最大进程数），若设置过小将报错。
-  
-  - 消息队列服务
