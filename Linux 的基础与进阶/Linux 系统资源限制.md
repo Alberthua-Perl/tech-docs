@@ -236,6 +236,10 @@
     - RHEL 和类似 RHEL 的发行版（从 9 开始）
 
 - cgroup 的层次结构：
+
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/linux-cgroup-hierarchy.png)
+  
+  > 图注：cgroup 对应的目录在创建之初将自动创建各类子系统参数
   
   - cgroup 暴露给用户的 API 为文件系统（filesystem），所有对 cgroup 的操作均可以通过对文件的修改完成，cgroup API 对应的路径为 `/sys/fs/cgroup/`，作为使用方，仅需要对文件系统中的内容进行编辑，即可达到配置对应的 cgroup 的要求。
   
