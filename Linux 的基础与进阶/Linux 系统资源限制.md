@@ -401,7 +401,7 @@ $ sudo reboot
   
   ```bash
   ### 配置 system.slice/foo.service 的资源限制
-  $ sudo cat > /etc/systemd/system/foo.service <<EOF
+  $ sudo vim /etc/systemd/system/foo.service
     [Unit]
     Description=The foo service that does nothing useful
     After=remote-fs.target nss-lookup.target
@@ -415,7 +415,7 @@ $ sudo reboot
   # 创建 foo.service 服务单元文件
   
   $ sudo mkdir /etc/systemd/system/foo.service.d
-  $ cat /etc/systemd/system/foo.service.d/50-CPULimits.conf <<EOF
+  $ sudo vim /etc/systemd/system/foo.service.d/50-CPULimits.conf
     [Service]
     CPUAccounting=yes
     CPUShares=2048
