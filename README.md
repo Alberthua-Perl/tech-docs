@@ -13,7 +13,7 @@
     
     - [find 与 locate 命令常用示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/find%20%E4%B8%8E%20locate%20%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E7%A4%BA%E4%BE%8B.md)
     
-    - [Linux 配置资源限制](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
+    - [Linux 系统资源限制](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
     
     - [NAS 与 NFS 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/NAS%20%E4%B8%8E%20NFS%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
     
