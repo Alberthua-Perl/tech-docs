@@ -1,6 +1,9 @@
 ---
-# linux-basic-knowledge.yaml includes most of linux basic to help
-# you to use and understand rapidly
+# Note:
+#   1. linux-basic-knowledge.yaml includes most of linux basic to help
+#      you to use and understand rapidly
+#   2. rhel6~9 all fit
+
 #course environment command:
 #  kiosk@foundation0:
 #    - cat /etc/rht
