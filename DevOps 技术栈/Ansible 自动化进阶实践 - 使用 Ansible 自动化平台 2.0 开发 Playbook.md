@@ -66,7 +66,7 @@
       
       - 也可使用 Ansible 自动化平台 2.0 提供的新工具 `ansible-builder` 来自行创建自定义执行环境（容器镜像）。
       
-      ![](pictures/Chapter01/rhaap2-ansible-builder-and-navigator.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/rhaap2-ansible-builder-and-navigator.jpg)
   
   - `Automation Controller`（自动化控制器）：
     
@@ -106,9 +106,9 @@
 
 - Red Hat Ansible Automation Platform 2.0 组件与架构：
   
-  ![](pictures/Chapter01/rhaap2-architecture.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/rhaap2-architecture.png)
   
-  ![](pictures/Chapter01/ansible-automation-platform-2.0-arch.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-automation-platform-2.0-arch.png)
   
   使用 Ansible 自动化平台 2.0 开发 Playbook：
   
@@ -159,15 +159,15 @@
     
     - 若未使用 -m stdout 选项，将进入基于文本交互界面，实时显示 playbook 的运行的输出概要信息，用户可在该界面中在 playbook 结束运行后查看更为详细的执行过程。
       
-      ![](pictures/Chapter01/ansible-navigator-eei-text-1.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-navigator-eei-text-1.jpg)
       
       以上界面中输入 `:0` 可进入指定 play 的运行界面，如下所示：
       
-      ![](pictures/Chapter01/ansible-navigator-eei-text-2.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-navigator-eei-text-2.jpg)
       
       以上界面中输入 `:1` 可进入指定 task 的运行界面，如下所示：
       
-      ![](pictures/Chapter01/ansible-navigator-eei-text-3.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-navigator-eei-text-3.jpg)
       
       👉 文本交互界面的最下方显示了操作该界面的方法。
   
@@ -255,9 +255,9 @@
     
     🤘 可在命令行上直接执行 ansible-navigator 命令或进入交互界面使用 `:` 启用以下子命令。
     
-    ![](pictures/Chapter01/ansible-navigator-subcommand.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-navigator-subcommand.jpg)
     
-    ![](pictures/Chapter01/ansible-navigator-welcome.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-navigator-welcome.jpg)
     
     - 运行 Playbook：
       
@@ -557,7 +557,7 @@
           print("Requires an argument, please use --list or --host <host>")
       ```
       
-      ![](pictures/Chapter01/python-simple-inventory.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/python-simple-inventory.png)
     
     - 动态清单在与云提供商、容器和虚拟机管理系统结合使用时尤其强大。
     
@@ -694,7 +694,7 @@
   
   - 🤘 通常，如果 Ansible 中的某一功能已启用或有变化，则该项目会在删除或更改功能之前提早四个小版本（minor releases）提供启用通知。
     
-    ![](pictures/Chapter01/ansible-playbook-deprecation-warning.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/ansible-playbook-deprecation-warning.png)
   
   - 💥 yum 模块从 2.11 版本开始，将移除使用循环的语法，可使用列表形式安装多个软件包。
 
@@ -719,6 +719,6 @@
     
     该工具不关心 Ansible，只是用于识别并分析 YAML 文件语法相关的问题。
     
-    ![](pictures/Chapter01/yamllint-demo.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-rhaap20-basic/yamllint-demo.png)
     
     👉 yamllint 工具位于 [epel8 软件源](https://github.com/Alberthua-Perl/scripts-confs/blob/master/yum-repo/epel8.repo) 中！
