@@ -26,6 +26,10 @@
     - [Linux 进程权限的各类 UID 探讨](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%9A%84%E5%90%84%E7%B1%BB%20UID%20%E6%8E%A2%E8%AE%A8.md)
     
     - [通过 PAM 控制身份认证](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E9%80%9A%E8%BF%87%20PAM%20%E6%8E%A7%E5%88%B6%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81.png)
+
+    - [使用 AUDIT 记录系统事件](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6.png)
+
+    - [使用 AIDE 监控文件系统更改](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AIDE%20%E7%9B%91%E6%8E%A7%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9B%B4%E6%94%B9.png)
     
     - [一文厘清 HTTPS 原理与应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8.md)
     
