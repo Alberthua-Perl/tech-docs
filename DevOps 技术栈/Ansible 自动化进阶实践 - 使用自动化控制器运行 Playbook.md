@@ -108,15 +108,15 @@
     
     - 作业模板资源与命令行对应的设置与选项：
       
-      ![](pictures/Chapter03/job-template-cmd-options.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/automation-controller-playbook/job-template-cmd-options.png)
     
     - 自动化控制器中除了 playbook 运行的输出外，`Jobs` 页面还显示清单同步作业和源代码控制更新作业。每个作业都包含一个数字，用于显示自动化控制器运行作业的顺序。
     
     - ✨ 自动化控制器中可指定模板的 `Execution Environment`，当作业执行时，由自动化控制器所在节点上的 `awx` 用户使用该执行环境运行 podman 容器，推送 playbook 中的任务至受管主机。因此，自动化控制器（automation controller）中的执行环境需提前在自动化中心（automation hub）中配置。
       
-      ![](pictures/Chapter03/automation-controller-ee-setting.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/automation-controller-playbook/automation-controller-ee-setting.png)
       
-      ![](pictures/Chapter03/automation-hub-container-images.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/automation-controller-playbook/automation-hub-container-images.png)
       
       ✨ 自动化中心中可存储名称格式为 `registry_uri/repository[:tag]` 或 `registry_uri/user_or_org/repository[:tag]` 的容器镜像。
 
