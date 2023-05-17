@@ -77,11 +77,11 @@
     #   registry.redhat.io/ansible-automation-platform-20-early-access/ee-supported-rhel8:2.0.0
     ```
     
-    ![](pictures/Chapter02/ansible-content-collections-doc-1.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-content-collections-doc-1.jpg)
     
     如上所示，第一列编号为集合编号，输入相关的集合编号可列出集合中的模块和插件，若集合编号编号大于 `9`，需在编号前加上 `:`，如 `:19` 表示第 19 行。
     
-    ![](pictures/Chapter02/ansible-content-collections-doc-2.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-content-collections-doc-2.jpg)
     
     如上所示，输入模块编号来访问其文档。默认情况下，ansible-navigator collections 命令以 `YAML` 格式呈现文档。
     
@@ -92,7 +92,7 @@
     # 命令行上查看 kubernetes.core.k8s 模块的使用文档
     ```
     
-    ![](pictures/Chapter02/ansible-module-and-collection.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-module-and-collection.jpg)
     
     🤘 `ansible.builtin.<module>` 模块的存储路径为自动化执行环境中默认 ansible 模块的路径。
   
@@ -146,7 +146,7 @@
     
     - 若存在旧版的 playbook 需要使用自动化执行环境可使用 `ee-29-rhel8` 容器镜像，该自动化执行环境提供不需要集合的 Ansible 2.9。
       
-      ![](pictures/Chapter02/no-collections-in-ansible-29.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/no-collections-in-ansible-29.jpg)
     
     > 👉 注意：Ansible 自动化平台 2.0 使用 Ansible 2.11 引擎。
   
@@ -293,7 +293,7 @@
     
     - 使用 https://console.redhat.com/ansible/automation-hub/ 上的 Ansible 自动化中心 Web UI 来列出和访问集合。
       
-      ![](pictures/Chapter02/ansible-automation-platform-online.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-automation-platform-online.jpg)
   
   - 开源社区提供的 `Ansible Galaxy`：
     
@@ -305,13 +305,13 @@
     
     - 使用 https://galaxy.ansible.com/ 上的 Web UI 来搜索集合。
       
-      ![](pictures/Chapter02/ansible-galaxy-collection-demo.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-galaxy-collection-demo.jpg)
   
   - 🤘 开发者或团队自行开发 Ansible 内容集合以自定义模块、角色或插件：
     
     - 本地部署私有 Ansible 自动化中心（`Ansible automation hub`）存储自定义的集合
       
-      ![](pictures/Chapter02/private-automation-hub-demo.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/private-automation-hub-demo.jpg)
     
     > 💥 本课程中不介绍 Ansible 自动化中心的部署与使用，可自行查看相关资料。
     
@@ -413,7 +413,7 @@
       
       - 报错信息如下所示：
         
-        ![](pictures/Chapter02/eei-not-use-collections.jpg)
+        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/eei-not-use-collections.jpg)
   
   - 使用 `collections/requirements.yml` 文件安装：
     
@@ -531,7 +531,7 @@
     
     - 如下所示，必须使用订阅账户登录 Ansible 自动化中心，用以生成对应的 token，并将该 token 用于 ansible.cfg 配置文件中：
       
-      ![](pictures/Chapter02/ansible-automation-hub-load-token.jpg)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-automation-hub-load-token.jpg)
     
     - 若在 ansible.cfg 配置文件中不使用 token、username 与 password 指令，可使用如下环境变量指定所需的 token、username 与 password：
       
@@ -578,9 +578,9 @@
 
 - Ansible 自动化平台 2.0 提供了三种预构建的自动化执行环境：
   
-  ![](pictures/Chapter02/automation-execution-environment-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/automation-execution-environment-1.png)
   
-  ![](pictures/Chapter02/automation-execution-environment-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/automation-execution-environment-2.png)
 
 - 最小化自动化执行环境仅包含 `ansible.builtin` Ansible 内容集合，通常将其保留为构建自定义自动化执行环境的起点。
 
@@ -602,6 +602,6 @@
   $ ansible-navigator images
   ```
   
-  ![](pictures/Chapter02/ansible-navigator-images.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/manage-content-collections-ee/ansible-navigator-images.png)
   
   可通过使用前置序号查看每个自动化执行环境的详细信息。
