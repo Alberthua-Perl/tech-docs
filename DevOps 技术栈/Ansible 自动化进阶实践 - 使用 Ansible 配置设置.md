@@ -37,7 +37,7 @@
       --eei hub.lab.example.com/ee-supported-rhel8:2.0
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\使用Ansible自动化平台开发高级自动化\pictures\Chapter04\ansible-navigator-config.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-navigator-config/ansible-navigator-config.png)
     
     以上每一行条目为 Ansible 配置参数，每列的信息如下所示：
     
@@ -95,7 +95,7 @@
       dump
     ```
     
-    ![](D:\Linux操作系统与编程语言汇总\Typora文档汇总\CICD\使用Ansible自动化平台开发高级自动化\pictures\Chapter04\ansible-navigator-config-dump.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-navigator-config/ansible-navigator-config-dump.png)
   
   - `view` 子命令：
     
