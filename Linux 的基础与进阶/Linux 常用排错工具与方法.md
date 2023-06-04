@@ -148,25 +148,25 @@ $ pmatop
 
 - GRUB2 在 MBR 分区中的分布：
   
-  ![](pictures/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
   
-  ![](pictures/grub2-mbr-scheme.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-mbr-scheme.png)
   
   如上图，GRUB2 使用 boot.img 作为 `boot loader` 负责系统引导过程的第一阶段（对应 GRUB 方式的 `stage1`），由于该镜像本身的容量大小限制无法识别 `/boot/grub2/` 所在文件系统类型，因此使用可以识别文件系统类型的 core.img，而 boot.img 由 GRUB2 硬编码 core.img 的磁盘位置定位该镜像。boot.img 位于 `/usr/lib/grub/i386-pc/` 中，grub2-install 程序将其转换为合适的 boot loader 程序写入第一个扇区。
   
   core.img 镜像是由位于 `/usr/lib/grub/i386-pc/` 中的 `diskboot.img`、`lzma_decompress.img`、`kernel.img` 与各类 `*.mod` 模块通过 `grub2-mkimage` 程序动态生成，该镜像安装的位置可在第二个扇区起始的称为 `MBR gap` 的区域（此区域至少 31 KiB）或任意文件系统的第一个扇区。
   
-  ![](pictures/grub2-structure-on-disk.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-structure-on-disk.jpg)
   
   由于 core.img 中可能包含更多的功能用以识别不同的文件系统类型与结构，如 Btrfs、ZFS、RAID 与 LVM 等，因此 MBR gap 需要更多空间。现代的很多磁盘管理与分区工具已预留至少 1 MiB 来满足该需求，如 fdisk、gdisk 与 parted 工具等。一旦 boot.img 引导定位至 core.img，其使用文件系统驱动识别 /boot/grub2 所在的文件系统（对应 GRUB 方式的 `stage1.5`）。
   
-  ![](pictures/core-img-structure.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/core-img-structure.png)
   
   GRUB2 通过读取 /boot/grub2 中的相关配置定位系统的 `vmlinuz (kernel)`、`initramfs (ramdisk)`，继而将系统的控制权由 GRUB2 转交给内存中的 kernel（对应 GRUB 方式的 `stage2`）。
 
 - GRUB2 在 GPT 分区中的分布：
   
-  ![](pictures/gnu-grub-on-gpt-partitioned.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/gnu-grub-on-gpt-partitioned.jpg)
   
   `GPT`（GUID partition table，全局唯一标识符分区表）分区的结构与 MBR 分区相似，但存在自身的独特分区。在 GPT 中使用 `LBA`（logical block address，逻辑区块地址）来代替常用扇区的概念，虽然当前可使用以 `4 KiB` 的存储单位，但在 LBA 中默认依然采用 `512 bytes` 作为一个 LBA 的存储单位（可将 LBA 作为扇区理解）。
   
@@ -184,7 +184,7 @@ $ pmatop
 
 - MBR 分区与 GPT 分区系统引导的过程与差异：
   
-  ![](pictures/boot-process-for-bios-and-uefi-systems.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/boot-process-for-bios-and-uefi-systems.jpg)
   
   虽然 BIOS 和 UEFI 启动过程的大多数配置语法与工具都相同，但存在一些差异。
   
@@ -238,11 +238,11 @@ $ pmatop
   # 删除指定的启动目标
   ```
   
-  ![](pictures/efibootmgr-rm-targets.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/efibootmgr-rm-targets.png)
   
   ✨ 若系统具有多个可用的内核版本时，使用 efibootmgr 命令依然可管理启动目标（默认通常位于 `/boot/efi/EFI/redhat/*.efi` 中），再使用 grubby 命令设置当前可用的默认内核版本，即当 UEFI 方式中 GRUB2 引导至内核选择时，默认选取的内核，如下所示：
   
-  ![](pictures/uefi-efibootmgr-grubby.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/uefi-efibootmgr-grubby.png)
   
   如下所示，通过添加额外的 UEFI 启动目标并指定该启动目标以引导系统：
   
@@ -261,23 +261,23 @@ $ pmatop
   # 指定可用的启动目标覆盖当前的启动目标
   ```
   
-  ![](pictures/efibootmgr-add-new-boot-target.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/efibootmgr-add-new-boot-target.png)
   
-  ![](pictures/uefi-boot-manager.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/uefi-boot-manager.png)
   
   efibootmgr 添加额外启动目标后，当系统重启进入 BIOS 引导界面（VMware 虚拟化环境）中可见新增的启动目标。
 
 - 2️⃣ 示例：使用 GRUB2 命令行引导 UEFI 方式启动的系统
   
-  ![](pictures/rhel85-efi-partition.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rhel85-efi-partition.png)
   
   该系统分区中 `/dev/sda1` 挂载于 `/boot/efi` 为 UEFI 的 `ESP` 分区，`/dev/sda2` 挂载于 `/boot`，根分区以 `/dev/rootvg/lv0` 逻辑卷的方式挂载。现尝试使用 GRUB2 命令行方式重新引导系统：
   
-  ![](pictures/grub2-boot-cmd.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-boot-cmd.png)
   
   若 `root=` 根分区指定错误将无法成功引导，报错如下：
   
-  ![](pictures/grub2-cmd-boot-error.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-cmd-boot-error.png)
 
 - 参考链接：
   
@@ -480,7 +480,7 @@ $ lsusb -v
 # 查看系统上的 USB 设备信息
 ```
 
-![](pictures/nic-pci-info.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nic-pci-info.jpg)
 
 如上图所示，确认各类物理网卡的详细 PCIe 信息。
 
@@ -513,13 +513,13 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 # 注意：memtest86+ 内存测试通常在物理机上运行测试，而不是虚拟机上运行！
 ```
 
-<img src="pictures/memtest86-test.jpg" style="zoom:;" />
+<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/memtest86-test.jpg" style="zoom:;" />
 
 如上图所示，使用 memtest86+ 软件包在系统启动引导过程中实现内存测试。
 
 ### 常见物理服务器及硬件示例：
 
-![](pictures/general-hardware-info.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/general-hardware-info.png)
 
 ### 管理内核模块与 KVM 虚拟化：
 
@@ -557,13 +557,13 @@ $ vim /etc/modprobe.d/blacklist.conf
 #   指令防止其依赖模块对它的载入。
 ```
 
-![](pictures/megaraid_sas-driver-info.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/megaraid_sas-driver-info.jpg)
 
-![](pictures/lsmod-cmd.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/lsmod-cmd.jpg)
 
 内核模块除了可在系统运行时动态加载、系统引导启动时加载之外，也可将其添加至 `initramfs` 或 `initrd` 镜像中，使镜像具有对特定硬件的驱动能力。如将 `magaraid_sas` 模块添加至 initramfs 中，如下所示：
 
-![](pictures/dracut-add-drivers.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/dracut-add-drivers.png)
 
 使用以上方式添加的为内核模块，而 initramfs 中本身具有模块（称为 dracut 模块）与内核模块不同，并且在执行 dracut 命令前必须先备份原先的 `/boot/initramfs-4.18.0-348.el8.x86_64.img` 镜像，防止添加失败导致原 initramfs 镜像数据丢失。
 
@@ -611,15 +611,15 @@ Linux 存储栈（storage stack）主要分为三层：
 
 根据不同内核版本存储栈存在一定的区别，此处以 `4.10` 内核版本为例展示存储栈全景图：
 
-![](pictures/Linux-storage-stack-diagram_v4.10.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/Linux-storage-stack-diagram_v4.10.png)
 
 若对上图实现简单抽象，可参考如下示意：
 
-![](pictures/linux-storage-stack-simple.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/linux-storage-stack-simple.png)
 
 存储的 I/O 工作流（从磁盘到网络）：
 
-![](pictures/classic-io-from-disk-to-network.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/classic-io-from-disk-to-network.png)
 
 ```bash
 ### 清理与 VFS 相关的缓存 ###
@@ -660,11 +660,11 @@ $ dmsetup table /dev/mapper/myvg1-mylv1
 
 Device Mapper 框架如下所示：
 
-![](pictures/device-mapper-kernel-architecture-1.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/device-mapper-kernel-architecture-1.png)
 
 devicemapper 从 `2.4.x` 内核中首次提出后，在 `2.6.x` 中正式使用，目前被广泛用于 LVM、devicemapper-multipath、LUKS、Stratis、VDO 等技术中。以前文 LVM 命令行输出为例，devicemapper 使用线性化的方式将不同的磁盘扇区与逻辑设备实现 1:1 映射，如下所示：
 
-![](pictures/dm-lvm-partition-linear-mapping.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/dm-lvm-partition-linear-mapping.png)
 
 ```bash
 ### 磁盘 IO 调度算法 ###
@@ -758,7 +758,7 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 
 - RPM 软件包中文件的状态标识：man rpm 命令 `-V`
 
-![](pictures/rpm-verify.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rpm-verify.jpg)
 
 ```bash
 rpm 命令常用选项：
@@ -875,11 +875,11 @@ $ rpm --setperms <package_name>
   
   - yum 软件源优先级功能是否启用：`/etc/yum/pluginconf.d/priorities.conf`
     
-    ![](pictures/yum-priority-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-1.png)
   
   - 编辑 `/etc/yum.repos.d/*.repo` 文件：
     
-    <img src="pictures/yum-priority-2.png" style="zoom:80%;" />
+    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-2.png" style="zoom:80%;" />
   
   - priority=*N*（取值 **`1~99`**），数值越大优先级越低。
   
@@ -979,7 +979,7 @@ $ rpm --setperms <package_name>
 
 - 网络连通性测试：ping 与 ping6 命令常用选项
   
-  <img src="pictures/ping-ping6-options.jpg" style="zoom:80%;" />
+  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/ping-ping6-options.jpg" style="zoom:80%;" />
 
 - 关于 `MTU` 故障的说明： 
   
@@ -997,11 +997,11 @@ $ rpm --setperms <package_name>
   
   - 💥 数据包大小大于 MTU 的故障：
     
-    ![](pictures/long-message-mtu-error-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/long-message-mtu-error-1.png)
     
     ping 命令使用 ICMP 协议测试网络连通性，整个数据包包括数据净荷（字节）、ICMP 头（8 字节）、IP 头（20 字节）。因此，上图中使用 1472 字节的数据净荷，而数据包整体为 1500 字节，已达到本地最大传输单元。若禁止本地的数据包分片（`-M do`）且数据净荷超过 1472 字节，则由于数据包大小大于本地 MTU 而无法测试网络连通性；若不使用 `-M do` 选项，可通过本地数据包分片测试连通性。
     
-    ![](pictures/long-message-mtu-error-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/long-message-mtu-error-2.png)
 
 - `nmap` 命令使用示例：
   
@@ -1176,7 +1176,7 @@ $ rpm --setperms <package_name>
   
   - 以上 nc 测试的 iptarf-ng 如下所示：
     
-    ![](pictures/nc-iptraf-ng.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nc-iptraf-ng.jpg)
 
 - tcpdump 命令示例：
   
@@ -1360,7 +1360,7 @@ $ rpm --setperms <package_name>
   
   - 无论是应用程序或库函数都有可能不调用系统调用而直接运行。
     
-    ![](pictures/library-call-system-call-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/library-call-system-call-1.png)
   
   - 库调用运行示例：
     
@@ -1379,7 +1379,7 @@ $ rpm --setperms <package_name>
     $ gcc -o printf_libcall_demo printf_libcall_demo.c
     ```
     
-    ![](pictures/strace-printf-demo.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/strace-printf-demo.png)
 
 - 系统调用的意义：
   
@@ -1415,7 +1415,7 @@ $ rpm --setperms <package_name>
   
   - 典型的系统调用：chdir、fork、write、brk
     
-    ![](pictures/library-call-system-call-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/library-call-system-call-2.png)
   
   - 参考《C 专家编程》中的附录 A.4，书中关于两者区别为函数库调用是语言或应用程序的一部分，而系统调用是操作系统的一部分。
 
