@@ -726,7 +726,7 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 
 - 关于 Device Mapper 框架的信息可参考如下链接：
   
-  - 💪 [**Device Mapper FOSDEM** *Sunday 27th February 2005* Alasdair Kergon [agk@redhat.com](mailto:agk@redhat.com)](https://people.redhat.com/agk/talks/FOSDEM_2005/)
+  - 💪 [**Device Mapper FOSDEM** *Sunday 27th February 2005* Alasdair Kergon](https://people.redhat.com/agk/talks/FOSDEM_2005/)
 
 - 关于磁盘 IO 调度的相关技术信息可参考如下链接：
   
