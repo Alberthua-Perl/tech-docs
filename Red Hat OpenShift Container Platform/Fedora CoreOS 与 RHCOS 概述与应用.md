@@ -283,7 +283,7 @@
         with_mount_unit: true
   ```
   
-  以上 YAML 文件可点击 [此处](https://github.com/Alberthua-Perl/scripts-confs/tree/master/fedora-coreos-36) 获得。
+  以上 YAML 文件可点击 [此处](https://github.com/Alberthua-Perl/sc-col/tree/master/fedora-coreos-36) 获得。
   
   ```bash
   $ cat ./hostname
