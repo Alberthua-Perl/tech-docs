@@ -3,69 +3,44 @@
 ### 文档说明：
 
 - OS 版本：`Ubuntu 20.04.3 LTS`
-
 - kernel 版本：`5.15.0-57-generic`
-
 - Linux 中各类 UID 的联系与区别对于理解进程权限与 Audit 审计系统发挥至关重要的作用，这些 UID 作为进程凭证。
-
 - ✍ 可参考 `man 7 credentials` 手册中的说明加以理解。
 
 ### 文档目录：
 
 - 各类 UID 的解析
-
 - ruid、euid 与 Saved set-user-ID 间的关系
-
 - ruid 与 euid 的验证示例
-
 - 各类 UID 在 Audit 审计系统中的说明
-
 - 参考链接
 
 ### 各类 UID 的解析：
 
-- user ID：
-  
+- user ID：  
   - 常规 Linux 用户 ID，作为系统中用户的唯一识别符。
-
-- Real user ID（`ruid`）：
-  
-  - 真实用户 ID
-  
-  - 🤘 ruid 为拥有当前进程的用户 ID，即调用该可执行文件的用户。
-  
+- Real user ID（`ruid`）： 
+  - 真实用户 ID  
+  - 🤘 ruid 为拥有当前进程的用户 ID，即调用该可执行文件的用户。  
   - 一般情况下，最初登录 Shell 的 user ID 与 ruid 相同，但是该登录用户有可能通过 su 或 sudo 提权为其他非特权用户或特权用户，此时的 ruid 与最初的登录 user ID 不同。
-
-- Effective user ID（`euid`）：
-  
-  - 有效用户 ID
-  
-  - 🤘 euid 被内核使用确定进程可访问资源的权限
-  
-  - 进程的权限由保存在 euid 中的 UID 来决定
-  
-  - 通常而言，进程的 ruid 与 euid 保持一致，ruid 与 euid 对进程而言。
-  
-  - euid 临时存储了另一个用户的 UID
-  
-  - 🚀 euid 在使用系统调用与执行 set-user-ID 程序或 set-group-ID 程序时被修改。
-  
+- Effective user ID（`euid`）：  
+  - 有效用户 ID  
+  - 🤘 euid 被内核使用确定进程可访问资源的权限  
+  - 进程的权限由保存在 euid 中的 UID 来决定  
+  - 通常而言，进程的 ruid 与 euid 保持一致，ruid 与 euid 对进程而言。  
+  - euid 临时存储了另一个用户的 UID  
+  - 🚀 euid 在使用系统调用与执行 set-user-ID 程序或 set-group-ID 程序时被修改。  
   - 也就是说，set-user-ID 程序或 set-group-ID 程序的可执行文件其本身也需要设置 set-user-ID 权限位（bit）后，euid 被更改为与可执行文件的所有者（owner）UID 相同，而未设置 set-user-ID 权限位（bit）的可执行文件，euid 依然与 ruid 保持一致，可参见下文 "ruid 与 euid 的验证示例" 部分。
   
   > 1. set-user-ID 权限位指的是 Linux 中的特殊权限 suid
   > 
   > 2. privileged 在不同的上下文中需加以辨别，可能是特权用户 root，也可能是其他普通用户。
 
-- Saved set-user-ID：
-  
-  - 保存设置用户 ID
-  
+- Saved set-user-ID：  
+  - 保存设置用户 ID  
   - 🚀 该 ID 相当于一个 `buffer`，在进程启动后，它会从 euid 拷贝信息到自身。对于非 root 用户，可以在未来使用 `setuid()` 系统调用来将 euid 设置成为 ruid 和 saved set-user-ID 中的任何一个。但是非 root 用户是不允许用 setuid() 将 euid 设置成为任何第三个 user ID。
-
-- Audit user ID（`auid`）：
-  
-  - 审计用户 ID，用于记录 Linux Audit 审计系统中的用户标识。
-  
+- Audit user ID（`auid`）：  
+  - 审计用户 ID，用于记录 Linux Audit 审计系统中的用户标识。  
   - auid 为最初登录 Shell 的的用户 ID
 
 ### ruid、euid 与 Saved set-user-ID 间的关系：
@@ -74,12 +49,9 @@
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-process-uid/linux-process-uid-mapping.png)
   
-  - 1️⃣2️⃣ 假定最初登录 Shell 的用户启动运行可执行文件，启动进程。
-  
-  - 3️⃣ 设置进程的 `ruid/rgid` 为当前用户的 uid/gid
-  
+  - 1️⃣2️⃣ 假定最初登录 Shell 的用户启动运行可执行文件，启动进程。  
+  - 3️⃣ 设置进程的 `ruid/rgid` 为当前用户的 uid/gid  
   - 4️⃣ 设置进程的 `euid/egid`，根据可执行文件的 `set-user-ID` 与 `set-group-ID` 权限位进行设置，图中红色 0 表示关闭，紫色 1 表示开启。为 1 时，将进程的 euid/egid 设置为可执行文件的 uid/gid，否则从 ruid/rgid 拷贝。
-
 - 以上过程可总结为下表：
   
   | ID 类型             | set-user-ID 权限位关闭    | set-user-ID 权限位开启                             |
@@ -90,7 +62,7 @@
 
 ### 🚀 ruid 与 euid 的验证示例：
 
-- 需要注意的是 Linux 系统中 set-user-ID 与 set-group-ID 权限位对 shell 脚本无效，如下 [process-cred-sample.c](https://github.com/Alberthua-Perl/scripts-confs/blob/master/ruid-euid-suid-test/process-cred-sample.c) 程序所示：
+- 需要注意的是 Linux 系统中 set-user-ID 与 set-group-ID 权限位对 shell 脚本无效，如下 [process-cred-sample.c](https://github.com/Alberthua-Perl/sc-col/blob/master/ruid-euid-suid-test/process-cred-sample.c) 程序所示：
   
   ```c
   #define _GNU_SOURCE
@@ -146,7 +118,7 @@
   
   以上命令第一次输出调用 shell 脚本而无法使用 set-user-ID 权限位返回 `Permission denied`。第二次输出使用 `setreuid()` 系统调用，将 euid 的值代替 ruid 的值作为参数传入，因此 ruid 也返回 1001，此时该进程可读取对应的文件内容，但请注意的是，此处的 ruid 是 setreuid() 系统调用的行为，从 kernel 的角度来看 ruid 依然是实际运行进程的 UID，即为 godev(1000)。
 
-- 因此，若要实现 shell 脚本相同的效果，可使用 `fopen()` 与 `fread()` 函数将以上源码更改为名为 [process-cred-sample-adv.c](https://github.com/Alberthua-Perl/scripts-confs/blob/master/ruid-euid-suid-test/process-cred-sample-adv.c) 程序：
+- 因此，若要实现 shell 脚本相同的效果，可使用 `fopen()` 与 `fread()` 函数将以上源码更改为名为 [process-cred-sample-adv.c](https://github.com/Alberthua-Perl/sc-col/blob/master/ruid-euid-suid-test/process-cred-sample-adv.c) 程序：
   
   ```c
   #define _GNU_SOURCE
@@ -207,7 +179,6 @@
 ### 各类 UID 在 Audit 审计系统中的说明：
 
 - 使用 Audit 审计系统过程中对文件、目录或系统调用的审计结果以审计日志的方式呈现，在众多的 type=SYSCALL 类型审计日志中包含了大量的 auid、uid、euid、suid 等的信息。
-
 - 以下将审计上述 process-cred-sample-adv 可执行文件，进一步理解各类 UID 的作用：
   
   ```bash
@@ -244,13 +215,8 @@
 ### 参考链接：
 
 - [credentials(7) - Linux man page](https://linux.die.net/man/7/credentials)
-
 - [setreuid(2) - Linux manual page](https://man7.org/linux/man-pages/man2/setregid.2.html)
-
 - [Difference between Real User ID, Effective User ID and Saved User ID](https://stackoverflow.com/questions/32455684/difference-between-real-user-id-effective-user-id-and-saved-user-id)
-
 - [深刻理解 - real user id, effective user id, saved user id in Linux](https://blog.csdn.net/fmeng23/article/details/23115989?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-23115989-blog-40857821.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-23115989-blog-40857821.pc_relevant_default&utm_relevant_index=5)
-
 - ❤[《Linux/Unix 系统编程手册》（上册）- 第9章 进程凭证（提取码：wop8）](https://pan.baidu.com/s/1DX8AEVBqepVDp3tiR06nBQ)
-
 - [ruid, euid, suid usage in Linux](https://mudongliang.github.io/2020/09/17/ruid-euid-suid-usage-in-linux.html)
