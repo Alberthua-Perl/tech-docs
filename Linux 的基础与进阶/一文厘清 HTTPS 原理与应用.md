@@ -810,6 +810,8 @@
 
 ### 参考链接：
 
+- ❤ [SSL and TLS Deployment Best Practices](https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices)
+
 - [HTTPS 加密协议详解 (四)：TLS/SSL 握手过程](https://www.wosign.com/FAQ/faq2016-0309-04.htm)
 
 - [TLS/SSL 协议详解(12) server key exchange](https://blog.csdn.net/mrpre/article/details/77867831)
