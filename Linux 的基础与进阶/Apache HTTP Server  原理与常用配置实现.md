@@ -66,7 +66,7 @@
 
 - 2021 年 1 月的 Web 服务器市场占有率调查统计：
   
-  ![](pictures/web-server-types.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/web-server-types.png)
 
 > 名词说明：
 > 
@@ -176,9 +176,9 @@
   
   Apache 的模块开发中使用到了第三方的开发库，如 `mod_ssl` 模块使用了 `OpenSSL`，`mod_perl` 模块使用了 `Perl` 开发库等。
   
-  ![](pictures/apache-http-server-arch-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-http-server-arch-1.png)
   
-  ![](pictures/apache-http-server-arch-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-http-server-arch-2.png)
 
 > 💥 注意：
 > 
@@ -216,7 +216,7 @@
   
   - 工作原理：
     
-    ![](pictures/apache-prefork-mpm.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-prefork-mpm.png)
 
 - 2️⃣ `worker MPM`：
   
@@ -238,7 +238,7 @@
   
   - 工作原理：
     
-    ![](pictures/apache-worker-mpm.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-worker-mpm.png)
 
 - 3️⃣ `event MPM`：
   
@@ -271,7 +271,7 @@
   # 查看 Apache HTTP 服务的编译配置
   ```
   
-  ![](pictures/httpd-status.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-status.png)
   
   ```bash
   $ sudo httpd -t
@@ -282,7 +282,7 @@
   # 可注释相应 MPM 模块，再重启 httpd 服务即可切换工作模式。
   ```
   
-  ![](pictures/httpd-mpm-config.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-mpm-config.png)
 
 ### Apache HTTP Server 安装与配置信息：
 
@@ -294,7 +294,7 @@
 
 - 实验节点环境说明：
   
-  ![](pictures/lab-env.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/lab-env.png)
   
   - 除 Apache 反向代理功能外，servera 具有 Apache HTTP Server 的其他功能。
   
@@ -356,7 +356,7 @@
     
     - 主配置文件中的常用全局配置参数：
       
-      ![](pictures/httpd-conf-golable-paraments.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-conf-golable-paraments.png)
   
   - 区域配置：单独针对于每个独立的子站点进行设置
 
@@ -389,7 +389,7 @@
     # 查看 Apache HTTP Server 的 IP 地址
     ```
     
-    ![](pictures/httpd-ip-based-vhost-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-1.png)
     
     ```bash
     $ sudo mkdir -p /webapp/data/site-{221,225,226}
@@ -405,7 +405,7 @@
     # 创建基于 IP 地址的虚拟主机配置文件
     ```
     
-    ![](pictures/httpd-ip-based-vhost-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-2.png)
     
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-ip-based.conf)。
     
@@ -427,7 +427,7 @@
     
     可在其他节点访问以上站点进行测试：
     
-    ![](pictures/httpd-ip-based-vhost-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-3.png)
 
 - 2️⃣ **基于域名（名称）的虚拟主机：**
   
@@ -451,7 +451,7 @@
     # 创建基于域名的虚拟主机配置文件
     ```
     
-    ![](pictures/httpd-domainname-based-vhost-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-domainname-based-vhost-1.png)
     
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-domainname-based.conf)。
     
@@ -464,7 +464,7 @@
     
     可在其他节点访问以上站点进行测试：
     
-    ![](pictures/httpd-domainname-based-vhost-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-domainname-based-vhost-2.png)
 
 - 3️⃣ **基于端口的虚拟主机：**
   
@@ -490,7 +490,7 @@
     # 创建基于端口的虚拟主机配置文件
     ```
     
-    ![](pictures/httpd-port-based-vhost-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-1.png)
     
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-port-based.conf)。
     
@@ -501,7 +501,7 @@
     # 重启 httpd 服务使配置生效，但由于端口被 SELinux 限制而重启报错。
     ```
     
-    ![](pictures/httpd-port-based-vhost-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-2.png)
     
     ```bash
     $ sudo semanage port -a -t http_port_t -p tcp 8880
@@ -514,7 +514,7 @@
     # 重载 firewalld 服务，使配置生效。可在其他节点访问以上站点进行测试：
     ```
     
-    ![](pictures/httpd-port-based-vhost-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-3.png)
 
 ### Apache HTTP Server 访问控制：
 
@@ -540,7 +540,7 @@
 
 - 相关模块：`mod_authz_core`、`mod_authz_host`
   
-  ![](pictures/httpd-access-control-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-1.png)
 
 - 配置方法如下所示：
   
@@ -550,17 +550,17 @@
     $ sudo vim /etc/httpd/conf.d/http-vhost.conf
     ```
     
-    ![](pictures/httpd-access-control-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-2.png)
     
     使用不同客户端测试：
     
     Chrome 与 Firefox 客户端均可访问资源，而 curl 命令行客户端被拒绝访问。
     
-    ![](pictures/httpd-access-control-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-3.png)
     
-    ![](pictures/httpd-access-control-4.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-4.png)
     
-    ![](pictures/httpd-access-control-5.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-5.png)
   
   - 基于源 IP 地址：
     
@@ -568,7 +568,7 @@
     $ sudo vim /etc/httpd/conf.d/http-vhost.conf
     ```
     
-    ![](pictures/httpd-access-control-6.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-6.png)
     
     🏷 可允许放行具体的 IP 地址、网段、域名等。
     
@@ -576,9 +576,9 @@
     
     10.197.11.222 可访问资源，而10.197.11.204 拒绝访问。
     
-    ![](pictures/httpd-access-control-7.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-7.png)
     
-    ![](pictures/httpd-access-control-8.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-8.png)
   
   > 💥 注意：
   > 
@@ -630,7 +630,7 @@
     
     - 相关模块：
       
-      ![](pictures/httpd-user-auth-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-1.png)
 
 - **基于密码文件的 Basic 认证实现：**
   
@@ -644,14 +644,14 @@
     # 文件中的参数可覆盖其中的配置。
     ```
     
-    ![](pictures/httpd-user-auth-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-2.png)
     
     ```bash
     $ sudo vim /webapp/data/learnpath/.htaccess
     # 创建 .htaccess 文件使其覆盖虚拟机配置文件的参数
     ```
     
-    ![](pictures/httpd-user-auth-3.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-3.png)
     
     ```bash
     $ sudo htpasswd -b -c /webapp/data/learnpath/.auth_basic foo redhat
@@ -660,7 +660,7 @@
     # 创建 Basic 认证密码文件后无需再次指定，可直接创建 bar 用户。
     ```
     
-    ![](pictures/httpd-user-auth-4.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-4.png)
     
     🏷 htpasswd 命令默认使用MD5对明文密码加密！
     
@@ -680,9 +680,11 @@
     # 指定 Basic 认证的用户名与密码，即可完成认证返回结果。
     ```
     
-    ![](pictures/httpd-user-auth-5.png)也打开浏览器输入指定URL后即可弹出用户认证窗口。
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-5.png)
+
+    也打开浏览器输入指定URL后即可弹出用户认证窗口。
     
-    ![](pictures/httpd-user-auth-6.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-6.png)
   
   - Wireshark 抓包验证：
     
@@ -694,9 +696,9 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](pictures/httpd-user-auth-wireshark-1.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-wireshark-1.png)
       
-      ![](pictures/httpd-user-auth-wireshark-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-wireshark-2.png)
 
 - **基于 SDBM 文件型数据库的 Basic 认证实现：**
   
@@ -708,7 +710,7 @@
     $ sudo vim /webapp/data/learnpath/.htaccess
     ```
     
-    ![](pictures/htaccess-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/htaccess-1.png)
     
     ```bash
     $ sudo htdbm -c /webapp/data/learnpath/.auth_dbm albert
@@ -722,7 +724,7 @@
     
     打开浏览器输入指定 URL 后即可弹出用户认证窗口
     
-    ![](pictures/httpd-basic-auth-sdbm-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-basic-auth-sdbm-1.png)
   
   - Wireshark 抓包验证：
     
@@ -734,7 +736,7 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](pictures/httpd-basic-auth-sdbm-2.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-basic-auth-sdbm-2.png)
 
 - **Digest 认证实现：**
   
@@ -744,7 +746,7 @@
     $ sudo vim /webapp/data/learnpath/.htaccess
     ```
     
-    ![](pictures/httpd-digest-auth-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-1.png)
     
     ```bash
     $ sudo htdigest -c /webapp/data/learnpath/.auth_digest \
@@ -760,7 +762,7 @@
     
     打开浏览器输入指定 URL 后即可弹出用户认证窗口
     
-    ![](pictures/httpd-digest-auth-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-2.png)
   
   - Wireshark 抓包验证：
     
@@ -772,7 +774,7 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](pictures/httpd-digest-auth-3.png)
+      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-3.png)
 
 - 🚀 用户认证授权注意要点：
   
@@ -790,7 +792,7 @@
     
     - `Satisfy all` 指令：只有两种都满足要求才能访问相应资源
     
-    ![](pictures/httpd-auth-htaccess.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-auth-htaccess.png)
 
 ### Apache HTTP Server 的 SSL 安全连接：
 
@@ -809,7 +811,7 @@
   # 安装 mod_ssl 模块实现 Apache 与 OpenSSL 间调用
   ```
   
-  ![](pictures/httpd-ssl-conf-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-1.png)
   
   ```bash
   $ sudo vim create-ssl-certs.sh
@@ -852,7 +854,7 @@
   # 配置虚拟主机 SSL 安全连接
   ```
   
-  ![](pictures/httpd-ssl-conf-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-2.png)
   
   ```bash
   $ sudo vim /webapp/data/learnpath/.htaccess
@@ -860,7 +862,7 @@
   # 将其与虚拟主机配置文件解耦，AuthOverride AuthConfig 指令将引用该文件。
   ```
   
-  ![](pictures/httpd-ssl-conf-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-3.png)
   
   💥 注意：
   
@@ -874,11 +876,11 @@
   
   - 从 IP 地址为 10.197.11.220 客户端的浏览器访问网站，先执行 HTTPS 认证，再进入访问控制，由于 `.htaccess` 文件中拒绝该 IP，因此无法访问。
     
-    ![](pictures/httpd-ssl-conf-4.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-4.png)
   
   - 服务端错误日志 `/etc/httpd/logs/*-error_ssl_log` 中显示：
     
-    ![](pictures/httpd-ssl-conf-5.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-5.png)
   
   - 从 IP 地址为 10.197.11.222 客户端使用 `curl` 命令行访问网站，提供 Digest 认证需要的用户名与密码，该 IP 地址允许访问网站。
     
@@ -888,13 +890,13 @@
     # 只查看通过 Digest 认证的用户的响应包头部信息
     ```
     
-    ![](pictures/httpd-ssl-conf-6.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-6.png)
     
     根据 `.htaccess` 文件中禁用的 IP 地址，使用其他 IP 地址进行访问测试。
     
-    ![](pictures/httpd-ssl-conf-7.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-7.png)
     
-    ![](pictures/httpd-ssl-conf-8.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-8.png)
 
 ### Apache HTTP Server 与 CGI 脚本：
 
@@ -908,11 +910,11 @@
 
 - CGI 脚本与 HTTP 服务器关系示意：发送 HTTP 请求前必须先创建 TCP 连接，完成 TCP 三次握手。
   
-  ![](pictures/httpd-cgi-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-1.png)
   
-  ![](pictures/httpd-cgi-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-2.png)
   
-  ![](pictures/httpd-cgi-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-3.png)
 
 - CGI 脚本在 Apache HTTP Server 中具有多种实现方式，包括 Shell、Perl、Python、PHP 脚本等，以下使用 Shell 与 Perl 脚本为例加以说明。
 
@@ -925,14 +927,14 @@
   # 查看 CGI 模块是否加载
   ```
   
-  ![](pictures/httpd-cgi-4.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-4.png)
   
   ```bash
   $ sudo vim /etc/httpd/conf.d/http-vhost.conf
   # 配置虚拟主机 CGI 相关参数
   ```
   
-  ![](pictures/httpd-cgi-5.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-5.png)
   
   ```bash
   $ sudo mkdir /webapp/data/learnpath/cgi-bin/
@@ -943,11 +945,11 @@
   
   💥 注意：该目录中的所有脚本都必须赋予可执行权限 `chmod a+x *`，否则访问时报错！
   
-  ![](pictures/httpd-cgi-6.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-6.png)
   
   在 /etc/httpd/logs/*-error_log 中的报错日志，如下所示：
   
-  ![](pictures/httpd-cgi-7.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-7.png)
 
 - Shell CGI 脚本示例：
   
@@ -1107,7 +1109,7 @@
   
   - 正向代理示意如下：
     
-    ![](pictures/httpd-proxy.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-proxy.png)
     
     - 正向代理服务器可位于数据中心或公司防火墙内部，将内部流量转发至外部网络。
     
@@ -1125,11 +1127,11 @@
   
   - 反向代理示意如下：
     
-    ![](pictures/httpd-reverse-proxy-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-1.png)
 
 - 正向代理与反向代理比较：
   
-  ![](pictures/httpd-reverse-proxy-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-2.png)
   
   - 正向代理即客户端代理，代理客户端，实际发起请求的客户端对服务端透明。
   
@@ -1137,7 +1139,7 @@
 
 - 相关模块：
   
-  ![](pictures/httpd-reverse-proxy-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-3.png)
 
 - Apache 反向代理配置方式：
   
@@ -1149,7 +1151,7 @@
   # 配置 Apache 反向代理与负载均衡配置文件
   ```
   
-  ![](pictures/httpd-reverse-proxy-4.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-4.png)
   
   👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/http-proxy.conf)。
   
@@ -1160,7 +1162,7 @@
   # 查看 Apache reverse proxy 相关的模块
   ```
   
-  ![](pictures/httpd-reverse-proxy-5.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-5.png)
   
   ```bash
   $ sudo apachectl restart
@@ -1169,23 +1171,23 @@
   
   💥 注意：该 Apache reverse proxy 的后端 Web 服务器为基于 SSL 的 Nginx podman 容器，分别运行于 base-server 与 servera 节点上。
   
-  ![](pictures/httpd-reverse-proxy-6.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-6.png)
   
-  ![](pictures/httpd-reverse-proxy-7.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-7.png)
 
 - 使用客户端浏览器测试：
   
   刷新 `https://10.197.11.222` 页面，确认负载均衡是否实现。
   
-  ![](pictures/httpd-reverse-proxy-8.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-8.png)
   
-  ![](pictures/httpd-reverse-proxy-9.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-9.png)
 
 - Apache 反向代理配置报错：
   
   `ProxyPass` 与 `ProxyPassReverse` 指令中的 `balancer` 末尾必须跟上 `/`，否则反向代理服务无法实现，error_log 中报错如下所示：
   
-  ![](pictures/httpd-reverse-proxy-10.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-10.png)
 
 - 🚀 客户端、Apache reverse proxy 与后端 Web 服务器间报文分析：
   
@@ -1203,7 +1205,7 @@
     
     - IP 地址：**`ip.src == <ip_address> [or|and] ip.dst == <ip_address>`**
     
-    ![](pictures/httpd-reverse-proxy-11.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-11.png)
 
 ### Apache HTTP Server 优化思路：
 
@@ -1235,9 +1237,9 @@
   
   - 可查找相应无法显示的图片，根据 Apache 支持的文件扩展名文件 `/etc/mime.types` 更改图片的扩展名，更改后再更新 html 中引用的图片链接即可正常显示。
     
-    ![](pictures/httpd-web-pic-error-display-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-web-pic-error-display-1.png)
     
-    ![](pictures/httpd-web-pic-error-display-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-web-pic-error-display-2.png)
 
 ### 参考链接：
 
