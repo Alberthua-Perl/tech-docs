@@ -139,6 +139,7 @@ $ pmatop
   - [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953) 
   - [Interactive web interface for Performance Co-Pilot](https://access.redhat.com/articles/1378113) 
   - [Introduction to storage performance analysis with PCP](https://access.redhat.com/articles/2450251)
+  - 📊 [Chapter 10. Setting up graphical representation of PCP metrics](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-up-graphical-representation-of-pcp-metrics_monitoring-and-managing-system-status-and-performance#doc-wrapper)
 
 ### 🔥 MBR 与 GPT 分区中的 GRUB2 再认识：
 
