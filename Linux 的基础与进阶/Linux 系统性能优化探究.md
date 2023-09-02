@@ -32,7 +32,7 @@
 
 - Linux 内核使用分段与分页机制实现进程虚拟内存地址、线性内存地址至物理内存地址的转换，而虚拟内存地址空间的分段信息可在 `/proc/<pid>/maps` 中确定，如下图所示。
   
-  ![](pictures/linux-process-memory-layout.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-process-memory-layout.png)
   
   `/proc/<pid>/maps` 中的 16 进制虚拟内存地址从显示的低地址位向高地址位扩展，并且在连续的地址空间之间为了保证数据安全性存在一定的 `gap` 区域，而右侧示意图中显示除了进程自身的虚拟内存地址空间外，还存在内核虚拟内存地址空间，两者共同协作完成进程所需执行的任务。
 
@@ -49,11 +49,11 @@
 
 - Linux 性能观测性工具图谱：
   
-  ![](pictures/linux-performance-observability.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-performance-observability.jpg)
 
 - Linux 静态性能工具图谱：
   
-  ![](pictures/linux-static-performance-tools.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-static-performance-tools.jpg)
 
 - `ps` 命令详解：
   
@@ -205,9 +205,9 @@
   
   - vmstat 命令 VM 模式输出的详细说明，如下所示：
     
-    ![](pictures/vmstat-header-info.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/vmstat-header-info.jpg)
     
-    ![](pictures/linux-process-schedule.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-process-schedule.jpg)
 
 - 🔥 sysstat 软件包相关命令：
   
@@ -231,7 +231,7 @@
     # 结果输出为指定 JSON 文件。
     ```
     
-    ![](pictures/mpstat-demo.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/mpstat-demo.png)
     
     若需启用实时输出的高亮显示，可设置 `S_COLORS` 环境变量为 `always` 或 `auto`。
   
@@ -250,7 +250,7 @@
     #   --human 选项：显示人类可读的容量格式
     ```
     
-    ![](pictures/iostat-demo.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/iostat-demo.png)
   
   - 监控进程的使用情况：`pidstat` 命令
     
@@ -300,7 +300,7 @@
 
 - 以下是来自性能优化大神 [Brendan](https://www.brendangregg.com/perf.html) 对于 perf 工具在各个维度的使用概括：
   
-  ![](pictures/linux-perf_events-event-sources.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-perf_events-event-sources.png)
 
 - 关于 perf 中的事件（events）：
   
@@ -336,9 +336,9 @@
   # -n 选项指定总请求次数，-c 选项指定请求的并发数。
   ```
   
-  ![](pictures/perf-top-pid-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/perf-top-pid-1.png)
   
-  ![](pictures/perf-top-pid-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/perf-top-pid-2.png)
 
 - perf stat 子命令：
   
@@ -429,7 +429,7 @@
     
     对于上述命令中部分选项的说明，如下所示：
     
-    ![](pictures/perf-stat-mind.jpg)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/perf-stat-mind.jpg)
     
     > 🔥 注意：以下所示的事件可能在不同的平台上会返回 `<not supported>`
     
@@ -527,7 +527,7 @@
 
 - Linux 进程调度优先级的分类：
   
-  ![](pictures/linux-process-priorities.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-process-priorities.jpg)
   
   - 系统优先级（system priority）
   
@@ -541,9 +541,9 @@
   
   - 上下文切换的过程：
     
-    ![](pictures/linux-context-switch-1.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-context-switch-1.png)
     
-    ![](pictures/linux-context-switch-2.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/linux-context-switch-2.png)
     
     - 当一个程序正在执行的过程中，中断（interrupt）或系统调用（system call）发生可以使得 CPU 的控制权从当前进程转移到操作系统内核。
     
@@ -645,7 +645,7 @@
 
 - 💻 一个完整的指令周期可包含以下五个阶段：
   
-  ![](pictures/instruction-cycle.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/instruction-cycle.jpg)
   
   - 取指令（Instruction Fetch）：
     
@@ -673,7 +673,7 @@
 
 - 对于一个指令周期来说，取出一条指令，然后执行它，至少需要两个 CPU 周期。取出指令至少需要一个 CPU 周期，执行至少也需要一个 CPU 周期，复杂的指令则需要更多的 CPU 周期。而一个 CPU 周期是若干时钟周期之和。
   
-  ![](pictures/three-cycle-relationship.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/three-cycle-relationship.jpg)
 
 ### x86_64 架构的常用寄存器示例：
 
@@ -739,17 +739,17 @@
 
 - 计算机存储体系整体分层示意：
   
-  ![](pictures/compute-storage-arch.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/compute-storage-arch.jpg)
 
 - CPU Cache 缓存架构拓扑示例：
   
   使用 `lstopo` 命令以获取如下拓扑，分别来自于 Intel Core i5 与 i7 处理器。
   
-  ![](pictures/foundation0-cpu-topo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/foundation0-cpu-topo.png)
   
-  ![](pictures/lenovo-t580-cpu-cache-topo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/lenovo-t580-cpu-cache-topo.png)
   
-  ![](pictures/dell-poweredge-r720-cpu-topo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/dell-poweredge-r720-cpu-topo.png)
   
   ```bash
   $ sudo yum install -y hwloc-gui
@@ -826,13 +826,13 @@
   
   左侧为 cache1.c，右侧为 cache2.c。
   
-  ![](pictures/cpu-cache-valgrind-test-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/cpu-cache-valgrind-test-demo.png)
   
   以上代码用以定义一个 7500 个行元素与 7500 个列元素的二维数组。左侧示例先定义行，在每行中以列进行递增，每行中的列元素的值是整型变量 `i`（行的索引号）与整型变量 `j`（列的索引号）的乘积，而右侧示例先定义列，在每列中以行进行递增。因此，两者编译后使用 valgrind 命令进行缓存命中率测试，结果如下所示：
   
-  ![](pictures/cpu-cache-valgrind-test-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/cpu-cache-valgrind-test-1.png)
   
-  ![](pictures/cpu-cache-valgrind-test-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-performance/cpu-cache-valgrind-test-2.png)
   
   从测试结果可知 cache1 的 L1 数据写缓存未命中率（6.2%）明显低于 cache2 的（100.0%），其原因在于 CPU Cache 缓存以缓存行（Cache line）的方式进行存储，先定义行再以列进行递增的效率更高。
 
