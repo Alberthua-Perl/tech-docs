@@ -3,7 +3,7 @@
 #   1. linux-basic-knowledge.yaml includes most of linux basic to help
 #      you to use and understand rapidly
 #   2. rhel6~9 all fit
-
+#
 #course environment command:
 #  kiosk@foundation0:
 #    - cat /etc/rht
@@ -124,6 +124,7 @@ Linux commands collection:
       # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中，原来的家目录将不复存在。
       # 请务必确认该用户可迁移家目录，需提前与其他团队沟通告知！
     - usermod -L chksys
+      # 用户的锁定也是 SSH 无法远程登录的原因之一
     - usermod -U chksys
     - usermod -G devgrp0 operator0
     - usermod -aG wheel operator0
@@ -246,7 +247,7 @@ user and group:
       UID 0: root(superuser)
       UID 1~499: system or application users
       UID 500+ included: regular user
-    rhel7/8:
+    rhel7/8/9:
       UID 0: root(superuser)
       UID 1~999: system or application users
       UID 1000+ included: regular user
@@ -277,12 +278,18 @@ user and group:
           third $: sha512(salt+plain password)
       - days: '$ date -d "1970-01-01 UTC 18389 day"'
     /etc/group: local group information
-    /etc/profile: all users
-    /etc/bashrc: all users
+    /etc/profile.d/*: priority higher than /etc/profile
+    /etc/profile: system scope shell script effect to all users
+    /etc/bashrc: 
+      - system scope shell script effect to all users
+      - set umask
     $HOME/.bash_profile: current user
     $HOME/.bashrc: current user
     /etc/login.defs:
       - define user action
+      - define user home action
+      - define passwd lifecycle
+      - define passwd crypto alog(HMAC_CRYPTO_ALGO SHA512)
       - NOTE: Ubuntu can't create home dir for new user!
     /etc/security/pwquality.conf: 'minlen = 8'
 
