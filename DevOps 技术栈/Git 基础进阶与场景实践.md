@@ -1028,6 +1028,7 @@ $ source $HOME/.bashrc
   在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
   
   Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
+  
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-fast-forward-detail_sm.png)
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-ff.gif)
