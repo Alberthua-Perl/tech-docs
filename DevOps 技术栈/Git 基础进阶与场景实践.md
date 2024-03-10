@@ -108,7 +108,7 @@
   
   Local Working Tree -> Staging Area -> Local Repository -> Remote Repositiry (upstream) 
   
-  ![](pictures/git-manage-files-foue-areas.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-manage-files-foue-areas.png)
 
 - Git 目录结构示例：
   
@@ -159,21 +159,21 @@
   
   - Clash 打开 7890 端口
     
-    ![](pictures/open-clash-port-7890.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/open-clash-port-7890.png)
   
   - Windows 防火墙放行 Clash 应用
     
-    ![](pictures/firewall-allow-clash.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/firewall-allow-clash.png)
   
   - 虚拟机中由于使用 SSH 远程连接认证 GitHub 中的私有仓库，需在 `$HOME/.ssh/config` 配置文件中添加红框中的参数，而 Git 代理依赖 `nc` 程序，应预安装 `nmap-ncat` 软件包(此处未使用 HTTPS 方式进行认证)：
     
-    ![](pictures/ssh-client-add-git-proxy.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/ssh-client-add-git-proxy.png)
     
     以上 `--proxy` 参数中指定的 IPv4 地址只需将其替换为自身环境中 Clash 所在节点的 IPv4 地址即可，若未使用默认的 7890 端口需自行定义。
   
   - SSH 客户端配置完成后，进一步运行 git config 命令，以满足 git pull 或 push 命令时的代理。
     
-    ![](pictures/git-add-proxy.png)
+    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-add-proxy.png)
 
 -----
 
@@ -230,19 +230,19 @@
   #   2. Git 局部设置只需去除 --global 选项即可
   ```
   
-  ![](pictures/git-config-user-info.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-config-user-info.png)
   
   👨‍🏫 示例：使用 git config 的 `credential` 配置参数，在推送本地仓库代码至远程代码仓库时，可能需要输入远程代码仓库中指定 git 用户的密码作为认证凭据，并且该远程仓库可能属于另一 git 用户所有，如下所示：
   
   👉 使用 `student` 用户推送本地仓库代码
   
-  ![](pictures/git-config-credential.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-config-credential.jpg)
   
-  ![](pictures/git-config-credential-gitlab-1.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-config-credential-gitlab-1.jpg)
   
   👉 该 GitLab 仓库属于名为 `git` 的用户，仓库状态为 `public` 状态。
   
-  ![](pictures/git-config-credential-gitlab-2.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-config-credential-gitlab-2.jpg)
 
 - git 软件包附带的 `git-prompt.sh` 脚本可报告工作树状态。
 
@@ -274,7 +274,7 @@
   
   > 👉 除了使用 git-prompt.sh 脚本设置 PS1 环境变量外，也可使用如 `oh-my-bash` 等 shell 命令行配置工具更改 theme 以获得不同的 PS1 环境变量的样式。
   > 
-  > ![](pictures/oh-my-bash-ps1.jpg)
+  > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/oh-my-bash-ps1.jpg)
 
 -----
 
@@ -286,9 +286,9 @@
 
 - 🚀 Git 目录结构与 Git 命令对应关系：
   
-  ![](pictures/git-workflow-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-workflow-1.png)
   
-  ![](pictures/git-workflow-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-workflow-2.png)
 
 -----  
 
@@ -310,7 +310,7 @@ $ git init --bare --shared=true
 #      还必须设置服务器，以便用户使用 HTTPS 或 SSH 协议来克隆、拉取和推送到仓库。
 ```
 
-![](pictures/git-init-clone.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-init-clone.png)
 
 -----
 
@@ -392,9 +392,9 @@ $ git rm --force <file>
 
 👨‍🏫 示例：`git rm` 与 `git rm --cached` 的区别
 
-![](pictures/git-rm-working-tree-and-staged.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-working-tree-and-staged.jpg)
 
-![](pictures/git-rm-f-cached-staged.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rm-f-cached-staged.jpg)
 
 👨‍🏫 示例：git add 针对于工作区已删除文件的操作
 
@@ -406,7 +406,7 @@ $ git rm --force <file>
 
 由于当前活动分支上还存在未暂存的或未提交的文件，在切换至其他分支时将出现如下报错（切换至其他分支时文件的修改将被覆盖）：
 
-![](pictures/git-stash-checkout-error.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-stash-checkout-error.png)
 
 因此，可通过当前活动分支中的暂存操作解决，即暂存当前活动分支中的修改，切换至其他分支完成提交后，再恢复暂存继续修改即可。
 
@@ -474,13 +474,13 @@ $ git push --delete origin <branch_name>
 # 删除远程代码仓库中的分支
 ```
 
-![](pictures/git-add-commit.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-add-commit.png)
 
-![](pictures/git-fetch.gif)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-fetch.gif)
 
-![](pictures/git-pull.gif)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-pull.gif)
 
-![](pictures/git-pull-push.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-pull-push.png)
 
 -----
 
@@ -570,9 +570,9 @@ $ git push --delete origin <branch_name>
 
 远程代码仓库的分支中已存在其他开发者提交的新代码，而在本地工作区与本地仓库中无这些更新，因此本地仓库推送更新的代码至远程代码仓库的分支中时会由于两者的状态不一致而产生冲突（`conflict`），此时可将远程的更新拉取（`pull`）至本地工作区与本地仓库，同步两者的状态后即可重新推送，如下所示：
 
-![](pictures/git-push-error-resolv-1.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-error-resolv-1.jpg)
 
-![](pictures/git-push-error-resolv-2.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-error-resolv-2.jpg)
 
 👨‍🏫 示例 2：
 
@@ -580,7 +580,7 @@ $ git push --delete origin <branch_name>
 
 💥 远程代码仓库中的分支无需手动创建，使用上述选项后将自动创建！
 
-![](pictures/git-push-set-upstream-branch.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-push-set-upstream-branch.jpg)
 
 👨‍🏫 示例 3：
 
@@ -725,7 +725,7 @@ $ source $HOME/.bashrc
   # 比较 main 分支与 test 分支之间的差异
   ```
   
-  ![](pictures/git-log-commit-info.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-log-commit-info.png)
 
 - 命令中不需要输入完整的哈希，只需其中的足够部分来唯一标识仓库中的特定提交。
 
@@ -753,7 +753,7 @@ $ source $HOME/.bashrc
   
   HEAD 是当前活动分支引用的指针，它总是指向某次提交，默认是上一次的提交。这表示 HEAD 将是下一次提交的父结点。通常，可以把 HEAD 看做上一次提交的快照。当然 HEAD 的指向是可以改变的，比如可指向提交（`commit`）、标签（`tag`）或分支（`branch`）等。
   
-  ![](pictures/git-head-log.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-head-log.jpg)
 
 - 若在工作区中进行更改，使用 git add 命令进行暂存，并使用 git commit 命令进行提交，则将创建一个新的提交，以最新的提交作为其父项，并且 `HEAD` 将转为指向新的提交。
 
@@ -889,7 +889,7 @@ $ source $HOME/.bashrc
 
 - 上述各分支关系示意：
   
-  ![](pictures/git-branch-workflow.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-workflow.png)
   
   主分支 master 和 develop 是保护分支，只能进行合并请求（merge request），均不可直接提交代码。
 
@@ -905,7 +905,7 @@ $ source $HOME/.bashrc
 
 - GitHub Flow 工作流示意：
   
-  ![](pictures/git-branch-workflow-from-github.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-workflow-from-github.png)
 
 -----
 
@@ -966,13 +966,13 @@ $ source $HOME/.bashrc
   
   👨‍🏫 示例：从 `master` 主分支当前的 `38fe8f9` commit 上创建 `feature` 分支
   
-  ![](pictures/git-different-branch-checkout.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-different-branch-checkout.jpg)
   
-  ![](pictures/git-branch-checkout.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-branch-checkout.png)
   
   👨‍🏫 示例：删除并更新远程代码仓库分支
   
-  ![](pictures/delete-remote-repository-branch.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/delete-remote-repository-branch.png)
 
 > 💥 注意：
 > 
@@ -997,7 +997,7 @@ $ source $HOME/.bashrc
   # 创建并切换至新分支中
   ```
   
-  ![](pictures/git-create-new-branch-from-previous-commit.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-create-new-branch-from-previous-commit.png)
 
 -----
 
@@ -1028,27 +1028,27 @@ $ source $HOME/.bashrc
   在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
   
   Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
-  ![](pictures/git-fast-forward-detail_sm.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-fast-forward-detail_sm.png)
   
-  ![](pictures/git-merge-ff.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-ff.gif)
   
-  ![](pictures/git-merge-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-demo.png)
   
   2️⃣ No-fast-forward (--no-ff) 的说明：
   
   如果当前分支相比于想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果在当前分支上提交想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。关闭 fast-forward 模式，使用 no-fast-forward 合并，在提交的时候，Git 会在当前活动分支上创建一个 merge 的提交信息，然后将合并分支，此时 HEAD 引用指向当前活动分支。
   
-  ![](pictures/cannot-git-fast-forward-detail_sm.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/cannot-git-fast-forward-detail_sm.png)
   
-  ![](pictures/git-merge-no-ff.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-no-ff.gif)
   
-  ![](pictures/git-no-fast-forward-detail_sm.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-no-fast-forward-detail_sm.png)
   
-  ![](pictures/git-merge-no-ff-notification.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-no-ff-notification.png)
   
-  ![](pictures/git-merge-no-ff-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-no-ff-demo.png)
   
-  ![](pictures/git-merge-no-ff-log.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-no-ff-log.png)
   
   从以上提交历史与提交时间戳可知，ea4b 提交不在要合并的 dev 分支中，并且该提交的时间在 dev 分支最后一次提交（49be）之后，因此将使用 No-fast-forward 模式合并。合并过程中 Git 要求说明合并的原因，并单独创建一个提交，这种方式由于新建提交可说明合并进入的分支，而 Fast-forward 方式无法确定哪个分支合并进入。
 
@@ -1060,7 +1060,7 @@ $ source $HOME/.bashrc
   
   在这样的情况下，Git 会询问想要保留哪种选择？假设在这两个分支中，都编辑了 README.md 的第一行。
   
-  ![](pictures/git-merge-conflict.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-merge-conflict.gif)
 
 -----
 
@@ -1070,7 +1070,7 @@ $ source $HOME/.bashrc
 
 - 通过简单的提交节点图解感受一下 rebase 在干什么：
   
-  ![](pictures/git-rebase-intro-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-intro-1.png)
   
   - 构造两个分支 master 和 feature，其中 feature 是在提交点 B 处从 master 上拉出的分支。
   
@@ -1078,7 +1078,7 @@ $ source $HOME/.bashrc
   
   - 此时切换到 feature 分支上，执行 rebase 命令，相当于是想要把 master 分支合并到feature 分支。这一步的场景就可以类比为在自己的分支 feature 上开发了一段时间，准备从主干 master 上拉一下最新改动，模拟了 `git pull --rebase` 的情形。
   
-  ![](pictures/git-rebase-intro-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-intro-2.png)
   
   - feature：待变基分支、当前分支
   
@@ -1108,9 +1108,11 @@ $ source $HOME/.bashrc
   
   本地 main 分支与 feature 分支间的 rebase，并解决 rebase 过程中的合并冲突。
   
-  ![](pictures/git-rebase-demo-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-demo-1.png)
   
-  ![](pictures/git-rebase-demo-2.png)如上图所示，提交 8e7324f 是 main 分支与 feature 分支的共同祖先。因此，在 feature 分支中执行 rebase 操作后，新提交将以 main 分支中的最新提交 5f97dfe 为基础连接上去。
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-demo-2.png)
+
+  如上图所示，提交 8e7324f 是 main 分支与 feature 分支的共同祖先。因此，在 feature 分支中执行 rebase 操作后，新提交将以 main 分支中的最新提交 5f97dfe 为基础连接上去。
   
   ```bash
   $ git rebase main feature
@@ -1118,13 +1120,15 @@ $ source $HOME/.bashrc
   # 可使用图中命令实现，也可使用此命令实现变基。
   ```
   
-  ![](pictures/git-rebase-demo-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-demo-3.png)
   
   如上图所示，由于 main 分支中的提交 5f97dfe 与 feature 分支中的提交 b379af8 均对源码文件的同一部分进行更改，因此在 rebase 过程中出现合并冲突。此时需手动解决冲突，决定保留哪个提交中的修改内容。
   
-  ![](pictures/git-rebase-demo-4-5.png)如上图所示，手动解决合并冲突后即可完成 rebase。以下为 rebase 后的 feature 分支提交日志记录，可见 rebase 后的新提交连接在提交 5f97dfe 之后。
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-demo-4-5.png)
+
+  如上图所示，手动解决合并冲突后即可完成 rebase。以下为 rebase 后的 feature 分支提交日志记录，可见 rebase 后的新提交连接在提交 5f97dfe 之后。
   
-  ![](pictures/git-rebase-demo-6.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-rebase-demo-6.png)
 
 - ✨ 推荐使用场景：
   
@@ -1167,7 +1171,7 @@ $ source $HOME/.bashrc
   $ git reset --hard HEAD~n  # 硬重置回退到上n次提交
   ```
   
-  ![](pictures/git-reflog.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reflog.gif)
 
 - 版本回退（重置）可分为：软重置、硬重置
   
@@ -1179,9 +1183,11 @@ $ source $HOME/.bashrc
   
   如下图，若不想保留添加了一个 style.css 文件的提交 9e78i，而且也不想保留添加了一个 index.js 文件的提交 035cc。但是，确实又想要保留新添加的 style.css 和 index.js 文件。这是软重置的一个完美用例。
   
-  ![](pictures/git-reset-soft.gif)输入 git status 后，仍然可以访问在之前的提交上做过的所有修改。它们依然在暂存区中，可以被修改与提交。
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-soft.gif)
+
+  输入 git status 后，仍然可以访问在之前的提交上做过的所有修改。它们依然在暂存区中，可以被修改与提交。
   
-  ![](pictures/git-reset-soft.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-soft.png)
   
   如上图所示，使用软重置版本回退至指定的提交，该提交之后的所有提交在 git log 中消失，但是该提交后的修改过的文件全部保留在工作区与暂存区中，依然可以再次修改与提交。
 
@@ -1189,19 +1195,19 @@ $ source $HOME/.bashrc
   
   直接重置到指定的提交状态，该提交之后的所有提交在 git log 中消失，并且之后提交中修改的文件在工作区与暂存区中也一起被删除。
   
-  ![](pictures/git-reset-hard-5.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-hard-5.gif)
   
-  ![](pictures/git-reset-hard-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-hard-1.png)
   
-  ![](pictures/git-reset-hard-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-hard-2.png)
   
   如上图所示，根据 git log 与 git reflog 确认需回退的提交，可直接使用提交的哈希值，也可使用 HEAD 索引（此处使用 HEAD 索引）。
   
-  ![](pictures/git-reset-hard-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-hard-3.png)
   
   如上图所示，硬重置后在工作区与暂存区中不存在修改过的文件。
   
-  ![](pictures/git-reset-hard-4.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-reset-hard-4.png)
   
   硬重置后的 HEAD 引用指向指定的提交，在 git log 中无法查看该提交之后的更改。但是可使用 git reflog 查看所有的 Git 相关操作。
 
@@ -1209,15 +1215,15 @@ $ source $HOME/.bashrc
   
   由于 git log 无法显示分支回退的提交历史，因此也就无法查看回退版本前的提交历史。使用 git reflog 查看完整的 Git 操作历史记录，确定需要回退的当前提交之后的提交哈希或 HEAD 索引，再使用软重置或硬重置回退即可。
   
-  ![](pictures/git-log-reflog-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-log-reflog-1.png)
   
   如上图所示，当前 test 分支的最新提交为 ea4b，需回退到 test 分支中该提交之后的 HEAD 索引 49 的提交。如果只是从 git log（上图左侧）确认的话就无法实现，而通过 git reflog（上图右侧）的话即可实现。
   
-  ![](pictures/git-log-reflog-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-log-reflog-2.png)
   
   如上图所示，回退后已修改的文件在工作区与暂存区中都存在。
   
-  ![](pictures/git-log-reflog-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-log-reflog-3.png)
 
 - ✨ 推荐使用场景：
   
@@ -1240,21 +1246,21 @@ $ source $HOME/.bashrc
   #   --no-commit 选项：只抵消暂存区和工作区的文件变化，不产生新的提交。
   ```
   
-  ![](pictures/git-revert.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-revert.gif)
 
 - 👨‍🏫 示例：git revert 还原提交 903d6
   
-  ![](pictures/git-revert-1.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-revert-1.png)
   
-  ![](pictures/git-revert-3.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-revert-3.png)
   
   如下图所示：使用 git revert 还原提交时创建新的提交说明
   
-  ![](pictures/git-revert-2.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-revert-2.png)
   
   如下图所示：执行 git log -p 903d6 查看该提交的原始更改已经被还原
   
-  ![](pictures/git-revert-4.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-revert-4.png)
 
 - ✨ 推荐使用场景：
   
@@ -1268,7 +1274,7 @@ $ source $HOME/.bashrc
   # 还原的文件恢复至暂存区与工作区，可用于还原误操作的文件。
   ```
   
-  ![](pictures/git-checkout-commit-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-checkout-commit-demo.png)
 
 -----
 
@@ -1283,11 +1289,11 @@ $ source $HOME/.bashrc
 
 - 如下图所示，假设 dev 分支上的提交 76d12 为 index.js 文件添加了一项修改，而希望将其整合到 master 分支中，且不想要整个 dev 分支，而只需要这个提交。
   
-  ![](pictures/git-cherry-pick.gif)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-cherry-pick.gif)
 
 - 如下图所示，将 test 分支中的提交 f5ac0 拣选至 main 分支中，main 分支中新建了 .gitignore 文件修改的提交。
   
-  ![](pictures/git-cherry-pick.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/git-basic-command/git-cherry-pick.png)
 
 -----
 
