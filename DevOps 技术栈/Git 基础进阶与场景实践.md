@@ -958,6 +958,10 @@ $ source $HOME/.bashrc
   ### 删除并更新远程代码仓库分支 ###
   $ git branch -r -d origin/<branch_name>
   # 删除本地的跟踪远程代码仓库分支
+  $ git branch --set-upstream-to=origin/<branch_name> <branch_name>
+  # 关联本地分支与本地的跟踪远程代码仓库分支
+  # 使用场景示例：可能由于本地分支改名并删除原跟踪分支，而远程代码库中也已改名，因此需重新关联本地与远程仓库。
+
   $ git push origin --delete <branch_name>
   # 删除远程代码库分支
   $ git push origin --set-upstream :<branch_name>
