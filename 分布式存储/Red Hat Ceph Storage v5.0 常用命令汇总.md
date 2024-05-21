@@ -846,19 +846,11 @@ $ ceph fs status
 ## 参考链接
 
 - [Product Documentation for Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/zh-cn/red_hat_ceph_storage/5)
-
 - ❤ [5.4. 使用 Ceph Manager 负载均衡器模块 Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/zh-cn/red_hat_ceph_storage/5/html/operations_guide/using-the-ceph-manager-balancer-module_ops)
-
 - [SERVICE MANAGEMENT | Ceph Docs](https://docs.ceph.com/en/latest/cephadm/services/?highlight=service_id#)
-
 - [使用 cephadm 搭建 ceph（octopus）过程](https://juejin.cn/post/7160585472538837006)
-
 - [Chapter 2. Management of services using the Ceph Orchestrator Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/5/html/operations_guide/management-of-services-using-the-ceph-orchestrator#deploying-the-ceph-daemons-using-the-service-specification_ops)
-
 - [Stray daemon tcmu-runner is reported not managed by cephadm - Red Hat Customer Portal](https://access.redhat.com/solutions/6472281)
-
 - [Ceph - mapping rbd image is failing with RBD image feature set mismatch or image uses unsupported features - Red Hat Customer Portal](https://access.redhat.com/solutions/4270092)
-
 - [maillist - rbd map image with journaling](https://lists.ceph.io/hyperkitty/list/ceph-users@ceph.io/thread/377S7XFN74MUYKVSXXRAN534FNZTDICK/)
-
 - [使用命令行界面更改 Ceph 仪表板密码](https://www.ibm.com/docs/zh/storage-ceph/6?topic=ia-changing-ceph-dashboard-password-using-command-line-interface)
