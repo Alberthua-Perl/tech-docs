@@ -60,9 +60,9 @@
   # 查看所有 osd 的版本
   ```
   
-  ![](pictures/cephadm-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephadm-demo.png)
   
-  ![](pictures/cephadm-shell-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephadm-shell-demo.png)
   
   ✨ 注意：使用 ceph orch host add 添加额外的节点时，需先将集群公钥导出并同步至节点。
   
@@ -151,7 +151,7 @@
   # 添加指定主机上的 osd 设备
   ```
   
-  ![](pictures/ceph-orch-daemon-add-osd-demo.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-orch-daemon-add-osd-demo.png)
   
   👉 删除 OSD 设备：
   
@@ -176,15 +176,15 @@
   # 将 osd 从集群 crushmap（CRUSH 映射）中删除
   ```
   
-  ![](pictures/ceph-status-with-noosd-in-osdmap.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-status-with-noosd-in-osdmap.png)
   
   ✨ 从 RHCS4 开始引入 `ceph-volume` 命令用于创建基于 `BlueStore` 存储引擎的 OSD，分别使用 `ceph-volume lvm prepare` 与 `ceph-volume lvm activate` 子命令创建与激活 OSD 设备，过程如下示意：
   
-  ![](pictures/ceph-volume-add-bluestore-osd-backend.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-add-bluestore-osd-backend.jpg)
   
-  ![](pictures/ceph-volume-add-bluestore-osd-backend-status.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-add-bluestore-osd-backend-status.jpg)
   
-  ![](pictures/ceph-volume-active-bluestore-osd.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-active-bluestore-osd.jpg)
   
   ```bash
   ### RHCS5 中依然可在
@@ -198,13 +198,13 @@
   
   每个 `ceph monitor` 节点管理一个集中式配置数据库，位于 `/var/lib/ceph/$fsid/mon.$host/store.db/` 中。在集群启动时，Ceph 守护进程解析由命令行选项、环境变量与本地集群配置的配置选项。Ceph 守护进程连接到集群以获取存储在集中式配置数据库中的配置设定。从 RHCS 4 开始弃用 `/etc/ceph/ceph.conf` 集群配置文件，而将集中式配置数据库作为配置存储的首选方式。ceph config set 命令可用于更改集群各类配置，包括 `public_network` 与 `cluster_network`。
   
-  ![](pictures/ceph-arch-network.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-arch-network.png)
   
-  ![](pictures/osd-network-community.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/osd-network-community.jpg)
   
   ☝ Ceph OSD 节点的网络连接示意（每个 OSD 使用一个端口通过 public 网络与客户端及 Mon 通信，一个端口通过 cluster 网络与其他 OSD 间传输数据，一个端口通过 cluster 网络交换 heatbeat 心跳包）
   
-  ![](pictures/default-ports-rhcs5.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/default-ports-rhcs5.jpg)
   
   ☝ RHCS5 中的默认端口范围
   
@@ -368,7 +368,7 @@ $ ceph fs dump
 
 Ceph PG、CRUSH 放置规则与 OSD 之间的关系如下图所示：
 
-![](pictures/ceph-pg-crush-osd-mapping.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-pg-crush-osd-mapping.png)
 
 ```bash
 $ ceph mgr stat
@@ -502,19 +502,19 @@ $ ceph osd pool create <pool-name> \
 
 关于纠删代码 profile 的设置 RedHat 给出以下推荐方式：
 
-![](pictures/redhat-reasure-code-profile-recommanded.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/redhat-reasure-code-profile-recommanded.jpg)
 
 ## CephX 认证与用户相关
 
 CephX 认证机制：
 
-![](pictures/cephx-request-1.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-1.jpg)
 
 Ceph 客户端使用 CephX 协议向 monitor 发送用户创建请求，当 monitor 创建用户后将存储用户名、keyring 与 capability 等信息，并将相同的 keyring 文件返回给客户端，其中 keyring 文件中的 key 为 `secret key`，用于加密与解密 monitor 生成的会话密钥（`session key`）。
 
-![](pictures/cephx-request-2.jpg)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-2.jpg)
 
-![](pictures/cephx-request-4.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-4.png)
 
 每个 monitor 都可以对客户端进行身份验证并分发密钥，这意味着认证依靠 monitor 节点完成，不会存在单点和性能瓶颈。monitor 会返回用于身份验证的数据结构，其中包含获取 Ceph 服务时用到的 session key。所谓 session key 就是客户端用来向 monitor 请求所需服务的凭证，`session key` 是通过客户端的 `secret key` 进行加密传输。
 
@@ -522,7 +522,7 @@ Ceph 客户端使用 CephX 协议向 monitor 发送用户创建请求，当 moni
 
 以上过程，需要注意的是，首先，客户端的 secret key 是通过 monitor 节点在创建用户帐号时就生成，所以 monitor 节点有对应客户端的 secret key，通过客户端的 secret key 加密，客户端可以用自身的 secret key 解密。其次，monitor 节点生成的 session key 是有记录的，所以对于不同客户端来说，都有不同的记录，并且该 session key 是有时间限制的，过期即便是对应客户端，也无法正常使用。所以客户端使用对应 session key 向 monitor 请求服务，对应 monitor 都是认可的，monitor 会向其发放 ticket。最后，monitor 和 OSD 都共享客户端的 secret key 和 session key，以及 monitor 发放的 ticket，所以客户端使用 monitor 发放的 ticket，对应 OSD 是认可的。这也意味着不管是哪个 monitor 节点发放的 ticket，对应所有 monitor 节点和 OSD 都可认证。
 
-![](pictures/cephx-request-3.png)
+![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-3.png)
 
 🏷 关于 CephX 认证机制更多可参考 [HIGH AVAILABILITY AUTHENTICATION](https://docs.ceph.com/en/latest/architecture/#high-availabilityauthentication) 中的说明。
 
@@ -639,9 +639,9 @@ $ rm -f /path/to/keyring
   
   RBD Mirror 的两种模式，包括 `RBD one-way mirroring` 模式（`active-backup mode`）、`RBD two-way mirroring` 模式（`active-active mode`），如下所示：
   
-  ![](pictures/rbd-one-way-mirroring.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-one-way-mirroring.jpg)
   
-  ![](pictures/rbd-two-way-mirroring.jpg)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-two-way-mirroring.jpg)
   
   🧪 示例：实现 RBD one-way mirroring 的核心命令
   
@@ -812,7 +812,7 @@ $ rm -f /path/to/keyring
   # 禁用 RBD 镜像的指定特性
   ```
   
-  ![](pictures/rbd-mirror-other-cmds.png)
+  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-mirror-other-cmds.png)
   
   ✨ RBD Mirror 的故障转移：
   
