@@ -189,7 +189,7 @@
               enabled: true
       ```
     
-    - [示例 2](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-course-demo/chapter02/ee-distribution-test.yml)：
+    - [示例 2](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-rhaap2.0-course-demo/chapter02/ee-distribution-test.yml)：
       
       使用 FQCN 表示法引用 `user` 模块，该示例中使用自动化执行环境 `ee-29-rhel8` 以此验证 ansible.builtin 集合中的模块。
       
@@ -254,7 +254,7 @@
     
     - Ansible 2.9 中包含 `firewalld` 模块，而在 Ansible 2.11 中已不具有该模块，已将该模块重定向至名为 `ansible.posix.firewalld` 的 Ansible 内容集合中。
     
-    - 因此，由旧语法开发的 Ansible playbook 使用 Ansible 2.11，可能报错而无法运行，需调整其中的 [模块名称](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-course-demo/exercise/manage-reusing/basic-web-fqcn.yml)（如 `ansible.builtin.service`）或添加 `collections` 关键字定义的列表，[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-course-demo/exercise/manage-reusing/basic-web-keyword.yml)：
+    - 因此，由旧语法开发的 Ansible playbook 使用 Ansible 2.11，可能报错而无法运行，需调整其中的 [模块名称](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-rhaap2.0-course-demo/exercise/manage-reusing/basic-web-fqcn.yml)（如 `ansible.builtin.service`）或添加 `collections` 关键字定义的列表，[如下所示](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-rhaap2.0-course-demo/exercise/manage-reusing/basic-web-keyword.yml)：
       
       ```yaml
       ---
@@ -417,7 +417,7 @@
   
   - 使用 `collections/requirements.yml` 文件安装：
     
-    - 类似于 Ansible 角色安装使用 roles/requirements.yml，集合的安装也使用 requirements.yml 文件，如下 [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-course-demo/exercise/manage-finding/collections/requirements.yml)：
+    - 类似于 Ansible 角色安装使用 roles/requirements.yml，集合的安装也使用 requirements.yml 文件，如下 [示例](https://github.com/Alberthua-Perl/ansible-demo/blob/master/do374-rhaap2.0-course-demo/exercise/manage-finding/collections/requirements.yml)：
       
       ```yaml
       ---
