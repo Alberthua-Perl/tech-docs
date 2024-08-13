@@ -1265,6 +1265,6 @@
 
 - [Apache 的用户认证](https://www.cnblogs.com/yandufeng/p/5092366.html)
 
-- [Apache 编写 CGI 脚本]([apache--编写cgi脚本_小布丁吃西瓜的博客-CSDN博客](https://blog.csdn.net/qq_38228830/article/details/82748078)
+- [Apache 编写 CGI 脚本](https://blog.csdn.net/qq_38228830/article/details/82748078)
 
 - [CGI Shell scripts and ISINDEX](http://www.yolinux.com/TUTORIALS/LinuxTutorialCgiShellScript.html)
