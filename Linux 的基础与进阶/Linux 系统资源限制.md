@@ -1,10 +1,10 @@
-## Linux 系统资源限制
+# Linux 系统资源限制
 
-### 文档说明：
+## 文档说明
 
 - 该文档中使用的 OS 版本为 `RHEL 6.x/7.x/8.x`，其他 Linux 发行版可自行测试。
 
-### 文档目录：
+## 文档目录
 
 - Linux 系统资源限制的级别
 
@@ -18,7 +18,7 @@
 
 - 参考链接
 
-### Linux 系统资源限制的级别：
+## Linux 系统资源限制的级别
 
 - 系统级别（kernel level）：
   
@@ -28,7 +28,7 @@
   
   资源限制配置文件与 `ulimit` 命令对用户资源的限制。
 
-### 使用 limit 针对不同用户限制系统资源：
+## 使用 limit 针对不同用户限制系统资源
 
 - RHEL 6.x/7.x 中的用户级系统资源限制由 PAM 中的 `pam_limits.so` 模块实现。
 
@@ -43,96 +43,96 @@
 - 配置文件的方式：
   
   - Linux 资源限制的主配置文件：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-1.jpg)
-    
+
+    ![rhel-suse-resource-limit-1](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-1.jpg)
+
     - RHEL 7.x 中的配置文件：
-      
+
       - /etc/security/limits.d/20-nproc.conf
-      
+
       - /etc/security/limits.conf
-    
+
     - RHEL 6.x 中的配置文件：
-      
+
       - /etc/security/limits.d/90-nproc.conf
-      
+
       - /etc/security/limits.conf
   
   - /etc/security/limits.conf 配置文件中的字段说明：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-3.jpg)
-    
+
+    ![rhel-suse-resource-limit-3](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-3.jpg)
+
     - `domain` ：用户分类
-      
+
       - 超级用户（root）
-      
+
       - 全局用户（*）
-      
+
       - 指定用户/组
-    
+
     - `type` ：类型
-      
+
       - `soft` ：软限制，即超出该限制系统发出警告。
-      
+
       - `hard` ：硬限制，即限制的最大值。
-      
+
       - `-` ：同时设置了 soft 与 hard 值。
-    
+
     > 💥 注意：
-    > 
+    >
     > 1. SLES 11 SP4 只有该配置文件限制用户的系统资源，配置方式相同！
-    > 
+    >
     > 2. 非 root 用户可以配置软限制，而具备 root 权限的用户可修改硬限制。
-    > 
+    >
     > 3. 一般情况下，软限制的配置不超过硬限制的配置。
   
   - `/etc/security/limits.d/[20|90]-nproc.conf`：
-    
+
     针对用户 nproc 最大进程数的限制，在 RHEL 5.x 中不存在。
   
   - `/etc/security/limits.d/[20|90]-nproc.conf` 优先级大于 `/etc/security/limits.conf`
   
   - 关于以上两个配置文件的重要说明：
-    
+
     - 若 [20|90]-nproc.conf 中，root、全局用户、指定用户的 soft 值小于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户均使用 [20|90]-nproc.conf 中的 soft 值。
-    
+
     - 若 [20|90]-nproc.conf 中, root、全局用户、指定用户的 soft 值（可设置为 unlimited）大于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户使用 limits.conf 中的 hard 值。
-    
+
     - ✨ [20|90]-nproc.conf 具有优先权，而 limits.conf 具有决定权。
-    
+
     - 👉 指定用户/组不受全局用户限制的影响。
-    
+
     - 可将 /etc/security/limits.d/[20|90]-nproc.conf 移除, 只由 limits.conf 进行限制，降低配置复杂度。
-    
+
     - 其他限制选项不受 [20|90]-nproc.conf 影响。
-    
+
     - 示例 1：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-2.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-4.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-5.jpg)
-    
+
+      ![rhel-suse-resource-limit-2](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-2.jpg)
+
+      ![rhel-suse-resource-limit-4](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-4.jpg)
+
+      ![rhel-suse-resource-limit-5](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-5.jpg)
+
     - 示例 2：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-6.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-7.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-8.jpg)
-    
+
+      ![rhel-suse-resource-limit-6](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-6.jpg)
+
+      ![rhel-suse-resource-limit-7](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-7.jpg)
+
+      ![rhel-suse-resource-limit-8](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-8.jpg)
+
     - 示例 3：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-9.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-10.jpg)
-    
+
+      ![rhel-suse-resource-limit-9](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-9.jpg)
+
+      ![rhel-suse-resource-limit-10](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-10.jpg)
+
     - 示例 4：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-11.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-12.jpg)
+
+      ![rhel-suse-resource-limit-11](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-11.jpg)
+
+      ![rhel-suse-resource-limit-12](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/rhel-suse-resource-limit-12.jpg)
 
 - ulimit 命令行的方式：
   
@@ -141,9 +141,9 @@
   - 可将指定用户的 ulimit 命令写入 `$HOME/.bash_profile` 中，实现永久资源限制。
   
   - ulimit 命令常用选项：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/ulimit-options.jpg)
-    
+
+    ![ulimit-options](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/ulimit-options.jpg)
+
     ```bash
     # ulimit 命令常用选项：
     -H                 设置用户 shell 环境的资源硬限制
@@ -156,28 +156,51 @@
     -T <thread_num>    设置用户的最大线程数
     ```
 
-### 使用 systemd 服务限制系统资源：
+## 使用 systemd 服务限制系统资源
 
 - 在 RHEL 7.x/8.x 中关于 systemd 服务配置的文件位于：
   
   - 1️⃣ `/etc/systemd/system/*.service.d/*.conf` 配置文件：
-    
+
     该目录中的配置文件以文件开头的字母数字顺序开始解析，具有最高配置优先级。
   
   - 2️⃣ `/etc/systemd/system/*.service` 单元文件：
-    
+
     服务的 systemd 置入（drop-in）文件
   
   - 3️⃣ `/usr/lib/systemd/system/*.service` 单元文件：
-    
+
     默认的服务配置单元文件，该文件在服务更新升级过程中自动更新，若手动修改该文件可能导致配置丢失。因此，将自定义配置写入 /etc/systemd/system/*.service 文件中可解决此问题。
 
 - systemd 服务限制系统资源示例：
   
   - 示例 1：
-    
-    限制 Nginx 服务终止前的最大 CPU 使用时间
-    
+
+    1️⃣ 限制 sha1sum 进程终止前的最大 CPU 使用时间
+
+    ```bash
+    $ sudo vim /etc/systemd/system/sha1sum.service
+      [Unit]
+      Description=Test sha1sum service cpulimit
+
+      [Service]
+      ExecStart=/usr/bin/sha1sum /dev/zero
+
+      [Install]
+      WantedBy=multi-user.target
+
+    $ sudo vim /etc/systemd/system/sha1sum.service.d/10-cpulimits.conf
+      [Service]
+      LimitCPU=10
+      # sha1sum 进程将持续运行，该参数将限制进程运行 10s 后退出。
+
+    $ sudo systemctl daemon-reload
+    $ sudo systemctl start sha1sum.service
+    # 该守护进程在运行 10s 后收到 SIGTERM 信号后自动终止 
+    ```
+
+    2️⃣ 限制 Nginx 服务终止前的最大 CPU 使用时间
+
     ```bash
     $ sudo vim /etc/systemd/system/nginx.service.d/10-cpulimits.conf
       [Service]
@@ -188,9 +211,9 @@
     ```
   
   - 示例 2：
-    
+
     设定 Nginx 服务对逻辑 CPU 核心的亲和性（affinity），关于 cgroup 限制进程在不同的逻辑 CPU 核心与 NUMA 内存节点的方式见下文。
-    
+
     ```bash
     $ sudo vim /etc/systemd/system/nginx.service.d/20-CPUAffinity.conf
       [Service]
@@ -209,7 +232,7 @@
   # 查看获取与设置资源限制的系统调用方法（getrlimit、setrlimit 与 prlimit）
   ```
 
-### 🔥 cgroup 层次结构与 systemd 的联系：
+## 🔥 cgroup 层次结构与 systemd 的联系
 
 - 控制组（control group）也被称为 `CGroup` 或 `cgroup`，来源于 Google 创建的 Process Containers 工具，主要用于对系统资源的使用限制管理。
 
@@ -222,39 +245,39 @@
   - 🚀 RHEL/Alma Linux 9 默认内核 5.14 支持 cgroup-v2，并且默认为 [v2](https://www.kernel.org/doc/Documentation/cgroup-v2.txt) 版本。
   
   - Linux 各发行版将 cgroup-v2 作为默认的情况如下：
-    
+
     - Container-Optimized OS（从 M97 开始）
-    
+
     - Ubuntu（从 21.10 开始，推荐 22.04+）
-    
+
     - Debian GNU/Linux（从 Debian 11 Bullseye 开始）
-    
+
     - Fedora（从 31 开始）
-    
+
     - Arch Linux（从 2021 年 4 月开始）
-    
+
     - RHEL 和类似 RHEL 的发行版（从 9 开始）
 
 - cgroup 的层次结构：
 
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/linux-cgroup-hierarchy.png)
+  ![linux-cgroup-hierarchy](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/linux-cgroup-hierarchy.png)
   
   > 图注：cgroup 对应的目录在创建之初将自动创建各类子系统参数
   
   - cgroup 暴露给用户的 API 为文件系统（filesystem），所有对 cgroup 的操作均可以通过对文件的修改完成，cgroup API 对应的路径为 `/sys/fs/cgroup/`，作为使用方，仅需要对文件系统中的内容进行编辑，即可达到配置对应的 cgroup 的要求。
   
   - `subsystem`（子系统）：
-    
+
     - 一个 subsystem 就是一个内核模块，它被关联到一颗 cgroup 树之后，就会在树的每个节点（进程组）上做具体的操作。
-    
+
     - 到目前为止，Linux 支持 12 种 `subsystem`，subsystem 经常被称作 `resource controller`（资源控制器）。
   
   - `hierarchy /ˈhaɪərɑːki/`（层次结构）：
-    
+
     - 一个 hierarchy 可以理解为一棵 cgroup 树，树的每个节点就是一个进程组，每棵树都会与零到多个 subsystem 关联。
-    
+
     - 系统中可以有很多颗 cgroup 树，每棵树都和不同的 subsystem 关联，一个进程可以属于多颗树，即一个进程可以属于多个节点（进程组），只是这些节点（进程组）和不同的 subsystem 关联。
-    
+
     - 若考虑与任何 subsystem 关联的情况（systemd 就属于这种情况），Linux 里面最多可以建 12 颗 cgroup 树，每棵树关联一个 subsystem，当然也可以只建一棵树，然后让这棵树关联所有的 subsystem。当一颗 cgroup 树不和任何 subsystem 关联的时候，意味着这棵树只是将进程进行分组，至于要在分组的基础上做些什么，将由应用程序自己决定，`systemd` 就是一个这样的例子。
 
 - cgroup 与 systemd 的联系：
@@ -264,8 +287,8 @@
   - 🏷 若将系统的资源看成一块馅饼，那么所有资源默认会被划分为 3 个等份的 cgroup：`System`、`User` 和 `Machine`。
   
   - 🏷 每一个 cgroup 都是一个 `slice`，每个 slice 都可以有自己的子 slice：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-slice-type.png)
+
+    ![systemd-slice-type](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-slice-type.png)
 
 - cgroup 版本查看与切换：
 
@@ -340,15 +363,15 @@ $ sudo reboot
   - 第一列：子系统名称
   
   - 第二列：subsystem 所关联到的 cgroup 树的 ID，若多个 subsystem 关联到同一棵 cgroup 树，那么它们的这个字段将一致，比如此处的 cpu 和 cpuacct 就一致，表明它们绑定到了同一棵树。若出现下面的情况，该字段将为 0：
-    
+
     - 当前 subsystem 没有和任何 cgroup 树绑定
-    
+
     - 当前 subsystem 已经和 cgroup-v2 的树绑定
-    
+
     - 当前 subsystem 没有被内核开启
   
   - 第三列：subsystem 所关联的 cgroup 树中进程组的个数，也即树上节点的个数。
-    
+
     ```bash
     $ sudo lscgroup | grep <subsys_name> | wc -l
     # 统计每种子系统绑定的 cgroup 树中进程组的个数（与此列相同）
@@ -364,7 +387,7 @@ $ sudo reboot
   # 可使用 "?" 获取交互式帮助
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cgtop-demo.png)
+  ![systemd-cgtop-demo](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cgtop-demo.png)
   
   ```bash
   $ sudo systemd-cgls -k
@@ -379,7 +402,7 @@ $ sudo reboot
   $ sudo cat /proc/<pid>/cgroup
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/single-process-cgroup-demo.png)
+  ![single-process-cgroup-demo](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/single-process-cgroup-demo.png)
 
 ### 🚧 cgroup 实施资源限制示例：
 
@@ -443,11 +466,11 @@ $ sudo reboot
   
   分别使用 tom 与 jack 用户登录系统，并分别运行 `sha1sum /dev/zero` 命令，查看此时系统的 `top` 命令输出（单核 CPU 的主机）：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpushares-demo-1.png)
+  ![systemd-cpushares-demo-1](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpushares-demo-1.png)
   
   双核 CPU 的主机输出：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpushares-demo-2.png)
+  ![systemd-cpushares-demo-2](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpushares-demo-2.png)
   
   如上所示，system.slice 控制组中的 foo.service 服务与 user.slice 控制组中的 tom、jack 用户运行的进程总共分别具有约 50% CPU 时间，而 tom 与 jack 用户在 user.slice 控制组内受到 CPUShares 权重的影响，jack 的权重是 tom 的 4 倍，因此在 CPU 繁忙的情况下显示上图中的结果，而双核 CPU 主机中只是进程将使用单个核心约 100%，CPUShares 权重对 CPU 时间的影响与单核 CPU 的情况下类似。
   
@@ -463,7 +486,7 @@ $ sudo reboot
   $ sudo systemctl set-property user-1001.slice CPUQuota=5%
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpuquota-demo.png)
+  ![systemd-cpuquota-demo](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-resource-limit/systemd-cpuquota-demo.png)
   
   CPUQuota 参数支持多核 CPU，可设置为 `CPUQuota=200%` 以使用 2 个 CPU 核心，至于是否能完全使用需考虑程序设计问题。
   
@@ -553,7 +576,7 @@ $ sudo reboot
   # 查看 systemd 服务单元配置
   ```
 
-### 参考链接：
+## 参考链接
 
 - [控制组群（Cgroup）简介](https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/6/html/resource_management_guide/ch01)
 
