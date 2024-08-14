@@ -22,11 +22,11 @@
 - perf 可定义一组常用性事件，并提供工具来列出事件或在报告中记录下来，供日后分析报告数据。
 - 以下是来自性能优化大神 [Brendan](https://www.brendangregg.com/perf.html) 对于 perf 工具在各个维度的使用概括：
   
-  ![linux-perf_events-event-sources](images/linux-perf_events-event-sources.png)
+  ![linux-perf_events-event-sources](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-perf-debug/linux-perf_events-event-sources.png)
 
 - perf 框架参考 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)，此文档中对追踪系统（tracing system）具有较为整体的阐述。
 
-  ![linux-tracing-perf_event](images/linux-perf-debug/linux-tracing-perf_event.png)
+  ![linux-tracing-perf_event](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-perf-debug/linux-perf-debug/linux-tracing-perf_event.png)
 
 - 关于 perf 中的事件（events）：
   
@@ -66,9 +66,9 @@
   # -n 选项指定总请求次数，-c 选项指定请求的并发数。
   ```
   
-  ![perf-top-pid-1](images/perf-top-pid-1.png)
+  ![perf-top-pid-1](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-perf-debug/perf-top-pid-1.png)
   
-  ![perf-top-pid-2](images/perf-top-pid-2.png)
+  ![perf-top-pid-2](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-perf-debug/perf-top-pid-2.png)
 
 - perf stat 子命令：
   
@@ -159,7 +159,7 @@
 
     对于上述命令中部分选项的说明，如下所示：
 
-    ![perf-stat-mind](images/perf-stat-mind.jpg)
+    ![perf-stat-mind](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-perf-debug/perf-stat-mind.jpg)
 
     > 🔥 注意：以下所示的事件可能在不同的平台上会返回 `<not supported>`
 
