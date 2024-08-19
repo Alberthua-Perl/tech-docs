@@ -1,14 +1,17 @@
-# 🧬 Linux 性能计数器 perf
+# 🧬 Linux 性能分析工具之 perf
 
 ## 文档目录
 
 - perf 介绍与说明
 - perf 的工作原理与事件类型
-- perf 子命令说明
+- perf 子命令概览
 - perf stat 子命令
 - perf top 子命令
 - perf record 与 perf report 子命令
 - perf annotate 子命令
+- perf 示例与排查
+- 火焰图生成与解读
+- 参考链接
 
 ## perf 介绍与说明
 
@@ -89,7 +92,7 @@
 
 > 以上可通过 man perf-list 命令查询  
 
-## perf 子命令说明
+## perf 子命令概览
 
 - perf 子命令如下所示：
 
@@ -328,8 +331,6 @@
   ![perf-top-event-tracing-1](images/perf-top-event-tracing-1.png)
 
   如上图所示，从第三行开始每行代表一个事件信息。`Overhead` 代表每个事件的开销百分比，表示该事件在总采样中所占的比重；`call_site` 代表一个内存地址，表示调用 kmem_cache_alloc 的指令位置；`ptr` 代表分配的内存块的起始地址；`bytes_req` 代表请求分配的内存字节数；`bytes_alloc` 代表实际分配的内存字节数；`gfp_flags` 代表内存分配标志，指示内存分配属性，其中 `GFP_KERNEL` 代表内存分配用于内存空间，`GFP_KERNEL | __GFP_ZERO` 代表分配的内存将被初始化为零。从上图可知，存在多个调用点（call_site）正在分配不同大小的内存块，即 kmem_cache_alloc 函数被多次调用，并且显示不同分配的开销。
-
-  以下示例使用 Nginx 作为 Web 服务端，如下 ab 命令压测显示的 nginx worker 进程在 perf 中的各函数调用与 `iowrite16` 内核函数的汇编指令：
   
   ```bash
   $ sudo perf top -e cycles:k
@@ -404,7 +405,7 @@
   void func_a() {
       unsigned int num = 1;
       int i;
-      for (i = 0; i < 10000000; i++) {
+      for (i = 0; i < 10000000; i++) {  /* 该循环对 num 变量最终的值无实际影响 */
           num *= 2;
           num = 1;
       }
@@ -414,7 +415,7 @@
   void func_b() {
       unsigned int num = 1;
       int i;
-      for (i = 0; i < 10000000; i++) {
+      for (i = 0; i < 10000000; i++) {  /* 该循环对 num 变量最终的值无实际影响 */
           num <<= 1;
           num = 1;
       }
@@ -444,6 +445,67 @@
   ![perf-report-demo](images/perf-report-demo.png)
 
   ![perf-annotate-source-demo](images/perf-annotate-source-demo.png)
+
+## perf 示例与排查
+
+- 源代码示例：
+
+  ```c
+  /* perf_tst_example.c */
+  #include <stdio.h>
+
+  void longa(void) {
+      int i, j;
+      for(i = 0; i < 10000; i++) {   /* 执行 10000 次循环，变量 j 的值为 9999 */
+          j = i;
+      }
+  }
+
+  void foo1(void) {
+      int i;
+      for(i = 0; i < 10; i++) {
+          longa();  /* 总共执行循环 10*10000 次 */
+      }
+  }
+
+  void foo2(void) {
+      int i;
+      for(i = 0; i <100; i++) {
+          longa();  /* 总共执行循环 100*10000 次 */
+      }
+  }
+
+  int main(void) {
+      while(1) {  /* 始终调用循环 */
+          foo1();
+          foo2();
+      }
+  }
+  ```
+
+  ```bash
+  $ gcc -g -O0 perf_tst_example.c -o perf_tst_example
+  # 编译程序
+  ```
+
+- 程序运行全局总览：
+
+  ![perf-example-1](images/perf-example-1.png)
+
+  perf stat 命令获取程序的全局性能事件，结果显示 task-clock 大量占用 CPU，因此可收集程序运行期间涉及的 cpu-clock 事件。
+
+- 性能事件导航定位：
+  使用 perf record 命令运行程序后将生成默认的 perf.data 二进制性能事件文件，可通过 perf report 分析性能事件并导航至引发该事件的具体热点代码。
+
+  ![perf-example-2](images/perf-example-2.png)
+
+  ![perf-example-3](images/perf-example-3.png)
+
+  如上图所示，longa 函数占用高达 99.26% 的 Overhead。定位到该函数后选择 "Annotate longa" 分析函数的调用关系及对应汇编代码的性能开销。
+
+  ![perf-example-4](images/perf-example-4.png)
+
+## 火焰图生成与解读
 
 ## 参考链接
 
