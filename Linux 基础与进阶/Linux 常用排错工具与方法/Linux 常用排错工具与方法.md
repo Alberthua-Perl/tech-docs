@@ -1,13 +1,13 @@
-## Linux 常用排错工具与方法
+# Linux 常用排错工具与方法
 
-### 文档说明：
+## 文档说明
 
 - 以下示例均在 `RHEL 7/8` 中验证实现，在 RHEL 8 中已更改的内容将特别指出。若针对其他 Linux 发行版请自行测试。
 - 该文档中涉及的命令与参考链接可提供排错思路或依据。
 - 若更深层次的分析与追踪故障原因需配合业务应用代码或 kernel 源码等进一步分析。
 - 该文档将根据所使用的命令持续更新与使用案例。
 
-### 文档目录：
+## 文档目录
 
 - journalctl 命令使用
 - sosreport 命令使用
@@ -29,7 +29,7 @@
 - 🔥 系统调用与库调用
 - strace 与 ltrace 命令使用
 
-### journalctl 命令使用：
+## journalctl 命令使用
 
 ```bash
 $ man 7 systemd.journal-filelds
@@ -79,7 +79,7 @@ $ journalctl -o verbose
   - [Chapter 10. Troubleshooting problems using log files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_troubleshooting-problems-using-log-files_configuring-basic-system-settings#masthead) 
   - [Chapter 5. Troubleshooting problems related to SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/troubleshooting-problems-related-to-selinux_using-selinux)
 
-### sosreport 命令使用：
+## sosreport 命令使用
 
 ```bash
 $ sosreport -l
@@ -93,7 +93,7 @@ $ sosreport -k xfs.logprint
 # 使用 xfs.logprint 选项以收集 XFS 文件系统的相关信息 
 ```
 
-### Performance Co-Pilot (PCP) 组件使用：
+## Performance Co-Pilot (PCP) 组件使用
 
 ```bash
 $ yum install -y pcp pcp-gui pcp-system-tools
@@ -133,7 +133,6 @@ $ pmatop
 
 - PCP 软件包除提供命令行模式的性能指标输出外，还提供 `GUI` 图形化界面及 Web 图形化界面，并可与 `Grafana` 集成显示。
   该软件包提供强大而丰富的系统性能监控指标与参数，关于 PCP 软件包及相关命令的使用方法，可参考如下 `Red Hat Access` 链接获取更为详细的技术指导：
-  
   - [RHEL 7 性能监控之 PCP](http://www.361way.com/rhel7-pcp/5149.html)  
   - [How do I install Performance Co-Pilot (PCP) on my RHEL server to capture performance logs](https://access.redhat.com/solutions/1137023) 
   - 💪 [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953) 
@@ -143,69 +142,54 @@ $ pmatop
   - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 1)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-1)
   - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 2)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-2)
 
-### 🔥 MBR 与 GPT 分区中的 GRUB2 再认识：
+## 🔥 MBR 与 GPT 分区中的 GRUB2 再认识
 
 - 传统 `GRUB` 与 `GRUB2` 在系统引导过程中存在明显的差异，因此对 GRUB2 引导系统各阶段的理解将帮助我们更好地实现引导过程的故障排除。
-
 - GRUB2 不再使用传统 GRUB 的 `stage1`、`stage1.5` 与 `stage2` 阶段，而采用 `boot.img`、`core.img` 与各类 `*.mod` 等实现系统的引导启动，并且根据 MBR 与 GPT 分区的方式不同，GRUB2 在两者间的分布存在显著的区别。
-
 - GRUB2 在 MBR 分区中的分布：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
+  ![gnu-grub-on-mbr-partitioned-hard-disk-drives](images/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-mbr-scheme.png)
+  ![grub2-mbr-scheme](images/grub2-mbr-scheme.png)
   
   如上图，GRUB2 使用 boot.img 作为 `boot loader` 负责系统引导过程的第一阶段（对应 GRUB 方式的 `stage1`），由于该镜像本身的容量大小限制无法识别 `/boot/grub2/` 所在文件系统类型，因此使用可以识别文件系统类型的 core.img，而 boot.img 由 GRUB2 硬编码 core.img 的磁盘位置定位该镜像。boot.img 位于 `/usr/lib/grub/i386-pc/` 中，grub2-install 程序将其转换为合适的 boot loader 程序写入第一个扇区。
-  
   core.img 镜像是由位于 `/usr/lib/grub/i386-pc/` 中的 `diskboot.img`、`lzma_decompress.img`、`kernel.img` 与各类 `*.mod` 模块通过 `grub2-mkimage` 程序动态生成，该镜像安装的位置可在第二个扇区起始的称为 `MBR gap` 的区域（此区域至少 31 KiB）或任意文件系统的第一个扇区。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-structure-on-disk.jpg)
+  ![grub2-structure-on-disk](images/grub2-structure-on-disk.jpg)
   
   由于 core.img 中可能包含更多的功能用以识别不同的文件系统类型与结构，如 Btrfs、ZFS、RAID 与 LVM 等，因此 MBR gap 需要更多空间。现代的很多磁盘管理与分区工具已预留至少 1 MiB 来满足该需求，如 fdisk、gdisk 与 parted 工具等。一旦 boot.img 引导定位至 core.img，其使用文件系统驱动识别 /boot/grub2 所在的文件系统（对应 GRUB 方式的 `stage1.5`）。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/core-img-structure.png)
+  ![core-img-structure](images/core-img-structure.png)
   
   GRUB2 通过读取 /boot/grub2 中的相关配置定位系统的 `vmlinuz (kernel)`、`initramfs (ramdisk)`，继而将系统的控制权由 GRUB2 转交给内存中的 kernel（对应 GRUB 方式的 `stage2`）。
 
 - GRUB2 在 GPT 分区中的分布：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/gnu-grub-on-gpt-partitioned.jpg)
+  ![gnu-grub-on-gpt-partitioned](images/gnu-grub-on-gpt-partitioned.jpg)
   
-  `GPT`（GUID partition table，全局唯一标识符分区表）分区的结构与 MBR 分区相似，但存在自身的独特分区。在 GPT 中使用 `LBA`（logical block address，逻辑区块地址）来代替常用扇区的概念，虽然当前可使用以 `4 KiB` 的存储单位，但在 LBA 中默认依然采用 `512 bytes` 作为一个 LBA 的存储单位（可将 LBA 作为扇区理解）。
-  
-  GPT 具体分区如上图所示：
-  
-  - `LBA 0`：第一个扇区，称为保护性 MBR（MBR 兼容区块），可安装 446 bytes 的 boot loader 程序与 GPT 分区格式标识符。
-  
-  - `LBA 1`：主要 GPT 表头记录，该部分记录了分区表自身的位置和大小，同时也记录了备用 GPT 分区所在位置（最后 34 个 LBA），还放置了分区表的校验码（CRC32），校验码的作用是让系统判断 GPT 的正确与否，倘若发现错误则可以从备份的 GPT 中恢复正常运行。
-  
-  - `LBA 2~33`：32 个 LBA 共存储 128 个 GPT 分区表信息（entry），其中每个 LBA 存储 4 个分区信息，每个分区信息占 128 bytes。
-  
-  - `LBA 34~2048`：类似于 MBR gap 区域，存储系统引导所需要的 core.img。
-  
+  `GPT`（GUID partition table，全局唯一标识符分区表）分区的结构与 MBR 分区相似，但存在自身的独特分区。在 GPT 中使用 `LBA`（logical block address，逻辑区块地址）来代替常用扇区的概念，虽然当前可使用以 `4 KiB` 的存储单位，但在 LBA 中默认依然采用 `512 bytes` 作为一个 LBA 的存储单位（可将 LBA 作为扇区理解）。  
+  GPT 具体分区如上图所示：  
+  - `LBA 0`：第一个扇区，称为保护性 MBR（MBR 兼容区块），可安装 446 bytes 的 boot loader 程序与 GPT 分区格式标识符。 
+  - `LBA 1`：主要 GPT 表头记录，该部分记录了分区表自身的位置和大小，同时也记录了备用 GPT 分区所在位置（最后 34 个 LBA），还放置了分区表的校验码（CRC32），校验码的作用是让系统判断 GPT 的正确与否，倘若发现错误则可以从备份的 GPT 中恢复正常运行。 
+  - `LBA 2~33`：32 个 LBA 共存储 128 个 GPT 分区表信息（entry），其中每个 LBA 存储 4 个分区信息，每个分区信息占 128 bytes。 
+  - `LBA 34~2048`：类似于 MBR gap 区域，存储系统引导所需要的 core.img。 
   - `LBA -34 ~ -1`：备用 GPT 分区信息
 
 - MBR 分区与 GPT 分区系统引导的过程与差异：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/boot-process-for-bios-and-uefi-systems.jpg)
+  ![](images/boot-process-for-bios-and-uefi-systems.jpg)
   
   虽然 BIOS 和 UEFI 启动过程的大多数配置语法与工具都相同，但存在一些差异。
-  
   - linux16 和 /initrd16  更改为 `linuxefi` 和 `initrdefi`：
-    
-    用于加载内核和初始 ramdisk 的配置命令将 linux16 和 initrd16（用于 BIOS）切换为 linuxefi 和 initrdefi（用于 UEFI）。此更改是必要的，因为 UEFI 系统上的内核必须与 BIOS 系统上的加载方式不同。grub2-mkconfig 命令可自动识别 UEFI 系统并使用正确的命令。
-  
+    用于加载内核和初始 ramdisk 的配置命令将 linux16 和 initrd16（用于 BIOS）切换为 linuxefi 和 initrdefi（用于 UEFI）。此更改是必要的，因为 UEFI 系统上的内核必须与 BIOS 系统上的加载方式不同。grub2-mkconfig 命令可自动识别 UEFI 系统并使用正确的命令。 
   - /boot/grub2 更改为 `/boot/efi/EFI/redhat`：
     用于存放 UEFI GRUB2 配置文件和对象的目录为 /boot/efi/EFI/redhat。此目录位于 `ESP`（EFI system partition）分区上，用于访问 UEFI 固件。
-  
   - grub2-install：
     不要直接使用 grub2-install 命令安装 UEFI boot loader。RHEL 8 提供预构建的 `/boot/efi/EFI/redhat/grubx64.efi` 文件，其中包含安全启动系统所需的身份认证签名。直接在 UEFI 系统上执行 grub2-install 会生成一个没有这些必要签名的新 grubx64.efi 文件。可以从 `grub2-efi` 软件包恢复正确的 grubx64.efi 文件。使用 grub2-install 会直接在 UEFI 固件中注册可启动目标，以使用该新的 grubx64.efi，而不是所需的 `shim.efi`。
-  
   - /boot/grub2/grub.cfg 更改为 `/boot/efi/EFI/redhat/grub.cfg`：
     GRUB2 配置文件从 BIOS 的 /boot/grub2 目录移至 UEFI ESP 分区上的 /boot/efi/EFI/redhat/ 目录。软链接 /etc/grub.cfg 已移至 `/etc/grub2-efi.cfg`。
 
 - 管理 boot loader 配置文件与引导菜单：
-  
   💥 MBR 分区与 GPT 分区对 boot loader 配置文件及引导菜单的管理方式相似，主要区别在于配置文件路径的变化。
   
   ```bash
@@ -231,7 +215,6 @@ $ pmatop
   ```
 
 - 1️⃣ 示例：管理多个 UEFI 启动目标（boot target）
-  
   UEFI 固件（firmware）引导系统可使用 `efibootmgr` 命令管理启动目标（启动设备）。该命令可对启动目标实现更改、删除、添加等操作，其中删除某项启动目标后，可通过手动添加的方式进行恢复。
   
   ```bash
@@ -241,11 +224,11 @@ $ pmatop
   # 删除指定的启动目标
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/efibootmgr-rm-targets.png)
+  ![efibootmgr-rm-targets](images/efibootmgr-rm-targets.png)
   
   ✨ 若系统具有多个可用的内核版本时，使用 efibootmgr 命令依然可管理启动目标（默认通常位于 `/boot/efi/EFI/redhat/*.efi` 中），再使用 grubby 命令设置当前可用的默认内核版本，即当 UEFI 方式中 GRUB2 引导至内核选择时，默认选取的内核，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/uefi-efibootmgr-grubby.png)
+  ![uefi-efibootmgr-grubby](images/uefi-efibootmgr-grubby.png)
   
   如下所示，通过添加额外的 UEFI 启动目标并指定该启动目标以引导系统：
   
@@ -264,31 +247,30 @@ $ pmatop
   # 指定可用的启动目标覆盖当前的启动目标
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/efibootmgr-add-new-boot-target.png)
+  ![efibootmgr-add-new-boot-target](images/efibootmgr-add-new-boot-target.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/uefi-boot-manager.png)
+  ![uefi-boot-manager](images/uefi-boot-manager.png)
   
   efibootmgr 添加额外启动目标后，当系统重启进入 BIOS 引导界面（VMware 虚拟化环境）中可见新增的启动目标。
 
 - 2️⃣ 示例：使用 GRUB2 命令行引导 UEFI 方式启动的系统
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rhel85-efi-partition.png)
+  ![rhel85-efi-partition](images/rhel85-efi-partition.png)
   
   该系统分区中 `/dev/sda1` 挂载于 `/boot/efi` 为 UEFI 的 `ESP` 分区，`/dev/sda2` 挂载于 `/boot`，根分区以 `/dev/rootvg/lv0` 逻辑卷的方式挂载。现尝试使用 GRUB2 命令行方式重新引导系统：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-boot-cmd.png)
+  ![grub2-boot-cmd](images/grub2-boot-cmd.png)
   
   若 `root=` 根分区指定错误将无法成功引导，报错如下：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/grub2-cmd-boot-error.png)
+  ![grub2-cmd-boot-error](images/grub2-cmd-boot-error.png)
 
 - 参考链接：
-  
   - 📚 [GNU GRUB manual v2.06](https://www.gnu.org/software/grub/manual/grub/)  
   - 📚 [Chapter 26. Working with GRUB 2](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-working_with_the_grub_2_boot_loader#doc-wrapper)  
   - ✨ [Managing, monitoring, and updating the kernel](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/managing_monitoring_and_updating_the_kernel/index#doc-wrapper)  
   - 💪 [grub2 详解 (翻译和整理官方手册) - 骏马金龙](https://www.cnblogs.com/f-ck-need-u/p/7094693.html) 
-  - 💪 [GRUB2 配置文件 grub.cfg 详解 (GRUB2 实战手册) - 金步国](http://www.jinbuguo.com/linux/grub.cfg.html) 
+  - 💪 [GRUB2 配置文件 grub.cfg 详解 (GRUB2 实战手册) - 金步国](http://www.jinbuguo.com/linux/grub.cfg.html)
   - 💪 [grub 安装过程](https://www.wxtechblog.com/grub/grub-install)  
   - [Step by Step Linux boot process with GRUB2 and systemd in RHEL 7 / CentOS 7](https://www.golinuxhub.com/2017/12/step-by-step-linux-boot-process-with/)  
   - [Linux Boot Process Explained Step by Step in Detail](https://www.golinuxcloud.com/linux-boot-process-explained-step-detail/) 
@@ -300,7 +282,7 @@ $ pmatop
   - [How to reinstall GRUB and GRUB2 on UEFI-based machines?](https://access.redhat.com/solutions/3486741)
   - [How to unpack/uncompress and repack/re-compress an initial ramdisk (initrd/initramfs) boot image file on RHEL 5,6 ?](https://access.redhat.com/solutions/24029)
 
-### systemd 单元文件的依赖性：
+## systemd 单元文件的依赖性
 
 ```bash
 $ systemctl list-dependencies <unit_name>
@@ -321,26 +303,19 @@ $ systemctl enable debug-shell.service
 ```
 
 - 可在系统 GRUB2 引导时进行中断，使用 `systemd.unit=emergency.target` 参数进入紧急模式，该模式中 **`/`** 为 `ro`（只读状态），而使用 `systemd.unit=rescue.target` 参数进入救援模式，该模式中 **`/`** 为 `rw`（读写）状态。
+- 关于 systemd 更为详尽的指导可参考[此链接](https://access.redhat.com/articles/754933)。
 
-- 关于 systemd 更为详尽的指导可参考 https://access.redhat.com/articles/754933
-
-### CPU 的个数、核心数、超线程的关系：
+## CPU 的个数、核心数、超线程的关系
 
 - 使用多处理器架构（SMP）或多核心 CPU 中 Linux 内核会将多核 CPU 当做多个单核 CPU 来识别，如 Linux 会将 2 个 4 核的 CPU 当做 8 个单核 CPU 来识别，但两者的性能并不等价。
-
 - 物理 CPU 个数（physical id）：
-  
   服务器主板插槽（socket）上实际插入的 CPU 个数
-
 - CPU 核心数（cpu cores or core id）：
-  
   单块 CPU 上面处理数据的芯片组的数量，如双核、四核等。
-
 - 逻辑 CPU 个数（processor）：
-  
   物理 CPU 个数（physical id）x 每颗 CPU 的核心数（core id）x 每个核心的超线程数（CPU 支持的话）
 
-### CPU 信息查看：
+## CPU 信息查看
 
 ```bash
 $ grep 'model name' /proc/cpuinfo | cut -d ':' -f 2 | uniq -c
@@ -367,7 +342,7 @@ $ grep 'flags' /proc/cpuinfo | grep 'lm' | wc -l
 # lm 指 long mode，支持 lm 则支持 64-bit。
 ```
 
-### dmidecode 命令使用：
+## dmidecode 命令使用
 
 ```bash
 $ man dmidecode
@@ -411,34 +386,24 @@ $ dmidecode -t 0,1
 ```
 
 - `dmidecode` 允许在 Linux 系统下获取有关硬件方面的信息，其遵循 `SMBIOS`（System Management BIOS）/ `DMI`（Desktop Management Interface） 标准，该标准由 DMTF（Desktop Management Task Force）开发，其输出的信息包括 BIOS、系统、主板、处理器、内存、缓存等等。
-
 - `DMI`（Desktop Management Interface）充当了管理工具和系统层之间接口的角色。它建立了标准的可管理系统更加方便了计算机厂商和用户对系统的了解。DMI 的主要组成部分是 Management Information Format（MIF）数据库。这个数据库包括了所有有关计算机系统和配件的信息。通过 DMI，用户可以获取序列号、计算机厂商、串口信息以及其它系统配件信息。
-
 - 查看硬件相关的命令与文件：
-  
   - `dmesg` 命令：
-    
     在 Linux 上 syslogd 或 klogd 启动前用来记录内核消息（启动阶段的消息）。
-    
     它通过读取内核的环形缓冲区（ring buffer）来获取数据，在排查问题或只是尝试获取系统硬件信息时，该命令非常有用。
-    
+
     ```bash
     $ dmesg -T
     # 转换 dmesg 命令输出的时间戳以查看启动过程
     ```
   
   - `lshw` 命令：
-    
     通过读取 `/proc` 目录下各种文件的内容和 DMI 表来生成硬件信息。
-  
   - `hwinfo` 命令：
-    
     可提供比 lshw、dmidecode、dmesg 命令更为详细的硬件信息。
-    
     它使用 libhd 库 `libhd.so` 来收集系统上的硬件信息。
-    
     该工具是为 OpenSuSE 特别设计的，后来其它发行版也将它包含在其官方仓库中（RHEL 中来自 EPEL 源）。
-    
+
     ```bash
     $ ldd $(which hwinfo)
             linux-vdso.so.1 (0x00007ffde40f9000)
@@ -449,15 +414,12 @@ $ dmidecode -t 0,1
     ```
   
   - `/sys/class/dm/id/`：
-    
     该目录中具有部分 DMI 信息。
-
 - 参考链接：
-  
   - [linux 下查看主板内存槽与内存信息（dmidecode）](https://blog.csdn.net/d12345678a/article/details/53908889)  
   - [dmidecode 命令详解（获取硬件信息）](http://www.linuxidc.com/Linux/2015-12/126814.htm)
 
-### 管理与测试硬件设备：
+## 管理与测试硬件设备
 
 ```bash
 ### 侦测不同的磁盘驱动设备 ###
@@ -483,7 +445,7 @@ $ lsusb -v
 # 查看系统上的 USB 设备信息
 ```
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nic-pci-info.jpg)
+![nic-pci-info](images/nic-pci-info.jpg)
 
 如上图所示，确认各类物理网卡的详细 PCIe 信息。
 
@@ -516,15 +478,15 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 # 注意：memtest86+ 内存测试通常在物理机上运行测试，而不是虚拟机上运行！
 ```
 
-<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/memtest86-test.jpg" style="zoom:;" />
+![memtest86-test](images/memtest86-test.jpg)
 
 如上图所示，使用 memtest86+ 软件包在系统启动引导过程中实现内存测试。
 
-### 常见物理服务器及硬件示例：
+## 常见物理服务器及硬件示例
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/general-hardware-info.png)
+![general-hardware-info](images/general-hardware-info.png)
 
-### 管理内核模块与 KVM 虚拟化：
+## 管理内核模块与 KVM 虚拟化
 
 ```bash
 ### 内核模块相关命令 ###
@@ -560,16 +522,15 @@ $ vim /etc/modprobe.d/blacklist.conf
 #   指令防止其依赖模块对它的载入。
 ```
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/megaraid_sas-driver-info.jpg)
+![megaraid_sas-driver-info](images/megaraid_sas-driver-info.jpg)
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/lsmod-cmd.jpg)
+![lsmod-cmd](images/lsmod-cmd.jpg)
 
 内核模块除了可在系统运行时动态加载、系统引导启动时加载之外，也可将其添加至 `initramfs` 或 `initrd` 镜像中，使镜像具有对特定硬件的驱动能力。如将 `magaraid_sas` 模块添加至 initramfs 中，如下所示：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/dracut-add-drivers.png)
+![dracut-add-drivers](images/dracut-add-drivers.png)
 
 使用以上方式添加的为内核模块，而 initramfs 中本身具有模块（称为 dracut 模块）与内核模块不同，并且在执行 dracut 命令前必须先备份原先的 `/boot/initramfs-4.18.0-348.el8.x86_64.img` 镜像，防止添加失败导致原 initramfs 镜像数据丢失。
-
 若 initramfs 镜像整个丢失，可使用如下命令重建该镜像：
 
 ```bash
@@ -598,31 +559,27 @@ $ virt-xml-validate /path/to/<kvm_domain_filename>.xml
 ```
 
 - 参考链接：
-  
   - 📚 [Chapter 2. Managing kernel modules](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_monitoring_and_updating_the_kernel/managing-kernel-modules_managing-monitoring-and-updating-the-kernel#doc-wrapper)  
   - [dracut.cmdline(7) - Linux manual page](https://man7.org/linux/man-pages/man7/dracut.cmdline.7.html)
 
-### 🔥 Linux 存储栈故障修复：
+## 🔥 Linux 存储栈故障修复
 
 Linux 存储栈（storage stack）主要分为三层：
 
 - 文件系统层（filesystem layer）
-
 - 块层（block layer）
-
 - 设备层（device layer）
-
 根据不同内核版本存储栈存在一定的区别，此处以 `4.10` 内核版本为例展示存储栈全景图：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/Linux-storage-stack-diagram_v4.10.png)
+![Linux-storage-stack-diagram_v4.10](images/Linux-storage-stack-diagram_v4.10.png)
 
 若对上图实现简单抽象，可参考如下示意：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/linux-storage-stack-simple.png)
+![linux-storage-stack-simple](images/linux-storage-stack-simple.png)
 
 存储的 I/O 工作流（从磁盘到网络）：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/classic-io-from-disk-to-network.png)
+![classic-io-from-disk-to-network](images/classic-io-from-disk-to-network.png)
 
 ```bash
 ### 清理与 VFS 相关的缓存 ###
@@ -663,11 +620,11 @@ $ dmsetup table /dev/mapper/myvg1-mylv1
 
 Device Mapper 框架如下所示：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/device-mapper-kernel-architecture-1.png)
+![device-mapper-kernel-architecture-1](images/device-mapper-kernel-architecture-1.png)
 
 devicemapper 从 `2.4.x` 内核中首次提出后，在 `2.6.x` 中正式使用，目前被广泛用于 LVM、devicemapper-multipath、LUKS、Stratis、VDO 等技术中。以前文 LVM 命令行输出为例，devicemapper 使用线性化的方式将不同的磁盘扇区与逻辑设备实现 1:1 映射，如下所示：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/dm-lvm-partition-linear-mapping.png)
+![dm-lvm-partition-linear-mapping](images/dm-lvm-partition-linear-mapping.png)
 
 ```bash
 ### 磁盘 IO 调度算法 ###
@@ -728,40 +685,30 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 ```
 
 - 关于 Device Mapper 框架的信息可参考如下链接：
-  
   - 💪 [**Device Mapper FOSDEM** *Sunday 27th February 2005* Alasdair Kergon](https://people.redhat.com/agk/talks/FOSDEM_2005/)
-
 - 关于磁盘 IO 调度的相关技术信息可参考如下链接：
-  
   - [Understanding the Deadline IO Scheduler](https://access.redhat.com/articles/425823) 
   - [Using the Deadline IO Scheduler](https://access.redhat.com/solutions/32376) 
   - [Understanding the Noop IO Scheduler](https://access.redhat.com/articles/46958) 
   - [Unable to change IO scheduler for virtio disk /dev/vda in RHEL 7.1](https://access.redhat.com/solutions/1305843)  
   - [RHEL7 Storage Docs](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.2_release_notes/storage#idp1704576)
-
-- 关于 LUKS 加密的相关技术信息可参考如下链接：  
-  
+- 关于 LUKS 加密的相关技术信息可参考如下链接：
   - [Chapter 11. Encrypting block devices using LUKS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/encrypting-block-devices-using-luks_security-hardening) 
   - [All about LUKS, cryptsetup, and dm-crypt](https://access.redhat.com/articles/193443)  
   - [What is LUKS ( Linux Unified Key Setup) disk encryption and how can it be implemented?](https://access.redhat.com/solutions/100463)  
   - [How to recover lost LUKS key or passphrase](https://access.redhat.com/solutions/1543373)
-
 - 关于 iSCSI 的信息可参考如下链接：
-  
   - [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
-
 - 关于 Linux 存储堆栈的信息可参考如下链接：
-  
   - [Linux Storage Stack Diagram - Thomas-Krenn-Wiki-en](https://www.thomas-krenn.com/en/wiki/Linux_Storage_Stack_Diagram)  
   - 💪 [深入理解 Linux I/O 系统](https://mp.weixin.qq.com/s/ccZJaRLq2-Ns9dJILigIgw)
 
-### rpm 命令使用：
+## rpm 命令使用
 
 - RPM GPG 公钥保存目录：`/etc/pki/rpm-gpg`
-
 - RPM 软件包中文件的状态标识：man rpm 命令 `-V`
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/rpm-verify.jpg)
+![rpm-verify](images/rpm-verify.jpg)
 
 ```bash
 rpm 命令常用选项：
@@ -866,23 +813,19 @@ $ rpm --setperms <package_name>
 # 恢复文件为软件包中定义的权限
 ```
 
-### yum 或 dnf 命令使用：
+## yum 或 dnf 命令使用
 
 - RHEL 8 中已使用 dnf 命令替换 yum 命令，为保证兼容性 yum 作为 dnf 的软链接依然可继续使用，两者的使用方法上几乎一致，下文依然使用 yum 进行说明，可自行替换为 dnf。
-
 - 配置 yum 软件源优先级：
-  
   - CentOS 7.x/RHEL 7.x 配置 yum 软件源优先级时，需安装 `yum-plugin-priorities` 软件包。
-  
   - yum 插件的配置文件目录：`/etc/yum/pluginconf.d/`
-  
   - yum 软件源优先级功能是否启用：`/etc/yum/pluginconf.d/priorities.conf`
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-1.png)
+
+    ![yum-priority-1](images/yum-priority-1.png)
   
   - 编辑 `/etc/yum.repos.d/*.repo` 文件：
-    
-    <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/yum-priority-2.png" style="zoom:80%;" />
+
+    <img src="images/yum-priority-2.png" style="zoom:80%;" />
   
   - priority=*N*（取值 **`1~99`**），数值越大优先级越低。
   
@@ -978,42 +921,31 @@ $ rpm --setperms <package_name>
   # 更改 /etc/vsftpd/vsftpd.conf 配置文件后，可被 yum verify-rpm 命令检测出更改的属性。 
   ```
 
-### 🔥 基础网络问题调试：
+## 🔥 基础网络问题调试
 
 - 网络连通性测试：ping 与 ping6 命令常用选项
   
-  <img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/ping-ping6-options.jpg" style="zoom:80%;" />
+  ![ping-ping6-options](images/ping-ping6-options.jpg)
 
-- 关于 `MTU` 故障的说明： 
-  
+- 关于 `MTU` 故障的说明：
   - MTU（Maximum Transmission Unit，最大传输单元）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位）。最大传输单元这个参数通常与通信接口有关。
-  
   - 当 MTU 不合理时会造成如下问题：
-    
     - 本地 MTU 值大于网络 MTU 值时，本地传输的 "数据包" 过大导致网络会拆包后传输，不但产生额外的数据包，而且消耗了 "拆包、组包" 的时间。
-    
     - 本地 MTU 值小于网络 MTU 值时，本地传输的数据包可以直接传输，但是未能完全利用网络给予的数据包传输尺寸的上限值，传输能力未完全发挥。
-  
   - 合理的 MTU 值：
-    
     所谓的合理的 MTU 值，就是让本地 MTU 值与网络的 MTU 值一致，以致于不会出现数据包的大小超过网络传输的 MTU 值，而不得不进行拆包，然后组包，再进行转发，既能完整发挥传输性能，又不让数据包拆分。
-  
   - 💥 数据包大小大于 MTU 的故障：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/long-message-mtu-error-1.png)
-    
+
+    ![long-message-mtu-error-1](images/long-message-mtu-error-1.png)
+
     ping 命令使用 ICMP 协议测试网络连通性，整个数据包包括数据净荷（字节）、ICMP 头（8 字节）、IP 头（20 字节）。因此，上图中使用 1472 字节的数据净荷，而数据包整体为 1500 字节，已达到本地最大传输单元。若禁止本地的数据包分片（`-M do`）且数据净荷超过 1472 字节，则由于数据包大小大于本地 MTU 而无法测试网络连通性；若不使用 `-M do` 选项，可通过本地数据包分片测试连通性。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/long-message-mtu-error-2.png)
+
+    ![long-message-mtu-error-2](images/long-message-mtu-error-2.png)
 
 - `nmap` 命令使用示例：
-  
   - nmap 是功能强大的网络扫描工具，可以扫描单个主机和大型网络。
-  
   - 它主要用于安全审核和渗透测试。
-  
   - nmap 是端口扫描的首选工具，除端口扫描外，nmap 还可以检测 MAC 地址、操作系统类型、内核版本等。
-  
   - nmap 默认发送一个 ARP 的 ping 数据包，来探测目标主机 `1-1000` 范围内所开放的所有端口。
   
   ```bash
@@ -1108,9 +1040,8 @@ $ rpm --setperms <package_name>
   ```
 
 - nc 命令使用示例：
-  
   - nc 命令（netcat）具有客户端模式与服务端模式
-    
+
     ```bash
     $ yum install -y nmap-ncat
     # 安装 nmap 与 ncat 软件包
@@ -1174,23 +1105,16 @@ $ rpm --setperms <package_name>
     ```
   
   - 使用 nc 命令测试网速时，可配合 `iptraf-ng` 工具可视化网络速率。
-  
   - iptraf-ng 命令来自 iptraf-ng 软件包。
-  
   - 以上 nc 测试的 iptarf-ng 如下所示：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/nc-iptraf-ng.jpg)
+
+    ![nc-iptraf-ng](images/nc-iptraf-ng.jpg)
 
 - tcpdump 命令示例：
-  
   - tcpdump 可使用 `-w` 选项将抓包结果写入以 `.pcap` 结尾的文件中。
-  
   - 该抓包文件可通过 tcpdump 命令的 `-r` 选项进行读取，或使用 Wireshark 读取。
-  
   - 💥 注意：
-    
     - 可使用 Wireshark 抓包显示数据包中的明文密码，如 vsftpd 登录、Apache HTTPD 的用户认证（基于密码文件或 SDBM 文件型数据库的 Basic 认证的方式）。
-    
     - vsftpd 软件包并不安全，建议使用 sftp 进行文件传输！
   
   ```bash
@@ -1213,7 +1137,6 @@ $ rpm --setperms <package_name>
   ```
 
 - 参考链接：
-  
   - [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
   - [How to use iptraf to monitor network interface?](https://access.redhat.com/solutions/30479)
   - [超详细的网络抓包神器 tcpdump 使用指南（米开朗基杨）](https://mp.weixin.qq.com/s/J3Rdrof9ts9b6_paJk1KJw)
@@ -1221,80 +1144,48 @@ $ rpm --setperms <package_name>
   - [可能是目前最简单易懂且实用的 tcpdump 和 Wireshark 抓包及分析教程](https://mp.weixin.qq.com/s/9OvL5VXrGad2q-Hxf9wGRw)
   - [最简单的 Wireshark 和 TCP 入门指南](https://mp.weixin.qq.com/s/D2jipFrVOluHGcIB9izKVQ)
 
-### 内存泄漏与内存溢出：
+## 内存泄漏与内存溢出
 
 - 内存泄漏（memory leak）：
-  
   - 指程序在申请内存后，无法释放已申请的内存空间，导致系统无法及时回收内存并且分配给其他进程使用。
-  
   - 通常少次数的内存无法及时回收并不会对程序造成什么影响，但是如果在系统内存本身就比较少获取多次导致内存无法正常回收时，就会导致内存不够用，最终导致内存溢出。
-
 - 内存溢出（out of memory, OOM）：
-  
   - 指程序申请内存时，没有足够的内存供申请者使用，导致数据无法正常存储到内存中。
-  
   - 也就是说若需要 int 类型的存储数据大小的空间，但是却存储一个 long 类型的数据，这样就会导致内存溢出。
-
 - 两者的关系：
-  
   - 内存泄露最终会导致内存溢出，由于系统中的内存是有限的，如果过度占用资源而不及时释放，最后会导致内存不足，从而无法给所需要存储的数据提供足够的内存，从而导致内存溢出。
-  
   - 导致内存溢出也可能是由于在给数据分配大小时没有根据实际要求分配，最后导致分配的内存无法满足数据的需求，从而导致内存溢出。
-
 - 两者的区别：
-  
   - 内存泄露是由于 `GC` 无法及时或者无法识别可以回收的数据进行及时的回收，导致内存的浪费。
-  
   - 内存溢出是由于数据所需要的内存无法得到满足，导致数据无法正常存储到内存中。
-  
   - 内存泄露的多次表现就会导致内存溢出。
-
 - 内存泄漏的分类（根据发生方式分类）：
-  
   - 常发性内存泄漏：
-    
     发生内存泄漏的代码会被多次执行到，每次被执行的时候都会导致一块内存泄漏。
-  
   - 偶发性内存泄漏：
-    
     - 发生内存泄漏的代码只有在某些特定环境或操作过程下才会发生。
-    
     - 常发性和偶发性是相对的，对于特定的环境，偶发性的也许就变成了常发性的。
-    
     - 所以测试环境和测试方法对检测内存泄漏至关重要。
-  
   - 一次性内存泄漏：
-    
     - 发生内存泄漏的代码只会被执行一次，或者由于算法上的缺陷，导致总会有一块仅且一块内存发生泄漏。
-    
     - 比如，在类的构造函数中分配内存，在析构函数中却没有释放该内存，所以内存泄漏只会发生一次。
-  
   - 隐式内存泄漏：
-    
     - 程序在运行过程中不停的分配内存，但是直到结束的时候才释放内存。
-    
     - 严格的说这里并没有发生内存泄漏，因为最终程序释放了所有申请的内存。
-    
     - 但是对于一个服务器程序，需要运行几天，几周甚至几个月，不及时释放内存也可能导致最终耗尽系统的所有内存。
-    
     - 所以，我们称这类内存泄漏为隐式内存泄漏。
-  
   > 💥 注意：
-  > 
   > 1. 内存泄漏与内存溢出应注重从应用代码角度去解决问题。
-  > 
   > 2. 泄漏虚拟内存虽然不好，但是泄漏物理内存更加不好。
 
-### 共享库相关命令：
+## 共享库相关命令
 
 - 共享库（shared library）的查询过程：
 
 > 💥 注意：共享库也称 C 函数库、共享对象（shared object）、动态链接库
 
 - 应用在编译时，需链接到提供相关功能的共享库上。
-
 - 编译器将检查所需的共享库是否存在。
-
 - 编译好的应用可执行文件中包含所需共享库的信息，包括其绝对路径、共享库名称与版本（`DT_SONAME`）。
   
   ```bash
@@ -1304,13 +1195,9 @@ $ rpm --setperms <package_name>
   ```
 
 - RHEL 7.x 中使用 `/lib64/ld-linux-x86-64.so.2` 作为 `run-time linker`。
-
 - run-time linker 在应用可执行文件运行时通过两种方式查找对应的共享库（以下两种方式任选其一）：​
-  
   - run-time linker 可读取 DT_SONAME，再根据环境变量 `LD_LIBRARY_PATH` 定义的存储目录查找共享库。
-  
   - run-time linker 也可读取 DT_SONAME 及共享库缓存文件 `/etc/ld.so.cache`，再根据该文件查找共享库。
-
 - run-time linker 最终将共享库映射至应用运行时的内存中。
   
   ```bash
@@ -1325,48 +1212,31 @@ $ rpm --setperms <package_name>
 
 > 💥 注意：若相应应用程序缺少指定的共享库，安装共享库后，需使用 ldconfig 命令更新共享库缓存文件。
 
-### 🔥 系统调用与库调用：
+## 🔥 系统调用与库调用
 
 - Linux 中用户空间程序使用内核空间数据的方法：
-  
   - 系统调用（system call）：
-    
     Linux 提供了一系列系统调用，用于用户空间程序向内核发起请求或通知，如读写文件、创建进程、申请内存等。通过这些系统调用，用户空间程序可以向内核发送请求，内核会进行相应的处理并返回结果。这些系统调用包括 `open`、`read`、`write`、`mmap`、`ioctl` 等。
-    
     ioctl 是一种特殊的系统调用，用于通过设备文件发送命令和控制信息给设备驱动程序。用户空间程序可以通过 ioctl 调用向设备驱动程序发送命令，设备驱动程序收到命令后进行相应的操作，比如启动设备、停止设备、修改设备配置等。
-  
   - 共享内存（shared memory）：
-    
     共享内存是一种高效的数据交换方式。在内核空间中，使用 `shmget` 系统调用来创建或获取一块共享内存区域，然后使用 `shmat` 系统调用将该共享内存区域映射到用户空间中。用户空间程序可以直接读写共享内存中的数据，无需进行系统调用，这样就能够实现用户空间和内核空间的数据交换。
-  
   - 内存映射（memory map）：
-    
     内存映射是一种将文件的一部分映射到进程地址空间的方法。用户空间程序可以通过 `mmap` 系统调用将文件映射到自己的虚拟内存中，然后直接访问内存中的数据，无需每次都通过系统调用来访问硬盘上的文件。内存映射提供了一种高效的数据交换方式，可用于大文件的读写。
-
 - 系统调用：
-  
   - 系统调用在内核空间（kernel space）中执行
-  
   - 系统调用可理解是操作系统为用户提供的一系列操作的接口（API），这些接口提供了对系统硬件设备功能的操作。
-
 - 库调用（library call）：
-  
   - 库调用也称为库函数调用
-  
   - 库函数在用户空间（user space）中执行
-  
   - 库函数可以理解为是对系统调用的一层封装
-  
   - 系统调用作为内核提供给用户空间程序的接口，它的执行效率是比较高效而精简的，但有时我们需要对获取的信息进行更复杂的处理，或更人性化的需要，我们把这些处理过程封装成一个函数再提供给程序员，便于程序编码。
-  
   - 库函数有可能包含有一个或多个系统调用，也可能没有系统调用，如有些操作不需要涉及内核的功能。
-  
   - 无论是应用程序或库函数都有可能不调用系统调用而直接运行。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/library-call-system-call-1.png)
+
+    ![library-call-system-call-1](images/library-call-system-call-1.png)
   
   - 库调用运行示例：
-    
+
     ```c
     // printf_libcall_demo.c
     #include <stdio.h>
@@ -1377,81 +1247,52 @@ $ rpm --setperms <package_name>
         return 0;
     }
     ```
-    
+
     ```bash
     $ gcc -o printf_libcall_demo printf_libcall_demo.c
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/strace-printf-demo.png)
+
+    ![strace-printf-demo](images/strace-printf-demo.png)
 
 - 系统调用的意义：
-  
   - 避免了用户直接对底层硬件进行编程。
-  
   - 隐藏背后的技术细节。
-  
   - 保证系统的安全性和稳定性。
-    
     用户程序不能直接操作内核地址空间，而系统调用的功能由内核实现，用户只需调用接口，无需关心细节。
-  
   - 方便程序的移植性。
-
 - ✍ 两者的区别：
-  
   - 所有 C 函数库是相同的，而各个操作系统的系统调用是不同的（CPU 架构的差异）。
-  
   > glibc 中针对不同的 CPU 架构具有不同的库函数实现，在 glibc 源码中体现。
-  
   - 函数库调用是调用函数库中的一个程序，而系统调用是调用系统内核的服务。
-  
   - 函数库调用是与用户程序相联系，而系统调用是操作系统的一个进入点。
-  
   - 函数库调用是在用户地址空间执行，而系统调用是在内核地址空间执行。
-  
   - 函数库调用的运行时间属于用户时间（`user time`），而系统调用的运行时间属于系统时间（`system time`）。
-  
   - 函数库调用属于过程调用，开销较小，而系统调用需要切换到内核上下文环境然后切换回来，开销较大。
-  
   - 在 C 函数库 **`libc`** 中大约 300 个程序，在 UNIX 中大约有 90 个系统调用。
-  
   - 函数库典型的 C 函数：system、fprintf、malloc
-  
   - 典型的系统调用：chdir、fork、write、brk
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-troubshooting/library-call-system-call-2.png)
+
+    ![library-call-system-call-2](images/library-call-system-call-2.png)
   
   - 参考《C 专家编程》中的附录 A.4，书中关于两者区别为函数库调用是语言或应用程序的一部分，而系统调用是操作系统的一部分。
-
 - 库函数调用大概花费时间为半微妙，而系统调用所需要的时间大约是库函数调用的 70 倍（35 微秒），由于系统调用会有内核上下文切换的开销。
-
 - 纯粹从性能上考虑，应该尽可能地减少系统调用的数量，但是必须记住，许多 C 函数库中的程序通过系统调用来实现功能。
-
 - 以上说明的库函数调用性能远高于系统调用的前提是库函数中没有使用系统调用，再来解释下某些包含系统调用的库函数，然而其性能确实也要高于系统调用。
-
 - 参考链接：
-  
   - [Top (The GNU C Library)](https://www.gnu.org/software/libc/manual/2.28/html_node/index.html) 
   - [The GNU C Library](https://www.gnu.org/savannah-checkouts/gnu/libc/preview/sources.html)  
   - [glibc 源码 - Index of /gnu/libc](https://ftp.gnu.org/gnu/libc/)
 
-### strace 与 ltrace 命令使用：
+## strace 与 ltrace 命令使用
 
 - 系统调用与库函数调用非常相似，即它们都接受并处理参数然后返回值，唯一的区别是系统调用进入内核，而库函数调用不进入。
-
 - 通过使用 C 函数库（Linux 系统上又称为 `glibc`），大部分系统调用对用户隐藏。
-
 - 尽管系统调用本质上是通用的，但是发出系统调用的机制在很大程度上取决于机器（CPU 架构的差异）。
-
 - `strace` 命令：
-  
   trace system calls and signals，跟踪用户进程与 Linux 内核之间的交互（系统调用），及所接收的信号情况。
-
 - `ltrace` 命令：
-  
   a library call tracer，跟踪进程调用库函数的情况。
-
 - 👉 若 strace 命令没有任何输出，并不代表此时进程发生阻塞，也可能进程正在执行某些不需要与系统其它部分发生通信的事情。
-
 - strace 从内核接收信息，且无需以任何特殊方式来构建内核。
 
 ```bash
@@ -1537,10 +1378,9 @@ $ ltrace -t -f -p <pid>
 ```
 
 - 参考链接：
-  
   - [Understanding system calls on Linux with strace](https://opensource.com/article/19/10/strace)
 
-### 参考链接：
+## 参考链接
 
 - [Red Hat Customer Portal - Access to 24x7 support and knowledge](https://access.redhat.com/knowledgebase/)
 - [Labs - Red Hat Customer Portal](https://access.redhat.com/labs)

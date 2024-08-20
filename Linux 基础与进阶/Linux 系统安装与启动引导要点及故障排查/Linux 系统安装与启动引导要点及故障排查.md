@@ -1,183 +1,123 @@
-## Linux 系统安装与启动引导及故障排查
+# Linux 系统安装与启动引导及故障排查
 
-### 文档目录：
+## 文档目录
 
 - 常见物理服务器远程带外口
-
 - 不同型号物理服务器安装 Linux 的故障排查
-
 - RHEL 中 grub 引导配置文件的说明
-
 - RHEL 配置开机启动方式
-
 - 系统开机自启动定义文件
-
 - 多种系统破解 root 密码的方式
-
 - 系统无故关机并重启原因排查方法
-
 - 案例：DELL R730 物理机 CentOS 7.2 开机启动恢复
-
 - 创建兼容 UEFI 与 BIOS 引导的 RHEL 6 自动化安装 ISO 镜像
-
 - 创建兼容 UEFI 与 BIOS 引导的 CentOS 7 自动化安装 ISO 镜像
-
 - CentOS 7 的 kernel 升级方法
 
-### 常见物理服务器远程带外口：
+## 常见物理服务器远程带外口
 
 - `Lenovo System x3650 M5` 服务器 `iLO 4` 管理口登录：
-  
   - 服务器使用 `IBM ServeRAID M5210 RAID` 卡，iLO 管理模块为 Lenovo Intergrated Management Module II。
-  
   - 生产运维接入平台登录 iLO地址，若一种类型浏览器无法打开，更换另一种浏览器打开。
-  
   - 默认用户名：USERID
-  
   - 默认密码：PASSW0RD
-
 - `Huawei FushionServer RH2288 V3/2488H V5` 服务器 `iBMC` 管理口登录：
-  
   - 默认用户名：root/Administrator
-  
   - 默认密码：Huawei12#$
-  
   - 默认 V3 BIOS 密码：Huawei12#$
-  
   - 默认 V5 BIOS密码：Admin@9000
-
 - HPE 服务器 iLO 4/5 管理口登录：
-  
   - 默认用户名：bocomsimuser
-  
   - 默认密码：Bocom$sim2012
-  
   - `HP ProLiant DL380 Gen9` 物理服务器使用 `iLO 4` 管理接口
-  
   - `HPE ProLiant DL560 Gen10` 物理服务器使用 `iLO 5` 管理接口
-  
   > 👉 iLO 5 管理模式：使用 HTML 5 远程管理界面，`Ctrl+Alt+Del` 组合键重启系统。
-
 - 浪潮服务器（inspur）管理口登录：
-  
   - 默认用户名：admin
-  
   - 默认密码：admin
-
 - `H3C` 服务器 `HDM` 管理口登录：
-  
   - 默认用户名：admin
-  
   - 默认密码：Password@_
-  
   > 👉 使用 HTML 5 远程管理界面登录
 
-### 不同型号物理服务器安装 Linux 的故障排查：
+## 不同型号物理服务器安装 Linux 的故障排查
 
 - 通用 troubleshooting 方法：
-  
   - 若物理服务器主板的引导方式为 `UEFI`，则磁盘分区方式使用 `GPT` 分区，引导分区的挂载点为 `/boot/efi`（FAT 文件系统，EFI System Partition/EFI Boot Partition），挂载设备为 `/dev/sda1`。
-  
   - 若物理服务器主板的引导方式为 `BIOS`，则磁盘分区方式使用 `MSDOS` 分区，引导分区的挂载点为 `/boot`（ext3/4/xfs文件系统）。
-  
   - ✅ 在新系统安装后首次引导可能无法正常完成，可将引导方式更改为 `BIOS`（Legacy Mode）或 `UEFI`（UEFI Mode）进行尝试引导。
-  
   - UEFI 方式引导 RHEL 7.x 或 SLES 12 SPx，重新封装系统引导镜像：
-    
+
     ```bash
     $ sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
     ```
   
   - 每台物理服务器均具有一个唯一的可识别序列号，如下所示：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/physical-server-serial-number.jpg)
+
+    ![physical-server-serial-number](images/physical-server-serial-number.jpg)
 
 - `Huawei FushionServer`：
-  
   > BOOT 引导过程中按 `Delete` 进入引导配置界面。
-  
   - `2488H V5` 服务器安装 RHEL 6.7 报错：
-    
     - 该服务器型号不支持 RHEL 6.7，可支持 `RHEL 6.9` 以上与 `RHEL 7.3` 以上等版本。
-    
     - 由于 RHEL 6.7 缺少该服务器型号的 `RAID 阵列卡驱动` 而无法识别 RAID 阵列卡，导致无法识别相应磁盘。
-  
   - `2288H V5` 服务器安装 `Debian 8.11.0` 报错：
-    
     - 该服务器的磁盘、RAID 阵列卡与物理网卡信息：
-      
       - 磁盘阵列如下所示：
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-disk-1.jpg)
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-disk-2.jpg)
-      
-      - RAID 阵列卡型号：
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-megaraid.jpg)
-      
-      - 物理网卡型号与芯片类型：
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic.jpg)
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic-1GbE-chip.jpg)
-        
-        ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/huawei-fushionserver-2288h-v5-server-nic-10GbE-chip.jpg)
-      
-      > ✅ 同一类 Linux 驱动程序识别相应的物理网卡芯片组（chipset）。
-    
-    - 导致的原因：
-      
-      - 该服务器上未配置额外的 `PCIe` 扩展插槽的物理网卡，因此 Debian 8.11.0 直接使用板载物理网卡连接。
-      
-      - 由于 Debian 8.11.0 无对应的物理网卡驱动（`i40e`），而无法识别物理网卡。
-      
-      - Debian 8.11.0 由于其缺少相应的 `RAID 阵列卡驱动` 而无法识别该服务器的磁盘，无法安装操作系统。
-      
-      > 🤔 解决思路：
-      > 
-      > 下载相应版本的驱动程序源代码并进行编译，将生成的 RAID 阵列卡驱动程序模块（.ko）在安装过程中导入待操作系统安装完成后，使用 update-initramfs 命令将该 RAID 卡驱动程序模块封装入 Linux 内核镜像中，重启系统即可正确识别。
-  
-  - `2288H V5` 服务器安装 RHEL 6.8 报错：
-    
-    - 该服务器已使用 BIOS 引导 MSDOS 磁盘分区格式成功安装 RHEL 6.8，但安装后首次引导无法找到引导设备。
-    
-    > 👉 此处的成功安装只是安装程序显示的安装完成，成功安装的标志为可正常引导进入系统。
-    
-    - 因此，尝试进入 BOOT 引导界面更改为 `UEFI` 引导方式，在系统安装磁盘分区过程中，切换为 `anaconda` 文本交互模式，以 UEFI 引导方式重新安装。
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-1.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-2.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/2288H-V5-disk-3.jpg)
-    
-    - 重新安装后即可正常引导启动。
 
+        ![huawei-fushionserver-2288h-v5-server-disk-1](images/huawei-fushionserver-2288h-v5-server-disk-1.jpg)
+
+        ![huawei-fushionserver-2288h-v5-server-disk-2](images/huawei-fushionserver-2288h-v5-server-disk-2.jpg)
+
+      - RAID 阵列卡型号：
+
+        ![huawei-fushionserver-2288h-v5-server-megaraid](images/huawei-fushionserver-2288h-v5-server-megaraid.jpg)
+
+      - 物理网卡型号与芯片类型：
+
+        ![huawei-fushionserver-2288h-v5-server-nic](images/huawei-fushionserver-2288h-v5-server-nic.jpg)
+
+        ![huawei-fushionserver-2288h-v5-server-nic-1GbE-chip](images/huawei-fushionserver-2288h-v5-server-nic-1GbE-chip.jpg)
+
+        ![huawei-fushionserver-2288h-v5-server-nic-10GbE-chip](images/huawei-fushionserver-2288h-v5-server-nic-10GbE-chip.jpg)
+
+      > ✅ 同一类 Linux 驱动程序识别相应的物理网卡芯片组（chipset）。
+
+    - 导致的原因：
+      - 该服务器上未配置额外的 `PCIe` 扩展插槽的物理网卡，因此 Debian 8.11.0 直接使用板载物理网卡连接。
+      - 由于 Debian 8.11.0 无对应的物理网卡驱动（`i40e`），而无法识别物理网卡。
+      - Debian 8.11.0 由于其缺少相应的 `RAID 阵列卡驱动` 而无法识别该服务器的磁盘，无法安装操作系统。
+      > 🤔 解决思路：
+      > 下载相应版本的驱动程序源代码并进行编译，将生成的 RAID 阵列卡驱动程序模块（.ko）在安装过程中导入待操作系统安装完成后，使用 update-initramfs 命令将该 RAID 卡驱动程序模块封装入 Linux 内核镜像中，重启系统即可正确识别。
+  - `2288H V5` 服务器安装 RHEL 6.8 报错：
+    - 该服务器已使用 BIOS 引导 MSDOS 磁盘分区格式成功安装 RHEL 6.8，但安装后首次引导无法找到引导设备。
+    > 👉 此处的成功安装只是安装程序显示的安装完成，成功安装的标志为可正常引导进入系统。
+    - 因此，尝试进入 BOOT 引导界面更改为 `UEFI` 引导方式，在系统安装磁盘分区过程中，切换为 `anaconda` 文本交互模式，以 UEFI 引导方式重新安装。
+
+      ![2288H-V5-disk-1](images/2288H-V5-disk-1.jpg)
+
+      ![2288H-V5-disk-2](images/2288H-V5-disk-2.jpg)
+
+      ![2288H-V5-disk-3](images/2288H-V5-disk-3.jpg)
+
+    - 重新安装后即可正常引导启动。
 - `H3C Server`：
-  
   > BOOT 引导过程中按 `F7` 进入引导配置界面。
-  
   - RAID 阵列卡故障后在引导设备中无法查看到系统盘。
-  
   - 由于 RAID 阵列卡故障导致系统 `I/O` 错误并只读（read-only），更换 RAID 阵列卡后即可恢复正常。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/H3C-server-disk-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/H3C-server-disk-2.jpg)
+
+    ![H3C-server-disk-1](images/H3C-server-disk-1.jpg)
+
+    ![H3C-server-disk-2](images/H3C-server-disk-2.jpg)
 
 - `HPE ProLiant DL560 Gen10`：
-  
   BOOT 引导过程中按 `F11` 进入引导配置界面，`F9` 进入系统配置界面。
 
-### RHEL 中 grub 引导配置文件的说明：
+## RHEL 中 grub 引导配置文件的说明
 
 - RHEL 6.x 中的 grub 引导配置文件：
-  
   - `/boot/grub/grub.conf`
-  
   - 该配置文件的两个软链接：`/etc/grub.conf`、`/boot/grub/menu.lst`
-
 - RHEL 7.x 中的 grub 引导配置文件：
   
   ```bash
@@ -189,7 +129,7 @@
   # 更改 /etc/default/grub 参数后，再使用 grub2-mkconfig -o 生成 grub2 配置文件。
   ```
 
-### RHEL 配置开机启动方式：
+## RHEL 配置开机启动方式
 
 - RHEL 6.x 的方式：
   
@@ -219,7 +159,7 @@
   # 以图形化方式开机登录
   ```
 
-### 系统开机自启动定义文件：
+## 系统开机自启动定义文件
 
 - RHEL 6.x 与 RHEL 7.x 的方式：
   
@@ -240,100 +180,88 @@
   # SLES 11 SP4 开机自启动定义文件，需要自行创建，自定义脚本写入即可。
   ```
 
-### 多种系统破解 root 密码的方式：
+## 多种系统破解 root 密码的方式
 
 - RHEL 6.x 的方式（进入单用户模式）：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-1.jpg)
+  ![rhel6-break-root-password-1](images/rhel6-break-root-password-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-2.jpg)
+  ![rhel6-break-root-password-2](images/rhel6-break-root-password-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-3.jpg)
+  ![rhel6-break-root-password-3](images/rhel6-break-root-password-3.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-4.jpg)
+  ![rhel6-break-root-password-4](images/rhel6-break-root-password-4.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-5.jpg)
+  ![rhel6-break-root-password-5](images/rhel6-break-root-password-5.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel6-break-root-password-6.jpg)
+  ![rhel6-break-root-password-6](images/rhel6-break-root-password-6.jpg)
 
 - RHEL 7.x 与 RHEL 8.x 的方式：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-1.jpg)
+  ![rhel7-break-root-password-1](images/rhel7-break-root-password-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-2.jpg)
+  ![rhel7-break-root-password-2](images/rhel7-break-root-password-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel7-break-root-password-3.jpg)
+  ![rhel7-break-root-password-3](images/rhel7-break-root-password-3.jpg)
 
 - SLES 11 SP4 的方式（进入单用户模式）：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-1.jpg)
+  ![sles11sp4-break-root-password-1](images/sles11sp4-break-root-password-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-2.jpg)
+  ![sles11sp4-break-root-password-2](images/sles11sp4-break-root-password-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles11sp4-break-root-password-3.jpg)
+  ![sles11sp4-break-root-password-3](images/sles11sp4-break-root-password-3.jpg)
 
 - SLES 12 SP3 的方式：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-1.jpg)
+  ![sles12sp3-break-root-password-1](images/sles12sp3-break-root-password-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-2.jpg)
+  ![sles12sp3-break-root-password-2](images/sles12sp3-break-root-password-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/sles12sp3-break-root-password-3.jpg)
+  ![sles12sp3-break-root-password-3](images/sles12sp3-break-root-password-3.jpg)
 
-### 系统无故关机并重启原因排查方法：
+## 系统无故关机并重启原因排查方法
 
 - 使用 `last` 命令与 `uptime` 命令查看系统开关机历史及运行时间
-
 - 查看 `/var/log/messages` 日志确认系统开关机时间戳及发生的事件，该日志文件包含开关机过程中的所有事件记录。
-
 - 该系统为 VMware 虚拟机，可通过虚拟化平台的日志记录进行判断。
 
-### 案例：DELL R730 物理机 CentOS 7.2 开机启动恢复
+## 案例：DELL R730 物理机 CentOS 7.2 开机启动恢复
 
 - 问题描述：
-  
   - CentOS 7.2 由于误删 `libselinux-2.5-12.el7.x86_64` 软件包而导致无法正常开机。
-  
   - 使用 CentOS 7.2 ISO 镜像进入 `rescue` 救援模式依然无法恢复。
-
 - 排查过程：
-  
   - `DELL R730` 物理机使用 `F11` 按键进入 BIOS 调整引导方式：系统 ISO 镜像引导
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/dell-r730-boot-method-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/dell-r730-boot-method-2.jpg)
+
+    ![dell-r730-boot-method-1.jpg](images/dell-r730-boot-method-1.jpg)
+
+    ![dell-r730-boot-method-2](images/dell-r730-boot-method-2.jpg)
   
   - 使用 `rescue` 救援模式的正确 shell 类型：`sh-4.2#`
-    
     > 💥 注意：此时所在的环境为 ISO 镜像的 shell 环境！
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-2.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rescue-shell-3.jpg)
+
+    ![rescue-shell-1](images/rescue-shell-1.jpg)
+
+    ![rescue-shell-2](images/rescue-shell-2.jpg)
+
+    ![rescue-shell-3](images/rescue-shell-3.jpg)
   
   - 从其他正常运行的节点上拷贝 `libselinux` 软件包文件至故障系统的 `/mnt/sysimage` 中的相应目录。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/recover-boot-error-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/recover-boot-error-2.jpg)
+
+    ![recover-boot-error-1](images/recover-boot-error-1.jpg)
+
+    ![recover-boot-error-2](images/recover-boot-error-2.jpg)
   
   - 切换至故障系统环境中验证系统是否恢复
-  
   - 系统恢复后需重新安装 libselinux-2.5-12.el7.x86_64 软件包
 
-### 创建兼容 UEFI 与 BIOS 引导的 RHEL 6 自动化安装 ISO 镜像：
+## 创建兼容 UEFI 与 BIOS 引导的 RHEL 6 自动化安装 ISO 镜像
 
 - 使用场景：
-  
   由于客户的现场环境中无法提供 PXE 与 DHCP 的方式进行自动化的安装，因此封装可自动化安装系统的 ISO 镜像实现大规模系统的自动化部署。
-
 - 由于 `genisoimage` 软件版本问题，需使用 `CentOS 7.x` 或 `RHEL 7.x` 封装 RHEL 6.x 自动化安装 ISO 镜像，否则存在操作系统自动化安装后，无法使用 UEFI 引导的问题。
-
 - 以 `RHEL 6.8/6.9` 为例进行创建与测试安装。
-
 - 创建 RHEL 6.x 自动化安装 ISO 镜像：
   
   ```bash
@@ -360,14 +288,14 @@
   # 编辑 BIOS 引导安装的配置文件
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-bios-isolinux-cfg.jpg)
+  ![ks-bios-isolinux-cfg](images/ks-bios-isolinux-cfg.jpg)
   
   ```bash
   $ vim EFI/BOOT/BOOTX64.conf
   # 编辑 UEFI 引导安装的配置文件
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-uefi-isolinux-cfg.jpg)
+  ![ks-uefi-isolinux-cfg](images/ks-uefi-isolinux-cfg.jpg)
   
   ```bash
   $ genisoimage -U -r -v -T -J -joliet-long \
@@ -384,27 +312,23 @@
    `-eltorito-alt-boot -e images/efiboot.img -no-emul-boot`
 
 - 测试 RHEL 6.8 自动化安装 ISO 镜像：
-  
   - 配置 RHEL 6.8 以 UEFI 引导方式启动：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-1.jpg)
+
+    ![rhel68-uefi-autoboot-test-1](images/rhel68-uefi-autoboot-test-1.jpg)
   
   - RHEL 6.8 自动化安装过程：UEFI 引导方式为例
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-2.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-3.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/rhel68-uefi-autoboot-test-4.jpg)
 
-### 创建兼容 UEFI 与 BIOS 引导的 CentOS 7 自动化安装 ISO 镜像：
+    ![rhel68-uefi-autoboot-test-2](images/rhel68-uefi-autoboot-test-2.jpg)
+
+    ![rhel68-uefi-autoboot-test-3](images/rhel68-uefi-autoboot-test-3.jpg)
+
+    ![rhel68-uefi-autoboot-test-4](images/rhel68-uefi-autoboot-test-4.jpg)
+
+## 创建兼容 UEFI 与 BIOS 引导的 CentOS 7 自动化安装 ISO 镜像
 
 - 使用场景：
-  
   由于客户的现场环境中无法提供 PXE 与 DHCP 的方式进行自动化的安装，因此封装可自动化安装系统的 ISO 镜像实现大规模系统的自动化部署。
-
 - 以 `CentOS 7.4` 为例进行创建与测试安装。
-
 - 创建 CentOS 7.x 自动化安装 ISO 镜像：
   
   ```bash
@@ -428,14 +352,14 @@
   # 编辑 BIOS 引导安装的配置文件
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-centos74-bios-isolinux-cfg.jpg)
+  ![ks-centos74-bios-isolinux-cfg](images/ks-centos74-bios-isolinux-cfg.jpg)
   
   ```bash
   $ vim EFI/BOOT/grub.cfg
   # 编辑 UEFI 引导安装的配置文件
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/ks-centos74-uefi-isolinux-cfg.jpg)
+  ![ks-centos74-uefi-isolinux-cfg](images/ks-centos74-uefi-isolinux-cfg.jpg)
   
   ```bash
   $ genisoimage -U -r -v -T -J -joliet-long \
@@ -453,38 +377,28 @@
 
 - CentOS 7.4 自动化安装过程：UEFI 引导方式为例
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-1.jpg)
+  ![centos74-uefi-autoboot-test-1](images/centos74-uefi-autoboot-test-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-2.jpg)
+  ![centos74-uefi-autoboot-test-2](images/centos74-uefi-autoboot-test-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/centos74-uefi-autoboot-test-3.jpg)
+  ![centos74-uefi-autoboot-test-3](images/centos74-uefi-autoboot-test-3.jpg)
 
 - 使用 UEFI/BIOS 引导的 CentOS 7.x 自动化安装 ISO 镜像，`dracut` 报错如下：
-  
   由于未发现安装引导介质所致，可使用 `inst.repo` 参数或添加 ISO 镜像标签解决。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-install-boot-troubleshoot/kickstart-autoinstall-dracut-error.jpg)
+  ![kickstart-autoinstall-dracut-error](images/kickstart-autoinstall-dracut-error.jpg)
 
-### 🚀 CentOS 7 的 kernel 升级方法：
+## 🚀 CentOS 7 的 kernel 升级方法
 
 - 该场景中将 CentOS 7.4 的 kernel `3.10.x` 升级至 `4.4.x`。
-
 - kernel 软件包类型：
-  
   - 主分支：`mainline`（ml）
-  
   - 稳定版：`stable`
-  
   - 长期维护：`longterm`（lt）
-
 - kernel 版本命名格式：`A.B.C`
-  
   - A：内核版本号
-  
   - B：内核主版本号
-  
   - C：内核次版本号
-
 - 使用 RPM 软件包方式的 kernel 升级过程：
   
   ```bash
