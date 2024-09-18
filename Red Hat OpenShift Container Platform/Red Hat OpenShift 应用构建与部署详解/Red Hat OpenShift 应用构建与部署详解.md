@@ -1,4 +1,4 @@
-# 🚀 Red Hat OpenShift v3 与 v4 应用构建与部署详解
+# 🚀 Red Hat OpenShift 应用构建与部署详解
 
 - OCP project 操作相关命令：
   
