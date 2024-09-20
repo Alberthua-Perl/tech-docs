@@ -4,7 +4,7 @@
 
 - 该文档作为笔者在学习与实践 OpenShift 过程中的总结与感悟，难免存在纰漏，望不吝赐教。
 - 该文档主要根据 `Red Hat OpenShift Container Platform v3.9` 与 `v4.14` 环境实践。
-- 以下分别称为 `OCP 3.x` 与 `OCP 4.x`。
+- 以下分别称为 `OCP3` 与 `OCP4`。
 - 其中涉及的选项与参数在绝大部分版本中适用，但部分版本可能略有不同，请参考实际使用版本。
 - 以上两个版本在架构与资源对象概念上存在诸多相同点，若未特别说明，即两者均适用。
 
@@ -29,34 +29,34 @@
   
   2014 年 Kubernetes 诞生以后，Red Hat 决定对 OpenShift 进行重构（原先的架构不依托于 Kubernetes），正是该决定，彻底改变了 OpenShift 的命运以及后续 `PaaS` 市场的格局。  
   2015 年 6 月，Red Hat 推出了基于 `Kubernetes 1.0` 的 `OpenShift 3.0`。  
-  🚀 2018 年 6 月，Red Hat 推出了基于 `Kubernetes 1.13` 的 `OpenShift 4.1`，在 OCP 4.x 架构中引入及增强了 OCP 3.x 中新功能。
+  🚀 2018 年 6 月，Red Hat 推出了基于 `Kubernetes 1.13` 的 `OpenShift 4.1`，在 OCP4 架构中引入及增强了 OCP3 中新功能。
 
 - OpenShift 的客户端命令行工具 `oc` 命令取代 Kubernetes 的 `kubectl` 命令，相同版本下两者的使用方法与参数选项基本保持一致。
-- OCP 3.x 集群架构：
+- OCP3 集群架构：
   
   ![ocp3-arch](images/ocp3-arch.png)
 
-- OCP 4.x 集群架构：
+- OCP4 集群架构：
   
   ![ocp4-arch](images/ocp4-arch.jpg)
   
-  OCP 4.x 中已将 `Kubernetes service` 与 `OpenShift service` 进行解耦实现松耦合设计，使 OpenShift 集群自身的资源由自身的 service 进行管理，此处的 service 指控制平面（control plan）的服务组件与集群中的 service 资源相区别。
+  OCP4 中已将 `Kubernetes service` 与 `OpenShift service` 进行解耦实现松耦合设计，使 OpenShift 集群自身的资源由自身的 service 进行管理，此处的 service 指控制平面（control plan）的服务组件与集群中的 service 资源相区别。
   
   ![kubernetes-service-in-ocp4](images/kubernetes-service-in-ocp4.jpg)
   
   ![openshift-service-in-ocp4](images/openshift-service-in-ocp4.jpg)
 
-- OCP 4.x 集群网络拓扑示例：  
-  OCP 3.x 与 OCP 4.x 在集群 SDN 的选型上存在差异，如 OCP 3.x 使用 `OVS` 插件实现 SDN 并且不能支持单 Pod 具有多个虚拟网络接口，而 OCP 4.x 可使用 `OVS` 插件或 `OVN-Kubernetes` 插件并且支持单 Pod 具有多个虚拟网络接口，如下所示，OCP 4.x 南北向流量与东西向流量拓扑。
+- OCP4 集群网络拓扑示例：  
+  OCP3 与 OCP4 在集群 SDN 的选型上存在差异，如 OCP3 使用 `OVS` 插件实现 SDN 并且不能支持单 Pod 具有多个虚拟网络接口，而 OCP4 可使用 `OVS` 插件或 `OVN-Kubernetes` 插件并且支持单 Pod 具有多个虚拟网络接口，如下所示，OCP4 南北向流量与东西向流量拓扑。
   
   ![ocp4-sourth-north-east-west-traffic](images/ocp4-sourth-north-east-west-traffic.png)
 
 ## OpenShift 集群部署方法说明
 
-- OCP 3.x 集群部署方法：  
+- OCP3 集群部署方法：  
   - 生产环境：
     - OCP 3.4、3.5 集群部署使用 RPM 软件包，OCP 3.9、3.11 集群部署使用容器镜像。
-    - 👉 OCP 3.x 中使用 `Ansible` 部署 OpenShift。  
+    - 👉 OCP3 中使用 `Ansible` 部署 OpenShift。  
   - 开发与测试环境：
     - all-in-one：`AIO`（本地单节点集群），即 CRC 开发与测试环境。
     - OCP 二进制执行程序快速启动与部署
@@ -319,7 +319,7 @@
       ```
   
   - 在 openshift 项目中的 image stream 与 template 资源在各个项目中均可共享，但只由具有 `cluster-admin` 角色的管理员用户管理。  
-  - 自 OCP 4.x 开始可使用 `Samples operator` 管理 openshift 项目并可删除由手动添加的资源。 
+  - 自 OCP4 开始可使用 `Samples operator` 管理 openshift 项目并可删除由手动添加的资源。 
   - 使用来自另一个项目的 image stream（基于 private registry）构建与部署应用：
     - 方式 1：
       在每个使用 image stream 的项目中创建包含可访问私有 OCP external registry 的 access token 的 secret，并将其 link 至每个项目中的 service account。
@@ -332,9 +332,9 @@
     > 可为 service account 添加 scc 与 role，也可将相关的 secret 链接至 service account。
   
   - OCP internal registry 只存储由 `S2I` 构建或 `Dockerfile/Containerfile` 构建的应用镜像，以实现一次构建多次部署。
-  - OCP 3.x 中新构建的应用镜像将存储于 default 项目中的 `docker-registry pod` 中。
+  - OCP3 中新构建的应用镜像将存储于 default 项目中的 `docker-registry pod` 中。
   - 该 pod 根据其资源定义文件中的 pvc 将应用镜像存储于后端存储中，默认存储 provider 为 NFS，也可集成 Ceph RBD。
-  - 💎 补充：OCP 4.x internal registry 概要
+  - 💎 补充：OCP4 internal registry 概要
     - OpenShift 安装程序将 internal registry 配置为仅仅集群内部可被集群管理员、各项目用户或各个组件等访问。
     - 使用集群管理员（`cluster-admin`）权限即可暴露 internal registry，对外暴露的路由信息可被集群外部访问，如下所示：
 
@@ -584,20 +584,20 @@
   - 部署配置、部署
   - 在 Kubernetes 1.0 中并不像现在如此方便可快速部署应用，而是需要繁复的手动配置才能满足要求，而在 OpenShift 3.0 中 Red Hat 开发了 `deploymentconfig`，以提供参数化部署输入、执行滚动部署、启用回滚至先前部署状态，以及通过触发器（`trigger`）以驱动自动部署等（buildconfig 构建配置完成后触发 deploymentconfig）。  
   - 由于 buildconfig 中 imagestreamtag 的改变，deploymentconfig 或 deployment 中可探测到 imagestreamtag 的改变针对新构建应用镜像的自动重新部署。
-    👉 OCP 3.x 中 deploymentconfig 的 `imagestreamtag trigger`：
+    👉 OCP3 中 deploymentconfig 的 `imagestreamtag trigger`：
 
     ![ocp3-imagestreamtag-trigger-dc-deploy](images/ocp3-imagestreamtag-trigger-dc-deploy.jpg)
 
-    👉 OCP 4.x 中 deployment 的 `imagestreamtag trigger`：
+    👉 OCP4 中 deployment 的 `imagestreamtag trigger`：
 
     ![ocp4-imagestreamtag-trigger-deployment-deploy](images/ocp4-imagestreamtag-trigger-deployment-deploy.jpg)
   
   - deploymentconfig 中的许多功能最终成为 `Kubernetes deployment` 功能集的一部分。
-    > ✅ 目前 OCP 4.x 同时兼容 deployment 资源与 deploymentconfig 资源。
+    > ✅ 目前 OCP4 同时兼容 deployment 资源与 deploymentconfig 资源。
   - 使用 oc new-app 命令默认生成 `List` 资源定义文件，包含 deploymentconfig 的资源定义。
   - 支持通过 webhook 与外部的持续集成（CI）与持续开发（CD）系统集成。
   - 💎 补充：
-    - OCP 4.x 中 deploymentconfig 集成 replication controller，该控制器支持基于等值类型的标签选择器（`equality-based selector`），而 deployment 中集成 `replicaset`，该控制器支持基于集合类型的标签选择器（`set-based selector`），两者均通过与 pod 的特定标签与 pod 进行关联，实现 pod 副本数的高可用。
+    - OCP4 中 deploymentconfig 集成 replication controller，该控制器支持基于等值类型的标签选择器（`equality-based selector`），而 deployment 中集成 `replicaset`，该控制器支持基于集合类型的标签选择器（`set-based selector`），两者均通过与 pod 的特定标签与 pod 进行关联，实现 pod 副本数的高可用。
     - 可参考官方文档 [Understanding Deployment and DeploymentConfig objects](https://docs.openshift.com/container-platform/4.6/applications/deployments/what-deployments-are.html)
   - deploy 资源对象以 pod 的方式运行。
   - 该对象用于跟踪 deploymentconfig 生成新的 pod 的过程。
@@ -659,12 +659,12 @@
 
       ![ocp3-network-plugin](images/ocp3-network-plugin.jpg)
   
-  - 🚀 OCP 3.x & 4.x 的网络模型继承于 Kubernetes，从内到外包含如下 4 个方面：
+  - 🚀 OCP3 & 4.x 的网络模型继承于 Kubernetes，从内到外包含如下 4 个方面：
     - pod 内部容器间通信的网络
     - pod 与 pod 间通信的网络（同节点或跨节点）
     - pod 与 service 间通信的网络
     - 集群外部与 service 或 pod 通信的网络
-  - 🚀 OCP 3.x OVS 网络拓扑示意：
+  - 🚀 OCP3 OVS 网络拓扑示意：
 
     ![ocp3-ovs-1](images/ocp3-ovs-1.png)
 
@@ -675,19 +675,19 @@
     ![ocp3-ovs-3](images/ocp3-ovs-3.png)
   
   - service 从逻辑层面解决了 service 与 pod 间的网络通信问题，而 pod 与 pod 间的跨节点间通信必须使用 CNI 插件加以解决。
-  - OCP 3.x 中默认使用 `OVS` 作为 SDN 插件，其共有 3 种工作类型，包括 `ovs-subnet`、`ovs-multitenent` 与 `ovs-networkpolicy`。
+  - OCP3 中默认使用 `OVS` 作为 SDN 插件，其共有 3 种工作类型，包括 `ovs-subnet`、`ovs-multitenent` 与 `ovs-networkpolicy`。
   - 💎 补充：
-    - OCP 4.x 中依然默认使用 `openshift-sdn` 插件（OVS 插件）的 `ovs-networkpolicy`，以实现更加细粒度的网络资源隔离，可基于 `namespace` 级别以及 `pod` 级别。
+    - OCP4 中依然默认使用 `openshift-sdn` 插件（OVS 插件）的 `ovs-networkpolicy`，以实现更加细粒度的网络资源隔离，可基于 `namespace` 级别以及 `pod` 级别。
     - ovs-subnet 将所有项目的 pod 置于扁平化（flat）网络中，彼此之间均能通信。
     - ovs-multitenant 使用 `VNID` 实现不同项目间的 pod 二层隔离，其使用 VXLAN 隧道打通 pod 间在各节点之间的联系。
-    - OCP 4.x 也可以使用 `OVN-kubernetes` 作为 SDN 插件，但需要在集群规划与部署前确定具体使用哪个 SDN 插件，一旦部署完成不可更改，并且可同时使用 `Multus CNI` 调用其他 CNI 插件使单 pod 同时具备 2 个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
+    - OCP4 也可以使用 `OVN-kubernetes` 作为 SDN 插件，但需要在集群规划与部署前确定具体使用哪个 SDN 插件，一旦部署完成不可更改，并且可同时使用 `Multus CNI` 调用其他 CNI 插件使单 pod 同时具备 2 个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
     - 可参考官方文档 [Understanding multiple networks](https://docs.openshift.com/container-platform/4.6/networking/multiple_networks/understanding-multiple-networks.html)
-  - 🚀 OCP 3.x OVS 流表分析示意：
+  - 🚀 OCP3 OVS 流表分析示意：
 
     ![ocp3-ovs-openflow-1](images/ocp3-ovs-openflow-1.jpg)
   
-  - 🚀 OCP 3.x 中访问使用 `NodePort` service 类型的 pod 跨节点流量分析：
-    以下为 iptables NAT 表与 OVS 流表部分条目，并且 OCP 3.x 集群使用 ovs-subnet SDN 插件，无 `networkpolicy` 策略存在。
+  - 🚀 OCP3 中访问使用 `NodePort` service 类型的 pod 跨节点流量分析：
+    以下为 iptables NAT 表与 OVS 流表部分条目，并且 OCP3 集群使用 ovs-subnet SDN 插件，无 `networkpolicy` 策略存在。
 
     ![NodePort-service-iptables-nat-ovs-analyze](images/NodePort-service-iptables-nat-ovs-analyze.jpg)
   
@@ -739,7 +739,7 @@
 - label：
   - 标签
   - 基于等值类型的标签
-    > OCP 4.x 中支持基于集合类型的标签
+    > OCP4 中支持基于集合类型的标签
   - OCP 集群中的各种资源使用 label 标签进行匹配
 - persistent volume（pv）：
   - 持久卷
@@ -833,7 +833,7 @@
     # 拉取镜像，否则 pod 创建失败。 
     ```
 
-    OCP 3.x 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP 4.x 中使用 deployment 资源对象代替 deploymentconfig 资源对象即可：
+    OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 deployment 资源对象代替 deploymentconfig 资源对象即可：
 
     ```bash
     $ oc create secret generic myappfilesec \
@@ -844,7 +844,7 @@
     $ oc set volume dc/myapp --add \
       -t secret -m /opt/app-root/secure \
       --name myappsec-vol --secret-name myappfilesec
-    # OCP 3.x 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的
+    # OCP3 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的
     # /opt/app-root/secure/ 目录中
     # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
     ```
@@ -927,21 +927,21 @@
 
     ```bash
     $ oc set env dc/<deploymentconfig_name> --from=configmap/<configmap_name>
-    # OCP 3.x 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
+    # OCP3 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
     # 注入至应用 pod 中
     
     ### 示例 ###
     $ oc set env dc/myapp --from=configmap/myappconf
-    # OCP 3.x 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
+    # OCP3 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
     # 以环境变量的方式存在。
     ```
 
     ```bash
     $ oc rollout latest dc/<deploymentconfig_name>
-    # OCP 3.x 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
+    # OCP3 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
     
     $ oc rollback 
-    # OCP 3.x 中 oc rollout/rollback 都是针对 dc 来实现
+    # OCP3 中 oc rollout/rollback 都是针对 dc 来实现
     ```
   
   - 如下所示，由于注入 configmap 与更改 dc 配置导致两次触发 dc 部署全新的 pod：
@@ -953,7 +953,7 @@
     - OpenShift 通过挂载卷（`volume`）的方式将其注入到容器中，在容器中以挂载卷的形式存在。
       > 还可将正在运行的应用程序的部署配置（deploymentconfig）更改为引用 configmap 资源或 secret 资源，然后 OpenShift 自动重新部署应用程序并使数据对容器可用。
   - 💎 补充：
-    OCP 4.x 中将 secret 与 configmap 资源对象注入应用 pod 的方式：
+    OCP4 中将 secret 与 configmap 资源对象注入应用 pod 的方式：
 
     ![oc-set-env-or-volume](images/oc-set-env-or-volume.jpg)
 
@@ -963,7 +963,7 @@
     - 另一方面，若应用有大量的配置变量，或正在迁移大量使用配置文件的遗留应用，则使用 `卷挂载` 方法，而不是为每个配置变量创建一个环境变量。
     - 如，若应用需要从本地节点文件系统上的特定位置获得一个或多个配置文件，则应该使用配置文件创建 secret 或 configmap，并将它们挂载到容器临时文件系统中应用所需的路径下。
 - OCP 中特有的资源对象：buildconfig、deploymentconfig、route、template
-- 外部访问 OCP 集群内应用的方式：NodePort、Route、Ingress（OCP 4.x 已支持）、port-forward
+- 外部访问 OCP 集群内应用的方式：NodePort、Route、Ingress（OCP4 已支持）、port-forward
 - OCP 资源之间的关系与工作流程：
   
   ![ocp3-resource-workflow](images/ocp3-resource-workflow.jpg)
@@ -1083,7 +1083,7 @@
   ![ocp3-delete-route-error-2](images/ocp3-delete-route-error-2.jpg)
 
 - 💎 补充：
-  在 OCP 4.x 集群中默认情况下普通用户无法访问 `openshift-console` 项目中的资源，可设置相应项目的 rolebindings 使普通用户可访问。
+  在 OCP4 集群中默认情况下普通用户无法访问 `openshift-console` 项目中的资源，可设置相应项目的 rolebindings 使普通用户可访问。
 
 ## OCP 日志与事件命令
 
