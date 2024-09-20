@@ -21,33 +21,24 @@
 ## MicroShift 概览与架构
 
 - MicroShift 概览（低资源环境与低硬件配置）：
-  
   - 运行在云中相同的 Kubernetes 工作负载，但在边缘运行。
   - 解决严重网络约束的环境挑战，如低速连接或无连接。
   - 通过在边缘设备上直接安装系统镜像，使边缘设备更加易于访问。
   - MicroShift 具有单节点部署的简洁性，以及在资源约束位置计算所需的功能和服务。
   - 可在不同的主机上有多个部署，创建每个应用程序所需的特定系统镜像。
-
 - MicroShift 架构：
-  
   - MicroShift 是一个单节点容器运行时，旨在将使用容器的好处扩展到低资源的边缘环境。
-  
   - 由于 MicroShift 主要是部署应用程序的平台，因此仅包含在边缘和小容量计算环境中操作所必须的 API 及功能。
-    
+
     ![microshift-architecture](images/microshift-architecture.jpg)
 
 - 💥 与 OpenShift Kubernetes Engine 的主要区别：
-  
   - 安装了 MicroShift 的设备可自我管理
-  
   - 与基于 `RPM-OStree` 的系统（RedHat CoreOS）兼容
-  
   - 仅使用基本功能的 API
-  
   - 从 OpenShift CLI (oc) 启用命令子集
-  
   - 不支持添加 worker 节点的工作负载高可用性（HA）或横向扩展
-    
+
     ![difference-microshift-openshift](images/difference-microshift-openshift.jpg)
   
   - 除架构上的差异外，部分集群资源对象与 oc 子命令的使用也存在变化，如，无法使用 oc new-project 子命令创建项目，MicroShift 不具有 `imagestream` 资源对象等。
@@ -55,17 +46,12 @@
 ## MicroShift 部署方式详解
 
 - MicroShift 使用 Red Hat 提供的 RPM 软件包安装部署，需要具有相关软件订阅频道的权限方可下载。
-
 - 虽然 Red Hat OpenShift Local (CRC) 可提供较为完整的 OpenShift 集群功能，但其不能在生产环境中使用，只适用于开发及测试环境。
-
 - MicroShift 作为轻量级的 OpenShift 集群可在单节点上运行，可满足边缘计算场景的需求与服务。
-
 - 此处使用的环境与软件包版本见 `Demo 环境说明`。
-
 - 部署过程如下所示：
-  
   - 启用所需的软件订阅频道：
-    
+
     ```bash
     $ sudo subscription-manager register  # 使用订阅用户名与密码将主机注册至订阅服务器
     $ sudo subscription-manager list --available  # 查看可用的软件订阅
@@ -79,17 +65,17 @@
     ```
   
   - 安装 microshift 软件包：
-    
+
     ```bash
     $ sudo dnf install -y microshift  # 安装 microshift 软件包
     ```
-  
+
   - 使用订阅账户登录 [Red Hat Hybrid Cloud Console](https://console.redhat.com/openshift/install/pull-secret) 下载 `pull-secret` 容器镜像拉取密钥文件。将此文件同步至 microshift 节点。
-    
+
     ![download-pull-secret](images/download-pull-secret.png)
   
   - 将 pull-secret.txt 文件拷贝至 microshift 节点的 /etc/crio 目录中，并更新其属组与权限：
-    
+
     ```bash
     $ sudo cp pull-secret.txt /etc/crio/openshift-pull-secret
     $ sudo chown root:root /etc/crio/openshift-pull-secret
@@ -97,14 +83,14 @@
     ```
   
   - 关闭 firewalld 服务避免干扰 microshift 集群网络：
-    
+
     ```bash
     $ sudo systemctl disable --now firewalld.service
     ```
   
-  - **【可选步骤】**  安装 Operator Lifecycle Manager (OLM) 软甲包：
+  - **【可选步骤】** 安装 Operator Lifecycle Manager (OLM) 软甲包：
     安装 microshift 软件包时，不会默认安装 OLM，需手动安装此 RPM 软件包。
-    
+
     ```bash
     $ sudo dnf install -y microshift-olm
     $ sudo systemctl restart microshift.service
@@ -112,33 +98,30 @@
     # olm pod 使用 deployment 资源定义
     ```
   
-  - **【可选步骤】**  安装 GitOps ArgoCD 清单：
-    
+  - **【可选步骤】** 安装 GitOps ArgoCD 清单：
     - 可使用 OpenShift GitOps 轻量级版本管理应用，此过程安装基本的 GitOps 功能，ArgoCD CLI 目前在 MicroShift 中不可用。
-    
     - 安装完成后需重启服务，将自动拉取 argocd 容器镜像并运行 pod。
-      
+
       ```bash
       $ sudo dnf install -y microshift-gitops
       $ sudo systemctl restart microshift.service
       ```
   
   - 启动 microshift 服务：
-    
     - 保证部署节点的网络可用，启动服务后将使用 pull-secret.txt 文件拉取部署所需的容器镜像至 root 用户命名空间中。
     - 可使用 `sudo crictl images` 或 `sudo podman images` 查看已拉取的容器镜像
     - 第一次启动此服务，将拉取容器镜像并启动各组件，需要经历一段时间等待，直至节点状态为 Ready，所有的 pod 为 Running 状态，才表明 microshift 集群可用。而后续启动集群可快速就绪。
-    
+
     ```bash
     $ sudo systemctl enable microshift.service
     $ sudo systemctl start microshift.service
     ```
-    
+
     ![microshift-cluster-status-spent_100min](images/microshift-cluster-status-spent_100min.png)
-    
+
     - 以上返回结果中还包含 microshift-olm 的两个 pod。排除这两个 pod 外，其余 microshift 集群相关的 pod 在此场景中耗时 97 分钟就绪，而这两个 pod 就绪总共耗时 119 分钟。在启动 microshift 服务后，将会有较长的一段时间使集群节点处于 NotReady 的状态，这是由于集群 openshift-dns 命名空间中的 `dns-default` pod 未就绪而造成的。直至此 pod 正常运行，集群节点即为 Ready 状态。`dns-default` pod 中运行 coredns 进程，而 `ovnkube-master` pod 中运行 ovn-northd、nbdb、sbdb 等进程，`ovnkube-node` pod 中运行 ovn-controller 进程。
     - 若 microshift 集群状态正常后，可启用 microshift-olm 与 microshift-gitops 服务。待所有 pod 全部就绪后将返回如下状态：
-    
+
     ```bash
     $ oc get nodes
     NAME                             STATUS   ROLES                         AGE   VERSION
@@ -159,19 +142,19 @@
     openshift-ovn-kubernetes               ovnkube-node-zkznm                            1/1     Running   2          2d
     openshift-service-ca                   service-ca-686b8b5949-wxt6v                   1/1     Running   1          2d
     ```
-    
+
     - 💥 openshift-gitops 命名空间中的 `argocd-application-controller` pod 使用 statefulset 资源定义，并且其容器镜像拉取策略为 `Always`，建议将其更改为 `IfNotPresent`，否则在每次集群启动时都将去拉取镜像。若集群节点无法连接外网，该镜像无法拉取将造成 ArgoCD 无法正常使用。
-      
+
       ![statefulset-argocd-application-controller](images/statefulset-argocd-application-controller.png)
   
   - 停止 microshift 服务：
-    
+
     ```bash
     $ sudo systemctl stop microshift.service
     ```
-    
+
     即使 microshift 服务停止运行，但是集群节点上的工作负载可能继续运行。如下方法停止工作负载：
-    
+
     ```bash
     $ sudo crictl ps -a  # 查看全部的工作负载，使用 podman 命令无效。
     $ sudo systemctl stop kubepods.slice  # 停止部署的工作负载
@@ -180,7 +163,6 @@
 ## Wildcard DNS 在 MicroShift 中的应用
 
 - 部署在 OpenShift 中的应用可使用泛域名解析（Wildcard DNS）的方式进行访问，因此，在本 Demo 中使用 `lab.example.com` 作为 DNS 查询域名，`apps.lab.example.com` 作为应用的 DNS 查询域名后缀。只有使用正确的 DNS 查询方式才能访问部署的应用。
-
 - 由于此处 MicroShift 部署于 RHEL9 中，可直接使用系统自带的 `NetworkManager.service` 服务与 `dnsmasq` 组件来完成泛域名解析。
   
   ```bash
