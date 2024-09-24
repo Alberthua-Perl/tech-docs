@@ -82,9 +82,9 @@
 
 ## ♾️ **DevOps 技术栈**
 
-- [【精华】Git 基础进阶与场景实践](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%9C%BA%E6%99%AF%E5%AE%9E%E8%B7%B5.md)
-- [GitHub 与 GitLab 原理与使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/GitHub%20%E4%B8%8E%20GitLab%20%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
-- [基于 GitLab、Jenkins、Harbor、Podman 的 CI/CD 示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20GitLab%E3%80%81Jenkins%E3%80%81Harbor%E3%80%81Podman%20%E7%9A%84%20CI%20&%20CD%20%E7%A4%BA%E4%BE%8B.md)
+- [【精华】Git 基础进阶与场景实践](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%9C%BA%E6%99%AF%E5%AE%9E%E8%B7%B5/Git%20%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%9C%BA%E6%99%AF%E5%AE%9E%E8%B7%B5.md)
+- [GitHub 与 GitLab 原理与使用配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/GitHub%20%E4%B8%8E%20GitLab%20%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE/GitHub%20%E4%B8%8E%20GitLab%20%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E9%85%8D%E7%BD%AE.md)
+- [基于 GitLab、Jenkins、Harbor、Podman 的 CI/CD 示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20GitLab%E3%80%81Jenkins%E3%80%81Harbor%E3%80%81Podman%20%E7%9A%84%20CI%20%26%20CD%20%E7%A4%BA%E4%BE%8B/%E5%9F%BA%E4%BA%8E%20GitLab%E3%80%81Jenkins%E3%80%81Harbor%E3%80%81Podman%20%E7%9A%84%20CI%20%26%20CD%20%E7%A4%BA%E4%BE%8B.md)
 - [使用 ansible-navigator 部署与管理 CI/CD 平台](https://github.com/Alberthua-Perl/ansible-demo/tree/master/ansible-cicd-plt)
 - [【系列教程】Ansible 自动化进阶实践 (1) - 利用推荐做法进行 Playbook 开发](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E5%88%A9%E7%94%A8%E6%8E%A8%E8%8D%90%E5%81%9A%E6%B3%95%E8%BF%9B%E8%A1%8C%20Playbook%20%E5%BC%80%E5%8F%91.md)
 - [【系列教程】Ansible 自动化进阶实践 (2) - 管理清单](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20-%20%E7%AE%A1%E7%90%86%E6%B8%85%E5%8D%95.md)
