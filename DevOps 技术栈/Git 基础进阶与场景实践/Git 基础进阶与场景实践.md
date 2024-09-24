@@ -486,12 +486,16 @@ $ git push --delete origin <branch_name>
   - perf：增加代码进行性能测试
   - test：增加测试用例
   - chore：改变构建流程、或者增加依赖库、工具等
+
   2️⃣ scope：本次 commit 波及的范围
+
   3️⃣ subject：简明扼要地阐述本次 commit 的主旨，在原文中特意强调了几点：
   - 使用祈使句
   - 首字母不要大写
   - 结尾无需添加标点
+
   4️⃣ body：同样使用祈使句，在主体内容中需要详细描述本次 commit，比如此次变更的动机，如需换行，则使用 `|`。
+  
   5️⃣ footer：描述下与之关联的 issue 或 break change
 
 -----

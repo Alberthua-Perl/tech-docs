@@ -1,108 +1,75 @@
-## GitHub 与 GitLab 原理与使用配置
+# GitHub 与 GitLab 原理与使用配置
 
-### 文档说明：
+## 文档说明
 
 - OS 版本：CentOS Linux release 7.4.1708 (Core)
-
 - Git 版本：git-1.8.3.1-20.el7.x86_64
-
 - GitLab 版本：gitlab-ce-12.7.0-ce.0.el7.x86_64
-
 - 该文档中若未指定具体版本均已上述版本为例。
-
 - ✨ 该文档中所涉及的 GitLab 命令、配置与故障排除将持续更新。
 
-### 文档目录：
+## 文档目录
 
 - GitHub 的常规使用
-
 - GitLab 基本概念与架构
-
 - GitLab 安装部署
-
 - GitLab 常规配置使用
-
 - 参考链接
 
-### GitHub 的常规使用：
+## GitHub 的常规使用
 
 - GitHub 官方 [guide demo](https://guides.github.com/activities/hello-world/)
-
 - GitHub 的使用场景：
-  
   - 创建和使用仓库（repository）：
-    
     - 一个仓库通常用来组织一个单独的项目（project）。
-    
     - 该仓库可以包含项目中的所有文件。
-    
     - 创建仓库时，默认创建 `README.md` 文件，或者自定义的用来记录项目信息的文件。
-  
   - 创建和管理分支（branch）：
-    
     - 分支是一个可以在同一时间工作在同一个仓库的不同版本的方法。
-    
     - 仓库中会有一个默认的名叫 `master` 的主分支，该分支用来存储最终确定的版本代码。
-    
     - 可使用其他的子分支来进行编辑和更改，确定之后再提交到主分支。
-    
     - 👉 当从主分支创建出一个子分支的那一刻，其实是对当时时间点的主分支做了一个拷贝。
-    
     - 💥 若之后别的分支对主分支进行了更新，在提交到主分支之前，必须先从主分支上拉取那些更新。
-    
     - 分支合作的整个流程，以创建 `feature` 子分支为例，如下所示：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-master-other-branch.png)
+
+      ![github-master-other-branch](images/github-master-other-branch.png)
   
   - 更改文件并将它提交（commit）到 GitHub：
-    
     - GitHub 中的每次操作最终保存更改称为提交（commit），每一次提交都需要写修改的备注说明。
-    
     - 该过程与 `git commit` 命令类似。
-  
   - 🤘 发起（`pull request`）合并请求（`merge`）至主分支（master）：
-    
     - 请求代码合并是 GitHub 团队协作的核心功能。
-    
     - 当发出一个 "请求代码合并" 请求时，相当于请求别人拷贝你当前的代码做出审查，审查通过之后将你的代码下载并且合并到他们的分支上。
-    
     - 该请求将会在所有的分支上显示出不相同的部分。
-    
     - 做出的任何更改、增加以及减少，都会用绿色和红色显示出来。
-    
     - 在代码完成之前，可以随时进行代码提交，发起请求代码合并的请求以及进行讨论。
-    
     - 可以通过 GitHub 的 `@` 功能，在每次发出 "请求代码合并" 请求时，向特定的人或团队做出反馈。
-    
     - ✅ 可以向自己的仓库发出 "请求代码合并" 的请求，并且自己去合并，这在接触到大型项目之前是非常好的练习方法。
-
 - GitHub 常规操作与故障排除：
-  
   - 添加 GitHub profile 的 `README.md` 文件以设置个人主页信息：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/personal-github-profile-readme.jpg)
+
+    ![personal-github-profile-readme](images/personal-github-profile-readme.jpg)
   
   - 本地用户使用 SSH 登录 GitHub 账号：
-    
     - 创建本地用户用于免密码登录 GitHub 的 SSH 公私钥对：
-      
+
       ```bash
       $ cd $HOME/.ssh
       $ ssh-keygen -t rsa -C "<your_email_address>"
       ```
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/local-login-github-ssh-keypair.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-1.png)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-2.png)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-3.png)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/add-ssh-pubkey-into-github-4.png)
-    
+
+      ![local-login-github-ssh-keypair](images/local-login-github-ssh-keypair.jpg)
+
+      ![add-ssh-pubkey-into-github-1](images/add-ssh-pubkey-into-github-1.png)
+
+      ![add-ssh-pubkey-into-github-2](images/add-ssh-pubkey-into-github-2.png)
+
+      ![add-ssh-pubkey-into-github-3](images/add-ssh-pubkey-into-github-3.png)
+
+      ![add-ssh-pubkey-into-github-4](images/add-ssh-pubkey-into-github-4.png)
+
     - 本地登录 GitHub 测试：
-      
+
       ```bash
       $ vim $HOME/.ssh/config
         Host github.com
@@ -113,86 +80,65 @@
       $ ssh -Tv git@github.com
       # 免密登录 GitHub 测试
       ```
-    
+
     - 登录 GitHub 的故障报错如下，`sign_and_send_pubkey: signing failed: agent refused operation Permission denied (publickey).`，其解决方法如下所示：
-      
+
       ```bash
       $ evel $(ssh-agent -s)
       $ ssh-add <ssh_private_key>
       ```
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-github-error.jpg)
-    
+
+      ![login-github-error](images/login-github-error.jpg)
+
     - 若不使用 SSH 公钥免密码登录 GitHub，将在推送本地仓库代码至远程代码仓库时，需交互式输入用户名与密码来完成身份验证。
-    
     - 👉 本地用户使用 SSH 登录 `GitLab` 类似登录 GitHub。
-    
     - GitLab 也使用本地用户的 `SSH pubkey` 认证方法，远程登录 GitLab Shell。
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-gitlab-1.png)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/login-gitlab-2.png)
+
+      ![login-gitlab-1](images/login-gitlab-1.png)
+
+      ![login-gitlab-2](images/login-gitlab-2.png)
   
   - 本地用户使用 SSH 登录 GitLab 私有代码仓库报错：
-    
     - 由于本地用户生成的 SSH 用户公私钥对已重命名，而 SSH 用户公钥做密钥交换时使用默认的 `id_rsa` 前缀名，两者的名称不一致导致的本地用户免密登录 GitLab 失败。
-    
     - 可更改 `$HOME/.ssh/config` 使用指定的 SSH 用户私钥名称以解决。
-  
   - 💥 GitHub 的仓库中不允许创建空目录，需在创建的目录中再创建文件，导入其他文件后删除该文件即可。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-new-dir.png)
+
+    ![github-new-dir](images/github-new-dir.png)
   
   - 💥 GitHub 推送代码大小限制：单个文件 `50MB`
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/github-upload-file-limit.png)
-    
-  - GitLab 中新建项目后可执行以下步骤实现代码库的初始化：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/git-push-new-gitlab-master-branch.jpg)  
 
-### GitLab 基本概念与架构：
+    ![github-upload-file-limit](images/github-upload-file-limit.png)
+
+  - GitLab 中新建项目后可执行以下步骤实现代码库的初始化：
+
+    ![git-push-new-gitlab-master-branch](images/git-push-new-gitlab-master-branch.jpg)  
+
+## GitLab 基本概念与架构
 
 - GitLab 是利用 `Ruby on Rails` 的开源版本管理系统，实现一个自托管的 Git 项目仓库，可通过 Web 界面进行访问公开的或者私有项目。
-
 - 与 GitHub 类似，GitLab 能够浏览源代码，管理缺陷和注释。
-
 - 可以管理团队对仓库的访问，它非常易于浏览提交过的版本并提供一个文件历史库。
-
 - 团队成员可以利用内置的简单聊天程序（`Wall`）进行交流。
-
 - 👉 它还提供一个代码片段收集功能可以轻松实现代码复用，便于日后有需要的时候进行查找。
-
 - GitLab `v12.7` 架构示意：
-  
+
   若无特殊指定，所有 GitLab 组件之间使用 `Unix socket` 通信！
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-application-architecture-v12.7.png)
+  ![gitlab-application-architecture-v12.7](images/gitlab-application-architecture-v12.7.png)
 
 - GitLab 各组件服务构成：
-  
   - nginx：静态 Web 服务器
-  
   - `gitlab-workhorse`：轻量级的反向代理服务器
-  
   - `gitlab-shell`：用于处理 `Git` 命令和修改 `authorized_keys` 列表
-  
   - logrotate：日志文件管理工具
-  
   - `unicorn`：该服务用于 `GitLab Rails` 应用的托管
-  
   - redis：缓存数据库
-  
   - postgresql：PG 数据库
-  
   - `sidekiq`：用于在后台执行队列任务（异步执行）
-
 - GitLab 默认内置用户：
-  
   GitLab 安装完成后将自动创建以下用户：
-  
   - `git`：Git 管理用户
-    
+
     ```bash
     ┌─[codeadmin][gitlab-harbor][~]
     └─➞ ls -lh /var/opt/gitlab/ | grep -w git
@@ -208,55 +154,32 @@
     ```
   
   - `gitlab-www`：Nginx 组件用户
-  
   - `gitlab-redis`：Redis 数据库用户
-  
   - `gitlab-psql`：PostgreSQL 数据库用户
-  
   - `gitlab-prometheus`：GitLab 监控用户
-
 - 🔥 GitLab 相关目录：
-  
   - `/opt/gitlab`：GitLab 默认安装目录
-  
   - `/etc/gitlab`：配置文件目录
-  
   > 👉 gitlab-ctl reconfigure 使用该配置文件目录编译，生成的数据将覆盖 /var/opt/gitlab。
-  
   - `/etc/gitlab/gitlab.rb`：主配置文件
-  
   - `/var/opt/gitlab`：默认配置文件目录
-  
   > 👉 gitlab-ctl reconfigure 编译后的配置文件，无需手动修改。
-  
   - `/var/opt/gitlab/git-data/repositories`：Git 代码仓库默认存储目录
-  
   > 👉 可指定自定义仓库路径
-  
   - `/var/opt/gitlab/nginx/conf/gitlab-http.conf`：Nginx 组件的配置文件
-  
   - `/var/opt/gitlab/backups`：备份文件生成的目录
-  
   - `/var/log/gitlab`：GitLab 各个组件生成的日志
-
 - GitLab 常规工作流程：
-  
   - 创建或克隆项目
-  
   - 创建项目或分支
-  
   - 编写代码并提交至该分支
-  
   - 推送该项目分支至远程 GitLab 服务器
-  
   - 进行代码检查并提交 master 主分支合并申请（pull request）
-  
   - 项目领导审查代码并确认合并申请
 
-### GitLab 安装部署：
+## GitLab 安装部署
 
 - GitLab 安装部署过程：
-  
   💥 此处使用 `RPM` 包的方式安装 GitLab，并且 GitLab 安装节点的物理内存不可小于 2G！
   
   ```bash
@@ -285,7 +208,7 @@
   
   此处已提前下载 `gitlab-ce-12.7.0-ce.0.el7.x86_64.rpm` 软件包，该软件包具有所有服务组件，无需安装数据库与缓存数据库，直接安装该软件包即可，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-install-success.png)
+  ![gitlab-install-success](images/gitlab-install-success.png)
   
   ```bash
   $ sudo gitlab-ctl reconfigure
@@ -293,7 +216,7 @@
   # 注意：系统中不应存在 git 用户，若存在需将其删除，否则报错！
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-ctl-reconfigure-error.png)
+  ![gitlab-ctl-reconfigure-error](images/gitlab-ctl-reconfigure-error.png)
   
   ```bash
   $ sudo gitlab-ctl status
@@ -320,7 +243,7 @@
   # 查看 gitlab 各组件服务状态
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-runsvdir-service-status.png)
+  ![gitlab-runsvdir-service-status](images/gitlab-runsvdir-service-status.png)
   
   ```bash
   $ sudo ss -ntulp | grep 80
@@ -328,9 +251,9 @@
   # 若 80 端口已被占用，可修改配置的端口或使用 Docker 容器方式运行 gitlab。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-listen-port.png)
+  ![gitlab-listen-port](images/gitlab-listen-port.png)
 
-### GitLab 常规配置使用：
+## GitLab 常规配置使用
 
 - GitLab 常用命令示例：
   
@@ -350,32 +273,25 @@
   ```
 
 - 创建、管理 GitLab 用户：
-  
   - 首次登录 GitLab 时，需设置 root 管理员密码并确认，密码长度至少 `8` 位。
-    
     - 8.8 版本之前默认 `root` 账号，密码为 `5iveL!fe`。
-    
     - 8.9 版本之后登录 Web 界面要求更改密码，密码最少为 `8` 位。
-  
   - root 密码设置完成后即可登录，如下所示：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-root-login.png)
+
+    ![gitlab-root-login](images/gitlab-root-login.png)
   
   - 创建项目（仓库）、用户与组：
-    
     👉 使用管理员区域（`Admin Area`）按钮设置
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-root-admin-area.png)
+
+    ![gitlab-root-admin-area](images/gitlab-root-admin-area.png)
   
   - 更改已存在用户的信息：
-    
     - 创建的新用户设置密码，需要使用由 GitLab 发送的邮件链接完成。
-    
     - 创建的密码可由 root 管理员或用户自身进行更改。
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-create-user-1.png)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-create-user-2.png)
+
+      ![gitlab-create-user-1](images/gitlab-create-user-1.png)
+
+      ![gitlab-create-user-2](images/gitlab-create-user-2.png)
 
 - 更改 GitLab 的远程拉取地址：
   
@@ -409,13 +325,8 @@
   ```
   
   - 编辑 `/etc/gitlab/gitlab.rb` 配置文件后需重新配置 gitlab，即执行 `gitlab-ctl reconfigure` 命令，而编辑其他配置文件后，只需重启 gitlab 各服务组件即可。
-  
   - 💥 若重新配置 gitlab，由于 /etc/gitlab/gitlab.rb 配置文件未更改，其他配置文件中更改的内容将被全部清除而无法生效！
-  
-  - ✅ 最佳实践：
-    
-    尽可能更改 `/var/opt/gitlab/` 目录中的配置，再重启 gitlab 各服务组件。
-
+  - ✅ 最佳实践：尽可能更改 `/var/opt/gitlab/` 目录中的配置，再重启 gitlab 各服务组件。
 - 更改 GitLab 自定义代码存储路径：
   
   ```bash
@@ -464,16 +375,12 @@
     gitlab-shell> exit
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/github-gitlab-basic-advanced/gitlab-rails-change-root-password.png)
+  ![gitlab-rails-change-root-password](images/gitlab-rails-change-root-password.png)
 
-### 参考链接：
+## 参考链接
 
 - [GitLab Docs](https://docs.gitlab.com)
-
 - [GitLab 架构](https://blog.csdn.net/kikajack/article/details/80354774)
-
 - [GitLab 搭建遇到的问题记录](https://blog.csdn.net/huohongpeng/article/details/113856718)
-
 - [GitLab启动所有服务的方式](http://www.doocr.com/articles/58aef65448fad94044cf13cc)
-
 - [GitLab 操作手册](https://blog.51cto.com/14241151/2366621?source=dra)
