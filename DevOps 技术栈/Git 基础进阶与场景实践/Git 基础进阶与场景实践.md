@@ -9,7 +9,7 @@
 
 -----
 
-### 文档目录
+## 文档目录
 
 - 基础架构即代码
 - Git 简介
@@ -78,7 +78,7 @@
   
   Local Working Tree -> Staging Area -> Local Repository -> Remote Repositiry (upstream)
   
-  ![](images/git-manage-files-foue-areas.png)
+  ![git-manage-files-foue-areas](images/git-manage-files-foue-areas.png)
 
 - Git 目录结构示例：
   
@@ -122,11 +122,8 @@
 ### 设置 Git 代理
 
 - 由于国内特殊的网络环境，使用 Git 与 GitHub 交互时经常会出现无法访问或访问超时的现象。因此，可配置 Git 代理解决此问题。
-
 - 设置 Git 代理需使用魔法上网，请确保自身的魔法可正常使用。
-
 - 笔者的开发环境中宿主机为 Windows 10，使用 VMware 运行 RHEL8.5 虚拟机环境。Windows 中的魔法使用 Clash 实现，其转发的端口为 `7890`。开发环境位于虚拟机中，需对其中的 Git 设置代理，设置步骤如下所示：
-  
   - Clash 打开 7890 端口
 
     ![open-clash-port-7890](images/open-clash-port-7890.png)
@@ -200,6 +197,7 @@
   ![git-config-user-info](images/git-config-user-info.png)
   
   👨‍🏫 示例：使用 git config 的 `credential` 配置参数，在推送本地仓库代码至远程代码仓库时，可能需要输入远程代码仓库中指定 git 用户的密码作为认证凭据，并且该远程仓库可能属于另一 git 用户所有，如下所示：
+
   👉 使用 `student` 用户推送本地仓库代码
   
   ![git-config-credential](images/git-config-credential.jpg)
@@ -355,9 +353,10 @@ $ git rm --force <file>
 ![git-rm-f-cached-staged](images/git-rm-f-cached-staged.jpg)
 
 👨‍🏫 示例：git add 针对于工作区已删除文件的操作
+
 由于工作区中将已提交至本地仓库的文件删除，该文件进入未跟踪的状态（`untracked`），若要跟踪该已删除的文件可使用 `git add --all <pathspec>` 将其添加至暂存区中，待 commit 提交至本地仓库。
 
-![git-add-removed-file-in-working-tree](pictures/git-add-removed-file-in-working-tree.jpg)
+![git-add-removed-file-in-working-tree](images/git-add-removed-file-in-working-tree.jpg)
 
 -----
 
@@ -500,6 +499,7 @@ $ git push --delete origin <branch_name>
 ## 🛠 git push 推送的故障排查
 
 👨‍🏫 示例 1：
+
 远程代码仓库的分支中已存在其他开发者提交的新代码，而在本地工作区与本地仓库中无这些更新，因此本地仓库推送更新的代码至远程代码仓库的分支中时会由于两者的状态不一致而产生冲突（`conflict`），此时可将远程的更新拉取（`pull`）至本地工作区与本地仓库，同步两者的状态后即可重新推送，如下所示：
 
 ![git-push-error-resolv-1](images/git-push-error-resolv-1.jpg)
@@ -507,12 +507,14 @@ $ git push --delete origin <branch_name>
 ![git-push-error-resolv-2](images/git-push-error-resolv-2.jpg)
 
 👨‍🏫 示例 2：
+
 本地工作区新建并切换至新分支，将代码更新提交至本地仓库中，但该工作区中的 `origin` 远程代码仓库中还未创建该分支，依然指向原先的远程分支，因此，若不使用 `-u` 或 `--set-upstream` 选项的话，将无法将本地仓库的新分支与远程分支关联，使用该选项后可推送成功。
 💥 远程代码仓库中的分支无需手动创建，使用上述选项后将自动创建！
 
 ![git-push-set-upstream-branch](images/git-push-set-upstream-branch.jpg)
 
 👨‍🏫 示例 3：
+
 将本地未初始化的代码目录推送至远程代码仓库时，必须先在远程代码仓库上创建仓库，再对本地目录执行 `git init` 初始化，且需进行 `git commit` 提交后再推送至远程代码仓库，若不执行 commit 操作，报错如下：
 
 ```bash
@@ -558,6 +560,7 @@ Branch 'master' set up to track remote branch 'master' from 'origin'.
 ```
 
 👨‍🏫 示例 4：
+
 在使用 `GitHub Personal Access Token` 推送代码至远程代码仓库时，显示如下 WARNING 信息，虽然不影响代码的推送，但是任需将其排除：
 
 ```bash
@@ -576,6 +579,7 @@ $ source $HOME/.bashrc
 ```
 
 👨‍🏫 示例 5：
+
 若不使用 SSH 的方式认证登录 GitHub，以 `GitHub Personal Access Token` 认证登录的话，可单独在代码库 `.git/config` 文件的 `[remote "origin"]` 部分中更新如下配置：
 
 ```bash
@@ -889,9 +893,11 @@ $ source $HOME/.bashrc
   ```
 
 - Git 可执行两种类型的合并：`fast-forward (--ff)` 和 `no-fast-forward (--no-ff)`
+
   1️⃣ Fast-forward (--ff) 的说明：
-  在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
-  Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
+
+  - 在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
+  - Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
   
   ![git-fast-forward-detail_sm](images/git-fast-forward-detail_sm.png)
   
@@ -900,7 +906,8 @@ $ source $HOME/.bashrc
   ![git-merge-demo](images/git-merge-demo.png)
   
   2️⃣ No-fast-forward (--no-ff) 的说明：
-  如果当前分支相比于想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果在当前分支上提交想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。关闭 fast-forward 模式，使用 no-fast-forward 合并，在提交的时候，Git 会在当前活动分支上创建一个 merge 的提交信息，然后将合并分支，此时 HEAD 引用指向当前活动分支。
+
+  - 如果当前分支相比于想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果在当前分支上提交想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。关闭 fast-forward 模式，使用 no-fast-forward 合并，在提交的时候，Git 会在当前活动分支上创建一个 merge 的提交信息，然后将合并分支，此时 HEAD 引用指向当前活动分支。
   
   ![cannot-git-fast-forward-detail_sm](images/cannot-git-fast-forward-detail_sm.png)
   
@@ -914,7 +921,7 @@ $ source $HOME/.bashrc
   
   ![git-merge-no-ff-log](images/git-merge-no-ff-log.png)
   
-  从以上提交历史与提交时间戳可知，ea4b 提交不在要合并的 dev 分支中，并且该提交的时间在 dev 分支最后一次提交（49be）之后，因此将使用 No-fast-forward 模式合并。合并过程中 Git 要求说明合并的原因，并单独创建一个提交，这种方式由于新建提交可说明合并进入的分支，而 Fast-forward 方式无法确定哪个分支合并进入。
+  - 从以上提交历史与提交时间戳可知，ea4b 提交不在要合并的 dev 分支中，并且该提交的时间在 dev 分支最后一次提交（49be）之后，因此将使用 No-fast-forward 模式合并。合并过程中 Git 要求说明合并的原因，并单独创建一个提交，这种方式由于新建提交可说明合并进入的分支，而 Fast-forward 方式无法确定哪个分支合并进入。
 
 > ✨ 最佳实践：推荐使用 No-fast-forward 模式，由于在合并过程中新建提交信息，可有效的区分合并的分支，而 Fast-forward 模式无法实现，以此来区分 master 分支或 main 分支的提交历史！
 
@@ -1022,8 +1029,8 @@ $ source $HOME/.bashrc
 
   💥 注意：以下软重置与硬重置均已回退至旧提交为例
 - 1️⃣ 软重置：
-  软重置会将 HEAD 移至指定的提交（或与 HEAD 相比的提交的索引），而不会移除该提交之后加入的修改！
-  如下图，若不想保留添加了一个 style.css 文件的提交 9e78i，而且也不想保留添加了一个 index.js 文件的提交 035cc。但是，确实又想要保留新添加的 style.css 和 index.js 文件。这是软重置的一个完美用例。
+  - 软重置会将 HEAD 移至指定的提交（或与 HEAD 相比的提交的索引），而不会移除该提交之后加入的修改！
+  - 如下图，若不想保留添加了一个 style.css 文件的提交 9e78i，而且也不想保留添加了一个 index.js 文件的提交 035cc。但是，确实又想要保留新添加的 style.css 和 index.js 文件。这是软重置的一个完美用例。
   
   ![git-reset-soft](images/git-reset-soft.gif)
 
@@ -1031,7 +1038,7 @@ $ source $HOME/.bashrc
   
   ![git-reset-soft](images/git-reset-soft.png)
   
-  如上图所示，使用软重置版本回退至指定的提交，该提交之后的所有提交在 git log 中消失，但是该提交后的修改过的文件全部保留在工作区与暂存区中，依然可以再次修改与提交。
+  - 如上图所示，使用软重置版本回退至指定的提交，该提交之后的所有提交在 git log 中消失，但是该提交后的修改过的文件全部保留在工作区与暂存区中，依然可以再次修改与提交。
 
 - 2️⃣ 硬重置：
   直接重置到指定的提交状态，该提交之后的所有提交在 git log 中消失，并且之后提交中修改的文件在工作区与暂存区中也一起被删除。
