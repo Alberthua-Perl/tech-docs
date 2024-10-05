@@ -180,6 +180,8 @@
   ```
 
 - MicroShift 中使用泛域名解析访问应用的过程可参考下图，而集群中的 SDN 组件也参与此访问过程。通过以上配置可使用应用通过发布的 URL 进行访问。
+
+  > 注意：在 /etc/resolv.conf 文件中 nameserver 的顺序，可将解析外部的 nameserver 置于最前方，127.0.0.1 置于后方。
   
   ![dns-resolution-progress-sdn-overview](images/dns-resolution-progress-sdn-overview.png)
 

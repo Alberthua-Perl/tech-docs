@@ -13,12 +13,13 @@
 - OpenShift 基础架构概述
 - OpenShift 集群部署方法说明
 - OpenShift 帮助与登录
+- CRI-O 容器运行时相关命令
 - 🔥 OpenShift 资源对象详解
 - 🧪 OpenShift 资源对象使用
+- OpenShift 用户与访问控制
+- OpenShift Pod 的调度
 - OpenShift 路由使用
 - OpenShift 日志与事件
-- OpenShift Pod 的调度
-- OpenShift 用户与访问控制
 - 参考链接
 
 ## OpenShift 基础架构概述
@@ -76,7 +77,7 @@
 
 - OCP4 集群部署方法：
   - CRC 开发与测试环境：[Red Hat OpenShift Local v2.35 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20Local%20v2.35%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
-  - MicroShift 单节点集群环境（边缘计算）：[基于 RHEL9.3 的 Red Hat MicroShift v4.15 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
+  - MicroShift 单节点集群环境（边缘计算场景）：[基于 RHEL9.3 的 Red Hat MicroShift v4.15 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
 
 ## OpenShift 帮助与登录
 
@@ -92,8 +93,23 @@
   $ oc options
   # 查看 oc 命令行可用的选项
   
+  $ oc api-resources
+  # 查看当前集群中受支持的 API 资源，默认不区分是否在命名空间中。
+
+  $ oc api-resources --namespaced=[true|false]
+  # 查看命名空间内（true）或全局非命名空间（false）内的 API 资源
+
+  $ oc api-resources --api-group=<api_group_name>
+  # 指定 API 组查看其中支持的 API 资源
+  $ oc api-resources --api-group=''
+  # 查看核心 API 资源
+
+  $ oc api-resources --namespaced=true --api-group apps --sort-by name
+  # 查看命名空间内，指定 API 组中支持的 API 资源，并根据 name 列排序。
+
   $ oc types
   # 查看 OCP 集群的概念与类型说明
+  # 💥 注意：该子命令已在 OCP4 中不再使用！
   
   $ oc explain <resource_object>
   # 查看 OCP 集群指定资源对象的详细说明
@@ -158,7 +174,49 @@
   
   ![docker-registry-route](images/docker-registry-route.jpg)
 
-## OpenShift 资源对象详解
+## CRI-O 容器运行时相关命令
+
+- 虽然流行的容器运行时包括 Docker、Containerd、Podman 等，但在 OpenShift 集群中的各节点上使用 CRI-O 容器运行时运行容器与 Pod。从 OCP4 开始，集群中的容器运行时均使用 CRI-O，不再使用 OCP3 中的 Docker。
+- CRI-O 提供一个命令行接口可使用 `crictl` 工具管理容器与 Pod。
+- 由于 OpenShift 课程环境的集群设置，可使用如下方法登录集群节点：
+
+  ![login-ocp-course-lab-node](images/login-ocp-course-lab-node.png)
+
+- 以上方法登录集群节点具有特殊性，而使用 `oc debug` 子命令将在指定的集群节点上启用 debug pod，通过此 pod 可对其宿主节点进行调试。
+
+  ![oc-debug-chroot](images/oc-debug-chroot.png)
+
+- crictl 工具使用示例：
+
+  ```bash
+  $ sudo crictl pods
+  # 列举集群节点上的 pod 列表信息
+
+  $ sudo crictl images
+  # 查看集群节点上的容器镜像列表
+
+  $ sudo crictl ps -o [json|yaml]
+  # 查看集群节点上运行的容器
+
+  $ sudo crictl inspect <container_id> | jq .info.pid
+  # 获取指定容器中运行进程的 PID
+
+  $ sudo crictl exec <container_id> <command> <arg1> <arg2> ... <argN>
+  # 交互式地在指定的容器中运行命令
+  $ sudo crictl exec -it <container_id> /bin/bash
+  bash-4.4$ 
+
+  $ sudo crictl logs <container_id>
+  # 查看指定容器的标准输出与标准错误日志
+  ```
+
+  如下所示，crictl exec 子命令可交互式进入容器内部查看进程状态，同样也可利用 crictl 命令获取容器内进程 PID，再使用 `lsns` 与 `nsenter` 命令获取进程命名空间中的进程状态：
+
+  ![crictl-get-container-info-1](images/crictl-get-container-info-1.png)
+
+  ![crictl-get-container-info-2](images/crictl-get-container-info-2.png)
+
+## 🔥 OpenShift 资源对象详解
 
 - master 节点：
   - OCP 集群或 Kubernetes 集群的控制节点
@@ -190,11 +248,12 @@
 
     ![atomic-openshift-node-error-2](images/atomic-openshift-node-error-2.jpg)
 
-- project：
+- Project：
   - 项目，也称为命名空间（namespace），OCP 集群使用项目来隔离资源（硬隔离），区别于 Linux namespace。
   - 若未将 `self-provisioner` 角色从指定用户去除，使用指定用户创建的项目，该用户即为项目的项目管理员。
   - default 项目与 openshift 项目能被所有用户使用，但只能由 `system:admin` 用户或具有 `cluster-admin` 角色的用户管理。
-- image stream（`is`）、image stream tag（`istag`）：
+
+- ImageStream（`is`）、ImageStream tag（`istag`）：
   - 镜像流、镜像流标签：
 
     ```bash
@@ -323,7 +382,7 @@
       ```
   
   - 在 openshift 项目中的 image stream 与 template 资源在各个项目中均可共享，但只由具有 `cluster-admin` 角色的管理员用户管理。  
-  - 自 OCP4 开始可使用 `Samples operator` 管理 openshift 项目并可删除由手动添加的资源。 
+  - 自 OCP4 开始可使用 `Samples operator` 管理 openshift 项目并可删除由手动添加的资源。
   - 使用来自另一个项目的 image stream（基于 private registry）构建与部署应用：
     - 方式 1：
       在每个使用 image stream 的项目中创建包含可访问私有 OCP external registry 的 access token 的 secret，并将其 link 至每个项目中的 service account。
@@ -403,7 +462,7 @@
 
     ![imagestream-error-3](images/imagestream-error-3.jpg)
 
-- buildconfig（`bc`）、build：
+- BuildConfig（`bc`）、Build：
   - 构建配置、构建
   - 创建 buildconfig 的方法：
     - 直接使用 `oc new-app` 命令创建或通过 template 模板中的参数化定义创建
@@ -584,7 +643,8 @@
       - 使用简单的命令行模式
       - 使用 shell 脚本模式：
         使用 `/bin/sh -ic` 命令配合脚本来实现所有的功能，如参数扩展、重定向等，并且 build pod 必须可提供 `sh` 的 shell 解释器。
-- deploymentconfig（`dc`）、deploy：
+
+- DeploymentConfig（`dc`）、Deploy：
   - 部署配置、部署
   - 在 Kubernetes 1.0 中并不像现在如此方便可快速部署应用，而是需要繁复的手动配置才能满足要求，而在 OpenShift 3.0 中 Red Hat 开发了 `deploymentconfig`，以提供参数化部署输入、执行滚动部署、启用回滚至先前部署状态，以及通过触发器（`trigger`）以驱动自动部署等（buildconfig 构建配置完成后触发 deploymentconfig）。  
   - 由于 buildconfig 中 imagestreamtag 的改变，deploymentconfig 或 deployment 中可探测到 imagestreamtag 的改变针对新构建应用镜像的自动重新部署。
@@ -606,11 +666,40 @@
   - deploy 资源对象以 pod 的方式运行。
   - 该对象用于跟踪 deploymentconfig 生成新的 pod 的过程。
   - 若新部署的 pod 无法正确运行，删除 deploy pod 后，将自动删除正在由 deploy pod 部署的其他 pod。
-- replication controller（`rc`）、replicaset：
+- ReplicationController（`rc`）、ReplicaSet：
   - 前者已集成至 deploymentconfig 中，而后者集成至 deployment 中。
   - 该资源对象保证运行的 pod 的高可用，使其当前的数量趋近于 desired 数量。
   - 若 pod 由于某些原因故障停止，该资源对象将根据配置的 pod 数量（replicas）重新部署 pod 保证不间断服务，此类 pod 为无状态应用居多。
-- service：
+
+- Pod：
+  - pod 是 Kubernetes 集群与 OCP 集群中容器运行的原子单位（最小粒度）
+  - 单个 pod 中可以运行单个或多个容器，它们共享 `network namespace` 与 `volume`。
+  - 在 pod 中可存储临时数据（ephemeral storage），但在 pod 重启后将丢失全部数据，因此 pod 在某些场景下需使用永久存储（persistent storage）。
+  - 🔥 pod 中的 UIDs 与 GIDs 分配方式：
+    - 使用 OpenShift 默认安全策略，常规集群用户（regular cluster users）不能为他们的容器选择 `USER` 或者 `UIDs`。当常规集群用户创建 pod，OpenShift 忽略容器镜像中的 `USER` 指令。取而代之的是，OpenShift 为容器内的用户从项目 `annotation` 中的识别范围中分配一个 `UID` 与一个补充 `GID`（supplemental GID）。用户的 GID 总是 `0`，这就意味着用户属于 root 组。容器进程可以写的任何文件或目录必须具有读和写的权限 (使用 `GID=0` 或具有 root 组)。虽然在容器中的用户属于 root 用户组，这个用户是一个非特权账户。
+    - 与此相反的是，当集群管理员创建 pod，容器镜像中的 `USER` 指令可被处理。比如，如果容器镜像的 USER 指令被设置为 0，然后容器中的用户是 root (特权账户)，其 UID 为 0。使用特权账户执行容器具有安全风险。在容器内的特权账户对容器的主机系统具有未加限制地访问。未加限制地访问意味着容器能修改或删除系统文件，安装软件包，或对主机的其他危害。RedHat 建议使用 `rootless` 用户运行容器，或者使用仅具有必要特权的非特权用户来运行容器。
+
+      ![openshift-project-uid-gid-assignment](images/openshift-project-uid-gid-assignment.png)
+
+    - 如果两个容器的 UID 相同，那么在一个容器内的进程可能访问另一个容器中的资源与文件。
+    - 依靠为每个项目分配一个可区别的 UIDs 与 GIDs 范围，OpenShift 确保在不同项目中的应用运行不使用相同的 UID 或 GID。
+    - 当未定义安全上下文创建 pod 时，Kubernetes Pod 安全准入控制器（pod security admission controller）发出一个告警。而 OpenShift 使用安全上下文限制控制器（security context contraints controller）为 pod 安全提供安全默认值。
+  - pod 日志处理方式：
+    - 容器化的应用应将其日志发送至标准输出（standard output），若容器化的应用将日志发送至日志文件，该方式与非容器化应用一致。
+    - 保存于容器临时存储中的日志将随容器的销毁而丢失。
+    - OpenShift 集群提供可选的基于 `EFK`（Elasticsearch、Fluentd、Kibana） 的日志子系统，该日志子系统提供了长期存储与检索 OpenShift 集群节点与应用日志的能力。
+    - 应用应该充分利用 EFK 的优势，将其日志以标准输出的形式发送给 EFK，以达到收集与处理日志的能力。
+      > 🤔 是否可以采用 Fluentd + Loki 的轻量级日志采集方案？
+      >
+      > 📝 Kubernetes 官方推荐的日志架构可参考 [此链接](https://kubernetes.io/zh/docs/concepts/cluster-administration/logging/)。
+
+- Label：
+  - 标签
+  - 基于等值类型的标签
+    > OCP4 中支持基于集合类型的标签
+  - OCP 集群中的各种资源使用 label 标签进行匹配
+
+- Service：
   - 服务
   - service 资源对象处理的场景：
     - 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
@@ -717,7 +806,8 @@
       ![service-performance](images/service-performance.jpg)
 
     - 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
-- route：
+
+- Route：
   - 路由
   - 可借助 service 实现 OCP 集群内前后端 pod 间的通信，而 OCP 集群外部对内部 pod 的访问默认需要使用 default 项目的 `router pod` 来实现。
   - OCP 集群外部通过泛域名解析（wildcard）指向特定 `infra` 节点（前端可加负载均衡与高可用），router pod 需指定在该 infra 节点上运行，其 IP 地址与 infra 节点绑定。
@@ -729,23 +819,7 @@
 
     ![ocp3-route-infra](images/ocp3-route-infra.jpg)
 
-- pod：
-  - pod 是 Kubernetes 集群与 OCP 集群中容器运行的原子单位（最小粒度）
-  - 单个 pod 中可以运行单个或多个容器，它们共享 `network namespace` 与 `volume`。
-  - 在 pod 中可存储临时数据（ephemeral storage），但在 pod 重启后将丢失全部数据，因此 pod 在某些场景下需使用永久存储（persistent storage）。
-  - pod 日志处理方式：
-    - 容器化的应用应将其日志发送至标准输出（standard output），若容器化的应用将日志发送至日志文件，该方式与非容器化应用一致。
-    - 保存于容器临时存储中的日志将随容器的销毁而丢失。
-    - OpenShift 集群提供可选的基于 `EFK`（Elasticsearch、Fluentd、Kibana） 的日志子系统，该日志子系统提供了长期存储与检索 OpenShift 集群节点与应用日志的能力。
-    - 应用应该充分利用 EFK 的优势，将其日志以标准输出的形式发送给 EFK，以达到收集与处理日志的能力。
-      > 🤔 是否可以采用 Fluentd + Loki 的轻量级日志采集方案？
-      > 📝 Kubernetes 官方推荐的日志架构可参考 [此链接](https://kubernetes.io/zh/docs/concepts/cluster-administration/logging/)。
-- label：
-  - 标签
-  - 基于等值类型的标签
-    > OCP4 中支持基于集合类型的标签
-  - OCP 集群中的各种资源使用 label 标签进行匹配
-- persistent volume（pv）：
+- PersistentVolume（pv）：
   - 持久卷
   - 持久卷属于 OCP 集群资源，必须使用 `system:admin` 管理员用户或具有 `cluster-role` 角色的用户进行管理、创建与删除。
   - pv 资源定义中默认使用 `NFS` 服务端提供 NFS 存储，可为 pod 提供永久存储。
@@ -772,7 +846,8 @@
       👉 通过执行 rm -rf 命令删除卷上所有数据，使得卷可被新 pvc 使用。
       👉 目前只有 NFS 与 hostPath 支持该回收模式。
       > 💥 pv 与 pvc 可绑定成功，但不代表 pv 使用的后端存储可正常使用！
-- persistent volume claim（pvc）：  
+
+- PersistentVolumeClaim（pvc）：  
   - 持久卷声明  
   - 持久卷声明属于项目（或命名空间）资源，使用项目用户即可管理 pvc。  
   - pv 与 pvc 通过访问模式（`accessMode`）与存储大小（`storage`）进行匹配。  
@@ -792,7 +867,7 @@
 
     ![ocp3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
 
-- secret：  
+- Secret：  
   - 该资源对象保存 OCP 集群中的敏感数据，如密码、token 凭据等，将敏感数据与 pod 解耦。
   - 数据使用 `base64` 编码存储在 secret 资源对象中。
   - secret 资源对象可在命名空间中共享。
@@ -902,7 +977,7 @@
 
       ![service-account-secret-3](images/service-account-secret-3.jpg)
 
-- configuration map（configmap）：
+- ConfigureMap（configmap）：
   - 该资源对象类似于 secret 资源对象，但它们存储的是不敏感的数据。
   - configmap 资源对象可用于存储细粒度（`fine-grained`）信息，如独立的属性，或粗粒度（`coarse-grained`）信息，如整个配置文件和 JSON 数据。
   - 可使用 OpenShift CLI 或 Web 控制台创建 configmap 与 secret 资源，可在 pod 规范和 OpenShift 中自动引用它们。
@@ -972,13 +1047,42 @@
   
   ![ocp3-resource-workflow](images/ocp3-resource-workflow.jpg)
 
-## OCP 资源对象操作命令
+## 🧪 OpenShift 资源对象使用
 
 - 常规操作命令：
   
   ```bash
+  ### 获取资源对象状态 ###
   $ oc get nodes
   # 查看节点的概要信息（system:admin 用户或具有 cluster-admin 角色的用户执行）
+
+  $ oc get pods --selector <key>=<value>
+  # 根据 label 标签筛选指定的 pod
+
+  $ oc get pod <pod_name> -n <project> | yq r - 'status.podIP'
+  # 使用 yq 工具解析 pod 被分配的 IP 地址
+  # 注意：新版本的 yq 工具与老版本存在兼容性问题！
+  # 下载链接：https://mikefarah.gitbook.io/yq/ 与 https://kislyuk.github.io/yq/，两者不兼容！
+
+  $ oc get pods \
+    -o custom-columns=NameSpace:"metadata.namespace",\
+    PodName:"metadata.name",\
+    ContainerName:"spec.containers[].name",\
+    Phase:"status.phase",\
+    IP:"status.podIP",\
+    HostIP:"status.hostIP",\
+    Ports:"spec.containers[].ports[].containerPort"
+  # -o custom-columns 选项指定输出格式
+
+  $ oc get pods \
+    -o jsonpath='{range .items[]}{"Pod Name: "}{.metadata.name}
+    {"IP: "}{.status.podIP}
+    {"Ports: "}{.spec.containers[].ports[].containerPort}{"\n"}{end}'
+  # 使用 JSONPath 表达式指定输出格式
+
+  $ oc get pods \
+    -o go-template='{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
+  # 使用 Go 模版指定输出格式  
   
   $ oc get all [-n <project>]
   # 查看项目中所创建的所有资源的重要信息
@@ -990,6 +1094,7 @@
   $ oc describe <resource_type> <resource_name> [-n <project>]
   # 查看指定资源的详细信息
   
+  ### 创建与编辑资源对象 ###
   $ oc create -f <resource_defination_file>.json [-n <project>]
   # 以命令式 API 使用修改的资源定义文件创建新的资源
   # oc create 命令常与 oc export 命令一起使用
@@ -997,31 +1102,42 @@
   $ oc edit <resource_type> <resource_name> [-n <project>]
   # 启用 vi 缓冲区以编辑指定资源的资源定义文件，编辑后即时生效。
   
+  ### 删除资源对象 ###
   $ oc delete project <project>
   # 删除项目及其所有资源
   
   $ oc delete all --labels=<label>
   # 删除项目中所有相应标签的资源
   # 可在创建各项资源时添加标签，便于删除相应资源。
+
+  $ oc delete pod <pod> --grace-period=<seconds>
+  # pod 支持优雅终止，即在 Kubernetes 强制终止 pod 之前，pod 首先尝试终止它的进程。
+  # --grace-period 选项指定 pod 被 Kubernetes 强制终止前的时间间隔
+
+  $ oc delete pod <pod> [--grace-period=1|--now]
+  # 立即删除指定的 pod
+
+  $ oc delete pod <pod> --force
+  # 强制删除指定的 pod
+  # 注意：
+  #   1. 若强制删除指定的 pod，Kubernetes 不等待 pod 中进程终止的确认，这将保留 pod 中的进程运行直至所在节点侦测到进程已被删除。
+  #   2. 因此，强制删除 pod 可能导致不一致或数据丢失
   ```
 
 - 常用资源调试命令：
   
   ```bash
-  $ oc exec <pod> [-n <project>] -- <command>
-  # 直接在 pod 中执行命令并返回结果
+  $ oc exec <pod> [-c <container>] [-n <project>] -- <command> arg1 arg2 ... argN
+  # 直接在 pod 中的容器内执行命令并返回结果
+  # 💥 注意：
+  #   1. 若忽略容器名称，Kubernetes 使用 pod 中的 `kubectl.kubernetes.io/default-container: <value>` 注释来选择容器。
+  #   2. 否则，oc exec 子命令默认进入 pod 中的第一个容器执行命令，若 pod 中运行多容器，可使用 `-c, --container= ` 选项指定容器。
   
-  $ oc exec -it <pod> [-n <project>] -- /bin/bash 
-  # 以交互模式进入 pod 运行环境中
-  
-  $ oc exec -it -p <pod> -c <container> [-n <project>] -- /bin/bash
-  # 以交互模式进入指定 pod 的指定容器运行环境中
-  
-  $ oc volume pod <pod> [-n <project>]
-  # 查看 pod 中容器的挂载点与 pvc 的对应关系
-  
-  $ oc volume dc <deploymentconfig> [-n <project>]
-  # 查看部署配置中的 volume 信息（pvc）
+  $ oc exec <pod> [-c <container>] [-n <project>] -it -- /bin/bash
+  # 以交互模式进入 pod (的指定容器) 运行环境中
+
+  $ oc attach <pod> [-c <container>] [-n <project>] -it
+  # 以交互模式进入 pod (的指定容器) 运行环境中
   
   $ oc port-forward <pod> <localhost_port>:<pod_port> [-n <project>]
   # 将本地节点的端口映射至远程 pod 的端口，不局限于 80 与 443 端口，可供开发人员使用调试。
@@ -1044,113 +1160,17 @@
   #   $ oc cp quotesdb-1-fzrgd:/tmp/quote.sql /home/developer/quote.sql
   # 
   # 使用场景：可用于将 pod 中的应用临时日志拷贝至本地节点的目标文件中
+
+  $ oc volume pod <pod> [-n <project>]
+  # 查看 pod 中容器的挂载点与 pvc 的对应关系
+  
+  $ oc volume dc <deploymentconfig> [-n <project>]
+  # 查看部署配置中的 volume 信息（pvc）  
   ```
 
-## OCP route 路由使用示例
+  ![oc-exec-it-diff](images/oc-exec-it-diff.png)
 
-- 方式 1：指定 route 路由名称、对应 service 的端口号与对外暴露的 URL 以创建
-  
-  ```bash
-  $ oc expose svc <service_name> \
-    --name=<route_name> --port=<service_port> \
-    --hostname=<custom_name>.<wildcard_domain> [-n <project>]
-  ```
-
-- 方式 2：直接指定 route 路由名称创建
-  
-  ```bash
-  $ oc expose svc temp-cvt --name=ocp
-  # --name        指定 route 的名称
-  #               若不指定 route 的名称，则使用 application_name 代替 route_name。
-  # --hostname    指定对外的公网域名
-  #               默认的对外公网域名：<route_name-project_name>.<wildcard_domain>
-  # 注意：可使用相同的 service 创建不同的 route 资源，而之前的 route 可不删除！
-  ```
-
-- 🚀 方式 3：创建安全边界终结型路由
-  
-  ```bash
-  $ oc create route edge \
-    --service=<service_name> --hostname=<exposed_fqdn_url> \
-    --key=<ca_trusted_private_key>.key --cert=<ca_trusted_certificate>.crt
-  # 使用 CA 私钥与 CA 签名的证书为 service 创建安全的边界型路由规则（secure edge-terminated）
-  
-  $ oc get route <route_name> [-n <project>] -o jsonpath='{..spec.host}{"\n"}'
-  # 解析返回暴露的路由对应的应用 URL
-  ```
-
-- 模板（`template`）与 `Web Console` 中已嵌入 route 资源，因此可直接创建。
-- 💥 OCP 3.9 版本中删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见 [Bugfix: route HostAlreadyClaimed](https://bugzilla.redhat.com/show_bug.cgi?id=1660598)。
-  
-  ![ocp3-delete-route-error-1](images/ocp3-delete-route-error-1.jpg)
-  
-  ![ocp3-delete-route-error-2](images/ocp3-delete-route-error-2.jpg)
-
-- 💎 补充：
-  在 OCP4 集群中默认情况下普通用户无法访问 `openshift-console` 项目中的资源，可设置相应项目的 rolebindings 使普通用户可访问。
-
-## OCP 日志与事件命令
-
-- 常规日志与事件查看：
-  
-  ```bash
-  $ oc logs <resource_type> <resource_name> [-n <project>]
-  # 查看指定资源的日志信息，该日志信息不输出至 /var/log/messages。
-  
-  $ oc logs <pod> [-n <project>]
-  # 查看 pod 的运行日志
-  
-  $ oc get [events|ev] [-n <project>]
-  # 查看 OCP 集群的事件信息，常用于 troubleshooting 排错。
-  # 也可在 Web Console 的 Monitoring > Events 中查看事件信息
-  ```
-
-## OCP pod 的调度示例
-
-- 为 OCP 集群计算节点添加 label 标签：
-  
-  ```bash
-  $ oc label node <node_fqdn> <key>=<value> [--overwrite]
-  # 设置（覆盖）已存在的 node 节点标签
-  
-  $ oc label node node2.lab.example.com region=app --overwrite 
-  # 设置（覆盖）已存在的节点标签 region 为 app
-  # 设置的节点标签可被 pod 的节点选择器 Pod.spec.nodeSelector 使用，使其调度至该节点。
-  ```
-  
-  ![node-label](images/node-label.jpg)
-
-> ✅ region 为地理概念，zone 为不同的机柜/架或机房（故障恢复域）。
-
-- 管理计算节点的 pod 可调度性：
-  
-  ```bash
-  $ oc adm manage-node --schedulable=false <node_fqdn>
-  # 设置 node 节点为 pod 不可调度状态
-  ```
-  
-  ![node-unscheduleable](images/node-unscheduleable.jpg)
-  
-  ```bash
-  $ oc adm manage-node <node_fqdn> --evacuate --pod-selector='<key>'='<value>'
-  # 指定 pod 标签从 node 节点上迁移指定的 pod
-  ```
-  
-  ![pod-evacuate-1](images/pod-evacuate-1.jpg)
-  
-  ![pod-evacuate-2](images/pod-evacuate-2.jpg)
-  
-  ```bash
-  $ oc adm drain <node_fqdn> [--delete-local-data]
-  # 从 node 节点上撤离所有运行的 pod
-  # 若 pod 中已挂载使用相应的 pvc，在撤离时将报错，无法卸载已使用的 pvc！
-  ```
-  
-  ![evacuate-delete-local-data-1](images/evacuate-delete-local-data-1.jpg)
-  
-  ![evacuate-delete-local-data-2](images/evacuate-delete-local-data-2.jpg)
-
-## OCP 用户与基于角色的访问控制
+## OpenShift 用户与访问控制
 
 - 用户与组（users and groups）、角色（roles）
 - OCP 中用户分类：
@@ -1233,6 +1253,116 @@
     add-scc-to-user anyuid -z <serviceaccount_name> -n <project> 
   # 使用 system:admin 用户或具有 cluster-admin 角色的用户为指定项目的服务账户添加 anyuid 的安全上下文（SCC）
   # 该安全上下文可使 pod 中运行应用的用户提权至 root 权限
+  ```
+
+## OpenShift Pod 的调度
+
+- 为 OCP 集群计算节点添加 label 标签：
+  
+  ```bash
+  $ oc label node <node_fqdn> <key>=<value> [--overwrite]
+  # 设置（覆盖）已存在的 node 节点标签
+  
+  $ oc label node node2.lab.example.com region=app --overwrite 
+  # 设置（覆盖）已存在的节点标签 region 为 app
+  # 设置的节点标签可被 pod 的节点选择器 Pod.spec.nodeSelector 使用，使其调度至该节点。
+  ```
+  
+  ![node-label](images/node-label.jpg)
+
+> ✅ region 为地理概念，zone 为不同的机柜/架或机房（故障恢复域）。
+
+- 管理计算节点的 pod 可调度性：
+  
+  ```bash
+  $ oc adm manage-node --schedulable=false <node_fqdn>
+  # 设置 node 节点为 pod 不可调度状态
+  ```
+  
+  ![node-unscheduleable](images/node-unscheduleable.jpg)
+  
+  ```bash
+  $ oc adm manage-node <node_fqdn> --evacuate --pod-selector='<key>'='<value>'
+  # 指定 pod 标签从 node 节点上迁移指定的 pod
+  ```
+  
+  ![pod-evacuate-1](images/pod-evacuate-1.jpg)
+  
+  ![pod-evacuate-2](images/pod-evacuate-2.jpg)
+  
+  ```bash
+  $ oc adm drain <node_fqdn> [--delete-local-data]
+  # 从 node 节点上撤离所有运行的 pod
+  # 若 pod 中已挂载使用相应的 pvc，在撤离时将报错，无法卸载已使用的 pvc！
+  ```
+  
+  ![evacuate-delete-local-data-1](images/evacuate-delete-local-data-1.jpg)
+  
+  ![evacuate-delete-local-data-2](images/evacuate-delete-local-data-2.jpg)
+
+## OpenShift 路由使用
+
+- 方式 1：指定 route 路由名称、对应 service 的端口号与对外暴露的 URL 以创建
+  
+  ```bash
+  $ oc expose svc <service_name> \
+    --name=<route_name> --port=<service_port> \
+    --hostname=<custom_name>.<wildcard_domain> [-n <project>]
+  ```
+
+- 方式 2：直接指定 route 路由名称创建
+  
+  ```bash
+  $ oc expose svc temp-cvt --name=ocp
+  # --name        指定 route 的名称
+  #               若不指定 route 的名称，则使用 application_name 代替 route_name。
+  # --hostname    指定对外的公网域名
+  #               默认的对外公网域名：<route_name-project_name>.<wildcard_domain>
+  # 注意：可使用相同的 service 创建不同的 route 资源，而之前的 route 可不删除！
+  ```
+
+- 🚀 方式 3：创建安全边界终结型路由
+  
+  ```bash
+  $ oc create route edge \
+    --service=<service_name> --hostname=<exposed_fqdn_url> \
+    --key=<ca_trusted_private_key>.key --cert=<ca_trusted_certificate>.crt
+  # 使用 CA 私钥与 CA 签名的证书为 service 创建安全的边界型路由规则（secure edge-terminated）
+  
+  $ oc get route <route_name> [-n <project>] -o jsonpath='{..spec.host}{"\n"}'
+  # 解析返回暴露的路由对应的应用 URL
+  ```
+
+- 模板（`template`）与 `Web Console` 中已嵌入 route 资源，因此可直接创建。
+- 💥 OCP 3.9 版本中删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见 [Bugfix: route HostAlreadyClaimed](https://bugzilla.redhat.com/show_bug.cgi?id=1660598)。
+  
+  ![ocp3-delete-route-error-1](images/ocp3-delete-route-error-1.jpg)
+  
+  ![ocp3-delete-route-error-2](images/ocp3-delete-route-error-2.jpg)
+
+- 💎 补充：
+  在 OCP4 集群中默认情况下普通用户无法访问 `openshift-console` 项目中的资源，可设置相应项目的 rolebindings 使普通用户可访问。
+
+## OpenShift 日志与事件
+
+- 容器日志是容器的标准输出（stdout）与标准错误（stderr）
+- 常规日志与事件查看：
+  
+  ```bash
+  $ oc logs <resource_type> <resource_name> [-n <project>]
+  # 查看指定资源的日志信息，该日志信息不输出至 /var/log/messages。
+  
+  $ oc logs <pod> [-n <project>] [-f|--follow] [--tail=N] [-c|--container=<container_name>] [-p|--previous=true]
+  # 查看 pod 的运行日志
+  # 重要选项：
+  #   -f, --fllow 选项：追踪容器的输出日志
+  #   --tail=N 选项：指定输出容器的最后几行日志
+  #   -c, --container=<container_name> 选项：指定 pod 内的容器
+  #   -p, --previous=[true|false] 选项：指定是否输出 pod 内前一个容器的日志
+  
+  $ oc get [events|ev] [-n <project>]
+  # 查看 OCP 集群的事件信息，常用于 troubleshooting 排错。
+  # 也可在 Web Console 的 Monitoring > Events 中查看事件信息
   ```
 
 ## 参考链接
