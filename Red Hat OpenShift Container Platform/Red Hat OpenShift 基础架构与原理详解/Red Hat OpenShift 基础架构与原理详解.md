@@ -18,7 +18,7 @@
 - 🧪 OpenShift 资源对象使用
 - OpenShift 用户与访问控制
 - OpenShift Pod 的调度
-- OpenShift 路由使用
+- OpenShift 服务与路由使用
 - OpenShift 日志与事件
 - 参考链接
 
@@ -103,6 +103,8 @@
   # 指定 API 组查看其中支持的 API 资源
   $ oc api-resources --api-group=''
   # 查看核心 API 资源
+  $ oc api-resources --api-group=operator.openshift.io
+  # 查看 operator.openshift.io/v1 API 组的 API 资源
 
   $ oc api-resources --namespaced=true --api-group apps --sort-by name
   # 查看命名空间内，指定 API 组中支持的 API 资源，并根据 name 列排序。
@@ -114,6 +116,10 @@
   $ oc explain <resource_object>
   # 查看 OCP 集群指定资源对象的详细说明
   ```
+
+  以下为 OCP4 (v4.14) 集群中获取的 operator.openshift.io/v1 的 API 资源：
+
+  ![ocp4-api-resources-operator](images/ocp4-api-resources-operator.png)
 
 - 密码与字符串编码：
   
@@ -131,7 +137,7 @@
   
   $ echo "<string>" | base64
   # 使用 base64 加密算法对字符串加密
-  $ echo "<hash>" | base64 -d
+  $ echo "<hash>" | base64 [-d|--decode]
   # 使用 base64 加密算法对哈希解密
   
   $ python -c \
@@ -701,14 +707,32 @@
 
 - Service：
   - 服务
+  - 🚀 OCP3 & OCP4 的网络模型继承于 Kubernetes，包含以下四种类型：
+    - 1️⃣ 高耦合的 pod 内部容器间（container-to-container）的通信
+    - 2️⃣ pod 与 pod 间（pod-to-pod）的通信（同节点或跨节点）：`CNI plugins`
+    - 3️⃣ pod 与 service 间（pod-to-service）的通信：`iptables`、`ipvs`、`OpenFlow rules`、`Cillium eBPF`
+    - 4️⃣ 集群外部与 service 间（external-to-service）的通信：`openshift route`、`ingress`
+    - OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件：
+
+      ```bash
+      $ oc get deployment/network-operator -n openshift-network-operator
+      # 查看 CNO 部署的 deployment 与 pod
+      ```
+
+    - OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
+
+      ```bash
+      $ oc get network.config.openshift.io cluster -o yaml
+      $ oc get network.config/cluster -o yaml
+      # 以上命令等效
+      ```
+
+      ![ocp4-pod-service-subnet](images/ocp4-pod-service-subnet.png)
+
   - service 资源对象处理的场景：
     - 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
     - service 为 pod 提供统一的入口 IP 地址，该入口地址默认为 service 的虚拟 IP 地址（`ClusterIP`）。
-    - service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。
-  - service 的类型：`ClusterIP`、`NodePort`、`LoadBalancer`、`ExternalIPs`
-    > 💥 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 `spec.externalTrafficPolicy` 字段，否则创建失败！
-    > ![change-service-type-error](images/change-service-type-error.jpg)
-  
+    - service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。  
   - service 在 Kubernetes 中的实现方式：
     - service 提供三种代理模式：
       - `userspace`：
@@ -750,31 +774,86 @@
       ...
       ```
 
+      OCP3 中的 service 网段与 pod 网段的定义示意：
+
       ![ocp3-network-plugin](images/ocp3-network-plugin.jpg)
-  
-  - 🚀 OCP3 & 4.x 的网络模型继承于 Kubernetes，从内到外包含如下 4 个方面：
-    - pod 内部容器间通信的网络
-    - pod 与 pod 间通信的网络（同节点或跨节点）
-    - pod 与 service 间通信的网络
-    - 集群外部与 service 或 pod 通信的网络
+
+  - service 的类型：
+    - `ClusterIP`
+    - `NodePort`
+    - `LoadBalancer`：这种类型构建在 NodePort 类型之上，其通过 cloud provider 提供的负载均衡器将服务暴露到集群外部，因此 LoadBalancer 一样具有 NodePort 和 ClusterIP。
+    - `ExternalIPs`
+
+    ![K8s-service-type](images/K8s-service-type.jpg)
+
+    > 💥 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 `spec.externalTrafficPolicy` 字段，否则创建失败！
+    >
+    > ![change-service-type-error](images/change-service-type-error.jpg)
+
+  - service 与 pod 的关联方式：
+    service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 ReplicationController (OCP3) 或 Deployment (OCP4) 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
+
+    ![ocp-service-selector-match-pod-label](images/ocp-service-selector-match-pod-label.jpg)
+
+    > 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
+
+  - service 与服务发现：
+    - service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。
+    - 服务发现的实现方式：
+      - 1️⃣ service 环境变量：
+        - 前端应用 pod 使用后端应用的 `service 环境变量` 来发现后端应用 pod
+        - 对于项目内的每个 service，将自动定义环境变量，并注入到同一项目中的所有 pod 中。
+        - service 环境变量的服务发现方式：
+          - *svc_name*_SERVICE_HOST：service 的 IP 地址
+          - *svc_name*_SERVICE_PORT：service 的 TCP 端口号
+
+        > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
+
+      - 2️⃣ SkyDNS：
+        - OCP3 中通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
+        - `SkyDNS` 服务发现方式：
+          - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
+          - SkyDNS 将每个 service 动态分配一个 `FQDN` 格式的 `SRV 记录`：*svc_name*.*project_name*.svc.cluster.local
+
+        > ✅ 在 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找相应的 service。
+
+      - 3️⃣ CoreDNS：
+        - OCP4 中通过名为 dns 的 `ClusterOperator` 部署 `CoreDNS`，CoreDNS 是 CNCF 毕业的成熟的云原生领域域名解析系统。
+        - 集群中各个 pod 可通过其 `/etc/resolv.conf` 中的 nameserver 实现服务发现，其中 nameserver 的 IP 地址为 CoreDNS pod 的 `service IP`。
+        - 每个 pod 都可通过 CoreDNS 查询动态分配的 service 与 `FQDN` 格式的 `SRV 记录`，每条 SRV 记录中的 FQDN 对应一条 A 记录，而 A 记录中的 IP 地址即为一组 pod 的 service IP。其中 SRV 记录的 FQDN 格式为 *svc_name*.*project_name*.svc.cluster.local。通过这种方式不同 pod 间可发现其他 pod 中的服务。以下示例为 web-server pod 可通过 DNS 查询发现 gcw 应用的 service IP：
+
+        ![ocp4-coredns-service-discovery-demo](images/ocp4-coredns-service-discovery-demo.png)
+
+        ![coredns-pod-resolv-2](images/coredns-pod-resolv-2.png)
+
+  - service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源进行暴露。
+  - OCP 中建议将 service 整合入 DeploymentConfig 中，而 Kubernetes 中建议将 service 定义在 Deployment 中。
+  - 💎 补充：OCP4 中建议使用 Deployment 以代替 DeploymentConfig，而此资源对象为保证兼容性依然得以保留。
+  - service 的拓展：
+    - 使用原生 `kube-proxy` 实现的 service 与自研的 service 解决方案的响应对比：
+
+      ![service-performance](images/service-performance.jpg)
+
+    - 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。  
+  - 💥 service 从逻辑层面解决了 service 与 pod 间的网络通信问题，而 pod 与 pod 间的跨节点间通信必须使用 CNI 插件加以解决。
+  - OCP3 中默认使用 `OVS` 作为 SDN 插件，其共有 3 种工作类型，包括 `ovs-subnet`、`ovs-multitenent` 与 `ovs-networkpolicy`。
+  - 💎 补充：
+    - OCP4 中依然默认使用 `openshift-sdn` 插件（OVS 插件）的 `ovs-networkpolicy`，以实现更加细粒度的网络资源隔离，可基于 `namespace` 级别以及 `pod` 级别。
+    - ovs-subnet 将所有项目的 pod 置于扁平化（flat）网络中，彼此之间均能通信。
+    - ovs-multitenant 使用 `VNID` 实现不同项目间的 pod 二层隔离，其使用 VXLAN 隧道打通 pod 间在各节点之间的联系。
+    - OCP4 也可以使用 `OVN-Kubernetes` 作为 SDN 插件，但需要在集群规划与部署前确定具体使用哪个 SDN 插件，一旦部署完成不可更改，并且可同时使用 `Multus CNI` 调用其他 CNI 插件使单 pod 同时具备 2 个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
+    - 可参考官方文档 [Understanding multiple networks](https://docs.openshift.com/container-platform/4.6/networking/multiple_networks/understanding-multiple-networks.html)
+
   - 🚀 OCP3 OVS 网络拓扑示意：
 
     ![ocp3-ovs-1](images/ocp3-ovs-1.png)
 
     ![ocp3-ovs-2](images/ocp3-ovs-2.png)
   
-  - 同一节点上 pod 间的通信示意：
+  - OCP3 同一节点上 pod 间的通信示意：
 
     ![ocp3-ovs-3](images/ocp3-ovs-3.png)
-  
-  - service 从逻辑层面解决了 service 与 pod 间的网络通信问题，而 pod 与 pod 间的跨节点间通信必须使用 CNI 插件加以解决。
-  - OCP3 中默认使用 `OVS` 作为 SDN 插件，其共有 3 种工作类型，包括 `ovs-subnet`、`ovs-multitenent` 与 `ovs-networkpolicy`。
-  - 💎 补充：
-    - OCP4 中依然默认使用 `openshift-sdn` 插件（OVS 插件）的 `ovs-networkpolicy`，以实现更加细粒度的网络资源隔离，可基于 `namespace` 级别以及 `pod` 级别。
-    - ovs-subnet 将所有项目的 pod 置于扁平化（flat）网络中，彼此之间均能通信。
-    - ovs-multitenant 使用 `VNID` 实现不同项目间的 pod 二层隔离，其使用 VXLAN 隧道打通 pod 间在各节点之间的联系。
-    - OCP4 也可以使用 `OVN-kubernetes` 作为 SDN 插件，但需要在集群规划与部署前确定具体使用哪个 SDN 插件，一旦部署完成不可更改，并且可同时使用 `Multus CNI` 调用其他 CNI 插件使单 pod 同时具备 2 个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
-    - 可参考官方文档 [Understanding multiple networks](https://docs.openshift.com/container-platform/4.6/networking/multiple_networks/understanding-multiple-networks.html)
+
   - 🚀 OCP3 OVS 流表分析示意：
 
     ![ocp3-ovs-openflow-1](images/ocp3-ovs-openflow-1.jpg)
@@ -783,29 +862,6 @@
     以下为 iptables NAT 表与 OVS 流表部分条目，并且 OCP3 集群使用 ovs-subnet SDN 插件，无 `networkpolicy` 策略存在。
 
     ![NodePort-service-iptables-nat-ovs-analyze](images/NodePort-service-iptables-nat-ovs-analyze.jpg)
-  
-  - service 与 pod 的关联方式：
-    service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 replication controller 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
-    > 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
-  - service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。
-  - 前端应用 pod 使用后端应用的 `service 环境变量` 来发现后端应用 pod，或通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
-  - 对于项目内的每个 service，将自动定义环境变量，并注入到同一项目中的所有 pod 中。
-  - service 环境变量的服务发现方式包括：
-    - *svc_name*_SERVICE_HOST：service 的 IP 地址
-    - *svc_name*_SERVICE_PORT：service 的 TCP 端口号
-      > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
-  - `SkyDNS` 服务发现方式：
-    - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
-    - SkyDNS 将每个 service 动态分配一个 `FQDN` 格式的 `SRV 记录`：`*svc_name*.*project_name*.svc.cluster.local`
-      > ✅ 在应用 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找创建的 service。
-  - service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源进行暴露。
-  - OCP 中建议将 service 整合入 deploymentconfig 中，而 Kubernetes 中建议将 service 定义在 deployment 中。
-  - service 的拓展：
-    - 使用原生 `kube-proxy` 实现的 service 与自研的 service 解决方案的响应对比：
-
-      ![service-performance](images/service-performance.jpg)
-
-    - 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
 
 - Route：
   - 路由
@@ -818,6 +874,9 @@
   - router 路由原理架构示例：
 
     ![ocp3-route-infra](images/ocp3-route-infra.jpg)
+
+  - 💎 补充：
+    - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 ingress controller 与 ingress，而在 OpenShift 中 ingress controller 对应为 HAProxy router pod，而 ingress 对应为 route。
 
 - PersistentVolume（pv）：
   - 持久卷
@@ -872,6 +931,10 @@
   - 数据使用 `base64` 编码存储在 secret 资源对象中。
   - secret 资源对象可在命名空间中共享。
   - 当来自 secret 的数据被注入到容器中时，数据被解码（decode），或者作为文件挂载，或者作为环境变量注入到 pod 中。
+  - secret 的类型：
+
+    ![k8s-ocp-secret-type](images/k8s-ocp-secret-type.png)
+
   - 创建与使用 secret 资源对象：
     若使用 Web 控制台创建 secret 资源对象，由于使用 `base64` 编码该资源对象，需对其解码才能注入 secret 的值，而使用 CLI 创建的方式如下所示：
 
@@ -885,12 +948,15 @@
     ```bash
     $ oc create secret generic <secret_name> \
       --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
-    # 创建 secret 资源使敏感数据与 pod 解耦
+    # 指定 key 与 value 的值创建 secret 资源，使敏感数据与 pod 解耦。
     
     $ oc create secret generic <secret_name> \
-      --from-file .dockerconfigjson=<access_token_file> \
-      --type kubernetes.io/dockerconfigjson
-    # 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
+      --from-file <key1>=/path/to/file1 ... --from-file <keyN>=/path/to/fileN
+    # 指定 key 与文件的内容创建 secret 资源
+
+    $ oc create secret tls <secret_name> \
+      --cert /path/to/certification-file --key /path/to/certification-key
+    # 指定证书文件与私钥文件创建 secret
     
     ### 示例 ###
     $ oc create secret generic mysql \
@@ -898,37 +964,40 @@
       --from-literal='database-password'='redhat' \
       --from-literal='database-root-password'='do285-admin'
     # 创建 secret 资源以存储 MySQL 相关的用户名与密码，该 secret 可被其他资源所引用。
-    
+
+    $ oc create secret generic <secret_name> \
+      --from-file .dockerconfigjson=<access_token_file> \
+      --type kubernetes.io/dockerconfigjson
+    # 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
+
     $ oc create secret generic quayio \
       --from-file .dockerconfigjson=/run/user/1000/containers/auth.json
       --type kubernetes.io/dockerconfigjson
-    # 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至
-    # service account 以拉取私有镜像。
-    
-    ### secret 通过链接（link）与 service account 关联 ###
+    # 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至 serviceaccount 以拉取私有镜像。
+
+    ### 示例：secret 通过链接（link）与 serviceaccount 关联 ###
     $ oc secrets link <serviceaccount_name> <secret_name> --for=pull
     # 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
-    # service account（默认为 default），该 service account 在创建 pod 时即可
+    # serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
     # 拉取镜像，否则 pod 创建失败。 
     ```
 
-    OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 deployment 资源对象代替 deploymentconfig 资源对象即可：
+    💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
 
     ```bash
     $ oc create secret generic myappfilesec \
       --from-file ~/DO288-apps/app-config/myapp.sec
-    # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，
-    # value 为文件中的内容。
+    # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
     
     $ oc set volume dc/myapp --add \
       -t secret -m /opt/app-root/secure \
       --name myappsec-vol --secret-name myappfilesec
-    # OCP3 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的
-    # /opt/app-root/secure/ 目录中
+    # OCP3 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的 /opt/app-root/secure/ 目录中，
     # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
     ```
 
     除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
+
   - 💎 补充：
     👨‍💻 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像
     由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
@@ -961,7 +1030,7 @@
     ![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
 
     secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。  
-  - 每个项目中默认的 secret 与 service account（sa） 的关联：
+  - 每个项目中默认的 secret 与 serviceaccount（sa） 的关联：
     - 必须指定 sa 以运行 pod，若未指定将使用 default sa。
     - sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
     - token分别用于：
@@ -1300,7 +1369,23 @@
   
   ![evacuate-delete-local-data-2](images/evacuate-delete-local-data-2.jpg)
 
-## OpenShift 路由使用
+## OpenShift 服务与路由使用
+
+- 使用 oc 命令行方式创建 service：
+
+  ```bash
+  $ oc expose deployment/<deployment_name> \
+    --selector <key>=<vaule> \
+    --port <port> --target-port <port> --protocol [TCP|UDP] \
+    --name <svc_name>
+  # 使用 selector 选择器时对应的 label 必须与 pod 中的相互匹配  
+
+  ### 示例 ###
+  $ oc expose deployment/golang-codeready-workspace \
+    --selector app=golang-codeready-workspace \
+    --port 8080 --target-port 8080 --protocol TCP \
+    --name gcw  
+  ```
 
 - 方式 1：指定 route 路由名称、对应 service 的端口号与对外暴露的 URL 以创建
   
@@ -1367,8 +1452,20 @@
 
 ## 参考链接
 
-- [Red Hat OpenShift Container Platform 4.6 Architecture](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/architecture/index)
-- [GitHub Doc - SkyDNS](https://github.com/skynetservices/skydns)
-- [GitHub Doc - CoreDNS](https://github.com/coredns/coredns)
-- [Red Hat OpenShift v3.11 東西南北向網路探討](https://blog.pichuang.com.tw/20190404-openshift-network-traffic-overview/)
-- [Red Hat OpenShift v4 東西南北向網路流](https://blog.pichuang.com.tw/20200413-openshift4-network-traffic-overview/)
+- Architecture
+  - [Red Hat OpenShift Container Platform 4.6 Architecture](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/architecture/index)
+- CRI
+  - [Container Runtime Interface (CRI) CLI](https://github.com/kubernetes-sigs/cri-tools/blob/master/docs/crictl.md#container-runtime-interface-cri-cli)
+  - [GitHub - cri-api](https://github.com/kubernetes/cri-api)
+- Pod
+  - [Kubernetes Doc - Pods](https://kubernetes.io/docs/concepts/workloads/pods/)  
+- Network
+  - [Kubernetes Doc - Cluster Networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
+  - [Red Hat OpenShift v3.11 東西南北向網路探討](https://blog.pichuang.com.tw/20190404-openshift-network-traffic-overview/)
+  - [Red Hat OpenShift v4 東西南北向網路流](https://blog.pichuang.com.tw/20200413-openshift4-network-traffic-overview/)
+  - [Chapter 5. Cluster Network Operator in OpenShift Container Platform](https://docs.redhat.com/en/documentation/openshift_container_platform/4.14/html-single/networking/index#cluster-network-operator)
+  - 🔥 [About the OVN-Kubernetes network plugin](https://docs.openshift.com/container-platform/4.14/networking/ovn_kubernetes_network_provider/about-ovn-kubernetes.html)
+  - 🔥 [Chapter 24. OVN-Kubernetes network plugin](https://docs.redhat.com/en/documentation/openshift_container_platform/4.14/html-single/networking/index#about-ovn-kubernetes)
+- Service Discovery
+  - [GitHub Doc - SkyDNS](https://github.com/skynetservices/skydns)
+  - [GitHub Doc - CoreDNS](https://github.com/coredns/coredns)

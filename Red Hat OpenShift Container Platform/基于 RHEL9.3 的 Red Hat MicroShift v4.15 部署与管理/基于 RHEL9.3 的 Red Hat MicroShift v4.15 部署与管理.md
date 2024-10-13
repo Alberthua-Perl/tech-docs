@@ -283,10 +283,14 @@ MicroShift 集群节点本地打开浏览器使用应用 URL 即可访问此 wor
 
 ## 参考链接
 
-- [GitHub: microshift](https://github.com/openshift/microshift)
-- [Red Hat build of MicroShift 4.15](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.15)
-- [Catalog of Container images](https://catalog.redhat.com/software/containers/explore)
-- [MicroShift Introduction](https://www.openshift-anwender.de/wp-content/uploads/2022/04/MicroShift-Open-Demo.pdf)
-- [GitHub: golang-codeready-workspace-deployment.yml](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/blob/hotfixes/golang-codeready-workspace-deployment.yml)
-- [Why I got Failed to allocate directory watch: Too many open files?](https://askubuntu.com/questions/1472428/why-i-got-failed-to-allocate-directory-watch-too-many-open-files)
-- [Failed to allocate directory watch](https://blog.differentpla.net/blog/2022/12/14/failed-allocate-directory-watch/)
+- MicroShift
+  - [GitHub - microshift](https://github.com/openshift/microshift)
+  - [Red Hat build of MicroShift 4.15](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.15)
+  - [MicroShift Introduction](https://www.openshift-anwender.de/wp-content/uploads/2022/04/MicroShift-Open-Demo.pdf)
+  - 🧪 [GitHub Wiki - microshift demo](https://github.com/anandpavithran/microshift/wiki)
+  - [Why I got Failed to allocate directory watch: Too many open files?](https://askubuntu.com/questions/1472428/why-i-got-failed-to-allocate-directory-watch-too-many-open-files)
+  - [Failed to allocate directory watch](https://blog.differentpla.net/blog/2022/12/14/failed-allocate-directory-watch/)  
+- Container Image  
+  - [Catalog of Container images](https://catalog.redhat.com/software/containers/explore)
+- Application Demo  
+  - 🧪 [GitHub: golang-codeready-workspace-deployment.yml](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/blob/hotfixes/golang-codeready-workspace-deployment.yml)

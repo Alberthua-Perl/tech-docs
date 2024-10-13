@@ -47,7 +47,7 @@
 
 - DNS 域名系统层次结构：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-domain-hierarchical-structure.jpg)
+  ![](images/dns-domain-hierarchical-structure.jpg)
   
   - 根域名服务器（Root Domain）：
     
@@ -71,7 +71,7 @@
 
 - 13 组根域名服务器的具体信息：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-root-server.jpg)
+  ![](images/dns-root-server.jpg)
 
 > 👨‍🏫 注意：为什么根域名服务器全球只有 13 组？
 > 
@@ -170,7 +170,7 @@
     
     - 查询过程如下所示：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-recursive-query.jpg)
+      ![](images/dns-recursive-query.jpg)
   
   - 2️⃣ 迭代查询（`iterative query`）：
     
@@ -178,7 +178,7 @@
     
     - 查询过程如下所示：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-iterative-query.jpg)
+      ![](images/dns-iterative-query.jpg)
 
 - 实际中，由于根域名服务器和其他的 TLD 服务器的资源宝贵，需要为全球的用户提供 DNS 解析服务，因此其不执行递归查询，执行 DNS 递归查询会导致全球互联网性能不佳。而且递归查询需要逐层查询才能获得查询结果，当查询具有许多层次的 DNS 结构时效率很低。
 
@@ -188,11 +188,11 @@
   
   以下 3 个图例均结合 DNS 递归与迭代查询以完成 DNS 查询的完整过程
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-query-progress-1.jpg)
+  ![](images/dns-query-progress-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-query-progress-2.jpg)
+  ![](images/dns-query-progress-2.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-query-progress-3.jpg)
+  ![](images/dns-query-progress-3.jpg)
 
 ### DNS 资源记录：
 
@@ -236,9 +236,9 @@
     
     - 🔥 Kubernetes 与 OpenShift 中 service 的服务发现采用 `SRV` 记录实现。以下示例为 Kubernetes 集群 codeready-workspace 命名空间内的 pod 通过上游 DNS 服务器获得 service 的 SRV 记录的请求查询。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/k8s-pod-dns-resolv-1.png)
+      ![](images/k8s-pod-dns-resolv-1.png)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/k8s-pod-dns-resolv-2.png)
+      ![](images/k8s-pod-dns-resolv-2.png)
   
   - `A` 与 `AAAA` 资源记录（Address Record）：
     
@@ -261,9 +261,9 @@
     
     - 对内部域名与 IP 的变更带来极大的便利
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-cname-1.png)
+      ![](images/dns-cname-1.png)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-cname-2.png)
+      ![](images/dns-cname-2.png)
     
     - 💥 CNAME 资源记录必须最终解析为具有 A 和/或 AAAA 的记录的名称。
     
@@ -364,14 +364,14 @@
     # 查看本地的 DNS 缓存信息
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/win-dns-cache-1.jpg)
+    ![](images/win-dns-cache-1.jpg)
     
     ```powershell
     > ipconfig /flushdns
     # 清除本地 DNS 缓存
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/win-dns-cache-2.jpg)
+    ![](images/win-dns-cache-2.jpg)
   
   - Linux 系统：
     
@@ -389,7 +389,7 @@
   
   - 对于 Web 浏览器的 DNS 缓存，可在地址栏输入 `chrome://net-internals/#dnsChrome`，然后再点击 `clear host cache`，也可以通过 `Ctrl+Shift+Del` 打开清除浏览器数据窗口进行清除。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/chrome-dns-cache-clear.jpg)
+    ![](images/chrome-dns-cache-clear.jpg)
 
 - Linux 中 DNS 缓存相关的组件与服务：
   
@@ -401,7 +401,7 @@
     
     dns_resolver 模块是 Linux 内核中用于处理 DNS 查询的模块，它提供了一组函数，用于处理 DNS 查询的过程，包括解析 DNS 名称、返回 IP 地址等。dns_resolver 模块可以直接用于实现域名解析功能，但它并不是专门用于缓存 DNS 查询结果的工具。因此，如果系统需要使用本地 DNS 缓存，可以考虑使用其他工具。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns_resolver-module.png)
+    ![](images/dns_resolver-module.png)
   
   - 🏷 `dnsmasq` 缓存名称服务器：
     
@@ -425,9 +425,9 @@
   
   - nscd 服务配置文件：`/etc/nscd.conf`
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nscd-conf-1.jpg)
+    ![](images/nscd-conf-1.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nscd-conf-2.jpg)
+    ![](images/nscd-conf-2.jpg)
     
     `/var/log/nscd.log` 日志文件中的 timeout 换算：
     
@@ -437,11 +437,11 @@
   
   - 👉 关于 **`/etc/nsswitch.conf`** 配置文件的说明：该文件定义 hosts 域名解析的查询顺序，若 files（/etc/hosts）查询失败，将查询 dns（/etc/resolv.conf）。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nsswitch-query-sequence-1.jpg)
+    ![](images/nsswitch-query-sequence-1.jpg)
 
     若该文件中定义的查询路径均无法成功返回，但在 nscd hosts 缓存散列表中存在域名与 IP 的对应关系，查询也将成功返回。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nsswitch-query-sequence-2.jpg)
+    ![](images/nsswitch-query-sequence-2.jpg)
     
     💥 /etc/nsswitch.conf 配置文件中对 DNS 解析的类型与顺序非常重要，若配置错误将导致无法解析，即使在静态与动态解析文件均配置正确的情况下。该文件中的 `hosts` 行如下所示：
     
@@ -601,11 +601,11 @@
   
   - 各服务器节点角色分布：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-service-nodes.jpg)
+    ![](images/named-service-nodes.jpg)
   
   - 各服务器节点物理拓扑示意：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-service-arch.jpg)
+    ![](images/named-service-arch.jpg)
     
     并非所有 DNS 权威服务器都必须是公共服务器。如，可能决定仅使用主 DNS 权威服务器来管理区域文件，并将区域信息发布到从 DNS 权威服务器。主服务器可以是私有服务器，但从服务器将是面向公共的，为外部客户端提供权威应答。这可保护主服务器免受攻击。
     
@@ -659,11 +659,11 @@
   $ sudo vim /etc/named.conf 
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-conf-demo.jpg)
+  ![](images/named-conf-demo.jpg)
 
   通过配置主 DNS 服务器 /etc/named.conf 文件来实现当主 DNS 服务器上的区域发生更改时通知所有从 DNS 服务器进行区域更新。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-conf-notify.jpg)
+  ![](images/named-conf-notify.jpg)
   
   4️⃣ 配置 bind 服务的区域配置文件：
   
@@ -671,7 +671,7 @@
   $ sudo vim /etc/named.rfc1912.zones
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-zone-conf.png)
+  ![](images/named-zone-conf.png)
   
   5️⃣ 创建区域数据配置文件：
   
@@ -681,19 +681,19 @@
   # 拷贝正向与反向解析文件模板，并保持原来的所属用户与用户组
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/var-named-zone-data-1.jpg)
+  ![](images/var-named-zone-data-1.jpg)
   
   ```bash
   $ sudo vim /var/named/lab.example.com.zone
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/var-named-zone-data-2.jpg)
+  ![](images/var-named-zone-data-2.jpg)
   
   ```bash
   $ sudo vim /var/named/10.197.11.arpa
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/var-named-zone-data-3.jpg)
+  ![](images/var-named-zone-data-3.jpg)
   
   6️⃣ 重启 bind DNS 服务并设置开机自启动：
   
@@ -718,7 +718,7 @@
   $ sudo vim /etc/named.conf
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-conf-slave.png)
+  ![](images/named-conf-slave.png)
   
   3️⃣ 配置 bind 服务的区域配置文件：
   
@@ -726,7 +726,7 @@
   $ sudo vim /etc/named.rfc1912.zones
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-zone-conf-slave.png)
+  ![](images/named-zone-conf-slave.png)
   
   ```bash
   $ sudo systemctl enable named.service
@@ -751,14 +751,14 @@
     # 使用 HMAC-MD5 算法加密生成名为 master-slave 的 128 位密钥
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-master-sectrans-1.png)
+    ![](images/named-master-sectrans-1.png)
     
     ```bash
     $ sudo vim /var/named/chroot/etc/transfer.key
     # 创建 dnssec 密钥验证文件
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-master-sectrans-2.png)
+    ![](images/named-master-sectrans-2.png)
     
     ```bash
     $ sudo chown root:named /var/named/chroot/etc/transfer.key
@@ -768,16 +768,16 @@
     $ sudo ls -lh /var/named/chroot/etc/transfer.key
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-master-sectrans-3.png)
+    ![](images/named-master-sectrans-3.png)
     
     ```bash
     $ sudo vim /etc/named.conf
     # 添加如下参数开启 bind 服务的密钥验证功能
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-master-sectrans-4.png)
+    ![](images/named-master-sectrans-4.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-master-sectrans-5.png)
+    ![](images/named-master-sectrans-5.png)
     
     ```bash
     $ sudo systemctl restart named.service
@@ -800,7 +800,7 @@
     # 创建 dnssec 密钥验证文件
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-slave-sectrans-1.png)
+    ![](images/named-slave-sectrans-1.png)
     
     ```bash
     $ sudo chown root:named /var/named/chroot/etc/transfer.key
@@ -812,7 +812,7 @@
     # 添加如下参数开启 bind 服务的密钥验证功能
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/named-slave-sectrans-2.png)
+    ![](images/named-slave-sectrans-2.png)
     
     ```bash
     $ sudo systemctl restart named.service
@@ -823,15 +823,15 @@
   
   - 使用 `dig` 命令验证DNS正向解析结果：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-test-1.png)
+    ![](images/dig-test-1.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-test-2.png)
+    ![](images/dig-test-2.png)
   
   - 使用 `dig -x` 命令验证 DNS 反向解析结果。
   
   - 也可使用 `nslookup` 命令验证 DNS 正向与反向解析结果。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-test.jpg)
+    ![](images/nslookup-test.jpg)
 
 ### dig 命令使用示例：
 
@@ -839,7 +839,7 @@
 
 - dig 命令输出六段信息，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-usage-1.png)
+  ![](images/dig-usage-1.png)
   
   status 状态通常包括：
   
@@ -875,14 +875,14 @@
   # 只查询返回对应域名的 IP 地址（A 记录中的 IP 地址）
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-usage-2.png)
+  ![](images/dig-usage-2.png)
   
   ```bash
   $ dig +trace <domain_name> @<dnsserver_ip>
   # 使用指定的 DNS 服务器查询追踪整个 DNS 分级查询过程 
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-usage-3.png)
+  ![](images/dig-usage-3.png)
   
   ```bash
   $ dig [+short] ns com
@@ -890,7 +890,7 @@
   # 查询不同层级域中的 NS 服务器及对应的 A 与 AAAA 记录
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dig-usage-4.png)
+  ![](images/dig-usage-4.png)
   
   ```bash
   $ dig +[short|trace] [a|ns|soa|cname|mx] <domain_name> @<dnsserver_ip>
@@ -929,7 +929,7 @@
   # 查看 DNS 反向解析记录，类似 dig -x 命令。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/host-usage.png)
+  ![](images/host-usage.png)
 
 ### nslookup 命令使用示例：
 
@@ -939,11 +939,11 @@
 
 - 交互模式，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-1.png)
+  ![](images/nslookup-usage-1.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-2.png)
+  ![](images/nslookup-usage-2.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-3.png)
+  ![](images/nslookup-usage-3.png)
 
 - 非交互模式，如下所示：
   
@@ -952,21 +952,21 @@
   # 查看相应域名的 SOA 记录，与 dig soa 命令类似。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-4.png)
+  ![](images/nslookup-usage-4.png)
   
   ```bash
   $ nslookup -type=ns <domain_name>
   # 查看相应域名的 NS 记录，与 dig ns 命令类似。 
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-5.png)
+  ![](images/nslookup-usage-5.png)
   
   ```bash
   $ nslookup -type=a <domain_name>
   # 查看相应域名的 A 记录，与 dig 命令或 dig a 命令类似。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/nslookup-usage-6.png)
+  ![](images/nslookup-usage-6.png)
 
 ### DNS 安全问题：
 
@@ -986,7 +986,7 @@
   
   - 如下图所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-hijack.png)
+    ![](images/dns-hijack.png)
 
 - DNS 欺骗：
   
@@ -996,7 +996,7 @@
   
   - 如下图所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/dns/dns-cheat.png)
+    ![](images/dns-cheat.png)
   
   - 通常可配置 bind、unbound 缓存名称服务器的 DNSSEC 验证预防 DNS 欺骗的发生。
 
