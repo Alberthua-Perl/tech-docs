@@ -719,6 +719,8 @@
       # 查看 CNO 部署的 deployment 与 pod
       ```
 
+      ![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
+
     - OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
 
       ```bash
@@ -989,11 +991,19 @@
       --from-file ~/DO288-apps/app-config/myapp.sec
     # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
     
-    $ oc set volume dc/myapp --add \
-      -t secret -m /opt/app-root/secure \
-      --name myappsec-vol --secret-name myappfilesec
+    $ oc set volume dc/myapp \
+      --add --type secret \
+      --secret-name myappfilesec \
+      --mount-path /opt/app-root/secure \
+      --name myappsec-vol
     # OCP3 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的 /opt/app-root/secure/ 目录中，
     # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
+
+    $ oc set volume deployment/<name> \
+      --add --type secret \
+      --secret-name <secret_name> \
+      --mount-path /path/to/directory
+    # OCP4 中以卷挂载的方式将 secret 资源挂载至 pod 的指定挂载点上
     ```
 
     除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
