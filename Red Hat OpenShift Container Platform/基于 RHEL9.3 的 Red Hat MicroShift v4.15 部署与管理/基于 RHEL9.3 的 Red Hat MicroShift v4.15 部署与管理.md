@@ -123,6 +123,10 @@
     - 若 microshift 集群状态正常后，可启用 microshift-olm 与 microshift-gitops 服务。待所有 pod 全部就绪后将返回如下状态：
 
     ```bash
+    $ mkdir ~/.kube
+    $ sudo cp /var/lib/microshift/resources/kubeadmin/kubeconfig ~/.kube/config  # 拷贝集群的 kubeconfig 配置文件
+    $ sudo chown $(id -u):$(id -g) ~/.kube/config
+
     $ oc get nodes
     NAME                             STATUS   ROLES                         AGE   VERSION
     microshift-dev.lab.example.com   Ready    control-plane,master,worker   2d    v1.28.12

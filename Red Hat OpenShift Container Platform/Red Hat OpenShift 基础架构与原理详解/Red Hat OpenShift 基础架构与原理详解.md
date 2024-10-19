@@ -930,9 +930,11 @@
 
 - Secret：  
   - 该资源对象保存 OCP 集群中的敏感数据，如密码、token 凭据等，将敏感数据与 pod 解耦。
-  - 数据使用 `base64` 编码存储在 secret 资源对象中。
+  - 数据使用 `base64` 编码（encode）存储在 secret 资源对象中。
   - secret 资源对象可在命名空间中共享。
-  - 当来自 secret 的数据被注入到容器中时，数据被解码（decode），或者作为文件挂载，或者作为环境变量注入到 pod 中。
+  - 当来自 secret 的数据被注入到容器中时，可采用以下两种方式实现：
+    - 1️⃣ 作为环境变量（env）注入到容器中
+    - 2️⃣ 作为卷（volume）挂载：指定容器内挂载路径，容器映射目录中的各个文件名为 secret 的各个 key，文件的内容为对应 key 的值。
   - secret 的类型：
 
     ![k8s-ocp-secret-type](images/k8s-ocp-secret-type.png)
@@ -958,7 +960,7 @@
 
     $ oc create secret tls <secret_name> \
       --cert /path/to/certification-file --key /path/to/certification-key
-    # 指定证书文件与私钥文件创建 secret
+    # 指定 CA 证书文件与 CA 私钥文件创建 secret
     
     ### 示例 ###
     $ oc create secret generic mysql \
@@ -981,7 +983,7 @@
     $ oc secrets link <serviceaccount_name> <secret_name> --for=pull
     # 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
     # serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
-    # 拉取镜像，否则 pod 创建失败。 
+    # 拉取镜像，否则 pod 创建失败。
     ```
 
     💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
@@ -996,20 +998,21 @@
       --secret-name myappfilesec \
       --mount-path /opt/app-root/secure \
       --name myappsec-vol
-    # OCP3 中以卷挂载的方式将 secret 资源（指定的文件）挂载至 pod 的 /opt/app-root/secure/ 目录中，
+    # OCP3 中以卷挂载的方式将 secret 资源挂载至容器的 /opt/app-root/secure/ 目录中，
     # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
 
     $ oc set volume deployment/<name> \
       --add --type secret \
       --secret-name <secret_name> \
       --mount-path /path/to/directory
-    # OCP4 中以卷挂载的方式将 secret 资源挂载至 pod 的指定挂载点上
+    # OCP4 中以卷挂载的方式将 secret 资源挂载至容器的指定挂载点上（OCP3 与 OCP4 的区别在于 dc 与 deployment）
     ```
 
     除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
 
   - 💎 补充：
     👨‍💻 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像
+
     由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
 
     ![oc-new-app-fail-for-no-secret](images/oc-new-app-fail-for-no-secret.jpg)
@@ -1040,12 +1043,12 @@
     ![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
 
     secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。  
-  - 每个项目中默认的 secret 与 serviceaccount（sa） 的关联：
+  - 每个项目中 default serviceaccount（sa）与 secret 的关联：
     - 必须指定 sa 以运行 pod，若未指定将使用 default sa。
-    - sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
+    - default sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
     - token分别用于：
-      👉 pod 与 apiserver 间的认证通信
-      👉 从 OCP internal registry 中拉取已构建的应用镜像
+      - 👉 pod 与 apiserver 间的认证通信
+      - 👉 从 OCP internal registry 中拉取已构建的应用镜像
 
       ![service-account-secret-1](images/service-account-secret-1.jpg)
 
