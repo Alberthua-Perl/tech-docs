@@ -1,43 +1,51 @@
 # 🚀 Red Hat OpenShift 应用构建与部署详解
 
-- OCP project 操作相关命令：
-  
-  ```bash
-  $ oc projects
-  # 查看所有已存在的可用项目，当前所在的项目前具有 "*" 标识。
-  # 该命令只能由 master 节点的 system:admin 管理员用户或具有 cluster-role 角色的用户执行。
-  
-  $ oc project
-  # 查看当前所在的项目
-  
-  $ oc project <project_name>
-  # 切换至指定的项目
-  
-  $ oc new-project <project_name> --description='<description_string>'
-  # 创建项目与相应描述内容
-  # OCP 使用项目进行资源隔离，即项目为命名空间（namespace）。
-  
-  $ oc status -v
-  # 查看当前所在项目的详细状态，包括 bc 与 dc 状态等。
-  ```
+## 文档目录
 
-- 👉 使用 `容器镜像` 创建应用 pod 流程：
+- OCP Project 相关命令
+- 使用 `容器镜像` 创建应用 Pod 流程
+- 使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 Pod
+- 使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 Pod
+- 使用 `template` 模板定义文件创建各应用资源
+
+## OCP Project 相关命令
   
-  ```bash
-  $ oc new-app --list
-  # 查看 OCP 集群中已存在的模板（template）与镜像流（imagestream）
+```bash
+$ oc projects
+# 查看所有已存在的可用项目，当前所在的项目前具有 "*" 标识。
+# 该命令只能由 master 节点的 system:admin 管理员用户或具有 cluster-role 角色的用户执行。
   
-  $ oc new-app \
-    --name=<application_name> \
-    --docker-image=<container_registry_url>/<repository>/<image_name>:[tag]
-  # 使用已有的容器镜像创建应用，并指定应用名称。
-  ```
+$ oc project
+# 查看当前所在的项目
   
-  ![oc-new-app-container-image-stratgy-1](images/oc-new-app-container-image-stratgy-1.jpg)
+$ oc project <project_name>
+# 切换至指定的项目
   
-  ![oc-new-app-container-image-stratgy-2](images/oc-new-app-container-image-stratgy-2.jpg)
+$ oc new-project <project_name> --description='<description_string>'
+# 创建项目与相应描述内容
+# OCP 使用项目进行资源隔离，即项目为命名空间（namespace）。
   
-  💎 补充：
+$ oc status -v
+# 查看当前所在项目的详细状态，包括 bc 与 dc 状态等。
+```
+
+## 使用 `容器镜像` 创建应用 Pod 流程
+  
+```bash
+$ oc new-app --list
+# 查看 OCP 集群中已存在的模板（template）与镜像流（imagestream）
+  
+$ oc new-app \
+  --name=<application_name> \
+  --docker-image=<container_registry_url>/<repository>/<image_name>:[tag]
+# 使用已有的容器镜像创建应用，并指定应用名称。
+```
+  
+![oc-new-app-container-image-stratgy-1](images/oc-new-app-container-image-stratgy-1.jpg)
+  
+![oc-new-app-container-image-stratgy-2](images/oc-new-app-container-image-stratgy-2.jpg)
+  
+- 💎 补充：
   
   - 由于 OCP 4.x 已兼容 Kubernetes 的 `deployment` 资源（`api-resources` 中可获知），因此在使用 `--docker-image` 选项直接构建应用时使用 `deployment.apps`。
 
@@ -45,25 +53,25 @@
   
   - 而 OCP 3.x 未集成 deployment 资源，使用以上选项构建应用时依然使用 `deploymentconfig` 资源实现。
 
-- 👉 使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 pod：
+## 使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 Pod
   
-  ```bash
-  $ oc new-app \
-    --name=<application_name> \
-    --strategy docker \
-    <git_repository_url_of_dockerfile> [--insecure-registry]
-  # 以 Dockerfile 所在的 Git 仓库的方式创建应用
-  # 注意：
-  #   1. Dockerfile 中 FROM 指令指向的容器镜像仓库，需注意是否使用 SSL 协议，即是否使用
-  #      --insecure-registry 命令行选项。
-  #   2. 如下所示：
-  #      $ oc new-app --name=echo --strategy docker \
-  #        --insecure-registry http://services.lab.example.com/rhel7-echo
-  ```
+```bash
+$ oc new-app \
+  --name=<application_name> \
+  --strategy docker \
+  <git_repository_url_of_dockerfile> [--insecure-registry]
+# 以 Dockerfile 所在的 Git 仓库的方式创建应用
+# 注意：
+#   1. Dockerfile 中 FROM 指令指向的容器镜像仓库，需注意是否使用 SSL 协议，即是否使用
+#      --insecure-registry 命令行选项。
+#   2. 如下所示：
+#      $ oc new-app --name=echo --strategy docker \
+#        --insecure-registry http://services.lab.example.com/rhel7-echo
+```
 
-- 👉 使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 pod：
+## 使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 Pod
   
-  📌 方式 1：
+- 📌 方式 1：
   
   > 使用非 openshift 项目中的 imagestream 时，只能使用 `~` 方法创建应用！
   
@@ -105,7 +113,7 @@
   # 该方法已在 OCP 4.x 中验证
   ```
   
-  💎 补充：
+  - 💎 补充：
   
   - 👨‍💻 示例：在 OCP 4.x 中使用 `--context-dir` 选项
 
@@ -137,7 +145,7 @@
   
   > ✅ 以上的 nodejs 构建镜像的构建方式可参考 [该 RHSCL 的 GitHub 链接](https://github.com/sclorg/s2i-nodejs-container/tree/master/12)。
   
-  📌 方式 2：
+- 📌 方式 2：
   
   ```bash
   $ oc new-app \
@@ -148,7 +156,7 @@
   # 以 S2I 源代码注入的方式创建应用
   ```
   
-  📌 方式 3：
+- 📌 方式 3：
   
   ```bash
   $ oc new-app \
@@ -160,7 +168,7 @@
   # 该命令将尝试根据 Git 代码仓库根目录中存在的特定文件来确定使用哪一种语言的构建镜像。
   ```
   
-  📌 `oc new-app` 命令常用选项：
+- 📌 `oc new-app` 命令常用选项：
   
   ```bash
   --name                        指定构建的应用及其相关资源的名称
@@ -176,51 +184,52 @@
   --insecure-registry           指定使用的容器镜像仓库未使用 SSL 连接
   ```
   
-  📌 使用 S2I 源代码注入创建应用 pod 流程：
+- 📌 使用 S2I 源代码注入创建应用 pod 流程：
   
   ![s2i-application-build](images/s2i-application-build.jpg)
 
-- 👉 使用 `template` 模板定义文件创建各应用资源：
-  - 该方法常用于部署构建多应用的项目中，需处理好多个应用之间的服务发现问题。
-  - oc new-app 命令行中可指定应用的名称（`--name` 选项）、模板名称（`--template` 选项）与命令行参数（`--param`, -p 选项）。
-  - `-p` 选项：指定命令行中的额外参数，可覆盖模板文件中定义的 parameters 参数（模板中的参数可被作为模板中 env 环境变量使用）。
-  - 使用 template 模板相关命令：
+## 使用 `template` 模板定义文件创建各应用资源
 
-    ```bash
-    $ oc get templates [-n <project>]
-    # 查看指定项目中的 OCP 资源定义模板，使用 oc get all 命令无法获取。
+- 该方法常用于部署构建多应用的项目中，需处理好多个应用之间的服务发现问题。
+- oc new-app 命令行中可指定应用的名称（`--name` 选项）、模板名称（`--template` 选项）与命令行参数（`--param`, -p 选项）。
+- `-p` 选项：指定命令行中的额外参数，可覆盖模板文件中定义的 parameters 参数（模板中的参数可被作为模板中 env 环境变量使用）。
+- 使用 template 模板相关命令：
+
+  ```bash
+  $ oc get templates [-n <project>]
+  # 查看指定项目中的 OCP 资源定义模板，使用 oc get all 命令无法获取。
     
-    $ oc create -f <template>.json [-n <project>]
-    # 上传 OCP 资源定义模板至指定项目中
-    # 企业生产环境中常使用 template 模板部署应用
+  $ oc create -f <template>.json [-n <project>]
+  # 上传 OCP 资源定义模板至指定项目中
+  # 企业生产环境中常使用 template 模板部署应用
     
-    $ oc describe templates <template> [-n <project>] 
-    # 查看指定项目中 OCP 资源定义模板的参数定义
+  $ oc describe templates <template> [-n <project>] 
+  # 查看指定项目中 OCP 资源定义模板的参数定义
     
-    $ oc process -f <template>.json | oc create -f -
-    # 使用 template 模板文件部署应用资源
-    # 注意：template 模板文件中可直接定义 pvc 与 route
-    ```
+  $ oc process -f <template>.json | oc create -f -
+  # 使用 template 模板文件部署应用资源
+  # 注意：template 模板文件中可直接定义 pvc 与 route
+  ```
   
-  - 💎 补充：
-    - `OCP 4.x` 中使用 `template` 模板构建 MySQL 数据库应用（单 pod 应用）：
+- 💎 补充：
+  - `OCP 4.x` 中使用 `template` 模板构建 MySQL 数据库应用（单 pod 应用）：
 
-      ![ocp4-oc-new-app-template](images/ocp4-oc-new-app-template.jpg)
+    ![ocp4-oc-new-app-template](images/ocp4-oc-new-app-template.jpg)
 
-    - `OCP 4.x` 中使用 template 模板构建 `php` 与 `mysql` 的多 pod 应用：
+  - `OCP 4.x` 中使用 template 模板构建 `php` 与 `mysql` 的多 pod 应用：
 
-      ![ocp4-template-php-mysql-ephemeral-1](images/ocp4-template-php-mysql-ephemeral-1.jpg)
+    ![ocp4-template-php-mysql-ephemeral-1](images/ocp4-template-php-mysql-ephemeral-1.jpg)
 
-      ![ocp4-template-php-mysql-ephemeral-2](images/ocp4-template-php-mysql-ephemeral-2.jpg)
+    ![ocp4-template-php-mysql-ephemeral-2](images/ocp4-template-php-mysql-ephemeral-2.jpg)
 
-      前端 php 应用发现后端 mysql 应用的方式，CoreDNS 解析过程见前文所述：
+    前端 php 应用发现后端 mysql 应用的方式，CoreDNS 解析过程见前文所述：
 
-      ![php-frontend-discover-mysql-backend](images/php-frontend-discover-mysql-backend.jpg)
+    ![php-frontend-discover-mysql-backend](images/php-frontend-discover-mysql-backend.jpg)
 
-      若 pod 中不具有相应的网络调试工具，可使用如下方式进行前后端 pod 的网络调试：
+    若 pod 中不具有相应的网络调试工具，可使用如下方式进行前后端 pod 的网络调试：
 
-      ![test-frontend-pod-to-backend-pod-connection](images/test-frontend-pod-to-backend-pod-connection.jpg)
+    ![test-frontend-pod-to-backend-pod-connection](images/test-frontend-pod-to-backend-pod-connection.jpg)
 
-      定义以上应用的 template 模板（JSON 格式）部分如下所示：
+    定义以上应用的 template 模板（JSON 格式）部分如下所示：
 
-      ![ocp4-template-php-mysql-ephemeral-3](images/ocp4-template-php-mysql-ephemeral-3.jpg)
+    ![ocp4-template-php-mysql-ephemeral-3](images/ocp4-template-php-mysql-ephemeral-3.jpg)
