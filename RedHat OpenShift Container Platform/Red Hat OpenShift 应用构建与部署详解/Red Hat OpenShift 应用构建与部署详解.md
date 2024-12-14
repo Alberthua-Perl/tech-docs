@@ -3,10 +3,12 @@
 ## 文档目录
 
 - OCP Project 相关命令
-- 使用 `容器镜像` 创建应用 Pod 流程
-- 使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 Pod
-- 使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 Pod
-- 使用 `template` 模板定义文件创建各应用资源
+- 使用容器镜像创建应用 Pod 流程
+- 使用 Containerfile 或 Dockerfile 构建应用容器镜像并创建 Pod
+- 使用应用源代码以 S2I 的方式注入构建镜像创建应用 Pod
+- 使用 template 模板定义文件创建各应用资源
+- Helm 常用命令汇总
+- 参考链接
 
 ## OCP Project 相关命令
   
@@ -193,21 +195,47 @@ $ oc new-app \
 - 该方法常用于部署构建多应用的项目中，需处理好多个应用之间的服务发现问题。
 - oc new-app 命令行中可指定应用的名称（`--name` 选项）、模板名称（`--template` 选项）与命令行参数（`--param`, -p 选项）。
 - `-p` 选项：指定命令行中的额外参数，可覆盖模板文件中定义的 parameters 参数（模板中的参数可被作为模板中 env 环境变量使用）。
+- 👉 模板可在集群的命名空间中，也可以资源定义文件的方式存在。
 - 使用 template 模板相关命令：
 
   ```bash
+  $ oc get templates -n openshift
   $ oc get templates [-n <project>]
-  # 查看指定项目中的 OCP 资源定义模板，使用 oc get all 命令无法获取。
-    
-  $ oc create -f <template>.json [-n <project>]
-  # 上传 OCP 资源定义模板至指定项目中
-  # 企业生产环境中常使用 template 模板部署应用
-    
-  $ oc describe templates <template> [-n <project>] 
-  # 查看指定项目中 OCP 资源定义模板的参数定义
-    
-  $ oc process -f <template>.json | oc create -f -
-  # 使用 template 模板文件部署应用资源
+  # 查看指定项目中的模板，使用 oc get all 命令无法获取。
+
+  $ oc describe templates <template> [-n <project>]
+  # 查看指定项目中模板的详细参数定义  
+
+  $ oc create -f /path/to/<template>.yaml [-n <project>]
+  # 在指定项目中根据模板定义文件上传模板
+
+  $ oc process --parameters <template> [-n <project>]
+  # 查看指定项目中模版的参数列表
+
+  $ oc process --parameters <template>.yaml [-n <project>]
+  # 查看指定项目中模版定义文件中的参数列表
+
+  $ oc process <template> \
+    -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> \
+    -o yaml > /path/to/<manifest_file>.yaml
+  # 根据当前命名空间中指定的参数替换模版中的默认值，生成清单文件（manifest file）。
+  # 注意：模版需已存在于命名空间中，生成的清单文件可直接用于创建资源对象。
+
+  $ oc process <template> \
+    --param-file=<parameters_file> \
+    -o yaml > /path/to/<manifest_file>.yaml
+  # 根据模板与参数定义文件生成清单文件（manifest file）
+  # 其中参数定义文件格式形如：<parameter_name>=<parameter_value>
+
+  $ oc process -f /path/to/<template>.yaml \
+    -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> \
+    -o yaml > /path/to/<manifest_file>.yaml
+  # 根据模板定义文件与指定的参数值生成清单文件（manifest file）
+
+  $ oc process -f /path/to/<template>.yaml \
+    -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> | \
+    oc apply -f -
+  # 根据模板与参数生成清单文件并直接生成资源对象
   # 注意：template 模板文件中可直接定义 pvc 与 route
   ```
   
@@ -233,3 +261,43 @@ $ oc new-app \
     定义以上应用的 template 模板（JSON 格式）部分如下所示：
 
     ![ocp4-template-php-mysql-ephemeral-3](images/ocp4-template-php-mysql-ephemeral-3.jpg)
+
+## Helm 常用命令汇总
+
+```bash
+### Helm Chart Repository 相关操作 ###
+$ helm repo add <repo_name> <repository_url>
+# 添加 helm charts 仓库信息并写入 $HOME/.config/helm/repositories.yaml 中
+
+$ helm repo list
+# 查看 helm charts 仓库的列表
+
+$ helm repo update
+
+$ helm repo remove <repository1_name> <repository2_name> ... <repositoryN_name>
+# 移除指定的一个或多个 helm charts 仓库
+
+$ helm search repo [<repository_name>]
+# 根据仓库搜索其中所有的 charts
+
+$ helm search repo [<chart_name>]
+# 根据 chart 名称在所有仓库中搜索
+
+### Helm Chart 相关操作 ###
+$ helm show chart <chart_reference>
+
+$ helm show values <chart_reference>
+
+$ helm install <release_name> <chart_reference> --dry-run --vaules vaules.yaml
+
+$ helm list
+# 查看当前项目中已安装的 release 信息
+# --all-namespaces 选项指定所有项目中的 release；--namespace 选项指定项目中的 release
+
+$ helm history <release_name>
+
+```
+
+## 参考链接
+
+- [⭕ Red Hat OpenShift 基础架构与原理详解](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3.md)

@@ -16,7 +16,7 @@
 - CRI-O 容器运行时相关命令
 - 🔥 OpenShift 资源对象详解
 - 🧪 OpenShift 资源对象使用
-- OpenShift 用户与访问控制
+- OpenShift 用户资源与访问控制
 - OpenShift Pod 的调度
 - OpenShift 服务与路由使用
 - OpenShift 日志与事件
@@ -233,7 +233,7 @@
 - master 节点执行的服务包括：
   - `apiserver`（包括 authentication/authorization）：
     - 接收、响应来自集群内部与外部的 `Restful API` 请求。
-    - 处理 OCP 集群内的用户与服务的身份认证/授权服务（`oAuth`）。
+    - 处理 OCP 集群内的用户与服务的身份认证/授权服务（`OAuth`）。
   - `controller-manager`：
     控制管理器，用于实现无状态 pod 与有状态 pod 的控制管理。
   - `scheduler`：
@@ -262,7 +262,7 @@
 - 若未将 `self-provisioner` 角色从指定用户去除，使用指定用户创建的项目，该用户即为项目的项目管理员。
 - default 项目与 openshift 项目能被所有用户使用，但只能由 `system:admin` 用户或具有 `cluster-admin` 角色的用户管理。
 
-### ImageStream (`is`), ImageStream tag (`istag`)
+### ImageStream [`is`], ImageStream tag [`istag`]
 
 - 镜像流、镜像流标签：
 
@@ -472,7 +472,7 @@
 
   ![imagestream-error-3](images/imagestream-error-3.jpg)
 
-### BuildConfig (`bc`), Build
+### BuildConfig [`bc`], Build
 
 - 构建配置、构建
 - 创建 buildconfig 的方法：
@@ -655,7 +655,7 @@
     - 使用 shell 脚本模式：
       使用 `/bin/sh -ic` 命令配合脚本来实现所有的功能，如参数扩展、重定向等，并且 build pod 必须可提供 `sh` 的 shell 解释器。
 
-### DeploymentConfig (`dc`), Deploy
+### DeploymentConfig [`dc`], Deploy
 
 - 部署配置、部署
 - 在 Kubernetes 1.0 中并不像现在如此方便可快速部署应用，而是需要繁复的手动配置才能满足要求，而在 OpenShift 3.0 中 Red Hat 开发了 `deploymentconfig`，以提供参数化部署输入、执行滚动部署、启用回滚至先前部署状态，以及通过触发器（`trigger`）以驱动自动部署等（buildconfig 构建配置完成后触发 deploymentconfig）。  
@@ -691,7 +691,7 @@ $ oc rollout restart deployment <deployment_name>
 # 根据新更新的 deployment 重新部署相关资源
 ```
 
-### ReplicationController (`rc`), ReplicaSet
+### ReplicationController [`rc`], ReplicaSet
 
 - 前者已集成至 deploymentconfig 中，而后者集成至 deployment 中。
 - 该资源对象保证运行的 pod 的高可用，使其当前的数量趋近于 desired 数量。
@@ -728,7 +728,7 @@ $ oc rollout restart deployment <deployment_name>
   > OCP4 中支持基于集合类型的标签
 - OCP 集群中的各种资源使用 label 标签进行匹配
 
-### 🔥 Service
+### 🔥 Service [`svc`]
 
 - 服务
 - 🚀 OCP3 & OCP4 的网络模型继承于 Kubernetes，包含以下四种类型：
@@ -903,7 +903,7 @@ $ oc rollout restart deployment <deployment_name>
 - 💎 补充：
   - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 ingress controller 与 ingress，而在 OpenShift 中 ingress controller 对应为 HAProxy router pod，而 ingress 对应为 route。
 
-### PersistentVolume (pv)
+### PersistentVolume [`pv`]
 
 - 持久卷
 - 持久卷属于 OCP 集群资源，必须使用 `system:admin` 管理员用户或具有 `cluster-role` 角色的用户进行管理、创建与删除。
@@ -932,7 +932,7 @@ $ oc rollout restart deployment <deployment_name>
     👉 目前只有 NFS 与 hostPath 支持该回收模式。
     > 💥 pv 与 pvc 可绑定成功，但不代表 pv 使用的后端存储可正常使用！
 
-### PersistentVolumeClaim (pvc)
+### PersistentVolumeClaim [`pvc`]
 
 - 持久卷声明  
 - 持久卷声明属于项目（或命名空间）资源，使用项目用户即可管理 pvc。  
@@ -953,203 +953,224 @@ $ oc rollout restart deployment <deployment_name>
 
   ![ocp3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
 
-- Secret：  
-  - 该资源对象保存 OCP 集群中的敏感数据，如密码、token 凭据等，将敏感数据与 pod 解耦。
-  - 数据使用 `base64` 编码（encode）存储在 secret 资源对象中。
-  - secret 资源对象可在命名空间中共享。
-  - 当来自 secret 的数据被注入到容器中时，可采用以下两种方式实现：
-    - 1️⃣ 作为环境变量（env）注入到容器中
-    - 2️⃣ 作为卷（volume）挂载：指定容器内挂载路径，容器映射目录中的各个文件名为 secret 的各个 key，文件的内容为对应 key 的值。
-  - secret 的类型：
+### Secret
 
-    ![k8s-ocp-secret-type](images/k8s-ocp-secret-type.png)
+- 该资源对象保存 OCP 集群中的敏感数据，如密码、token 凭据等，将敏感数据与 pod 解耦。
+- 数据使用 `base64` 编码（encode）存储在 secret 资源对象中。
+- secret 资源对象可在命名空间中共享。
+- 当来自 secret 的数据被注入到容器中时，可采用以下两种方式实现：
+  - 1️⃣ 作为环境变量（env）注入到容器中
+  - 2️⃣ 作为卷（volume）挂载：指定容器内挂载路径，容器映射目录中的各个文件名为 secret 的各个 key，文件的内容为对应 key 的值。
+- secret 的类型：
 
-  - 创建与使用 secret 资源对象：
-    若使用 Web 控制台创建 secret 资源对象，由于使用 `base64` 编码该资源对象，需对其解码才能注入 secret 的值，而使用 CLI 创建的方式如下所示：
+  ![k8s-ocp-secret-type](images/k8s-ocp-secret-type.png)
 
-    ```bash
-    $ oc create secret --help
-    # 查看创建 secret 的方法
-    ```
+- 创建与使用 secret 资源对象：
+  若使用 Web 控制台创建 secret 资源对象，由于使用 `base64` 编码该资源对象，需对其解码才能注入 secret 的值，而使用 CLI 创建的方式如下所示：
 
-    ![oc-create-secret](images/oc-create-secret.jpg)
+  ```bash
+  $ oc create secret --help
+  # 查看创建 secret 的方法
+  ```
 
-    ```bash
-    $ oc create secret generic <secret_name> \
-      --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
-    # 指定 key 与 value 的值创建 secret 资源，使敏感数据与 pod 解耦。
+  ![oc-create-secret](images/oc-create-secret.jpg)
+
+  ```bash
+  $ oc create secret generic <secret_name> \
+    --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
+  # 指定 key 与 value 的值创建 secret 资源，使敏感数据与 pod 解耦。
     
-    $ oc create secret generic <secret_name> \
-      --from-file <key1>=/path/to/file1 ... --from-file <keyN>=/path/to/fileN
-    # 指定 key 与文件的内容创建 secret 资源
+  $ oc create secret generic <secret_name> \
+    --from-file <key1>=/path/to/file1 ... --from-file <keyN>=/path/to/fileN
+  # 指定 key 与文件的内容创建 secret 资源
 
-    $ oc create secret tls <secret_name> \
-      --cert /path/to/certification-file --key /path/to/certification-key
-    # 指定 CA 证书文件与 CA 私钥文件创建 secret
+  $ oc create secret tls <secret_name> \
+    --cert /path/to/certification-file --key /path/to/certification-key
+  # 指定 CA 证书文件与 CA 私钥文件创建 secret
     
-    ### 示例 ###
-    $ oc create secret generic mysql \
-      --from-literal='database-user'='mysql' \
-      --from-literal='database-password'='redhat' \
-      --from-literal='database-root-password'='do285-admin'
-    # 创建 secret 资源以存储 MySQL 相关的用户名与密码，该 secret 可被其他资源所引用。
+  ### 示例 ###
+  $ oc create secret generic mysql \
+    --from-literal='database-user'='mysql' \
+    --from-literal='database-password'='redhat' \
+    --from-literal='database-root-password'='do285-admin'
+  # 创建 secret 资源以存储 MySQL 相关的用户名与密码，该 secret 可被其他资源所引用。
 
-    $ oc create secret generic <secret_name> \
-      --from-file .dockerconfigjson=<access_token_file> \
-      --type kubernetes.io/dockerconfigjson
-    # 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
+  $ oc create secret generic <secret_name> \
+    --from-file .dockerconfigjson=<access_token_file> \
+    --type kubernetes.io/dockerconfigjson
+  # 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
 
-    $ oc create secret generic quayio \
-      --from-file .dockerconfigjson=/run/user/1000/containers/auth.json
-      --type kubernetes.io/dockerconfigjson
-    # 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至 serviceaccount 以拉取私有镜像。
+  $ oc create secret generic quayio \
+    --from-file .dockerconfigjson=/run/user/1000/containers/auth.json
+    --type kubernetes.io/dockerconfigjson
+  # 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至 serviceaccount 以拉取私有镜像。
 
-    ### 示例：secret 通过链接（link）与 serviceaccount 关联 ###
-    $ oc secrets link <serviceaccount_name> <secret_name> --for=pull
-    # 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
-    # serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
-    # 拉取镜像，否则 pod 创建失败。
-    ```
+  ### 示例：secret 通过链接（link）与 serviceaccount 关联 ###
+  $ oc secrets link <serviceaccount_name> <secret_name> --for=pull
+  # 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
+  # serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
+  # 拉取镜像，否则 pod 创建失败。
+  ```
 
-    💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
+  💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
 
-    ```bash
-    $ oc create secret generic myappfilesec \
-      --from-file ~/DO288-apps/app-config/myapp.sec
-    # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
+  ```bash
+  $ oc create secret generic myappfilesec \
+    --from-file ~/DO288-apps/app-config/myapp.sec
+  # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
     
-    $ oc set volume dc/myapp \
-      --add --type secret \
-      --secret-name myappfilesec \
-      --mount-path /opt/app-root/secure \
-      --name myappsec-vol
-    # OCP3 中以卷挂载的方式将 secret 资源挂载至容器的 /opt/app-root/secure/ 目录中，
-    # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
+  $ oc set volume dc/myapp \
+    --add --type secret \
+    --secret-name myappfilesec \
+    --mount-path /opt/app-root/secure \
+    --name myappsec-vol
+  # OCP3 中以卷挂载的方式将 secret 资源挂载至容器的 /opt/app-root/secure/ 目录中，
+  # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
 
-    $ oc set volume deployment/<name> \
-      --add --type secret \
-      --secret-name <secret_name> \
-      --mount-path /path/to/directory
-    # OCP4 中以卷挂载的方式将 secret 资源挂载至容器的指定挂载点上（OCP3 与 OCP4 的区别在于 dc 与 deployment）
-    ```
+  $ oc set volume deployment/<name> \
+    --add --type secret \
+    --secret-name <secret_name> \
+    --mount-path /path/to/directory
+  # OCP4 中以卷挂载的方式将 secret 资源挂载至容器的指定挂载点上（OCP3 与 OCP4 的区别在于 dc 与 deployment）
+  ```
 
-    除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
+  除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
 
-  - 💎 补充：
-    👨‍💻 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像
+- 提取与更新 secret：
 
-    由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
+  以下示例为 `HTPasswd` 作为 `Identity Provider` 的场景中，通过提取的文件更新集群中的用户：
 
-    ![oc-new-app-fail-for-no-secret](images/oc-new-app-fail-for-no-secret.jpg)
+  ```bash
+  $ oc extract secret/htpasswd-secret -n openshift-config --to /tmp --confirm
+  # 提取 openshift-config 项目中名为 htpasswd-secret 的 secret 至 /tmp 目录中以文件的形式保存
+  # 注意：提取的文件中存储用户的用户名与加密的哈希
 
-    因此，在项目中创建 secret 并将其链接至名为 default 的 `service account`，实则是为 service account 添加对应的 `imagePullSecrets`，如下所示：
+  $ oc set data secret/htpasswd-secret -n openshift-config --from htpasswd=/tmp/htpasswd
+  # 使用更新后 htpasswd 文件设置 secret
+  # 注意：使用 htpasswd 命令更新 /tmp/htpasswd 文件中的用户信息
 
-    ![oc-secretes-link-help](images/oc-secretes-link-help.jpg)
+  $ oc get pods -w -n openshift-authentication
+  # authentication ClusterOperator (OAuth operator) 在上述 secret 更新后将重新部署名为 oauth-openshift 的 pod
+  ```
 
-    ```bash
-    $ echo ${XDG_RUNTIME_DIR}
-      /run/user/1000
-    # 默认的容器镜像仓库认证文件路径前缀
+- 💎 补充：
+  👨‍💻 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像
+
+  由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
+
+  ![oc-new-app-fail-for-no-secret](images/oc-new-app-fail-for-no-secret.jpg)
+
+  因此，在项目中创建 secret 并将其链接至名为 default 的 `service account`，实则是为 service account 添加对应的 `imagePullSecrets`，如下所示：
+
+  ![oc-secretes-link-help](images/oc-secretes-link-help.jpg)
+
+  ```bash
+  $ echo ${XDG_RUNTIME_DIR}
+    /run/user/1000
+  # 默认的容器镜像仓库认证文件路径前缀
     
-    $ oc create secret generic quayio \
-      --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
-      --type kubernetes.io/dockerconfigjson
-    # 使用 podman 登录容器镜像仓库的 token 创建 secret
+  $ oc create secret generic quayio \
+    --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
+    --type kubernetes.io/dockerconfigjson
+  # 使用 podman 登录容器镜像仓库的 token 创建 secret
     
-    $ oc secrets link default quayio --for=pull
+  $ oc secrets link default quayio --for=pull
     
-    $ oc new-app --name sleep \
-      --docker-image=quay.io/${RHT_OCP4_QUAY_USER}/ubi-sleep:1.0
-    # 成功拉取镜像并部署
-    ```
+  $ oc new-app --name sleep \
+    --docker-image=quay.io/${RHT_OCP4_QUAY_USER}/ubi-sleep:1.0
+  # 成功拉取镜像并部署
+  ```
 
-    ![oc-get-serviceaccounts-default-imagepullsecrets](images/oc-get-serviceaccounts-default-imagepullsecrets.jpg)
+  ![oc-get-serviceaccounts-default-imagepullsecrets](images/oc-get-serviceaccounts-default-imagepullsecrets.jpg)
 
-    ![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
+  ![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
 
-    secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。  
-  - 每个项目中 default serviceaccount（sa）与 secret 的关联：
-    - 必须指定 sa 以运行 pod，若未指定将使用 default sa。
-    - default sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
-    - token分别用于：
-      - 👉 pod 与 apiserver 间的认证通信
-      - 👉 从 OCP internal registry 中拉取已构建的应用镜像
+  secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。  
+- 每个项目中 default serviceaccount（sa）与 secret 的关联：
+  - 必须指定 sa 以运行 pod，若未指定将使用 default sa。
+  - default sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
+  - token分别用于：
+    - 👉 pod 与 apiserver 间的认证通信
+    - 👉 从 OCP internal registry 中拉取已构建的应用镜像
 
-      ![service-account-secret-1](images/service-account-secret-1.jpg)
+    ![service-account-secret-1](images/service-account-secret-1.jpg)
 
-    - pod 运行后将 secret 挂载至 `/var/run/secrets/kubernetes.io/serviceaccount/` 目录中。
-    - 该目录中的 token 即为 sa 中的 secret 对应的 token。
+  - pod 运行后将 secret 挂载至 `/var/run/secrets/kubernetes.io/serviceaccount/` 目录中。
+  - 该目录中的 token 即为 sa 中的 secret 对应的 token。
 
-      ![service-account-secret-2](images/service-account-secret-2.jpg)
+    ![service-account-secret-2](images/service-account-secret-2.jpg)
 
-      ![service-account-secret-3](images/service-account-secret-3.jpg)
+    ![service-account-secret-3](images/service-account-secret-3.jpg)
 
-- ConfigureMap (cm)
-  - 该资源对象类似于 secret 资源对象，但它们存储的是不敏感的数据。
-  - configmap 资源对象可用于存储细粒度（`fine-grained`）信息，如独立的属性，或粗粒度（`coarse-grained`）信息，如整个配置文件和 JSON 数据。
-  - 可使用 OpenShift CLI 或 Web 控制台创建 configmap 与 secret 资源，可在 pod 规范和 OpenShift 中自动引用它们。
-  - secret 资源对象与 configmap 资源对象的特点：
-    - 均可以独立地被定义（definition）与被引用（referenced）
-    - 出于安全原因，为这些资源挂载的卷由临时文件存储（tmpfs）支持，不存储在节点上。
-    - 它们均作用于所在的命令空间（namespace）
-  - 创建与使用 configmap 资源：
+### ConfigureMap [`cm`]
 
-    ```bash
-    $ oc create configmap --help
-    # 查看创建 configmap 的多种方式
-    ```
+- 该资源对象类似于 secret 资源对象，但它们存储的是不敏感的数据。
+- configmap 资源对象可用于存储细粒度（`fine-grained`）信息，如独立的属性，或粗粒度（`coarse-grained`）信息，如整个配置文件和 JSON 数据。
+- 可使用 OpenShift CLI 或 Web 控制台创建 configmap 与 secret 资源，可在 pod 规范和 OpenShift 中自动引用它们。
+- secret 资源对象与 configmap 资源对象的特点：
+  - 均可以独立地被定义（definition）与被引用（referenced）
+  - 出于安全原因，为这些资源挂载的卷由临时文件存储（tmpfs）支持，不存储在节点上。
+  - 它们均作用于所在的命令空间（namespace）
+- 创建与使用 configmap 资源：
 
-    ![oc-configmap-create](images/oc-configmap-create.jpg)
+  ```bash
+  $ oc create configmap --help
+  # 查看创建 configmap 的多种方式
+  ```
 
-    ```bash
-    $ oc create configmap <configmap_name> \
-      --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
-    # 创建 configmap 资源，并可使用于 deploymentconfig 中。
+  ![oc-configmap-create](images/oc-configmap-create.jpg)
+
+  ```bash
+  $ oc create configmap <configmap_name> \
+    --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
+  # 创建 configmap 资源，并可使用于 deploymentconfig 中。
     
-    ### 示例 ###
-    $ oc create configmap myappconf \
-      --from-literal APP_MSG="Test Message"
-    ```
+  ### 示例 ###
+  $ oc create configmap myappconf \
+    --from-literal APP_MSG="Test Message"
+  ```
 
-    ```bash
-    $ oc set env dc/<deploymentconfig_name> --from=configmap/<configmap_name>
-    # OCP3 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
-    # 注入至应用 pod 中
+  ```bash
+  $ oc set env dc/<deploymentconfig_name> --from=configmap/<configmap_name>
+  # OCP3 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
+  # 注入至应用 pod 中
     
-    ### 示例 ###
-    $ oc set env dc/myapp --from=configmap/myappconf
-    # OCP3 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
-    # 以环境变量的方式存在。
-    ```
+  ### 示例 ###
+  $ oc set env dc/myapp --from=configmap/myappconf
+  # OCP3 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
+  # 以环境变量的方式存在。
+  ```
 
-    ```bash
-    $ oc rollout latest dc/<deploymentconfig_name>
-    # OCP3 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
+  ```bash
+  $ oc rollout latest dc/<deploymentconfig_name>
+  # OCP3 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
     
-    $ oc rollback 
-    # OCP3 中 oc rollout/rollback 都是针对 dc 来实现
-    ```
+  $ oc rollback 
+  # OCP3 中 oc rollout/rollback 都是针对 dc 来实现
+  ```
   
-  - 如下所示，由于注入 configmap 与更改 dc 配置导致两次触发 dc 部署全新的 pod：
+- 如下所示，由于注入 configmap 与更改 dc 配置导致两次触发 dc 部署全新的 pod：
 
-    ![configmap-trigger-dc](images/configmap-trigger-dc.jpg)
+  ![configmap-trigger-dc](images/configmap-trigger-dc.jpg)
   
-  - 🚀 将 secret 与 configmap 资源注入应用 pod 的方式：
-    - OpenShift 将其作为环境变量（`environment variables`）注入到容器中，在容器中以环境变量的形式存在。
-    - OpenShift 通过挂载卷（`volume`）的方式将其注入到容器中，在容器中以挂载卷的形式存在。
-      > 还可将正在运行的应用程序的部署配置（deploymentconfig）更改为引用 configmap 资源或 secret 资源，然后 OpenShift 自动重新部署应用程序并使数据对容器可用。
-  - 💎 补充：
-    OCP4 中将 secret 与 configmap 资源对象注入应用 pod 的方式：
+- 🚀 将 secret 与 configmap 资源注入应用 pod 的方式：
+  - OpenShift 将其作为环境变量（`environment variables`）注入到容器中，在容器中以环境变量的形式存在。
+  - OpenShift 通过挂载卷（`volume`）的方式将其注入到容器中，在容器中以挂载卷的形式存在。
 
-    ![oc-set-env-or-volume](images/oc-set-env-or-volume.jpg)
+    > 还可将正在运行的应用程序的部署配置（deploymentconfig）更改为引用 configmap 资源或 secret 资源，然后 OpenShift 自动重新部署应用程序并使数据对容器可用。
 
-    使用卷挂载的方式注入 secret 或 configmap 资源对象中的应用数据时，需指定 `-m` 选项对应的 pod 中挂载的路径。  
-  - 选取应用 pod 环境变量或卷挂载方式的参考：
-    - 若应用只有少数可以从 `环境变量` 中读取或通过命令行传递的简单配置变量，那么可以使用环境变量从 configmap 和 secret 资源对象中注入数据，环境变量是注入数据的首选方法。
-    - 另一方面，若应用有大量的配置变量，或正在迁移大量使用配置文件的遗留应用，则使用 `卷挂载` 方法，而不是为每个配置变量创建一个环境变量。
-    - 如，若应用需要从本地节点文件系统上的特定位置获得一个或多个配置文件，则应该使用配置文件创建 secret 或 configmap，并将它们挂载到容器临时文件系统中应用所需的路径下。
+- 💎 补充：
+  OCP4 中将 secret 与 configmap 资源对象注入应用 pod 的方式：
 
-- OCP 中特有的资源对象：buildconfig、deploymentconfig、route、template
+  ![oc-set-env-or-volume](images/oc-set-env-or-volume.jpg)
+
+  使用卷挂载的方式注入 secret 或 configmap 资源对象中的应用数据时，需指定 `-m` 选项对应的 pod 中挂载的路径。  
+- 选取应用 pod 环境变量或卷挂载方式的参考：
+  - 若应用只有少数可以从 `环境变量` 中读取或通过命令行传递的简单配置变量，那么可以使用环境变量从 configmap 和 secret 资源对象中注入数据，环境变量是注入数据的首选方法。
+  - 另一方面，若应用有大量的配置变量，或正在迁移大量使用配置文件的遗留应用，则使用 `卷挂载` 方法，而不是为每个配置变量创建一个环境变量。
+  - 如，若应用需要从本地节点文件系统上的特定位置获得一个或多个配置文件，则应该使用配置文件创建 secret 或 configmap，并将它们挂载到容器临时文件系统中应用所需的路径下。
+
+- OCP 中特有的资源对象：BuildConfig、DeploymentConfig、Route、Template
 - 外部访问 OCP 集群内应用的方式：NodePort、Route、Ingress（OCP4 已支持）、port-forward
 - OCP 资源之间的关系与工作流程：
   
@@ -1280,54 +1301,184 @@ $ oc rollout restart deployment <deployment_name>
 
 ## OpenShift 用户与访问控制
 
-- 用户与组（users and groups）、角色（roles）
+### OpenShift 用户认证（Authentication）
+
+- OCP 中的用户与组相关的资源：
+  - 用户（User）：使用 `oc get users.user.openshift.io` 命令获取集群中的所有用户
+  - 身份（Identity）：使用 `oc get identities.user.openshift.io` 命令获取集群中的身份信息
+
+  ![openshift-user-identity-demo](images/openshift-user-identity-demo.png)
+
+  - 服务账户（Service Account）
+  - 组（Group）
+  - 角色（Role）
+- 认证的 API 请求：
+  - 当用户向 API 发起请求，该 API 将用户与请求相关联。成功完成认证后，授权层既能接受也能拒绝该 API 请求。授权层使用基于角色的访问控制 (RBAC) 策略来决定用户的权限。
+  - OpenShift API 处理认证请求的两种方式：
+    - OAuth 访问 tokens
+    - X.509 客户端证书
+- 认证 Operator（Authentication Operator）：OCP 提供认证 Operator，它运行一个 OAuth server (openshift-authentication 项目中的 `oauth-server`)。当用户向 API 发起认证，OAuth server 为用户提供 OAuth 访问 tokens。身份提供者必须被配置，并且对 OAuth server 是可用的。OAuth server 使用一个身份提供者来验证请求者的身份。该服务器使用身份和解用户，并且为用户创建 OAuth 访问 token。在用户成功登录集群后 OpenShift 自动创建身份 (identity) 与用户 (user) 资源。
+
+> 注意：身份作为用户与 OAuth 访问 token 的中间层，它可对接集群外部身份提供者。
+
+- 身份提供者（Identity Providers）：
+  - HTPasswd
+  - Keystone v3
+  - LDAP
+  - GitHub or GitHub Enterprise
+  - OpenID Connect
+- 新安装的 OpenShift 集群使用集群管理员权限提供两种方法来认证 API 请求：
+  - 1️⃣ 使用 `kubeconfig` 文件：已嵌入了永不过期的 `X.509` 客户端证书
+
+    ```bash
+    ### 方法1 ###
+    $ export KUBECONFIG=/path/to/kubeconfig
+    # 使用 KUBECONFIG 环境变量指定文件
+    $ oc get nodes
+
+    ### 方法2 ###
+    $ oc --kubeconfig /path/to/kubeconfig get nodes
+    ```
+
+  - 2️⃣ 使用 `kubeadmin` 虚拟用户进行认证：成功认证后获取 OAuth 访问 token
+
+    ```bash
+    $ oc login -u <user_with_clusteradmin_role> -p <password> https://<apiserver_url>:<port>
+    # 使用具有集群管理员权限的用户（默认为 kubeadmin）登录集群
+    # 注意：若 $HOME/.kube/config 文件不存在，那么在执行该命令后将在此目录中生成该文件，其中包含集群信息、上下文信息与非集群管理员角色用户的 token 信息等。
+    ```
+
+    ![home-kube-config-demo](images/home-kube-config-demo.png)
+
+    kubeadmin 集群管理员用户的密码保存在 `kube-system` 命名空间中名为 `kubeadmin` 的 `secret` 中。因此，可使用以下方法验证密码的准确性：
+
+    ```bash
+    $ SECRET_DATA=$(oc get secret kubeadmin -n kube-system -o jsonpath='{range .items[]}{.data.kubeadmin}{"\n"}')
+    # 返回以 base64 编码的 kubeadmin 集群管理员用户的加密密码
+    # 注意：此密码不是明文的密码，而是通过 bcrypt 加密算法加密返回的哈希值，可根据明文密码与该哈希值进行验证。
+
+    $ echo $SECRET_DATA | base64 -d; echo
+    # 解开 base64 编码获取 bcrypt 加密过的哈希值，该哈希值可用如下程序验证。运行此程序可验证 kubeadmin 用户的密码。
+    ```
+
+    ```python
+    ### file: verify_kube_passwd.py
+    #!/usr/bin/env python3
+
+    import bcrypt
+
+    hashed_password = b'<hashed_password_from_secret>'  # 转换字符串类型为字节类型
+    password_to_check = b'<kubeadmin_password>'
+
+    if bcrypt.checkpw(password_to_check, hashed_password):
+        print("kubeadmin password matched!")
+    else:
+        print("kubeadmin password NOT matched!")
+    ```
+
+- ✨ 多个 `kubeconfig` 配置文件的说明：
+  - `$HOME/.kube/config` 文件：
+    - 该 kubeconfig 文件位于集群用户的主目录下，通常是在开发者或者管理员的本地机器上。
+    - 它用于用户的 `kubectl` 命令行工具与 Kubernetes 集群 API 服务器进行通信，进行资源的管理和操作。
+    - 用户可以手动编辑这个文件来切换不同的 Kubernetes 集群或者更新访问凭证。
+    - `$HOME/.kube/config` 文件中的凭证通常具有较为受限的权限，取决于用户的角色和权限设置。
+    - 该文件是用户与 Kubernetes 集群交互的主要方式，可以通过 `kubectl config view` 命令来查看当前的配置。
+
+    > 注意：OCP4 中若使用虚拟用户 token 的方式登录集群的话，$HOME/.kube/config 文件可不存在。当虚拟用户登录集群后将自动生成此文件。但此文件不包含集群认证证书，而包含虚拟用户的认证 token，与此文件的常规形式不同！
+
+  - `/etc/kubernetes/kubeconfig` 文件：
+    - 该 kubeconfig 文件通常存在于 Kubernetes 集群的控制平面节点（如 master 节点）上。
+    - 它用于集群组件之间的通信，比如 `kube-apiserver`、`kube-controller-manager`、`kube-scheduler` 和 `etcd` 之间的认证和授权。
+    - 该文件通常由集群安装工具在初始化集群时自动生成，并且不应该被手动编辑。
+    - 该文件中的凭证通常具有较高的权限，因为它需要访问集群的所有资源以进行管理和调度操作。
+    - 该文件的路径可能会根据集群的安装方式和配置有所不同。
+  - `/etc/kubernetes/kubeconfig` 主要用于集群内部组件的通信，而 `$HOME/.kube/config` 用于用户与集群的交互。
+
+### OpenShift 用户授权（Authorized）
+
+- 授权的过程由规则（rules）、角色（roles）与绑定（bindings）管理：
+  - 规则（Rule）：允许对对象与组的行为
+  - 角色（Role）：规则的集合。用户与组能与多个角色关联。
+  - 绑定（Binding）：分配角色至用户与组。
+- 基于角色的访问控制（`Role-based Access Control`, `RBAC`）：
+  - OpenShift 3.0 的发布已提供了基于角色的访问控制（RBAC），而 `Kubernetes 1.6` 版本才提供该功能。
+  - 用户与组通过绑定（binding）与角色（roles）相关联
+- RBAC 作用域（RBAC Scope）：
+  - 集群角色（Cluster Role）：具有此角色水平的用户或组能管理 OpenShift 集群
+  - 项目角色（Project Role）：具有此角色水平的用户或组仅仅能管理项目水平的资源
+- OCP 中的默认角色：
+  - `admin`：具有此类角色的用户能管理所有项目资源，包括为其他用户提权以访问项目。
+  - `basic-user`：具有此类角色的用户对项目有读取访问权限。
+  - `cluster-admin`：具有此类角色的用户对集群资源具有超级用户的访问权限。这些用户能在集群上执行任何动作，对所有项目有完全的控住权。
+  - `cluster-status`：具有此类角色的用户能获取集群状态信息。
+  - 🧪 `edit`：具有此类角色的用户在项目中能创建、更改和删除常规应用资源，如 services 与 deployments。这些用户不能管理如 limitranges 与 quotas 等资源，并且不能管理对项目的访问权限。开发者用户常使用此类角色。
+  - `self-provisioner`：具有此类角色的用户能创建项目。它是一种集群角色，而不是项目角色。
+  - `view`：具有此类角色的用户能查看项目资源，但不能修改项目资源。
 - OCP 中用户分类：
   - 普通用户（regular user）
   - 系统用户（system user）
-  - 服务账户（service account）
+  - 服务账户（service account）：
+    - 服务账户是和项目相关的系统用户，是 Kubernetes 资源。工作负载能使用此系统账户来调用 Kubernetes APIs。
+    - 默认情况下，服务账户没有角色。授予角色给服务账户来启用工作负载以使用指定的 APIs。
+    - 服务账户代表在 pod 中运行应用的一种身份。
+    - ✨ 为了授权应用访问 Kubernetes API，可执行以下内容：
+      - 创建应用服务账户
+      - 授权服务账户访问 Kubernetes API
+      - 分配服务账户至应用 pod
+    - 如果 pod 定义未指定服务账户，那么 pod 使用 `default` 服务账户。OpenShift 不为 default 服务账户授权权限。
+    - 💥 不推荐为 default 服务账户授权额外的权限，因为这将为项目中的所有 pod 授权那些额外的权限，这可能不是有意的。  
 - 若根据用户访问不同级别资源的权限划分，可分为：
-  - 集群管理员（cluster administrator）：
-    - 集群的最高权限管理员
-  - 项目管理员（project administrator）：
-    - 项目的最高权限管理员
+  - 集群管理员（cluster administrator）：集群的最高权限管理员
+  - 项目管理员（project administrator）：项目的最高权限管理员
   - 开发者（developer）：
     - 管理项目资源的子集
     - 资源的子集包括：buildconfig, deploymentconfig, pvc, service, secret, route
     - 该类型的用户不能为其他用户对资源进行提权，也不能管理项目级别（project-level）的资源。
-- 基于角色的访问控制（`RBAC`）：
-  - OpenShift 3.0 的发布已提供了基于角色的访问控制（RBAC），而 `Kubernetes 1.6` 版本才提供该功能。
-  - 用户与组通过绑定（binding）与角色（roles）相关联
-- OCP 定义的两种策略：
-  - 角色是策略的集合
-  - 集群策略（cluster policy）：administration-related
-  - 本地项目策略（local policy）：project-related
-
-    ![project-level-role](images/project-level-role.jpg)
-
+- 👉 没有身份验证或身份验证无效的 API 请求由匿名系统用户（anonymous system user）作为请求进行身份验证。
+- 👉 身份验证成功后，策略确定授权用户执行的操作。
 - 用户与组可同时绑定一个或多个本地项目角色与集群角色。
-  
+
+- RBAC 常用命令：
+
   ```bash
+  ### 普通用户 ###
   $ oc adm policy add-cluster-role-to-user cluster-admin admin
   # 为 admin 用户添加 cluster-role 集群管理员角色
-  ```
-  
-  ```bash
+
+  $ oc adm policy remove-cluster-role-from-user cluster-admin admin
+  # 为 admin 用户移除 cluster-role 集群管理员角色
+
   $ oc adm policy remove-cluster-role-from-group \
     self-provisioner \
     system:authenticated:oauth
-  # 从集群角色中删除自调配角色，使已认证的 oAuth 用户与组无法调配创建新项目。
+  # 从集群角色中删除自调配角色，使已认证的 OAuth 用户与组无法调配创建新项目。
   
   $ oc adm policy add-cluster-role-from-group \
     self-provisioner \
     system:authenticated \
     system:authenticated:oauth
-  # 集群角色中添加自调配角色，使已认证的 oAuth 用户与组能调配创建新项目。
-  
-  $ oc get clusterrole
-  # 查看集群角色信息
+  # 集群角色中添加自调配角色，使已认证的 OAuth 用户与组能调配创建新项目。
+  ```
+
+  ```bash
+  $ oc policy add-role-to-user <role> <username> -n <project>
+  # 指定项目为用户添加角色
+
+  $ oc policy add-role-to-user basic-user developer -n wordpress
+  # 为 developer 用户在 wordpress 项目中添加 basic-user 角色
+  # 注意：basic-user 角色是集群角色，指定项目可限制在该项目中。
+  ```
+
+  ```bash
+  $ oc adm groups new <group_name>
+  # 创建新用户组
+  $ oc adm groups add-user <group_name> <user_name>
+  # 添加用户至指定的组中
   ```
   
   ```bash
+  $ oc get clusterrole
+  # 查看集群角色信息    
   $ oc describe clusterrole system:<role>
   # 查看集群角色的详细信息
   ```
@@ -1346,21 +1497,46 @@ $ oc rollout restart deployment <deployment_name>
   ```
   
   ![self-provisioner-desc](images/self-provisioner-desc.jpg)
-  
+
+- OCP 中的 ServiceAccount 与 SCC 的关系：
+
   ```bash
+  $ oc get deployment <deployment_name> -o yaml | \
+    oc adm policy scc-subject-review -u <username> -f -
+  # 根据 deployment 查询指定用户的安全上下文约束
+
   $ oc create serviceaccount <serviceaccount_name> [-n <project>]
   # 在指定项目中创建服务账户，该账户可用于pod与api-server的通信认证。
   # 注意：服务账户必须由具有项目管理员角色的用户创建
   $ oc create serviceaccount wordpress -n farm
-  ```
-  
-  ![serviceaccount-wordpress](images/serviceaccount-wordpress.jpg)
-  
-  ```bash
+
   $ oc adm policy \
     add-scc-to-user anyuid -z <serviceaccount_name> -n <project> 
-  # 使用 system:admin 用户或具有 cluster-admin 角色的用户为指定项目的服务账户添加 anyuid 的安全上下文（SCC）
-  # 该安全上下文可使 pod 中运行应用的用户提权至 root 权限
+  # 使用 system:admin 用户或具有 cluster-admin 角色的用户为指定项目的服务账户添加 anyuid 安全上下文约束（SCC）
+  # 该安全上下文约束可使 pod 中运行应用的用户提权至 root 权限
+
+  $ oc set serviceaccount deployment/<deployment_name> <serviceaccount_name> -n <project>
+  # 将项目中的 serviceaccount 与 deployment 关联
+  # 比如通过此种方式可将关联有 SCC 的 serviceaccount 与 deployment 关联
+  ```
+
+  ![serviceaccount-wordpress](images/serviceaccount-wordpress.jpg)
+
+- 在不同命名空间中访问 Kubernetes API 资源：
+  - 使用服务账户与不同角色的绑定可实现不用命名空间中应用 pod 对其他命名空间中资源的访问。
+  - 如，使用以下步骤完成 project1 命名空间中应用 app-pod 访问 project2 命名空间中的 secret 资源：
+    - project1 命名空间中创建名为 app-sa 的服务账户
+    - 为 project1 命名空间中 app-pod 被分配 app-sa 服务账户
+    - 在 project2 命名空间中创建 `RoleBinding`，即 `system:serviceaccount:project1:app-sa` 服务账户与 `secret-reader` 集群角色绑定。
+
+    ![serviceaccount-rolebinding](images/serviceaccount-rolebinding.jpg)
+
+  ```bash
+  $ oc adm policy add-cluster-role-to-user <cluster_role> <serviceaccount_name>
+  # 为服务账户添加集群管理员角色
+
+  $ oc adm policy add-role-to-user <role> -z <serviceaccount_name> -n <project>
+  # 为指定项目中服务账户添加角色
   ```
 
 ## OpenShift Pod 的调度
