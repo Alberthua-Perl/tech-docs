@@ -273,8 +273,9 @@ $ git init --bare --shared=true
 ## 克隆远程代码仓库
 
 ```bash
-$ git clone git@github.com:Alberthua-Perl/kani.git
+$ git clone git@github.com:Alberthua-Perl/kani.git [--branch <remote_branch>]
 # 克隆 GitHub 远程代码仓库至本地仓库
+# --branch 选项：指定远程代码仓库中的分支
 $ git clone git@gitlab.lab.example.com:devuser/do447-course-demo.git
 # 克隆 GitLab 远程代码库至本地当前目录中同名的代码库目录
 
