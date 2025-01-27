@@ -1502,7 +1502,7 @@ $ oc rollout restart deployment <deployment_name>
 
   ```bash
   $ oc get deployment <deployment_name> -o yaml | \
-    oc adm policy scc-subject-review -u <username> -f -
+    oc adm policy scc-subject-review [-u <username>] -f -
   # 根据 deployment 查询指定用户的安全上下文约束
 
   $ oc create serviceaccount <serviceaccount_name> [-n <project>]

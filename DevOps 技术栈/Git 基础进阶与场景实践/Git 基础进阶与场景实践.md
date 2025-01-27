@@ -642,7 +642,7 @@ $ source $HOME/.bashrc
   
   $ git show [<commit_hash>|<tag>]
   # 查看指定提交的更改内容（或指定 tag 的详细信息）
-  # 注意：若直接使用 git show 即查看最新的提交信息
+  # 注意：若直接使用 git show 即查看最新的提交信息，并可返回与前一个版本中的差异！
   
   $ git branch -v
     * dev  d8e93eb Update README.md in dev branch
@@ -661,6 +661,8 @@ $ source $HOME/.bashrc
   ```
   
   ![git-log-commit-info](images/git-log-commit-info.png)
+
+  ![git-show-example](images/git-show-example.png)
 
 - 命令中不需要输入完整的哈希，只需其中的足够部分来唯一标识仓库中的特定提交。
 - 这些哈希还可用于恢复到之前的提交，或者查看版本控制系统的历史记录。

@@ -199,33 +199,40 @@ $ oc new-app \
 - 使用 template 模板相关命令：
 
   ```bash
+  ### 查看、上传模板 ###
   $ oc get templates -n openshift
   $ oc get templates [-n <project>]
   # 查看指定项目中的模板，使用 oc get all 命令无法获取。
 
   $ oc describe templates <template> [-n <project>]
-  # 查看指定项目中模板的详细参数定义  
+  # 查看指定项目中模板的详细参数定义
 
   $ oc create -f /path/to/<template>.yaml [-n <project>]
   # 在指定项目中根据模板定义文件上传模板
 
+  ### 查看模板参数、创建模板资源
   $ oc process --parameters <template> [-n <project>]
-  # 查看指定项目中模版的参数列表
+  # 查看指定项目中模板的参数列表
 
   $ oc process --parameters <template>.yaml [-n <project>]
-  # 查看指定项目中模版定义文件中的参数列表
+  # 查看指定项目中模板定义文件中的参数列表
 
   $ oc process <template> \
     -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> \
     -o yaml > /path/to/<manifest_file>.yaml
-  # 根据当前命名空间中指定的参数替换模版中的默认值，生成清单文件（manifest file）。
-  # 注意：模版需已存在于命名空间中，生成的清单文件可直接用于创建资源对象。
+  # 根据当前命名空间中指定的参数替换模板中的默认值，生成清单文件（manifest file）。
+  # 注意：模板需已存在于命名空间中，生成的清单文件可直接用于创建资源对象。
 
   $ oc process <template> \
     --param-file=<parameters_file> \
     -o yaml > /path/to/<manifest_file>.yaml
   # 根据模板与参数定义文件生成清单文件（manifest file）
   # 其中参数定义文件格式形如：<parameter_name>=<parameter_value>
+
+  $ oc process <template> \
+    -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> | \
+    oc apply -f -
+  # 根据模板与指定的参数创建资源对象
 
   $ oc process -f /path/to/<template>.yaml \
     -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> \
@@ -235,7 +242,7 @@ $ oc new-app \
   $ oc process -f /path/to/<template>.yaml \
     -p <parameter_name1>=<parameter_value1> ... -p <parameter_nameN>=<parameter_valueN> | \
     oc apply -f -
-  # 根据模板与参数生成清单文件并直接生成资源对象
+  # 根据模板定义文件与指定的参数创建资源对象
   # 注意：template 模板文件中可直接定义 pvc 与 route
   ```
   
@@ -266,36 +273,54 @@ $ oc new-app \
 
 ```bash
 ### Helm Chart Repository 相关操作 ###
-$ helm repo add <repo_name> <repository_url>
+$ helm repo add <repo_name> <repo_url>
 # 添加 helm charts 仓库信息并写入 $HOME/.config/helm/repositories.yaml 中
+$ helm repo add do280-repo http://helm.ocp4.example.com/charts
 
 $ helm repo list
 # 查看 helm charts 仓库的列表
 
 $ helm repo update
 
-$ helm repo remove <repository1_name> <repository2_name> ... <repositoryN_name>
+$ helm repo remove <repo1_name> <repo2_name> ... <repoN_name>
 # 移除指定的一个或多个 helm charts 仓库
 
-$ helm search repo [<repository_name>]
-# 根据仓库搜索其中所有的 charts
+$ helm search repo [<repo_name>] [--versions]
+# 若不指定仓库时，将返回所有仓库中的 charts；若指定仓库时，将返回指定仓库中的 charts。
+# --versions 选项：查看所有 charts 的全部版本信息
+$ helm search repo do280-repo
+# 指定仓库搜索其中最新的 charts 版本
+$ helm search repo do280-repo --versions
+# 指定仓库搜索其中所有的 charts 版本
 
-$ helm search repo [<chart_name>]
-# 根据 chart 名称在所有仓库中搜索
+$ helm search repo [<repo_name>/<chart_name>] [--versions]
+# 指定仓库搜索指定 chart 的版本信息
 
 ### Helm Chart 相关操作 ###
-$ helm show chart <chart_reference>
+# 注意：<chart_reference> 为 <repo_name>/<chart_name>
+$ helm show chart <chart_reference> [--version <version_number>]
+# 查看指定版本的 chart 信息
+$ helm show chart do280-repo/etherpad --version 0.0.7
 
-$ helm show values <chart_reference>
+$ helm show values <chart_reference> [--version <version_number>]
+# 查看指定版本的 chart 中默认定义的变量值
+$ helm show values do280-repo/etherpad --version 0.0.7
 
-$ helm install <release_name> <chart_reference> --dry-run --vaules vaules.yaml
+$ helm install <release_name> <chart_reference> -f ./values.yaml [--version <version_number>] [--dry-run]
+# 指定 chart 与自定义的 values.yaml 中的值创建应用，其中 <release_name> 为应用的名称。
+# --dry-run 选项：用于模拟安装而实际不真实部署应用
+$ helm install example-app do280-repo/etherpad -f ./values.yaml --version 0.0.7
+
+$ helm upgrade <release_name> <chart_reference> -f ./values.yaml
+# 指定 chart 与自定义的 values.yaml 中的值更新应用
+$ helm upgrade example-app do280-repo/etherpad -f ./values.yaml
 
 $ helm list
-# 查看当前项目中已安装的 release 信息
+# 查看当前项目中已安装的应用 release 信息
 # --all-namespaces 选项指定所有项目中的 release；--namespace 选项指定项目中的 release
 
 $ helm history <release_name>
-
+# 查看指定应用 release 的历史版本
 ```
 
 ## 参考链接
