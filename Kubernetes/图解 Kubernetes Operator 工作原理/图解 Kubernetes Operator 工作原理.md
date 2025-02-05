@@ -28,3 +28,7 @@ Kubernetes 项目对 "Operator" 的定义很简单：“Operator 是使用自定
 
 以上图表说明了 control plane 如何在一个回路中运行各个控制器，其中一些控制器原生内置于 Kubernetes 中，如，deployment controller 和 job controller，而另一些则是属于 Kubernetes Operator 的一部分，如，Custom controller 1 属于 Memcached Operator，而 Custom controller 2 则属于 etcd Operator。
 control plane 的控制器针对无状态（Stateless）工作负载（workloads）进行了优化，一组控制器即可适用于所有的无状态工作负载，因为它们都是相似的。隶属于某个 Kubernetes Operator 的控制器都是为特定的有状态（Stateful）工作负载而定制的。每个有状态的工作负载都有各自的 Operator 及其隶属控制器，这些控制器了解如何管理该工作负载。
+
+## 参考链接
+
+- [Operator SDK](https://sdk.operatorframework.io/)
