@@ -63,6 +63,7 @@
 - [kubeadm 更新 Kubernetes 集群到期证书](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/kubeadm%20%E6%9B%B4%E6%96%B0%20Kubernetes%20%E9%9B%86%E7%BE%A4%E5%88%B0%E6%9C%9F%E8%AF%81%E4%B9%A6.md)
 - [使用 NFS-Client Privisioner 实现 StorageClass 的 PV 动态分配](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/nfs-provisioned-storageclass)
 - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
+- [图解 Kubernetes Operator 工作原理]()
 
 ## ⭕️ **Red Hat OpenShift Container Platform**
 

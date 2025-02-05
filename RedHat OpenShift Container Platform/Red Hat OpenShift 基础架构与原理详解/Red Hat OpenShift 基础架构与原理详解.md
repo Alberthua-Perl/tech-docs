@@ -691,6 +691,15 @@ $ oc rollout restart deployment <deployment_name>
 # 根据新更新的 deployment 重新部署相关资源
 ```
 
+- 💥 `kubectl create` 与 `kubectl apply` 的区别：
+
+| 序号    | kubectl create    | kubectl apply    |
+|-----|-----|-----|
+| 1    | 首先删除集群中现有的所有资源，然后重新根据 yaml 文件（必须是完整的配置信息）生成新的资源对象。    | 根据 yaml 文件中包含的字段（yaml 文件可以只写需要改动的字段），直接升级集群中的现有资源对象。    |
+| 2    | yaml 文件必须是完整的配置字段内容    | yaml 文件可以不完整，只写需要的字段。    |
+| 3    | kubectl create 工作在 yaml 文件中的所有字段    | kubectl apply 只工作在 yaml 文件中的某些改动过的字段    |
+| 4    | 在没有改动 yaml 文件时，使用同一个 yaml 文件执行命令 kubectl replace，将不会成功（fail 掉），因为缺少相关改动信息。    | 在只改动了 yaml 文件中的某些声明时，而不是全部改动，可以使用 kubectl apply。    |
+
 ### ReplicationController [`rc`], ReplicaSet
 
 - 前者已集成至 deploymentconfig 中，而后者集成至 deployment 中。
@@ -1684,3 +1693,5 @@ $ oc rollout restart deployment <deployment_name>
 - Service Discovery
   - [GitHub Doc - SkyDNS](https://github.com/skynetservices/skydns)
   - [GitHub Doc - CoreDNS](https://github.com/coredns/coredns)
+- Configure Reloader
+  - ✨ [GitHub Doc - Reloader: Reloader can watch changes in ConfigMap and Secret and do rolling upgrades on Pods with their associated DeploymentConfigs, Deployments, Daemonsets Statefulsets and Rollouts.](https://github.com/stakater/Reloader)
