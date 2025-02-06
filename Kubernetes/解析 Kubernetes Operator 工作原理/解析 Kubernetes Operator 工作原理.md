@@ -1,4 +1,4 @@
-# 图解 Kubernetes Operator 工作原理
+# 解析 Kubernetes Operator 工作原理
 
 在以 Kubernetes 为事实标准的云原生环境中，Kubernetes Operator 是强有力的工具，籍此，Kubernetes 集群得以充分扩展功能。
 基于以下两图，本文简述了 Operator、Controller 和 Custom Resources（自定义资源）的协同工作机制。
