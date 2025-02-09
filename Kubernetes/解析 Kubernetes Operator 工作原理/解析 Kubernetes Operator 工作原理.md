@@ -32,3 +32,4 @@ control plane 的控制器针对无状态（Stateless）工作负载（workloads
 ## 参考链接
 
 - [Operator SDK](https://sdk.operatorframework.io/)
+- [RedHat Doc: Operators](https://docs.redhat.com/en/documentation/openshift_container_platform/4.14/html-single/operators/index#operators-overview)

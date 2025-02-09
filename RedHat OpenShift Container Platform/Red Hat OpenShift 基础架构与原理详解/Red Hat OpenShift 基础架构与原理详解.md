@@ -849,7 +849,7 @@ $ oc rollout restart deployment <deployment_name>
 
       > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
 
-    - 2️⃣ SkyDNS：
+    - 2️⃣ SkyDNS（OCP4 中已经 deprecated）：
       - OCP3 中通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
       - `SkyDNS` 服务发现方式：
         - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
