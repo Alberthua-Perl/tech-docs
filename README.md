@@ -2,6 +2,10 @@
 
 > 以下文档中的内容将根据实际情况进行更新补充！
 
+## 🧠 机器学习 & 深度学习
+
+- [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb)
+
 ## 🐧 **Linux 原理与进阶**
 
 - [Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/linux-basic-knowledge.yaml)    
