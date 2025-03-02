@@ -57,7 +57,7 @@ drwxr-xr-x 2 appuser0 users    6 Mar 15  2022 bin
 drwxr-xr-x 2 appuser0 users   24 Dec 19 22:18 public_html
 ```
 
-在一些场景中，需要验证设置的用户密码是否符合预期，可使用以下脚本验证 `已设置密码` 与 `预设置密码` 的**一致性**：
+在一些场景中，需要验证设置的用户密码是否符合预期，可使用以下[脚本](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94/verify_passwd.sh)验证 `已设置密码` 与 `预设置密码` 的**一致性**：
 
 ```bash
 #!/bin/bash
@@ -72,10 +72,10 @@ read -s -p "Please type user password: " PASSWORD
 #提取用户的密码字段（已设置密码）
 SHADOW=$(grep ${USER} /etc/shadow | cut -d ':' -f 2)
 echo -e "\nShadow of ${USER}: ${SHADOW}"
+
 #提取用户密码中的 salt 值
 SALT=$(grep ${USER} /etc/shadow | cut -d ':' -f 2 | cut -d '$' -f 3)
 echo "Salt of previous shadow: ${SALT}"
-
 #使用明文密码与 salt 值生成密码（预设置密码）
 CRYPT=$(perl -e "print crypt("${PASSWORD}", q(\$6\$$SALT))")
 echo "Crypted password is: ${CRYPT}"
