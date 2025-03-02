@@ -16,7 +16,7 @@
 - 用户创建说明
 - 关于 /etc/sudoers.d/* 文件的说明
 - 配置离线 Zypper 软件源
-- 网络配置
+- 常规网络配置
 - 容器与镜像管理
 
 ## 用户创建说明
@@ -55,6 +55,33 @@ drwx------ 2 appuser0 users    6 Mar 15  2022 .local
 -rwxr-xr-x 1 appuser0 users 1.1K May  5  2019 .xinitrc.template
 drwxr-xr-x 2 appuser0 users    6 Mar 15  2022 bin
 drwxr-xr-x 2 appuser0 users   24 Dec 19 22:18 public_html
+```
+
+在一些场景中，需要验证设置的用户密码是否符合预期，可使用以下脚本验证 `已设置密码` 与 `预设置密码` 的**一致性**：
+
+```bash
+#!/bin/bash
+
+echo -e "\n***** VERIFY PASSWORD CONSISTENCY *****"
+##输入待验证的用户
+read -p "Please type user name: " USER
+##输入待验证的明文密码
+##read 命令的 -s 选项将隐藏输入的明文密码
+read -s -p "Please type user password: " PASSWORD
+
+#提取用户的密码字段（已设置密码）
+SHADOW=$(grep ${USER} /etc/shadow | cut -d ':' -f 2)
+echo -e "\nShadow of ${USER}: ${SHADOW}"
+#提取用户密码中的 salt 值
+SALT=$(grep ${USER} /etc/shadow | cut -d ':' -f 2 | cut -d '$' -f 3)
+echo "Salt of previous shadow: ${SALT}"
+
+#使用明文密码与 salt 值生成密码（预设置密码）
+CRYPT=$(perl -e "print crypt("${PASSWORD}", q(\$6\$$SALT))")
+echo "Crypted password is: ${CRYPT}"
+
+#比较已设置密码与预设置密码的一致性
+[[ $SHADOW == $CRYPT ]] && echo "Setup password correctly!"
 ```
 
 ## 关于 /etc/sudoers.d/* 文件的说明
@@ -218,6 +245,11 @@ default via 192.168.110.1 dev eth0
 mysle15sp6:/etc/sysconfig/network # wicked ifdown eth1
 eth1            device-ready
 ```
+
+关于 `NetworkManager` 的相关配置可参考以下文档：
+
+- [RedHat doc: Configuring and managing networking](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/configuring_and_managing_networking/index#proc_customizing-the-prefix-for-ethernet-interfaces-during-installation_consistent-network-interface-device-naming)
+- [RHEL 9 networking: Say goodbye to ifcfg-files, and hello to keyfiles](https://www.redhat.com/en/blog/rhel-9-networking-say-goodbye-ifcfg-files-and-hello-keyfiles)。
 
 ## 容器与镜像管理
 
