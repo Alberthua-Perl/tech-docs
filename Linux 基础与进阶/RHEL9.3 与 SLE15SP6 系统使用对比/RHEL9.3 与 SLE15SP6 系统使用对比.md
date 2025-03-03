@@ -1,8 +1,8 @@
-# RHEL9.3 与 SLE15SP6 系统使用对比
+# 🦎 RHEL9.3 与 SLE15SP6 系统使用对比
 
 ## 文档说明 & 实验环境
 
-- 该文档用于说明 SLE15SP6 在使用上与 RHEL9.3 的异同点，主要侧重于 `SLE15SP6`。
+- 该文档用于说明 SLE15SP6 在使用上与 RHEL9.3 的差异点，主要侧重于 `SLE15SP6`。
 - 实验环境：
   - 操作系统：`SUSE Linux Enterprise Server 15 SP6`
   - 主机名：`mysle15sp6`
@@ -10,6 +10,11 @@
   - 网卡接口：
     - 外网连接：`192.168.110.X/24`，网关 `192.168.110.1/24`
     - 内网测试：`172.24.10.X/24`，网关 `172.24.10.1/24`
+    💥 注意：以上网络信息需根据自身实际条件进行更改！
+  - 用户/密码：
+    - devops/redhat（具有 sudo 提权的权限）
+    - root/redhat
+- 👉 友情链接：[Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/linux-basic-knowledge.yaml)
 
 ## 文档目录
 
@@ -84,6 +89,20 @@ echo "Crypted password is: ${CRYPT}"
 [[ $SHADOW == $CRYPT ]] && echo "Setup password correctly!"
 ```
 
+以下为验证 `julia` 用户设置密码一致性的示例：
+
+```bash
+mysle15sp6:~ # sh ./verify_passwd.sh
+
+***** VERIFY PASSWORD CONSISTENCY *****
+Please type user name: julia
+Please type user password: 
+Shadow of julia: $6$Xx7wjaTBPW/7xdm1$mamKWKoSTfliU01XUQFDsmDYXelpoyoYxB.2YLbzmnzsIr7nn1FAfP0iZqBtyiQ5L9dYQQu8A55jb/HUI4.V/.
+Salt of previous shadow: Xx7wjaTBPW/7xdm1
+Crypted password is: $6$Xx7wjaTBPW/7xdm1$mamKWKoSTfliU01XUQFDsmDYXelpoyoYxB.2YLbzmnzsIr7nn1FAfP0iZqBtyiQ5L9dYQQu8A55jb/HUI4.V/.
+Setup password correctly!
+```
+
 ## 关于 /etc/sudoers.d/* 文件的说明
 
 以 `/etc/sudoers.d/devops` 文件为例：`devops  ALL=(ALL)  NOPASSWD: ALL`
@@ -152,6 +171,8 @@ mysle15sp6:~ # zypper install -y <package_name>
 ## 移除指定的软件包，如 zypper remove -y pcp。
 mysle15sp6:~ # zypper remove -y <package_name>
 ```
+
+📚 更多关于 Zypper 的命令示例可参考 [Zypper-cheet-sheet](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94/Zypper-cheat-sheet.pdf)。
 
 ## 常规网络配置
 
@@ -246,11 +267,77 @@ mysle15sp6:/etc/sysconfig/network # wicked ifdown eth1
 eth1            device-ready
 ```
 
-关于 `NetworkManager` 的相关配置可参考以下文档：
+📚 NetworkManager 可在服务器环境与桌面环境中使用，支持命令行模式与图形化模式。在 RHEL9.3 中默认使用该组件用于网络配置管理，关于 `NetworkManager` 的相关配置可参考以下文档：
 
 - [RedHat doc: Configuring and managing networking](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/configuring_and_managing_networking/index#proc_customizing-the-prefix-for-ethernet-interfaces-during-installation_consistent-network-interface-device-naming)
 - [RHEL 9 networking: Say goodbye to ifcfg-files, and hello to keyfiles](https://www.redhat.com/en/blog/rhel-9-networking-say-goodbye-ifcfg-files-and-hello-keyfiles)。
 
 ## 容器与镜像管理
 
+SLES15 安装 iso 中的软件源提供 `Docker` 与 `Podman` 的软件仓库，因此，可兼容这两种容器运行时，具体使用哪种根据用户的实际情况而定。此处，笔者使用 Podman 容器运行时进行测试。
 
+```bash
+devops@mysle15sp6:~> sudo zypper search-packages docker
+devops@mysle15sp6:~> sudo zypper search-packages podman
+devops@mysle15sp6:~> sudo zypper install -y podman
+
+## 使用 Podman 的 rootless 模式
+devops@mysle15sp6:~> podman version
+Client:       Podman Engine
+Version:      4.8.3
+API Version:  4.8.3
+Go Version:   go1.21.8
+Built:        Tue Mar 19 20:00:00 2024
+OS/Arch:      linux/amd64
+```
+
+由于目前无法在国内直接从[DockerHub](https://hub.docker.com/)拉取容器镜像，若直接拉取镜像返回连接拒绝或超时，导致无法正常运行所需容器。因此，需添加相关的代理来解决此问题：
+
+```bash
+devops@mysle15sp6:~> vim ~/.profile
+...
+### Setup Podman Proxy                          
+export HTTP_PROXY=socks5://192.168.110.246:7890    #此地址与端口为已配置的 Clash 代理
+export HTTPS_PROXY=socks5://192.168.110.246:7890
+
+## 加载 devops 用户的环境变量
+devops@mysle15sp6:~> source ~/.profile
+## 拉取 docker.io 与 quay.io 中的容器镜像
+devops@mysle15sp6:~> podman pull docker.io/library/alpine:3.21.3
+Trying to pull docker.io/library/alpine:3.21.3...
+Getting image source signatures
+Copying blob f18232174bc9 done   | 
+Copying config aded1e1a5b done   | 
+Writing manifest to image destination
+aded1e1a5b3705116fa0a92ba074a5e0b0031647d9c315983ccba2ee5428ec8b
+devops@mysle15sp6:~> podman pull quay.io/alberthua/ubi8-debug:1.0
+Trying to pull quay.io/alberthua/ubi8-debug:1.0...
+Getting image source signatures
+Copying blob 0a9762cca1f6 done   | 
+Copying blob 20270d11ada0 done   | 
+Copying config 1f683268b4 done   | 
+Writing manifest to image destination
+1f683268b4a269966d970df218df0e3412a1dd4210e13c954b7ede0aa4200125
+## 查看本地缓存中的容器镜像
+devops@mysle15sp6:~> podman images
+REPOSITORY                    TAG         IMAGE ID      CREATED        SIZE
+docker.io/library/alpine      3.21.3      aded1e1a5b37  2 weeks ago    8.13 MB
+quay.io/alberthua/ubi8-debug  1.0         1f683268b4a2  20 months ago  309 MB
+```
+
+📚 有关 Podman 更多的技术背景与使用方法可参考以下链接：
+
+- [Podman 容器原理与使用（1）](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Podman%20%E5%AE%B9%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%881%EF%BC%89.md)
+- [Podman 容器原理与使用（2）](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Podman%20%E5%AE%B9%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%882%EF%BC%89.md)
+
+若使用 Docker 容器运行时，可更新以下配置：
+
+```bash
+mysle15sp6:~ # vim /usr/lib/systemd/system/docker.service
+[Service]
+...
+#StartLimitInterval=60s
+StartLimitInterval=5s    #重置 docker 服务重启时间间隔
+Environment="HTTP_PROXY=socks5://192.168.110.246:7890"    #设置 docker 代理地址与端口（用以拉取 docker.io 中的容器镜像）
+Environment="HTTPS_PROXY=socks5://192.168.110.246:7890"
+```
