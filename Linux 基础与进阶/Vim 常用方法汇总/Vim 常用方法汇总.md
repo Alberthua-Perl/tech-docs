@@ -9,7 +9,7 @@
 
 ## Vim 的运行模式
 
-![vim-all-mode](pictures/Vim常用方法汇总/vim-all-mode.png)
+![vim-all-mode](images/vim-all-mode.png)
 
 - 命令模式：command 模式
 - 扩展命令模式：extended command 模式
@@ -81,7 +81,7 @@ Vim 中多窗格之间的跳转可使用以下方法：
 
 - `NERDTree` 插件：Vim 左侧显示目录，右侧显示内容的布局。
   
-  ![vim-nerdtree-plugin](pictures/Vim常用方法汇总/vim-nerdtree-plugin.png)
+  ![vim-nerdtree-plugin](images/vim-nerdtree-plugin.png)
   
   ```bash
   $ wget http://www.vim.org/scripts/download_script.php?src_id=17123 \
