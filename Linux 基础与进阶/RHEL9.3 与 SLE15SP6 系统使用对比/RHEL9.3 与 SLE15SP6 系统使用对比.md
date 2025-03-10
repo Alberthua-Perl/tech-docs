@@ -14,7 +14,7 @@
   - 用户/密码：
     - devops/redhat（具有 sudo 提权的权限）
     - root/redhat
-- 💪 友情链接：[Linux 基础命令快速入门](hhttps://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
+- 💪 友情链接：[Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
 
 ## 文档目录
 
@@ -170,6 +170,33 @@ mysle15sp6:~ # zypper install -y <package_name>
 
 ## 移除指定的软件包，如 zypper remove -y pcp。
 mysle15sp6:~ # zypper remove -y <package_name>
+```
+
+👉 SLE15SP6 发行版对应 `OpenSUSE Leap 15.6` 发行版，因此，可使用 OpenSUSE 的在线软件源对原生 iso 提供的软件源进行扩充。可参考 [OpenSUSE-Leap_15.6-online.repo](https://github.com/Alberthua-Perl/sc-col/blob/master/dnf-repo/OpenSUSE-Leap_15.6-online.repo) 文件进行额外软件包的搜索与安装，执行以下命令刷新新添加的软件源：
+
+```bash
+mysuse:/etc/zypp/repos.d # ls -lh OpenSUSE-Leap_15.6-online.repo  #新添加的 OpenSUSE 在线软件源
+-rw-r--r-- 1 root root 2.2K Mar 10 22:48 OpenSUSE-Leap_15.6-online.repo
+mysuse:/etc/zypp/repos.d # zypper refresh  #刷新所有软件源，更新软件源元数据。
+mysuse:/etc/zypp/repos.d # zypper search-packages htop
+Following packages were found in following modules:
+
+Package          Module or Repository                         SUSEConnect Activation Command
+---------------- -------------------------------------------- --------------------------------------------
+htop             SUSE Package Hub (PackageHub/15.6/x86_64)    SUSEConnect --product PackageHub/15.6/x86_64
+htop-debuginfo   Available in repo OpenSUSE-Leap_15.6-Debug
+htop-debugsource Available in repo OpenSUSE-Leap_15.6-Debug
+htop             Available in repo OpenSUSE-Leap_15.6-OSS
+srcpackage:htop  Available in repo OpenSUSE-Leap_15.6-Src-OSS
+
+To activate the respective module or product, use SUSEConnect --product.
+Use SUSEConnect --help for more details.
+
+mysuse:/etc/zypp/repos.d # zypper install htop  #从 OpenSUSE 软件源安装 htop
+Loading repository data...
+Reading installed packages...
+Resolving package dependencies...
+...
 ```
 
 📚 更多关于 Zypper 的命令示例可参考 [Zypper-cheet-sheet](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94/Zypper-cheat-sheet.pdf)。

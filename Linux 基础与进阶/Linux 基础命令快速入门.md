@@ -283,7 +283,7 @@
   $ ps aux
   $ ps -efL
     # 查看系统进程及其子线程的信息 (NLWP)
-  $ ps -L p <pid>
+  $ ps -L <pid>
     # 查看进程子线程的信息
   $ pgrep -l -u <username>
     # 查看指定用户的进程列表
@@ -339,43 +339,43 @@
   ```
 
 - RPM 常用命令：
+  - 使用 `RPM` 包管理器的发行版：Fedora, RHEL, CentOS, Rocky, OpenSUSE, SUSE
+  - 适应 `DEB` 软件包的发行版：Debian, Ubuntu
 
   ```bash
-  $ rpm -qf /path/to/file
-  $ rpm -ql /path/to/rpmpackage
-  $ rpm -qa | grep rpmpackage-name
-  $ rpm -qi /path/to/rpmpackage
-  $ rpm -qc /path/to/rpmpackage
-  $ rpm -qd /path/to/rpmpackage
-  $ rpm -q --changelog /path/to/rpmpackage
-  $ rpm -q --scripts /path/to/rpmpackage
+  rpm -qf /path/to/file
+  rpm -ql /path/to/rpmpackage
+  rpm -qa | grep rpmpackage-name
+  rpm -qi /path/to/rpmpackage
+  rpm -qc /path/to/rpmpackage
+  rpm -qd /path/to/rpmpackage
+  rpm -q --changelog /path/to/rpmpackage
+  rpm -q --scripts /path/to/rpmpackage
   ```
 
-package manage method:
-  rhel,centos,rocky,fedora,suse,opensuse: rpm package(*.rpm)
-  debian,ubuntu: deb package(*.deb)
-  alpine os: apk package(*.apk)
+- YUM 与 DNF 常用命令：
+  - RHEL 8/9 中 yum 与 dnf 命令都是 `dnf-3` 命令的软链接！
 
-yum and dnf:
-  rhel8: yum is the same as dnf-3 and yum is softlink to dnf-3
-  command:
-    - yum search "pattern"
-    - yum install [-y] packagename
-    - yum remove [-y] packagename
-    - yum update [-y] packagename
-    - yum upgrade [-y]
-    - yum downgrade [-y] packagename
-    - yum repolist
-    - yum makecache
-    - yum clean all
-    - yum list packagename
-    - yum history undo
-    - yum info packagename
-    - yum provides /path/to/file
-      # 查看文件来自于哪个 RPM 软件包
-    - yum group info groupname
-    - yum group list hidden
+  ```bash
+  $ yum search "pattern"
+  $ yum install [-y] packagename
+  $ yum remove [-y] packagename
+  $ yum update [-y] packagename
+  $ yum upgrade [-y]
+  $ yum downgrade [-y] packagename
+  $ yum repolist
+  $ yum makecache
+  $ yum clean all
+  $ yum list packagename
+  $ yum history undo
+  $ yum info packagename
+  $ yum provides /path/to/file
+    # 查看文件来自于哪个 RPM 软件包
+  $ yum group info groupname
+  $ yum group list hidden
       # 查看所有包组列表
+  ```
+
   package group:
     - regular group: 
         - group of packages
