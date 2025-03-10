@@ -296,9 +296,11 @@
   $ pstree -p <username>
     # 查看指定用户的进程树
 
+  $ <command> &
   $ jobs
   $ fg %<job-number>
   $ bg %<job-number>
+  ## 注意：jobs 返回列表中的进程在当运行的 Shell 会话关闭后终止作业的运行！
   ```
 
 - systemctl 常用命令：

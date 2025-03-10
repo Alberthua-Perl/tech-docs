@@ -8,7 +8,7 @@
 
 ## 🐧 **Linux 原理与进阶**
 
-- [Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/linux-basic-knowledge.yaml)
+- [Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
 - [Vim 常用方法汇总](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Vim%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/Vim%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB.md)
 - [Linux 系统安装与启动引导及故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
 - [【精华】Linux 常用排错工具与方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95.md)
