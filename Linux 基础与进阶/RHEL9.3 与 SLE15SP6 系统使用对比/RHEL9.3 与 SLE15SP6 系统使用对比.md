@@ -14,7 +14,7 @@
   - 用户/密码：
     - devops/redhat（具有 sudo 提权的权限）
     - root/redhat
-- 👉 友情链接：[Linux 基础命令快速入门](hhttps://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
+- 💪 友情链接：[Linux 基础命令快速入门](hhttps://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
 
 ## 文档目录
 
