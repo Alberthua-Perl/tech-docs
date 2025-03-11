@@ -10,19 +10,22 @@
 - Shell 相关概念
 - 远程登录方法
 - Linux 文本编辑器
-- Shell 相关命令
-- 时间查询与设置
+- Shell 变量设置
+- 系统时间设置
 - 文件与目录管理
 - 文件与目录的权限管理
 - 用户信息
 - 用户与用户组管理
 - 用户密码生命周期管理
 - 进程管理
-- systemd 服务管理
+- Systemd 服务管理
+- RPM 软件包管理
+- YUM 与 DNF 软件包管理
+- RHEL 7/8/9 系统引导过程
 - Linux 磁盘管理
 - LVM 逻辑卷管理
+- Linux 中导致系统无法正常启动的原因
 - 基础网络管理
-- RHEL 7/8/9 系统引导过程
 - 🧪 Lab 示例
 
 ## Shell 相关概念
@@ -32,7 +35,7 @@
 - Alpine 中默认使用 ash
 - IBM AIX 中默认使用 ksh
 - 还用其他类型的 shell：zsh、csh
-- Shell 命令的格式：command + [subcommand] + [options] + arguements
+- Shell 命令的格式：`command + [subcommand] + [options] + arguements`
 - 正则表达式：
   - 小写字母：`[a-z]`
   - 大写字母：`[A-Z]`
@@ -43,9 +46,9 @@
   - 用户空间层（user space）：
     - 编辑指定文件
     - 写文件请求
-    - 调用系统调用
+    - 调用系统调用（syscall）
   - 内核空间层（kernel space）：
-    - 根据文件所在的文件系统类型调用虚拟文件系统（Virtual File System, VFS）中对应的驱动，如 vfat、ext、xfs、btrfs 与 ntfs 等。
+    - 根据文件所在的文件系统类型调用虚拟文件系统（Virtual File System, VFS）中的驱动，如 vfat, ext, xfs, btrfs 与 ntfs 等。
     - 磁盘驱动
     - 磁盘设备
 - 文件系统中的文件只有真正占据存储空间才会在 ls 命令中显示其逻辑大小。
@@ -56,8 +59,8 @@
 - KVM 带外管理登录：`iLO`、`iBMC`
 - Telnet 登录：明文密码登录不安全（不推荐）
 - SSH 登录：
-  - 明文密码登录（password）
-  - 基于密钥的免密登录（publickey）
+  - 方法1：明文密码登录（password）
+  - 方法2：基于密钥的免密登录（publickey）
     - 相关文件与目录的权限：
       - $HOME/.ssh/: `0700`
       - $HOME/.ssh/*key: `0600`
@@ -73,7 +76,7 @@
     - o: 在当前光标下方插入新行
     - Esc: 退出插入模式至命令行模式
   - 命令行模式（Command mode）：
-    - `<n>yy`: 拷贝光标所在行之后的指定行数
+    - *N*yy: 拷贝光标所在行之后的指定行数
     - p: 从光标所在行下方粘贴内容
     - gg: 光标定位至首行
     - Shift+g: 光标定位至末行
@@ -92,27 +95,42 @@
     - `:set nu`: 设置行号
     - `:set nonu`: 取消设置行号
 - Emacs
-- Geditor: GUI 模式的文本编辑器
+- Geditor: GNOME3 中的图形化文本编辑器
 
-## Shell 相关命令
+## Shell 变量设置
 
 ```bash
 $ set
   # 查看当前 shell 环境中的所有变量
-$ unset <shell-var>
+$ unset <shell_var>
+  # 重置指定的 shell 变量
 $ env
-$ export [-n] <env-var>
+$ export [-n] <env_var>
+  # 移除指定的环境变量
 ```
 
-## 时间查询与设置
+## 系统时间设置
 
 ```bash
 $ date
 $ date -u
 $ date -s "2022-03-26 18:10:00"
 $ date +'%Y-%m-%d %H:%M:%S'
-$ date -d "1970-01-01 UTC 18389 day"  ##计算从 1970-01-01 起的第 18389 天的日期
+$ date -d "1970-01-01 UTC 18389 day"
+  # 计算从 1970-01-01 起的第 18389 天的日期
 $ hwclock -w
+  # 从系统时间同步设置 RTC 时间（BIOS 时间）
+$ hwclock -s
+  # 从 RTC 时间同步设置系统时间  
+
+$ timetatectl [status]
+$ timedatactl set-timezone Asia/Shanghai
+$ tzselect
+  # 根据 IANA 数据库查询时区
+$ timedatectl set-time 2025-03-11 15:13:00
+  # 此方法必须提前关闭 NTP 时间同步服务（chronyd）
+$ timedatectl set-ntp [true|false]
+  # 启用或禁用 NTP 时间同步服务（chronyd)
 ```
 
 ## 文件与目录管理
@@ -120,6 +138,7 @@ $ hwclock -w
 ```bash
 $ file /path/to/file
 $ cat [-n] /path/to/file
+  # -n 选项：显示行号
 $ less /path/to/file
 $ more /path/to/file
 $ tail -n20 /etc/passwd | tee t20-passwd | less
@@ -136,7 +155,7 @@ $ head -n6 /etc/paswd 2>> h6-passwd
 $ head -n6 /etc/paswd >> h6-passwd 2> /dev/null
 $ head -n6 /etc/paswd &>> h6-passwd
 $ head -n6 /etc/paswd >> h6-passwd 2>&1  
-$ wc -l|-w|-c /path/to/file 
+$ wc [-l|-w|-c] /path/to/file 
 $ history
   # 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
   # 当前的命令历史被记录在内存中,  退出窗口之后将写入 $HOME/.bash_history 文件中。
@@ -145,8 +164,9 @@ $ history -c
 $ pwd
 $ cd /path/to/dir
 $ cd -
-$ ls -lhdRtaZi /path/to/file-or-dir
+$ ls [-lhdRtaZi] /path/to/file_or_dir
 $ touch /path/to/file
+  # 创建空文件，也可用于修改文件的时间戳。
 $ mkdir -p /path/to/dir1/dir2
 $ cp /path/to/file /path/to/dir/
 $ cp --preserve=mode,ownership,timestamps /path/to/file /path/to/dir/
@@ -154,10 +174,10 @@ $ cp -Rv --preserve=mode,ownership,timestamps /path/to/dir1 /path/to/dir2/
 $ mv /path/to/file /path/to/dir/
 $ rm -rf /path/to/dir
 $ rmdir /path/to/emptydir
-$ ln /path/to/file /path/to/file-hardlink
-$ ln -s /path/to/file /path/to/file-softlink
-  # 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
-  # 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
+$ ln /path/to/file /path/to/file_hardlink
+$ ln -s /path/to/file /path/to/file_softlink
+  # 创建 raw 设备：SAP, Oracle, Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
+  # 对不同软件版本的调用解耦：/path/to/nginx -> /path/to/nginx-1.12.x, /path/to/nginx-1.15.x
 ```
 
 ## 文件与目录的权限管理
@@ -169,14 +189,14 @@ $ ln -s /path/to/file /path/to/file-softlink
   - 八进制数值法
 
 ```bash
-$ chown [-R] <username>:<groupname> /path/to/file-or-dir      
-  # 建议使用 ":" 作为分隔符,  防止用户名与所有组名称中出现 "." 而造成命令解析的歧义！
-$ chgrp <groupname> /path/to/file-or-dir
-$ chmod u+s /sbin/parted  ## suid: 4---
+$ chown [-R] <username>:<groupname> /path/to/file_or_dir
+  # 建议使用 ":" 作为分隔符，防止用户名与所有组名称中出现 "." 而造成命令解析的歧义！
+$ chgrp <groupname> /path/to/file_or_dir
+$ chmod u+s /sbin/parted  ##suid: 4---
 $ chmod u-s /sbin/parted
-$ chmod g+s /path/to/dir  ## sgid: 2---
+$ chmod g+s /path/to/dir  ##sgid: 2---
 $ chmod g-s /path/to/dir
-$ chmod o+t /path/to/dir  ## sbit: 1---
+$ chmod o+t /path/to/dir  ##sbit: 1---
 $ chmod o-t /path/to/dir
 ```
 
@@ -203,15 +223,15 @@ $ id [username]
     - max user UID: 60000
 - 用户组：
   - 主要组（primary group）：
-    - 随用户创建同时创建，组名称与用户名相同。
-    - 手动创建
+    - 创建方法1：随用户创建同时创建，组名称与用户名相同。
+    - 创建方法2：手动创建
   - 次要组（secondary group）：
     - 手动添加
 - su 与 sudo 命令：
   - /etc/sudoers.d/appuser1:
-    - 'appuser1  ALL=(ALL)  ALL'
-    - 'appuser1  ALL=(ALL)  NOPASSWD: /usr/sbin/lvs,/usr/sbin/pvs'
-    - 'appuser1  ALL=(ALL)  NOPASSWD: ALL --> sudo -i'
+    - `appuser1  ALL=(ALL)  ALL`
+    - `appuser1  ALL=(ALL)  NOPASSWD: /usr/sbin/lvs,/usr/sbin/pvs`
+    - `appuser1  ALL=(ALL)  NOPASSWD: ALL`（sudo -i 或 sudo su - 可直接提权为 root）
   - su 与 su -：前者为非登录 shell，后者为登录 shell。
   - sudo -i 与 sudo su -：前者为非登录 shell，后者为登录 shell。
 - 用户密码加密方式：
@@ -246,28 +266,32 @@ $ useradd chksys
 
 $ groupadd devgrp0
 $ useradd -u 2000 -g devgrp0 -m -d /opt/chkdev -s /bin/bash chkdev
-  # 使用其他用户组作为主要组
+  # devgrp0 用户组作为主要组，指定 UID 2000、家目录与登录 shell 类型，创建 chkdev 用户。
 
 $ useradd -u 900 -r -m -d /opt/nginx -s /sbin/nologin nginx
-  # 使用非登录用 shell 创建系统用户
+  # 使用非登录 shell 创建系统用户
 
 $ usermod -u 1100 chksys
 $ usermod -m -d /opt/chksys chksys
-  # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中,  原来的家目录将不复存在。
+  # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中，原来的家目录将不复存在。
   # 请务必确认该用户可迁移家目录,  需提前与其他团队沟通告知！
+
 $ usermod -L chksys
   # 用户的锁定也是 SSH 无法远程登录的原因之一
 $ usermod -U chksys
 $ usermod -G devgrp0 operator0
+  # 将 devgrp0 用户组设置为 operator0 的次要组
 $ usermod -aG wheel operator0
+  # 将 wheel 用户组追加为 operator0 的次要组
 
 $ gpasswd -d operator0 wheel
+  # 将 operator0 用户从 wheel 用户组中删除
 $ groupadd -g 900 -r nginx
 $ groupmod -n webapp nginx
 $ groupmod -g 905 webapp
 $ groupdel webapp
 $ userdel [-r] <username>
-  # 加 -r：同时删除家目录与邮件信息不做保留有可能其中包含重要数据，造成数据丢失。
+  # 加 -r：同时删除家目录与邮件信息不做保留，有可能其中包含重要数据，造成数据丢失。
   # 不加 -r：不会删除家目录数据并且持久保留，但是源目录的 uid 与 gid 会被之后新创建的同 uid 与 gid 的用户所占用。
 ```
 
@@ -275,9 +299,15 @@ $ userdel [-r] <username>
 
 ```bash
 $ chage -m 2 -M 90 -W 5 -I 2 chksys
+  # 设置 chksys 用户的密码生命周期：
+  #   -m 2：2天内用户不可自行需改密码
+  #   -M 90：自密码修改之日起90天后密码失效
+  #   -W 5：在密码到期前5天发出警告
+  #   -I 2：密码过期后可继续使用2天
 $ chage -l chksys
-  # 密码的最大过期日期随上次密码修改日期而定！
+  # 查看 chksys 用户的密码状态
 $ chage -E 2022-08-01 chksys
+  # 设置 chksys 用户的账户过期日期
 $ chage -d 0 chkdev
   # 强制用户下次登录时更改密码
 ```
@@ -293,7 +323,7 @@ $ chage -d 0 chkdev
 - Linux 中任务（task）与进程等同
 - 平均负载（load average）：Running（运行的进程）+ Runnable（待运行的进程）+ Deep Sleeping（深度睡眠不可中断进程）
 - CPU 物理使用率（%）：该值可能是小于等于 100%（单核CPU），也可能大于 100%（多核CPU）。这个指标只受到 Running 状态的任务影响。
-- (load average)/(total cpu cores) <= 70% 表示系统资源使用缓和
+- 一般情况下，(load average)/(total cpu cores) $\leq$ 70% 表示系统资源使用缓和。
 - Linux 中的两种系统调优配置方法：
   - 静态调优：主要的操作对象为 kernel 参数（/proc 目录中）
   - 动态调优：主要的操作对象为 tuned-profile（包含两种类型的参数, 即 kernel 参数与 profile 自定义参数）
@@ -301,7 +331,7 @@ $ chage -d 0 chkdev
 ```bash
 $ ps aux
 $ ps -efL
-  # 查看系统进程及其子线程的信息 (NLWP)
+  # 查看系统进程及其子线程的信息（NLWP）
 $ ps -L <pid>
   # 查看进程子线程的信息
 $ pgrep -l -u <username>
@@ -310,19 +340,19 @@ $ pkill -<SIGNALNAME> -u <username>
   # 向指定用户运行的所有进程发送信号
 $ pkill -P <ppid>
   # 终止由父进程生成的所有子进程
-$ killall -<SIGNALNAME> <process-name>
+$ killall -<SIGNALNAME> <process_name>
   # 向指定的所有进程发送信号
 $ pstree -p <username>
   # 查看指定用户的进程树
 
 $ <command> &
 $ jobs
-$ fg %<job-number>
-$ bg %<job-number>
+$ fg %<job_number>
+$ bg %<job_number>
 ## 注意：jobs 返回列表中的进程在当运行的 Shell 会话关闭后终止作业的运行！
 ```
 
-## systemd 服务管理
+## Systemd 服务管理
 
 - RHEL 5/6: SysV, init(PID 1)
 - RHEL 7/8/9: systemd(PID 1)
@@ -331,8 +361,14 @@ $ bg %<job-number>
 ```bash
 $ systemctl -t help
   # 查看系统上支持的单元类型
+$ systemctl list-units --type=service
+  # 查看已加载到内存中的 service 类型单元文件
+$ systemctl list-unit-files --type=service
+  # 查看系统上存在的 service 类型单元文件（是否加载到内存中均可）
+
 $ systemctl enable <name>.service
 $ systemctl enable --now <name>.service
+  # 立即启动服务，并设置服务开机自启动。
 $ systemctl start <name>.service
 $ systemctl stop <name>.service
 $ systemctl disable <name>.service
@@ -344,6 +380,14 @@ $ systemctl --failed --type=<type>
 $ systemctl reload <name>.service
 $ systemctl mask <name>.service
 $ systemctl umask <name>.service
+$ systemctl list-dependencies
+  # 系统全局正向依赖单元文件
+$ systemctl list-dependencies --reverse
+  # 系统全局反向依赖单元文件（冲突的服务）
+$ systemctl list-dependencies <name>.service
+  # 指定服务的正向依赖单元文件
+$ systemctl list-dependencies <name>.service --reverse
+  # 指定服务的反向依赖单元文件（冲突的服务）
 ```
 
 - GUI 模式与 CLI 模式：
@@ -351,11 +395,11 @@ $ systemctl umask <name>.service
 ```bash
 $ systemctl get-default
   # 查看系统当前开机启动模式
+$ systemctl set-default [multi-user.target|graphical.target]
+  # 设置不同的开机启动登录模式
 $ systemctl isolate multi-user.target
 $ systemctl isolate graphical.target
   # 切换不同的系统登录方式
-$ systemctl set-default [multi-user.target|graphical.target]
-  # 设置不同的开机启动登录模式
 ```
 
 ## RPM 软件包管理
@@ -366,7 +410,7 @@ $ systemctl set-default [multi-user.target|graphical.target]
 ```bash
 $ rpm -qf /path/to/file
 $ rpm -ql /path/to/rpmpackage
-$ rpm -qa | grep rpmpackage-name
+$ rpm -qa | grep rpmpackage_name
 $ rpm -qi /path/to/rpmpackage
 $ rpm -qc /path/to/rpmpackage
 $ rpm -qd /path/to/rpmpackage
@@ -374,13 +418,13 @@ $ rpm -q --changelog /path/to/rpmpackage
 $ rpm -q --scripts /path/to/rpmpackage
 ```
 
-## 使用 yum 与 dnf 管理软件包
+## YUM 与 DNF 软件包管理
 
 - RHEL 8/9 中 yum 与 dnf 命令都是 `dnf-3` 命令的软链接！
 - 软件包组：
   - 常规组：
     - 软件包的集合
-    - 包含三种安装模式的软件包：mandatory, default, optional
+    - 包含三种安装模式的软件包：`mandatory`, `default`, `optional`
   - 环境组：
     - 常规组的集合  
 
@@ -398,162 +442,14 @@ $ yum list packagename
 $ yum history undo
 $ yum info packagename
 $ yum provides /path/to/file
-  # 查看文件来自于哪个 RPM 软件包
+  # 查看绝对路径的文件来自于哪个 RPM 软件包
+$ yum provides */filebasename
+  # 查看基本文件名的文件来自于哪个 RPM 软件包
 $ yum group info groupname
 $ yum group list hidden
   # 查看所有包组列表（显示隐藏包组）
+$ yum group install [-y] groupname  
 ```
-
-## Linux 磁盘管理
-
-storage device identity:
-  scsi driver:
-    - /dev/sdX: /dev/sd[a-z]
-  IDE driver:   
-    - /dev/hdX: /dev/hd[a-z]
-  nvme driver:
-    - /dev/nvmeX: /dev/nvmeXnM
-  virtio_blk:
-    - /dev/vdX: /dev/vd[a-z]
-
-partition:
-  MBR: 
-    - master boot record(512 bytes)
-    - boot loader(GRUB2 or iLILO) + partition tables(primary table1~4)
-    - 2048s ~ 1MiB
-  method1: /dev/vda: 20G -> p1:5G p2:3G p3:6G p4:6G
-  method2: primary1 + primary2 + primary3 + extented4(1K) + logical5 + logical6 + ... + logical 15
-              5G          3G         6G           1K            2G        2G
-  GPT: 
-    - GPT + partition tables(128)
-    - double GPT backup
-  system disk: 
-    - legency BIOS + MBR + partition + system data
-    - UEFI BIOS + GPT + partition + system data
-    - /boot:
-      - raw disk partition NOT LV
-      - btrfs,ext3,vfat,xfs
-    - other dir: support LV
-  data disk: 
-    - partition + application data
-  tools:
-    - fdisk: 
-        - IBM
-        - msdos(mbr)
-    - gdisk: msdos and gpt
-    - parted: 
-        - GNU 
-        - disk partition tool
-        - msdos and gpt
-        - CLI and human-machine
-  filesystem type:
-    rhel6/7: ext4(default),ext3,vfat,btrfs,gfs,ntfs
-    rhel8: xfs(default),ext3,ext4,vfat,ntfs
-  mount persistent fs:
-    - disk partition
-    - mkfs -t ext4|xfs|vfat /dev/vdc1
-    - mkdir /path/to/mountpoint
-    - vim /et/fstab
-      /dev/vdc1  /path/to/mountpoint   ext4  defaults   0 0
-    - mount -a
-    - df -Th
-  swap:
-    - linux disk partition
-    - linux virtual memory(VIRT): physical-memory(RES) + swap
-      # top command: VIRT, RES
-      # ps command: VSZ, RSS
-    - create swap partition:
-        - mkswap /dev/sdXn
-        - vim /etc/fstab: /dev/sdXn  swap  swap  defaults  0 0
-        - swapon -a
-        - swapon -s
-    - change swap priority:
-        - sync: 换出 swap 中非活动页面至物理内存中
-        - swapoff -a
-        - vim /etc/fstab: /dev/sdXn  swap  swap  defaults,pri=N  0 0
-          # 添加 pri=N 参数以更改 swap 优先级
-        - swapon -a
-        - swapon -s
-          # EXAMPLE:
-          #   [root@serverb ~]# cat /etc/fstab
-          #   /dev/vdb2  swap      swap defaults  0 0
-          #   /dev/vdb3  swap      swap defaults,pri=5  0 0
-          #   [root@serverb ~]# swapon -s
-          #   Filename                                Type            Size    Used    Priority
-          #   /dev/vdb2                               partition       511996  0       -2
-          #   /dev/vdb3                               partition       1048572 0       5
-
-## LVM 逻辑卷管理
-
-- 逻辑卷：logical volume manager, LVM
-- 实现的方式：
-  - 一个或多个磁盘分区或整盘
-  - 物理卷：physical volume, PV
-  - 卷组：
-    - volume group, VG
-    - 物理扩展单元：physical extent, PE（默认为 4M，也可指定为 8M, 16M, 32M）
-  - 逻辑卷：logical volume, LV
-  - Linux kernel 中的 devicemapper 驱动框架：
-    - 自 kernel 2.6.x 起加入内核
-    - 以内核模块的形式运行
-    - 使用场景：stratis, vdo, crypt, docker-image-graph-driver, mutipath
-
-## 基础网络管理
-
-network configure:
-  verify network:
-    - ifconfig [-a]
-    - netstat -an
-    - netstat -antulp
-    - route -n
-      # 以上的命令来自于 net-tools 软件包已被弃用
-    - ip [-s] link show
-    - ip address show
-      # 与 ip a s 命令相同
-    - ip -br a s
-      # 以简要的形式查看 ip 信息
-    - ip address del 172.25.250.9/24 dev eth0
-    - ip address add 172.25.250.110/24 dev eth0
-    - ip address flush dev eth0
-      # clear all address 
-    - ip route show
-    - ss -antulp
-  system time service:
-    - rhel5/6: ntpd
-    - rhel7/8: chronyd
-  network service change:
-    - rhel5/6: 
-        - service network [start|stop|restart]
-    - rhel7:
-        - network.service: 
-            - initscripts manage
-        - NetworkManager.service:
-        - /etc/sysconfig/network-scripts/ifcfg-*: NM_CONTROLLED=no
-          # 该参数可使 network.service 与 NetworkManager.service 服务共存,  并且后者不会影响前者配置 IP 的状态。
-    - rhel8:
-        - NetworkManager.service(python): nmcli or nmtui --> dbus.socket --> NetworkManager.service --> provision network
-  ipv4 address configure and route:
-    - command line:
-        - nmcli connection add con-name "System eth0" type ethernet dev eth0
-        - nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.254 ipv4.method manual
-          # 同一台主机上可以存在多个默认路由,  但是在这种情况下,  可能发生间断性的访问中断。
-          # 在生产的节点上,  强烈建议只配置一个默认路由,  而 ipv4.gateway 是默认路由的配置选项,  因此,  我们建议在 nmcli connection modify 过程中不要加入
-          # ipv4.gateway 配置,  并且将对应网口配置 /etc/sysconfig/network-scripts/ifcfg-* 中的 DEFROUTE=yes 去除！
-        - nmcli connection show
-        - nmcli connection down "System eth0"
-          # 等同于 ifdown "System_eth0"
-        - nmcli connection up "System eth0"
-          # 等同于 ifup "System_eth0"
-    - configure file: /etc/sysconfig/network-scripts/ifcfg-*
-  hostname:
-    - command line:
-        - hostnamectl set-hostname rh199.lab.example.com
-    - configure file:
-        - echo "servera.lab.example.com" > /etc/hostname
-        - echo "servera.lab.example.com" > /proc/sys/kernel/hostname
-  resolv host:
-    - /etc/hosts
-    - /etc/resolv.conf
 
 ## RHEL 7/8/9 系统引导过程
 
@@ -571,9 +467,176 @@ network configure:
 - load and start all available unit file
 - login system through multi-user.target or graphical.target
 
+## Linux 磁盘管理
+
+- 存储设备的识别符：
+  - SCSI 驱动：`/dev/sdX (/dev/sd[a-z])`
+  - IDE 驱动：`/dev/hdX (/dev/hd[a-z])`
+  - NVMe 驱动：`/dev/nvmeX (/dev/nvmeXnM)`
+  - virtio_blk 驱动：`/dev/vdX (/dev/vd[a-z])`
+- 磁盘分区方案：
+  - MBR：
+    - 主引导记录：master boot record (512 bytes)
+    - boot loader (`GRUB2` or `iLILO`) + partition tables (primary table1~4, extended, logical)
+    - MBR Gap ~ 1MiB
+    - 分区方法1：`/dev/vda: 20G -> p1:5G, p2:3G, p3:6G, p4:6G (4 个主分区)`
+    - 分区方法2：`primary1(5G) + primary2(3G) + primary3(6G) + extented4(1K) + logical5 + logical6 + ... + logical 15`
+  - GPT：
+    - GPT + partition tables (128个分区)
+    - 磁盘头尾的 GPT 备份
+- 系统磁盘（RAID0、RAID1）：
+  - legency BIOS + MBR + partition + system data
+  - UEFI BIOS + GPT + partition + system data
+  - /boot 分区：
+    - 只能是裸分区，不能做成逻辑卷！
+    - 该分区支持的可被引导的文件系统：btrfs, ext3, vfat, xfs
+- 数据磁盘：
+  - partition + application data
+  - 此类磁盘不受分区方案影响，因为不会被引导。
+- 磁盘分区工具：
+  - fdisk：
+    - IBM
+    - msdos(mbr)
+  - gdisk:
+    - msdos and gpt
+  - parted:
+    - GNU
+    - disk partition tool
+    - msdos and gpt
+    - CLI 或交互式
+- 文件系统的类型：
+  - RHEL 6/7: ext4(default), ext3, vfat, btrfs, gfs, ntfs
+  - RHEL 8/9: xfs(default), ext3, ext4, vfat, ntfs
+- 持久化挂载文件系统的步骤：
+  - 磁盘分区
+  - mkfs -t [ext4|xfs|vfat] /dev/vd*MN*
+  - mkdir /path/to/mountpoint
+  - vim /et/fstab
+    /dev/vd*MN*  /path/to/mountpoint   ext4  defaults   0 0
+  - mount -a
+  - df -Th /path/to/mountpoint
+- SWAP 交换空间：
+  - 本质是磁盘分区
+  - Linux 虚拟内存：物理内存 + SWAP
+    - top 命令中的 `VIRT`、`RES`
+    - ps 命令中的 `VSZ`、`RSS`
+  - 创建 SWAP 分区的方式：
+    - mkswap /dev/sdXn
+    - vim /etc/fstab
+      /dev/sdXn  swap  swap  defaults  0 0
+    - swapon -a
+    - swapon -s
+- 更改 SWAP 优先级：
+  - sync: 换出 SWAP 中非活动页面至物理内存中
+  - swapoff -a
+  - vim /etc/fstab
+    /dev/sdXn  swap  swap  defaults,pri=N  0 0    ##添加 pri=N 参数以更改 swap 优先级
+  - swapon -a
+  - swapon -s
+
+  ```bash
+  # 如下过程所示：
+  [root@serverb ~]# cat /etc/fstab
+  /dev/vdb2  swap      swap defaults  0 0
+  /dev/vdb3  swap      swap defaults,pri=5  0 0
+  [root@serverb ~]# swapon -s
+  Filename                                Type            Size    Used    Priority
+  /dev/vdb2                               partition       511996  0       -2
+  /dev/vdb3                               partition       1048572 0       5
+  ```
+
+## LVM 逻辑卷管理
+
+- 逻辑卷：logical volume manager, LVM
+- 实现的方式：
+  - 一个或多个磁盘分区或整盘
+  - 物理卷：physical volume, PV
+  - 卷组：
+    - volume group, VG
+    - 物理扩展单元：physical extent, PE（默认为 4M，也可指定为 8M, 16M, 32M）
+  - 逻辑卷：logical volume, LV
+  - Linux kernel 中的 `devicemapper` 驱动框架：
+    - 自 kernel 2.6.x 起加入内核
+    - 以内核模块的形式运行
+    - 使用场景：stratis, vdo, crypt, docker-image-graph-driver, mutipath
+
+## Linux 中导致系统无法正常启动的原因
+
+- 系统安装期间出现：
+  - 安装程序找不到磁盘驱动器：系统与服务器硬件不兼容。已有的磁盘驱动无法识别新硬件（将现有系统的 initramfs 中添加对应的驱动程序，如 RAID 阵列卡驱动，重新封装 iso 镜像，再次安装系统）。但请注意，修改过的系统原厂极大可能不做售后与支持！
+- 系统常规使用期间出现：
+  - 进入 emergency 模式：/etc/fstab 未能正常读取，该文件中出现文件系统类型指定错误。
+  - 开机直接出现 kernel panic (Call trace)
+  - 开机出现文件系统报错 ext3/4 error, xfs error，需要进入 rescue 模式中，修复指定的分区。
+  - 开机的 GRUB2 引导界面丢失无法选择对应的内核版本
+  - GRUB2 本身的错误导致的引导失败
+  - SELinux 错误配置，将 `SELINUX=enforc` 修改错误，导致系统检测 SELinux 上下文无法通过。
+
+## 基础网络管理
+
+- 确认网络状态：
+
+  ```bash
+  $ ifconfig [-a]
+  $ netstat -an
+  $ netstat -antulp
+  $ route -n
+    # 以上的命令来自于 net-tools 软件包已被弃用
+
+  $ ip [-s] link show
+  $ ip address show
+    # 与 ip a s 命令相同
+  $ ip -br a s
+    # 以简要的形式查看 ip 信息
+  $ ip address del 172.25.250.9/24 dev eth0
+  $ ip address add 172.25.250.110/24 dev eth0
+  $ ip address flush dev eth0
+    # 清除指定网络接口的所有 IP 地址
+  $ ip route show
+  $ ss -an
+    # 查看系统中所有的 socket 连接，并转换为相应端口（LISTEN 与 ESTAB 状态）。
+  $ ss -tulnp
+    # 查看监听 UDP 与 TCP 端口的进程，并转换为相应端口。
+  ```
+
+- 网络服务的变更：
+  - RHEL 5/6:
+    - service network [start|stop|restart]
+  - RHEL 7：
+    - network.service:
+      - initscripts manage
+    - NetworkManager.service:
+      - /etc/sysconfig/network-scripts/ifcfg-*: `NM_CONTROLLED=no`
+      - 该参数可使 `network.service` 与 `NetworkManager.service` 服务共存，并且后者不会影响前者配置 IP 的状态。
+  - RHEL 8：
+    - NetworkManager.service:
+      - `nmcli` or `nmtui` --> `dbus.socket` --> `NetworkManager.service` --> `provision network`
+- 使用 nmcli 配置网络：
+  - 有用的 man 手册：nmcli-examples(7), nm-settings-keyfile(5)
+  - 命令行方式：
+    - `$ nmcli connection add con-name "System eth0" type ethernet dev eth0`
+    - `$ nmcli connection modify "System eth0" ipv4.addresses 172.25.250.110/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.254 ipv4.method manual`
+    - 同一台主机上可以存在多个默认路由，但是在这种情况下，可能发生间断性的访问中断。
+    - 在生产的节点上，强烈建议只配置一个默认路由，而 `ipv4.gateway` 是默认路由的配置选项，因此，我们建议在 nmcli connection modify 过程中不要加入 ipv4.gateway 配置，并且将对应网口配置 `/etc/sysconfig/network-scripts/ifcfg-*` 中的 `DEFROUTE=yes` 去除！
+    - `$ nmcli connection show`
+    - `$ nmcli connection down "System eth0"`  ##等同于 ifdown "System_eth0"
+    - `$ nmcli connection up "System eth0"`    ##等同于 ifup "System_eth0"
+  - 配置文件方式：
+    - /etc/NetworkManager/system-connections/*.nmconnection
+    - /etc/sysconfig/network-scripts/ifcfg-*
+- 主机名设置：
+  - 命令行方式：
+    - `$ hostnamectl set-hostname rh199.lab.example.com`
+  - 配置文件方式：
+    - `$ echo "servera.lab.example.com" > /etc/hostname`
+    - `$ echo "servera.lab.example.com" > /proc/sys/kernel/hostname`
+  - 主机名解析文件：
+    - 静态解析：/etc/hosts
+    - 动态解析：/etc/resolv.conf
+
 ## 🧪 Lab 示例
 
-- 使用基于密钥的免密登录的方法
+- 使用基于密钥的免密登录的方法：
   - 方法1：拷贝客户端用户的 SSH 公钥至服务端用户的 authorized_keys 文件中
   - 方法2：ssh-copy-id 命令指定客户端用户 SSH 私钥拷贝其公钥
 
@@ -609,7 +672,7 @@ network configure:
       <b>Test Customized Web Page.</b>
     ```
 
-- 2️⃣ NFSv4 与 autofs：
+- NFSv4 与 autofs：
   - 描述：RHEL 9 中如何配置 nfs-server 和 nfs-client？
   - 实验过程：
 
