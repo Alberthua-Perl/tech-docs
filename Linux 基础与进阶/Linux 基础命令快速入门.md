@@ -5,6 +5,26 @@
 - 该文档中涉及的 Linux 命令与相关配置已在 `RedHat Enterprise Linux 6~9` 中验证。
 - 其他 Linux 发行版中可能存在差异，需自行验证。
 
+## 文档目录
+
+- Shell 相关概念
+- 远程登录方法
+- Linux 文本编辑器
+- Shell 相关命令
+- 时间查询与设置
+- 文件与目录管理
+- 文件与目录的权限管理
+- 用户信息
+- 用户与用户组管理
+- 用户密码生命周期管理
+- 进程管理
+- systemd 服务管理
+- Linux 磁盘管理
+- LVM 逻辑卷管理
+- 基础网络管理
+- RHEL 7/8/9 系统引导过程
+- 🧪 Lab 示例
+
 ## Shell 相关概念
 
 - RHEL, Fedora, CentOS, OpenSUSE 与 SUSE 中默认使用 bash
@@ -43,9 +63,6 @@
       - $HOME/.ssh/*key: `0600`
       - $HOME/.ssh/authorized_keys: `0600`
       - $HOME/.ssh/config: `0600`
-    - 🧪 实验：使用基于密钥的免密登录的方法
-      - 方法1：拷贝客户端用户的 SSH 公钥至服务端用户的 authorized_keys 文件中
-      - 方法2：ssh-copy-id 命令指定客户端用户 SSH 私钥拷贝其公钥
 
 ## Linux 文本编辑器
 
@@ -77,320 +94,317 @@
 - Emacs
 - Geditor: GUI 模式的文本编辑器
 
-## 常用命令汇总
+## Shell 相关命令
 
-- 用户信息：
+```bash
+$ set
+  # 查看当前 shell 环境中的所有变量
+$ unset <shell-var>
+$ env
+$ export [-n] <env-var>
+```
 
-  ```bash
-  who
-  whoami
-  w
-  id [username]
-  ```
+## 时间查询与设置
 
-- 时间查询与设置：
+```bash
+$ date
+$ date -u
+$ date -s "2022-03-26 18:10:00"
+$ date +'%Y-%m-%d %H:%M:%S'
+$ date -d "1970-01-01 UTC 18389 day"  ##计算从 1970-01-01 起的第 18389 天的日期
+$ hwclock -w
+```
 
-  ```bash
-  date
-  date -u
-  date -s "2022-03-26 18:10:00"
-  date +'%Y-%m-%d %H:%M:%S'
-  date -d "1970-01-01 UTC 18389 day"  ##计算从 1970-01-01 起的第 18389 天的日期
-  hwclock -w
-  ```
+## 文件与目录管理
 
-- 文件管理：
+```bash
+$ file /path/to/file
+$ cat [-n] /path/to/file
+$ less /path/to/file
+$ more /path/to/file
+$ tail -n20 /etc/passwd | tee t20-passwd | less
+$ tail -n15 /etc/passwd | tee -a t20-passwd | less
+  # 最后的 less 命令显示的是前面的命令输出而不是重定向文件的内容。
+$ tail -n <number> /path/to/file
+$ tail -f /path/to/file
+  # 追踪实时日志刷新
+$ head -n <number> /path/to/file
+  # 默认查看文本文件的前 10 行
+$ head -n6 /etc/passwd > h6-passwd
+$ head -n6 /etc/passwd >> h6-passwd
+$ head -n6 /etc/paswd 2>> h6-passwd
+$ head -n6 /etc/paswd >> h6-passwd 2> /dev/null
+$ head -n6 /etc/paswd &>> h6-passwd
+$ head -n6 /etc/paswd >> h6-passwd 2>&1  
+$ wc -l|-w|-c /path/to/file 
+$ history
+  # 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
+  # 当前的命令历史被记录在内存中,  退出窗口之后将写入 $HOME/.bash_history 文件中。
+$ history -c
+  # 清除当前 shell 会话窗口的历史记录 
+$ pwd
+$ cd /path/to/dir
+$ cd -
+$ ls -lhdRtaZi /path/to/file-or-dir
+$ touch /path/to/file
+$ mkdir -p /path/to/dir1/dir2
+$ cp /path/to/file /path/to/dir/
+$ cp --preserve=mode,ownership,timestamps /path/to/file /path/to/dir/
+$ cp -Rv --preserve=mode,ownership,timestamps /path/to/dir1 /path/to/dir2/
+$ mv /path/to/file /path/to/dir/
+$ rm -rf /path/to/dir
+$ rmdir /path/to/emptydir
+$ ln /path/to/file /path/to/file-hardlink
+$ ln -s /path/to/file /path/to/file-softlink
+  # 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
+  # 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
+```
 
-  ```bash
-  $ file /path/to/file
-  $ cat [-n] /path/to/file
-  $ less /path/to/file
-  $ more /path/to/file
-  $ tail -n <number> /path/to/file
-  $ tail -f /path/to/file
-    # 追踪实时日志刷新
-  $ head -n <number> /path/to/file
-    # 默认查看文本文件的前 10 行
-  $ wc -l|-w|-c /path/to/file 
-  $ history
-    # 每个 bash shell 会话窗口只记录自身执行的命令历史直到该窗口退出。
-    # 当前的命令历史被记录在内存中,  退出窗口之后将写入 $HOME/.bash_history 文件中。
-  $ history -c
-    # 清除当前 shell 会话窗口的历史记录 
-  $ pwd
-  $ cd /path/to/dir
-  $ cd -
-  $ ls -lhdRtaZi /path/to/file-or-dir
-  $ touch /path/to/file
-  $ mkdir -p /path/to/dir1/dir2
-  $ cp /path/to/file /path/to/dir/
-  $ cp --preserve=mode,ownership,timestamps /path/to/file /path/to/dir/
-  $ cp -Rv --preserve=mode,ownership,timestamps /path/to/dir1 /path/to/dir2/
-  $ mv /path/to/file /path/to/dir/
-  $ rm -rf /path/to/dir
-  $ rmdir /path/to/emptydir
-  $ ln /path/to/file /path/to/file-hardlink
-  $ ln -s /path/to/file /path/to/file-softlink
-    # 创建 raw 设备: SAP,Oracle,Ceph 等用于创建 raw 设备提高 IO 效率而不通过文件系统层的写入
-    # 对不同软件版本的调用解耦: /path/to/nginx -> /path/to/nginx-1.12.x,/path/to/nginx-1.15.x
-  ```
+## 文件与目录的权限管理
 
-- Shell 相关命令：
+- chmod 命令：
+  - 符号法（symbolic）：
+    - 用户：u, g, o, a
+    - 权限：r(4), w(2), x(1), X
+  - 八进制数值法
 
-  ```bash
-  $ head -n6 /etc/passwd > h6-passwd
-  $ head -n6 /etc/passwd >> h6-passwd
-  $ head -n6 /etc/paswd 2>> h6-passwd
-  $ head -n6 /etc/paswd >> h6-passwd 2> /dev/null
-  $ head -n6 /etc/paswd &>> h6-passwd
-  $ head -n6 /etc/paswd >> h6-passwd 2>&1
-  $ tail -n20 /etc/passwd | tee t20-passwd | less
-  $ tail -n15 /etc/passwd | tee -a t20-passwd | less
-    # 最后的 less 命令显示的是前面的命令输出而不是重定向文件的内容。
-  $ set
-    # 查看当前 shell 环境中的所有变量
-  $ unset <shell-var>
-  $ env
-  $ export [-n] <env-var>
-  ```
+```bash
+$ chown [-R] <username>:<groupname> /path/to/file-or-dir      
+  # 建议使用 ":" 作为分隔符,  防止用户名与所有组名称中出现 "." 而造成命令解析的歧义！
+$ chgrp <groupname> /path/to/file-or-dir
+$ chmod u+s /sbin/parted  ## suid: 4---
+$ chmod u-s /sbin/parted
+$ chmod g+s /path/to/dir  ## sgid: 2---
+$ chmod g-s /path/to/dir
+$ chmod o+t /path/to/dir  ## sbit: 1---
+$ chmod o-t /path/to/dir
+```
 
-- 用户与用户组管理：
-  - 用户：
-    - RHEL 5/6:
-      - UID 0: root（超级用户）
-      - UID 1~499: 系统或应用用户
-      - UID 500+ included: 常规用户
-    - RHEL 7/8/9:
-      - UID 0: root（超级用户）
-      - UID 1~999: 系统或应用用户
-      - UID 1000+ included: 常规用户
-      - max user UID: 60000
-  - 用户组：
-    - 主要组（primary group）：
-      - 随用户创建同时创建，组名称与用户名相同。
-      - 手动创建
-    - 次要组（secondary group）：
-      - 手动添加
-  - su 与 sudo 命令：
-    - /etc/sudoers.d/appuser1:
-      - 'appuser1  ALL=(ALL)  ALL'
-      - 'appuser1  ALL=(ALL)  NOPASSWD: /usr/sbin/lvs,/usr/sbin/pvs'
-      - 'appuser1  ALL=(ALL)  NOPASSWD: ALL --> sudo -i'
-    - su 与 su -：前者为非登录 shell，后者为登录 shell。
-    - sudo -i 与 sudo su -：前者为非登录 shell，后者为登录 shell。
-  - 用户密码加密方式：
-    - RHEL 5: MD5
-    - RHEL 6: SHA256
-    - RHEL 7/8/9: SHA512
-  - 用户账户文件：
-    - /etc/passwd: 本地用户信息
-    - /etc/shadow: 本地用户密码存储文件（影子文件）
-      - 第二个字段含义：
-        - 第一个 `$`：SHA512 加密方式
-        - 第二个 `$`：SALT 值
-        - 第三个 `$`：SALT 值与明文密码通过 SHA512 加密算法获得的哈希值
-    - /etc/group: 本地用户组信息
-    - /etc/profile.d/*: 优先级高于 /etc/profile
-    - /etc/profile: 系统全局的环境设置文件（对所有用户均有效）
-    - /etc/bashrc:
-      - 系统全局的环境设置文件（对所有用户均有效）
-      - 可设置 umask
-    - $HOME/.bash_profile: 当前用户的环境设置文件
-    - $HOME/.bashrc: 当前用户的环境设置文件
-    - /etc/login.defs:
-      - 定义用户行为
-      - 定义用户家目录
-      - 定义密码生命周期
-      - 定义密码加密算法
-      - 注意：Ubuntu 与 SUSE 15 默认情况下不为用户自动创建家目录！
-    - /etc/security/pwquality.conf: 定义默认密码长度至少是 8 位
+## 用户信息
 
-  ```bash
-  $ useradd chksys
+```bash
+$ who
+$ whoami
+$ w
+$ id [username]
+```
 
-  $ groupadd devgrp0
-  $ useradd -u 2000 -g devgrp0 -m -d /opt/chkdev -s /bin/bash chkdev
-    # 使用其他用户组作为主要组
+## 用户与用户组管理
 
-  $ useradd -u 900 -r -m -d /opt/nginx -s /sbin/nologin nginx
-    # 使用非登录用 shell 创建系统用户
+- 用户：
+  - RHEL 5/6:
+    - UID 0: root（超级用户）
+    - UID 1~499: 系统或应用用户
+    - UID 500+ included: 常规用户
+  - RHEL 7/8/9:
+    - UID 0: root（超级用户）
+    - UID 1~999: 系统或应用用户
+    - UID 1000+ included: 常规用户
+    - max user UID: 60000
+- 用户组：
+  - 主要组（primary group）：
+    - 随用户创建同时创建，组名称与用户名相同。
+    - 手动创建
+  - 次要组（secondary group）：
+    - 手动添加
+- su 与 sudo 命令：
+  - /etc/sudoers.d/appuser1:
+    - 'appuser1  ALL=(ALL)  ALL'
+    - 'appuser1  ALL=(ALL)  NOPASSWD: /usr/sbin/lvs,/usr/sbin/pvs'
+    - 'appuser1  ALL=(ALL)  NOPASSWD: ALL --> sudo -i'
+  - su 与 su -：前者为非登录 shell，后者为登录 shell。
+  - sudo -i 与 sudo su -：前者为非登录 shell，后者为登录 shell。
+- 用户密码加密方式：
+  - RHEL 5: MD5
+  - RHEL 6: SHA256
+  - RHEL 7/8/9: SHA512
+- 用户账户文件：
+  - /etc/passwd: 本地用户信息
+  - /etc/shadow: 本地用户密码存储文件（影子文件）
+    - 第二个字段含义：
+      - 第一个 `$`：SHA512 加密方式
+      - 第二个 `$`：SALT 值
+      - 第三个 `$`：SALT 值与明文密码通过 SHA512 加密算法获得的哈希值
+  - /etc/group: 本地用户组信息
+  - /etc/profile.d/*: 优先级高于 /etc/profile
+  - /etc/profile: 系统全局的环境设置文件（对所有用户均有效）
+  - /etc/bashrc:
+    - 系统全局的环境设置文件（对所有用户均有效）
+    - 可设置 umask
+  - $HOME/.bash_profile: 当前用户的环境设置文件
+  - $HOME/.bashrc: 当前用户的环境设置文件
+  - /etc/login.defs:
+    - 定义用户行为
+    - 定义用户家目录
+    - 定义密码生命周期
+    - 定义密码加密算法
+    - 注意：Ubuntu 与 SUSE 15 默认情况下不为用户自动创建家目录！
+  - /etc/security/pwquality.conf: 定义默认密码长度至少是 8 位
 
-  $ usermod -u 1100 chksys
-  $ usermod -m -d /opt/chksys chksys
-    # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中,  原来的家目录将不复存在。
-    # 请务必确认该用户可迁移家目录,  需提前与其他团队沟通告知！
-  $ usermod -L chksys
-    # 用户的锁定也是 SSH 无法远程登录的原因之一
-  $ usermod -U chksys
-  $ usermod -G devgrp0 operator0
-  $ usermod -aG wheel operator0
+```bash
+$ useradd chksys
 
-  $ gpasswd -d operator0 wheel
-  $ groupadd -g 900 -r nginx
-  $ groupmod -n webapp nginx
-  $ groupmod -g 905 webapp
-  $ groupdel webapp
-  $ userdel [-r] <username>
-    # 加 -r：同时删除家目录与邮件信息不做保留有可能其中包含重要数据，造成数据丢失。
-    # 不加 -r：不会删除家目录数据并且持久保留，但是源目录的 uid 与 gid 会被之后新创建的同 uid 与 gid 的用户所占用。
+$ groupadd devgrp0
+$ useradd -u 2000 -g devgrp0 -m -d /opt/chkdev -s /bin/bash chkdev
+  # 使用其他用户组作为主要组
 
-- 用户密码生命周期管理：
+$ useradd -u 900 -r -m -d /opt/nginx -s /sbin/nologin nginx
+  # 使用非登录用 shell 创建系统用户
 
-  ```bash
-  $ chage -m 2 -M 90 -W 5 -I 2 chksys
-  $ chage -l chksys
-    # 密码的最大过期日期随上次密码修改日期而定！
-  $ chage -E 2022-08-01 chksys
-  $ chage -d 0 chkdev
-    # 强制用户下次登录时更改密码
-  ```
+$ usermod -u 1100 chksys
+$ usermod -m -d /opt/chksys chksys
+  # chksys 用户的 /home/chksys 家目录将迁移至 /opt 中,  原来的家目录将不复存在。
+  # 请务必确认该用户可迁移家目录,  需提前与其他团队沟通告知！
+$ usermod -L chksys
+  # 用户的锁定也是 SSH 无法远程登录的原因之一
+$ usermod -U chksys
+$ usermod -G devgrp0 operator0
+$ usermod -aG wheel operator0
 
-- 文件与目录的权限管理：
-  - chmod 命令：
-    - 符号法（symbolic）：
-      - 用户：u, g, o, a
-      - 权限：r(4), w(2), x(1), X
-    - 八进制数值法
+$ gpasswd -d operator0 wheel
+$ groupadd -g 900 -r nginx
+$ groupmod -n webapp nginx
+$ groupmod -g 905 webapp
+$ groupdel webapp
+$ userdel [-r] <username>
+  # 加 -r：同时删除家目录与邮件信息不做保留有可能其中包含重要数据，造成数据丢失。
+  # 不加 -r：不会删除家目录数据并且持久保留，但是源目录的 uid 与 gid 会被之后新创建的同 uid 与 gid 的用户所占用。
+```
 
-  ```bash
-  $ chown [-R] <username>:<groupname> /path/to/file-or-dir      
-    # 建议使用 ":" 作为分隔符,  防止用户名与所有组名称中出现 "." 而造成命令解析的歧义！
-  $ chgrp <groupname> /path/to/file-or-dir
-  $ chmod u+s /sbin/parted  ## suid: 4---
-  $ chmod u-s /sbin/parted
-  $ chmod g+s /path/to/dir  ## sgid: 2---
-  $ chmod g-s /path/to/dir
-  $ chmod o+t /path/to/dir  ## sbit: 1---
-  $ chmod o-t /path/to/dir
-  ```
-  
-- 进程管理：
-  - 进程间通信方式：
-    - 共享内存（shared memory）
-    - 管道（pipeline）
-    - 信号量（signal）
-    - 套接字（socket）：RAW 套接字、Unix 域套接字（local）、UDP 套接字、TCP 套接字
-    - 跨主机间：RPC、gRPC/proto-buff、REST、GraphQL 等
-  - Linux 中任务（task）与进程等同
-  - 平均负载（load average）：Running（运行的进程）+ Runnable（待运行的进程）+ Deep Sleeping（深度睡眠不可中断进程）
-  - CPU 物理使用率（%）：该值可能是小于等于 100%（单核CPU），也可能大于 100%（多核CPU）。这个指标只受到 Running 状态的任务影响。
-  - (load average)/(total cpu cores) <= 70% 表示系统资源使用缓和
-  - Linux 中的两种系统调优配置方法：
-    - 静态调优：主要的操作对象为 kernel 参数（/proc 目录中）
-    - 动态调优：主要的操作对象为 tuned-profile（包含两种类型的参数, 即 kernel 参数与 profile 自定义参数）
+## 用户密码生命周期管理
 
-  ```bash
-  $ ps aux
-  $ ps -efL
-    # 查看系统进程及其子线程的信息 (NLWP)
-  $ ps -L <pid>
-    # 查看进程子线程的信息
-  $ pgrep -l -u <username>
-    # 查看指定用户的进程列表
-  $ pkill -<SIGNALNAME> -u <username>
-    # 向指定用户运行的所有进程发送信号
-  $ pkill -P <ppid>
-    # 终止由父进程生成的所有子进程
-  $ killall -<SIGNALNAME> <process-name>
-    # 向指定的所有进程发送信号
-  $ pstree -p <username>
-    # 查看指定用户的进程树
+```bash
+$ chage -m 2 -M 90 -W 5 -I 2 chksys
+$ chage -l chksys
+  # 密码的最大过期日期随上次密码修改日期而定！
+$ chage -E 2022-08-01 chksys
+$ chage -d 0 chkdev
+  # 强制用户下次登录时更改密码
+```
 
-  $ <command> &
-  $ jobs
-  $ fg %<job-number>
-  $ bg %<job-number>
-  ## 注意：jobs 返回列表中的进程在当运行的 Shell 会话关闭后终止作业的运行！
-  ```
+## 进程管理
 
-- systemctl 常用命令：
-  - RHEL 5/6: SysV, init(PID 1)
-  - RHEL 7/8: systemd(PID 1)
-  - 使用 systemd 管理的发行版：RHEL, Fedora, CentOS, CentOS-Stream, Rocky, OpenSUSE, SUSE, Debian, Ubuntu
+- 进程间通信方式：
+  - 共享内存（shared memory）
+  - 管道（pipeline）
+  - 信号量（signal）
+  - 套接字（socket）：RAW 套接字、Unix 域套接字（local）、UDP 套接字、TCP 套接字
+  - 跨主机间：RPC、gRPC/proto-buff、REST、GraphQL 等
+- Linux 中任务（task）与进程等同
+- 平均负载（load average）：Running（运行的进程）+ Runnable（待运行的进程）+ Deep Sleeping（深度睡眠不可中断进程）
+- CPU 物理使用率（%）：该值可能是小于等于 100%（单核CPU），也可能大于 100%（多核CPU）。这个指标只受到 Running 状态的任务影响。
+- (load average)/(total cpu cores) <= 70% 表示系统资源使用缓和
+- Linux 中的两种系统调优配置方法：
+  - 静态调优：主要的操作对象为 kernel 参数（/proc 目录中）
+  - 动态调优：主要的操作对象为 tuned-profile（包含两种类型的参数, 即 kernel 参数与 profile 自定义参数）
 
-  ```bash
-  $ systemctl -t help
-    # 查看系统上支持的单元类型
-  $ systemctl enable <name>.service
-  $ systemctl enable --now <name>.service
-  $ systemctl start <name>.service
-  $ systemctl stop <name>.service
-  $ systemctl disable <name>.service
-  $ systemctl status <name>.service
-  $ systemctl is-active <name>.service
-  $ systemctl is-enabled <name>.service
-  $ systemctl is-failed <name>.service
-  $ systemctl --failed --type=<type>
-  $ systemctl reload <name>.service
-  $ systemctl mask <name>.service
-  $ systemctl umask <name>.service
-  ```
+```bash
+$ ps aux
+$ ps -efL
+  # 查看系统进程及其子线程的信息 (NLWP)
+$ ps -L <pid>
+  # 查看进程子线程的信息
+$ pgrep -l -u <username>
+  # 查看指定用户的进程列表
+$ pkill -<SIGNALNAME> -u <username>
+  # 向指定用户运行的所有进程发送信号
+$ pkill -P <ppid>
+  # 终止由父进程生成的所有子进程
+$ killall -<SIGNALNAME> <process-name>
+  # 向指定的所有进程发送信号
+$ pstree -p <username>
+  # 查看指定用户的进程树
+
+$ <command> &
+$ jobs
+$ fg %<job-number>
+$ bg %<job-number>
+## 注意：jobs 返回列表中的进程在当运行的 Shell 会话关闭后终止作业的运行！
+```
+
+## systemd 服务管理
+
+- RHEL 5/6: SysV, init(PID 1)
+- RHEL 7/8/9: systemd(PID 1)
+- 使用 systemd 管理的发行版：RHEL, Fedora, CentOS, CentOS-Stream, Rocky, OpenSUSE, SUSE, Debian, Ubuntu
+
+```bash
+$ systemctl -t help
+  # 查看系统上支持的单元类型
+$ systemctl enable <name>.service
+$ systemctl enable --now <name>.service
+$ systemctl start <name>.service
+$ systemctl stop <name>.service
+$ systemctl disable <name>.service
+$ systemctl status <name>.service
+$ systemctl is-active <name>.service
+$ systemctl is-enabled <name>.service
+$ systemctl is-failed <name>.service
+$ systemctl --failed --type=<type>
+$ systemctl reload <name>.service
+$ systemctl mask <name>.service
+$ systemctl umask <name>.service
+```
 
 - GUI 模式与 CLI 模式：
 
-  ```bash
-  $ systemctl get-default
-    # 查看系统当前开机启动模式
-  $ systemctl isolate multi-user.target
-  $ systemctl isolate graphical.target
-    # 切换不同的系统登录方式
-  $ systemctl set-default [multi-user.target|graphical.target]
-    # 设置不同的开机启动登录模式
-  ```
+```bash
+$ systemctl get-default
+  # 查看系统当前开机启动模式
+$ systemctl isolate multi-user.target
+$ systemctl isolate graphical.target
+  # 切换不同的系统登录方式
+$ systemctl set-default [multi-user.target|graphical.target]
+  # 设置不同的开机启动登录模式
+```
 
-- RPM 常用命令：
-  - 使用 `RPM` 包管理器的发行版：Fedora, RHEL, CentOS, Rocky, OpenSUSE, SUSE
-  - 适应 `DEB` 软件包的发行版：Debian, Ubuntu
+## RPM 软件包管理
 
-  ```bash
-  rpm -qf /path/to/file
-  rpm -ql /path/to/rpmpackage
-  rpm -qa | grep rpmpackage-name
-  rpm -qi /path/to/rpmpackage
-  rpm -qc /path/to/rpmpackage
-  rpm -qd /path/to/rpmpackage
-  rpm -q --changelog /path/to/rpmpackage
-  rpm -q --scripts /path/to/rpmpackage
-  ```
+- 使用 `RPM` 包管理器的发行版：Fedora, RHEL, CentOS, Rocky, OpenSUSE, SUSE
+- 适应 `DEB` 软件包的发行版：Debian, Ubuntu
 
-- YUM 与 DNF 常用命令：
-  - RHEL 8/9 中 yum 与 dnf 命令都是 `dnf-3` 命令的软链接！
+```bash
+$ rpm -qf /path/to/file
+$ rpm -ql /path/to/rpmpackage
+$ rpm -qa | grep rpmpackage-name
+$ rpm -qi /path/to/rpmpackage
+$ rpm -qc /path/to/rpmpackage
+$ rpm -qd /path/to/rpmpackage
+$ rpm -q --changelog /path/to/rpmpackage
+$ rpm -q --scripts /path/to/rpmpackage
+```
 
-  ```bash
-  $ yum search "pattern"
-  $ yum install [-y] packagename
-  $ yum remove [-y] packagename
-  $ yum update [-y] packagename
-  $ yum upgrade [-y]
-  $ yum downgrade [-y] packagename
-  $ yum repolist
-  $ yum makecache
-  $ yum clean all
-  $ yum list packagename
-  $ yum history undo
-  $ yum info packagename
-  $ yum provides /path/to/file
-    # 查看文件来自于哪个 RPM 软件包
-  $ yum group info groupname
-  $ yum group list hidden
-      # 查看所有包组列表
-  ```
+## 使用 yum 与 dnf 管理软件包
 
-  package group:
-    - regular group: 
-        - group of packages
-        - mandatory packages(installed) and optional packages(non-installed)
-    - environment group: 
-        - set of regular groups
+- RHEL 8/9 中 yum 与 dnf 命令都是 `dnf-3` 命令的软链接！
+- 软件包组：
+  - 常规组：
+    - 软件包的集合
+    - 包含三种安装模式的软件包：mandatory, default, optional
+  - 环境组：
+    - 常规组的集合  
 
-repository:
-  package: local yum /etc/yum.repos.d/*.repo --> remote yum repository
-  software package manage: ruby,java,nodejs,golang,php,python,... package --> nexus repository
-  container image: local container image --> image registry
+```bash
+$ yum search "pattern"
+$ yum install [-y] packagename
+$ yum remove [-y] packagename
+$ yum update [-y] packagename
+$ yum upgrade [-y]
+$ yum downgrade [-y] packagename
+$ yum repolist
+$ yum makecache
+$ yum clean all
+$ yum list packagename
+$ yum history undo
+$ yum info packagename
+$ yum provides /path/to/file
+  # 查看文件来自于哪个 RPM 软件包
+$ yum group info groupname
+$ yum group list hidden
+  # 查看所有包组列表（显示隐藏包组）
+```
 
-yum repository service: 
-  - supported type: http,local(file:///path/to/repository),ftp
-  - classroom method: foundation0:/content --nfs4--> classroom --http--> other nodes
+## Linux 磁盘管理
 
 storage device identity:
   scsi driver:
@@ -469,22 +483,22 @@ partition:
           #   /dev/vdb2                               partition       511996  0       -2
           #   /dev/vdb3                               partition       1048572 0       5
 
-LVM:
-  description: logical volume manager
-  component: 
-    - disk-partition or whole-disk
-    - PV: physical volume
-    - VG: 
-      - volume group
-      - physical extent(PE): 4M(default), 8M, 16M, 32M
-    - LV: logical volume
-  devicemapper frame:
-    - from kernel 2.6.x
-    - kernel module(driver)
-    - solutions: vm,stratis,vdo,crypt,docker-image-graph-driver,mutipath
-  ext4 extend: 
-    - nohup resize2fs /dev/mapper/vgname-lvname &
-    - active all devices exclude vdo device --> start service included vdo.service --> active vdo device
+## LVM 逻辑卷管理
+
+- 逻辑卷：logical volume manager, LVM
+- 实现的方式：
+  - 一个或多个磁盘分区或整盘
+  - 物理卷：physical volume, PV
+  - 卷组：
+    - volume group, VG
+    - 物理扩展单元：physical extent, PE（默认为 4M，也可指定为 8M, 16M, 32M）
+  - 逻辑卷：logical volume, LV
+  - Linux kernel 中的 devicemapper 驱动框架：
+    - 自 kernel 2.6.x 起加入内核
+    - 以内核模块的形式运行
+    - 使用场景：stratis, vdo, crypt, docker-image-graph-driver, mutipath
+
+## 基础网络管理
 
 network configure:
   verify network:
@@ -557,7 +571,11 @@ network configure:
 - load and start all available unit file
 - login system through multi-user.target or graphical.target
 
-## 实验示例
+## 🧪 Lab 示例
+
+- 使用基于密钥的免密登录的方法
+  - 方法1：拷贝客户端用户的 SSH 公钥至服务端用户的 authorized_keys 文件中
+  - 方法2：ssh-copy-id 命令指定客户端用户 SSH 私钥拷贝其公钥
 
 - SELinux 文件上下文标签的问题：
   - 描述：如何使用自定义 Web 根目录与端口实施 Web 服务？
@@ -591,7 +609,7 @@ network configure:
       <b>Test Customized Web Page.</b>
     ```
 
-- NFSv4 与 autofs：
+- 2️⃣ NFSv4 与 autofs：
   - 描述：RHEL 9 中如何配置 nfs-server 和 nfs-client？
   - 实验过程：
 
