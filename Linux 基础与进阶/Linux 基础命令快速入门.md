@@ -608,9 +608,12 @@ $ yum group install [-y] groupname
     - NetworkManager.service:
       - /etc/sysconfig/network-scripts/ifcfg-*: `NM_CONTROLLED=no`
       - 该参数可使 `network.service` 与 `NetworkManager.service` 服务共存，并且后者不会影响前者配置 IP 的状态。
-  - RHEL 8：
+  - RHEL 8/9：
     - NetworkManager.service:
       - `nmcli` or `nmtui` --> `dbus.socket` --> `NetworkManager.service` --> `provision network`
+  - SLE15SP6：
+    - wicked.service：相当于兼容 `initscripts` 的管理方式，如 `ifdown`、`ifup` 等命令与 `ifcfg-*` 配置文件等（man 5 ifcfg）。
+    - NetworkManager.service：与 RHEL 中的使用方法完全一致
 - 使用 nmcli 配置网络：
   - 有用的 man 手册：nmcli-examples(7), nm-settings-keyfile(5)
   - 命令行方式：
@@ -626,13 +629,31 @@ $ yum group install [-y] groupname
     - /etc/sysconfig/network-scripts/ifcfg-*
 - 主机名设置：
   - 命令行方式：
-    - `$ hostnamectl set-hostname rh199.lab.example.com`
+    - `$ hostnamectl hostname rh199.lab.example.com`
   - 配置文件方式：
     - `$ echo "servera.lab.example.com" > /etc/hostname`
     - `$ echo "servera.lab.example.com" > /proc/sys/kernel/hostname`
   - 主机名解析文件：
     - 静态解析：/etc/hosts
     - 动态解析：/etc/resolv.conf
+  - 名称解析缓存的实现：
+    - dnsmasq 软件包
+    - nscd 软件包（推荐）：RHEL 与 SUSE 中均可使用
+    - unbound 软件包：该服务功能齐全，但较重。
+    - dns_resolver 内核模块
+  - 测试主机名解析：
+
+    ```bash
+    $ host <FQDN>
+    $ host <ipaddress>
+
+    $ dig <FQDN> @<nameserver>
+      # 默认返回完全限定主机名的 A 记录
+    $ dig A <FQDN> @<nameserver>
+      # 查询完全限定主机名的 A 记录
+    $ dig SOA <FQDN> @<nameserver>
+      # 查询完全限定主机名所在域内的权威名称解析服务器地址
+    ```  
 
 ## 🧪 Lab 示例
 
