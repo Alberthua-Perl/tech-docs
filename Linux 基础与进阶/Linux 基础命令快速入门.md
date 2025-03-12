@@ -655,6 +655,34 @@ $ yum group install [-y] groupname
       # 查询完全限定主机名所在域内的权威名称解析服务器地址
     ```  
 
+## Firewalld 防火墙服务
+
+```bash
+$ firewall-cmd --get-services
+# 查看预定义的所有防火墙支持的服务
+# 预定义服务的 xml 文件所在路径：/usr/lib/firewalld/services/*.xml
+
+## 服务端放行自定义服务的端口并测试
+##root@servera:
+$ vim /usr/lib/firewalld/services/nc.xml
+  <?xml version="1.0" encoding="utf-8"?>
+  <service>
+    <short>nc</short>
+    <description>nc port for service</description>
+    <port protocol="tcp" port="8810"/>
+  </service>
+$ firewall-cmd --zone=public --pernament --add-service=nc
+$ firewall-cmd --reload
+$ firewall-cmd --list-all | grep 'nc'
+$ nc -l 8810  ##nc 服务端模式监听 8810 端口测试
+
+## 客户端链接 nc 服务端测试
+##root@serverb:
+$ nc -v servera.lab.example.com 8810
+
+
+```
+
 ## 🧪 Lab 示例
 
 - 使用基于密钥的免密登录的方法：
