@@ -1,13 +1,13 @@
-## Linux 进程权限的各类 UID 探讨
+# Linux 进程权限的各类 UID 探讨
 
-### 文档说明：
+## 文档说明
 
 - OS 版本：`Ubuntu 20.04.3 LTS`
 - kernel 版本：`5.15.0-57-generic`
 - Linux 中各类 UID 的联系与区别对于理解进程权限与 Audit 审计系统发挥至关重要的作用，这些 UID 作为进程凭证。
 - ✍ 可参考 `man 7 credentials` 手册中的说明加以理解。
 
-### 文档目录：
+## 文档目录
 
 - 各类 UID 的解析
 - ruid、euid 与 Saved set-user-ID 间的关系
@@ -15,11 +15,11 @@
 - 各类 UID 在 Audit 审计系统中的说明
 - 参考链接
 
-### 各类 UID 的解析：
+## 各类 UID 的解析
 
 - user ID：  
   - 常规 Linux 用户 ID，作为系统中用户的唯一识别符。
-- Real user ID（`ruid`）： 
+- Real user ID（`ruid`）：
   - 真实用户 ID  
   - 🤘 ruid 为拥有当前进程的用户 ID，即调用该可执行文件的用户。  
   - 一般情况下，最初登录 Shell 的 user ID 与 ruid 相同，但是该登录用户有可能通过 su 或 sudo 提权为其他非特权用户或特权用户，此时的 ruid 与最初的登录 user ID 不同。
@@ -43,11 +43,11 @@
   - 审计用户 ID，用于记录 Linux Audit 审计系统中的用户标识。  
   - auid 为最初登录 Shell 的的用户 ID
 
-### ruid、euid 与 Saved set-user-ID 间的关系：
+## ruid、euid 与 Saved set-user-ID 间的关系
 
 - 进程启动过程中三者的赋值关系，如下图所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-process-uid/linux-process-uid-mapping.png)
+  ![linux-process-uid-mapping](images/linux-process-uid-mapping.png)
   
   - 1️⃣2️⃣ 假定最初登录 Shell 的用户启动运行可执行文件，启动进程。  
   - 3️⃣ 设置进程的 `ruid/rgid` 为当前用户的 uid/gid  
@@ -60,7 +60,7 @@
   | Effective user ID | 不变                   | **<font color=blue>设置为可执行文件的 user ID</font>** |
   | Saved set-user-ID | 复制 Effective user ID | 复制 Effective user ID                          |
 
-### 🚀 ruid 与 euid 的验证示例：
+## 🚀 ruid 与 euid 的验证示例
 
 - 需要注意的是 Linux 系统中 set-user-ID 与 set-group-ID 权限位对 shell 脚本无效，如下 [process-cred-sample.c](https://github.com/Alberthua-Perl/sc-col/blob/master/ruid-euid-suid-test/process-cred-sample.c) 程序所示：
   
@@ -174,9 +174,9 @@
 
 - 以上验证源码与文件的权限如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-process-uid/linux-ruid-euid-test.png)
+  ![linux-ruid-euid-test](images/linux-ruid-euid-test.png)
 
-### 各类 UID 在 Audit 审计系统中的说明：
+## 各类 UID 在 Audit 审计系统中的说明
 
 - 使用 Audit 审计系统过程中对文件、目录或系统调用的审计结果以审计日志的方式呈现，在众多的 type=SYSCALL 类型审计日志中包含了大量的 auid、uid、euid、suid 等的信息。
 - 以下将审计上述 process-cred-sample-adv 可执行文件，进一步理解各类 UID 的作用：
@@ -212,7 +212,7 @@
   
   在执行 process-cred-sample-adv 可执行文件后，使用 `ausearch` 查找对应的执行日志，其中 `type=SYSCALL` 中 `uid=godev` 为 kernel 确定的 ruid 值 1000(godev)，虽然在 process-cred-sample-adv 进程返回中 ruid 为 1001，但该值为 setreuid() 系统调用重新设置的值，真实的 ruid 依然为 1000(godev)。`euid=sysadmin` 与 `suid=sysadmin` 的结果与进程返回的结果完全一致。
 
-### 参考链接：
+## 参考链接
 
 - [credentials(7) - Linux man page](https://linux.die.net/man/7/credentials)
 - [setreuid(2) - Linux manual page](https://man7.org/linux/man-pages/man2/setregid.2.html)

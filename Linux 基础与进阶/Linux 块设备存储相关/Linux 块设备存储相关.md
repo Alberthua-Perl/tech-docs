@@ -1,23 +1,20 @@
-## Linux 块设备存储相关
+# Linux 块设备存储相关
 
-### 文档目录：
+## 文档目录
 
 - Linux 磁盘盘符分类
 - 块设备相关命令示例
 - 虚拟机或物理机不重启在线热添加磁盘
 - 案例：SLES 11 SP4 磁盘格式化失败故障排查
 
-### Linux 磁盘盘符分类：
+## Linux 磁盘盘符分类
 
 - IDE HDD：/dev/hd*X*
-
 - SATA HDD：/dev/sd*X*
-
 - SATA SSD：/dev/sd*X*
-
 - NVMe SSD：/dev/nvme*X*n*N*
 
-### 块设备相关命令示例：
+## 块设备相关命令示例
 
 ```bash
 $ sginfo -g /dev/sdX
@@ -41,9 +38,9 @@ $ blockdev --setrw <device_path>
 # 块设备级别设置读写权限，该块设备可进行挂载访问。
 ```
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/blockdev-example.png)
+![blockdev-example](images/blockdev-example.png)
 
-### 虚拟机或物理机不重启在线热添加磁盘：
+## 虚拟机或物理机不重启在线热添加磁盘
 
 由于物理机、VMware 虚拟机以及 OpenStack 虚拟机的磁盘驱动方式存在差异, 若使用扫描 `SCSI` 总线的方式无法识别新添加的磁盘, 可使用扫描 **`/proc/scsi/scsi`** 的方式进行。
 
@@ -63,16 +60,14 @@ $ less /var/log/messages
 # 查看系统日志中关于热添加 SCSI 磁盘的相关内容
 ```
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/add-scsi-device-online-1.jpg)
+![add-scsi-device-online-1](images/add-scsi-device-online-1.jpg)
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/add-scsi-device-online-2.jpg)
+![add-scsi-device-online-2](images/add-scsi-device-online-2.jpg)
 
-### 案例：SLES 11 SP4 磁盘格式化失败故障排查
+## 案例：SLES 11 SP4 磁盘格式化失败故障排查
 
 - 问题描述：
-  
   SLES 11 SP4 格式化数据盘 /dev/sd{h,i} 为 `ext3` 文件系统失败，`mkfs` 进程卡死。
-
 - 排查过程：
   
   ```bash
@@ -90,4 +85,4 @@ $ less /var/log/messages
   # 排除 HP RAID 卡故障后即可正常完成格式化
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/linux-blockdev-demo/raid-error.jpg)
+  ![raid-error](images/raid-error.jpg)

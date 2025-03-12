@@ -701,19 +701,17 @@ $ yum group install [-y] groupname
     ## 注意：rpcbind 服务必须在 nfs-server 服务运行之前运行！
     ## root@serverb: 作为 nfs-server
     # 创建 nfs-server 并被 nfs-client 挂载共享
-    $ mkdir -p /shared 
+    $ mkdir -p /shared
     $ mkdir -p /mnt/tp1/data{1..10}
     $ vim /etc/exports.d/shared.exports
-      /shared  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
-      /mnt/tp1  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)
+      /shared  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)   ##此目录供下一实验 autofs 的直接映射挂载使用
+      /mnt/tp1  172.25.250.0/255.255.255.0(rw,sync,no_root_squash)  ##此目录供下一实验 autofs 的间接映射挂载使用
     $ systemctl start nfs-server.service
     $ systemctl enable nfs-server.service
     $ exportfs -a
       # 可不重启 nfs-server 服务而直接导出共享目录
     $ showmount -e localhost
-    $ firewall-cmd --zone=public --permanent --add-service=nfs
-    $ firewall-cmd --zone=public --permanent --add-service=mountd
-    $ firewall-cmd --zone=public --permanent --add-service=rpc-bind
+    $ firewall-cmd --zone=public --permanent --add-service={nfs,mountd,rpc-bind}
     $ firewall-cmd --zone=public --reload
     $ firewall-cmd --zone=public --list-all
 
@@ -738,7 +736,7 @@ $ yum group install [-y] groupname
     $ systemctl enable --now autofs.service
     $ cd /shared
       # 触发自动挂载 nfs-server 的 /shared 共享
-    $ df -Th
+    $ df -Th /shared
       # serverb.lab.example.com:/shared nfs4      9.9G  1.6G  8.4G  16% /shared
         
     # 场景2：autofs 自动挂载通配符支持的间接映射的共享
