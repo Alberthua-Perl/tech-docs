@@ -34,10 +34,9 @@
 ## 🛠 **Linux 服务与配置**
 
 - [DHCP 原理与常规配置实现](https://github.com/Alberthua-Perl/sc-col/tree/master/dhcp-server-conf)
-- [【精华】DNS 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
-- [【精华】Apache HTTP Server 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Apache%20HTTP%20Server%20%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
-- [NAS 与 NFS 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/NAS%20%E4%B8%8E%20NFS%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
-- [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md) 
+- [【精华】DNS 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
+- [【精华】Apache HTTP Server 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Apache%20HTTP%20Server%20%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
+- [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
 
 ## 🚀 **Linux 网络虚拟化**
 

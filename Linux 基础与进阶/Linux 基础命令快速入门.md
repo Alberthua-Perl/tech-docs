@@ -683,41 +683,9 @@ $ nc -v servera.lab.example.com 8810
 
 ## 🧪 Lab 示例
 
-- 使用基于密钥的免密登录的方法：
+- 使用基于密钥的免密登录方法：
   - 方法1：拷贝客户端用户的 SSH 公钥至服务端用户的 authorized_keys 文件中
   - 方法2：ssh-copy-id 命令指定客户端用户 SSH 私钥拷贝其公钥
-
-- SELinux 文件上下文标签的问题：
-  - 描述：如何使用自定义 Web 根目录与端口实施 Web 服务？
-  - 实验过程：
-
-    ```bash
-    ## root@serverb: web server
-    $ yum install -y httpd
-    $ mkdir /webapp
-    $ echo "<b>Test Customized Web Page.</b>" > /webapp/index.html
-    $ mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
-    $ vim /etc/httpd/conf.d/webapp.conf
-      Listen 8182
-      <VirtualHost *:8182>
-        ServerName  serverb.lab.example.com
-        DocumentRoot  "/webapp"
-        <Directory "/webapp">
-          AllowOverride none
-          Require all granted
-        </Directory>
-      </VirtualHost>
-    $ semanage port -a -t http_port_t -p tcp 8182
-      # allow selinux to use tcp 8182 port
-    $ firewall-cmd --permanent --zone=public --add-port=8182/tcp
-    $ firewall-cmd --reload
-    $ chcon -Rt httpd_sys_content_t /webapp
-      # set selinux httpd file context
-    $ systemctl enable --now httpd.service
-      # root@servera: web client
-    $ curl http://serverb.lab.example.com:8182
-      <b>Test Customized Web Page.</b>
-    ```
 
 - NFSv4 与 autofs：
   - 描述：RHEL 9 中如何配置 nfs-server 和 nfs-client？
@@ -774,4 +742,36 @@ $ nc -v servera.lab.example.com 8810
     $ cd /tp-data/data3
     $ cd /tp-data/data5
       # 触发自动挂载 nfs-server 的间接映射共享目录
+    ```
+
+- SELinux 文件上下文标签的问题：
+  - 描述：如何使用自定义 Web 根目录与端口实施 Web 服务？
+  - 实验过程：
+
+    ```bash
+    ## root@serverb: web server
+    $ yum install -y httpd
+    $ mkdir /webapp
+    $ echo "<b>Test Customized Web Page.</b>" > /webapp/index.html
+    $ mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+    $ vim /etc/httpd/conf.d/webapp.conf
+      Listen 8182
+      <VirtualHost *:8182>
+        ServerName  serverb.lab.example.com
+        DocumentRoot  "/webapp"
+        <Directory "/webapp">
+          AllowOverride none
+          Require all granted
+        </Directory>
+      </VirtualHost>
+    $ semanage port -a -t http_port_t -p tcp 8182
+      # allow selinux to use tcp 8182 port
+    $ firewall-cmd --permanent --zone=public --add-port=8182/tcp
+    $ firewall-cmd --reload
+    $ chcon -Rt httpd_sys_content_t /webapp
+      # set selinux httpd file context
+    $ systemctl enable --now httpd.service
+      # root@servera: web client
+    $ curl http://serverb.lab.example.com:8182
+      <b>Test Customized Web Page.</b>
     ```
