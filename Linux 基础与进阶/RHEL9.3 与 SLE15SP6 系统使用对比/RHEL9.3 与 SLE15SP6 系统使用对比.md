@@ -172,7 +172,13 @@ mysle15sp6:~ # zypper install -y <package_name>
 mysle15sp6:~ # zypper remove -y <package_name>
 ```
 
-👉 SLE15SP6 发行版对应 `OpenSUSE Leap 15.6` 发行版，因此，可使用 OpenSUSE 的在线软件源对原生 iso 提供的软件源进行扩充。可参考[OpenSUSE-Leap_15.6-online.repo](https://github.com/Alberthua-Perl/sc-col/blob/master/dnf-repo/OpenSUSE-Leap_15.6-online.repo)文件进行额外软件包的搜索与安装，执行以下命令刷新新添加的软件源：
+👉 SLE15SP6 发行版对应 `OpenSUSE Leap 15.6` 发行版，因此，可使用 OpenSUSE 的在线软件源对原生 iso 进行扩充。
+👉 可供参考的 `repository` 文件：
+
+- [OpenSUSE-Leap_15.6-online.repo](https://github.com/Alberthua-Perl/sc-col/blob/master/dnf-repo/OpenSUSE-Leap_15.6-online.repo)
+- [OpenSUSE-Leap_15.6-python311.repo](https://github.com/Alberthua-Perl/sc-col/blob/master/dnf-repo/OpenSUSE-Leap_15.6-python311.repo)
+
+执行以下命令刷新新添加的软件源：
 
 ```bash
 mysuse:/etc/zypp/repos.d # ls -lh OpenSUSE-Leap_15.6-online.repo  #新添加的 OpenSUSE 在线软件源
@@ -298,6 +304,21 @@ eth1            device-ready
 
 - [RedHat doc: Configuring and managing networking](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/configuring_and_managing_networking/index#proc_customizing-the-prefix-for-ethernet-interfaces-during-installation_consistent-network-interface-device-naming)
 - [RHEL 9 networking: Say goodbye to ifcfg-files, and hello to keyfiles](https://www.redhat.com/en/blog/rhel-9-networking-say-goodbye-ifcfg-files-and-hello-keyfiles)。
+
+配置 DNS 动态解析文件：
+
+```bash
+mysuse-amd:~ # vim /etc/sysconfig/network/config
+...
+NETCONFIG_DNS_STATIC_SERVERS="8.8.8.8"  #指定上游 DNS 名称服务器（根据实际情况替换即可）
+...
+
+mysuse-amd:~ # netconfig update  #netconfig 命令将配置更新至 /etc/resolv.conf（手动修改无效）
+mysuse-amd:~ # tail -n3 /etc/resolv.conf 
+### Call "netconfig update -f" to force adjusting of /etc/resolv.conf.
+search lab.example.com
+nameserver 8.8.8.8
+```
 
 ## 容器与镜像管理
 
