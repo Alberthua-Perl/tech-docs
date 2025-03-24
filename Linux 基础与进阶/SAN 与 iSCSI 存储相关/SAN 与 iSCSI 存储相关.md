@@ -43,7 +43,7 @@
 
     ![iSCSI-resolve-compare](images/iSCSI-resolve-compare.jpg)
 
-    ![SAN-iSCSI-arch](images/SAN-iSCSI-arch.jpg)
+    ![SAN-iSCSI-arch](images/SAN-iSCSI-arch.JPG)
 
 - iSCSI 协议的封包与解包过程：
   - iSCSI 数据包结构：
