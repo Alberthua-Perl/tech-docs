@@ -14,17 +14,25 @@
   - 用户/密码：
     - devops/redhat（具有 sudo 提权的权限）
     - root/redhat
-- 💪 友情链接：[Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
+- 💪 友情链接：
+  - [Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
+  - [SUSE Linux Enterprise Server 文档](https://documentation.suse.com/zh-cn/sles/15-SP6/html/SLES-all/index.html)
 
 ## 文档目录
 
-- 用户创建说明
-- 关于 /etc/sudoers.d/* 文件的说明
-- 配置离线 Zypper 软件源
-- 常规网络配置
-- 容器与镜像管理
+- 系统管理与配置
+  - 用户创建说明
+  - 关于 /etc/sudoers.d/* 文件的说明
+  - 配置离线 Zypper 软件源
+  - 网络基本配置
+  - 容器与镜像管理
+- 服务部署与管理
+  - vncserver 部署与 VNC 客户端连接
+  - Apache2 HTTPD Server 部署
 
-## 用户创建说明
+## 系统管理与配置
+
+### 用户创建说明
 
 `/etc/login.defs` 中定义创建新用户默认不创建家目录，即 `CREATE_HOME  no`，可将其修改为 `yes` 后，重新创建用户，即可在 /home 目录下自动生成用户家目录。也可使用以下命令指定用户家目录：
 
@@ -103,7 +111,7 @@ Crypted password is: $6$Xx7wjaTBPW/7xdm1$mamKWKoSTfliU01XUQFDsmDYXelpoyoYxB.2YLb
 Setup password correctly!
 ```
 
-## 关于 /etc/sudoers.d/* 文件的说明
+### 关于 /etc/sudoers.d/* 文件的说明
 
 以 `/etc/sudoers.d/devops` 文件为例：`devops  ALL=(ALL)  NOPASSWD: ALL`
 
@@ -112,7 +120,7 @@ Setup password correctly!
 - 第二个等号右边的 ALL 表示该行行首第一个的用户可以切换到系统中任何一个其他用户。
 - 第三个行尾的 ALL 表示当前行首的用户能以 root 用户的身份执行任何命令。
 
-## 配置离线 Zypper 软件源
+### 配置离线 Zypper 软件源
 
 SLES 系统中依然延用 `RPM` 管理软件包的方式，但是解决软件包依赖性问题不再使用 `Yum`，而使用 `Zypper` 工具进行管理。以下示例中，已预先将 SLE15SP6 的 iso 文件挂载于部署了 Apache HTTPD 服务的节点目录上，因此，该 iso 文件中的所有软件源可基于 HTTP 共享。
 
@@ -207,7 +215,7 @@ Resolving package dependencies...
 
 📚 更多关于 Zypper 的命令示例可参考[Zypper-cheet-sheet](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94/Zypper-cheat-sheet.pdf)。
 
-## 常规网络配置
+### 网络基本配置
 
 SLES15 中同时支持 `NetworkManager` 服务与 `Wicked` 服务用于网络管理。SUSE 选择 `wicked` 作为 SLES 15 的网络管理工具，是为了在服务器环境中提供**高性能**、**可靠性**和**现代化架构**支持，同时保持与 SUSE 生态的无缝集成。对于习惯传统工具的用户，可通过学习其配置语法（兼容旧格式）快速上手（`man 5 ifcfg`）。若需图形界面，仍可通过 `YaST` 或手动安装 `NetworkManager` 辅助管理。
 
@@ -320,7 +328,7 @@ search lab.example.com
 nameserver 8.8.8.8
 ```
 
-## 容器与镜像管理
+### 容器与镜像管理
 
 SLES15 安装 iso 中的软件源提供 `Docker` 与 `Podman` 的软件仓库，因此，可兼容这两种容器运行时，具体使用哪种根据用户的实际情况而定。此处，笔者使用 Podman 容器运行时进行测试。
 
@@ -389,3 +397,89 @@ StartLimitInterval=5s    #重置 docker 服务重启时间间隔
 Environment="HTTP_PROXY=socks5://192.168.110.246:7890"    #设置 docker 代理地址与端口（用以拉取 docker.io 中的容器镜像）
 Environment="HTTPS_PROXY=socks5://192.168.110.246:7890"
 ```
+
+## 服务部署与管理
+
+### vncserver 部署与 VNC 客户端连接
+
+常见的 `vncserver` 服务端软件包括 `tigervnc-server`（RHEL 中常用）、`x11vnc`（SUSE 中常用） 等。如下所示，SLE15SP6 中安装部署 x11vnc，并在 VNC 客户端使用 `MobaXterm` 工具连接 x11vnc 服务端。
+
+```bash
+alberthua@mysuse-amd:~> sudo zypper install -y x11vnc
+# 安装 x11vnc 软件包
+alberthua@mysuse-amd:~> x11vnc -storepasswd
+# 在当前普通用户下设置登录 vncserver 的密码
+Enter VNC password: 
+Verify password:    
+Write password to /home/alberthua/.vnc/passwd?  [y]/n y
+Password written to: /home/alberthua/.vnc/passwd
+alberthua@mysuse-amd:~> x11vnc -display :0 -forever -usepw -noxdamage
+# 以普通用户身份前台运行 vncserver
+# -display 选项：显示编号
+# -forever 选项：表示 x11vnc 服务器会持续运行，即使客户端断开连接也不会自动退出。它会一直监听连接请求，直到手动停止服务器。
+# -usepw 选项：使用用户设置的 VNC 登录密码登录
+# -noxdamage 选项：用于禁止 x11vnc 服务器对 X 服务器的损坏事件进行检测和处理。损坏事件通常是指 X 服务器上的某些区域需要重绘或更新。
+
+alberthua@mysuse-amd:~> sudo ss -tunlp | grep x11vnc  
+tcp   LISTEN 0      32           0.0.0.0:5900       0.0.0.0:*    users:(("x11vnc",pid=5128,fd=8))                                                                                                                 
+tcp   LISTEN 0      32              [::]:5900          [::]:*    users:(("x11vnc",pid=5128,fd=9))
+# x11vnc 监听的端口号与显示编号
+```
+
+MobaXterm 使用 VNC 客户端的方式：
+
+![vnc-client-session-setting](images/vnc-client-session-setting.png)
+
+如上图所示，`Remote hostname or IP address` 填写 vncserver 的主机名或 IP 地址及对应的显示编号（Display Number），`Port` 端口始终填写 `5900`，用户的通过显示编号进行区别。不同用户可以启动各自的 VNC 实例，设置自身的登录密码。
+
+![vnc-client-connect-successfully](images/vnc-client-connect-successfully.png)
+
+### Apache2 HTTPD Server 部署
+
+在 RHEL 中常用的 HTTPD 服务器软件包名为 `httpd`，而 SUSE 中的软件包名为 `apach2`（与 Debian 及 Ubuntu 中相同）。
+
+Apache2 的主配置文件与目录：
+
+- 主配置目录：`/etc/apache2/`
+- 主配置文件：`/etc/apache2/httpd.conf` 与 `/etc/apache2/default-server.conf`
+- 虚拟主机配置目录：`/etc/apache2/vhosts.d/`
+- 默认根目录：`/srv/www/htdocs/`
+
+```bash
+alberthua@mysuse-amd:~> sudo zypper install -y apache2
+alberthua@mysuse-amd:~> rpm -q --info apache2
+
+alberthua@mysuse-amd:~> su -
+mysuse-amd:~ # cd /etc/apache2/vhosts.d/
+mysuse-amd:/etc/apache2/vhosts.d # vim materials.conf  #创建虚拟主机配置文件
+<VirtualHost *:80>  #服务监听的端口
+    ServerName mysuse-amd.lab.example.com  #基于域名的虚拟主机
+    DocumentRoot "/srv/www/htdocs"  #站点根目录
+    HostnameLookups Off
+    <Directory "/srv/www/htdocs">  #设置根目录的访问权限与访问模式
+        Options indexes FollowSymLinks  #允许查看目录中的子目录
+        <IfModule !mod_access_compat.c>
+            Require all granted
+        </IfModule>
+        <IfModule mod_access_compat.c>
+            Order allow,deny
+            Allow from all
+        </IfModule>
+    </Directory>
+</VirtualHost>
+
+mysuse-amd:/etc/apache2/vhosts.d # cd /srv/www/htdocs/
+mysuse-amd:/srv/www/htdocs # vim index.html 
+<b>Welcome Page for Apache2</b>
+
+mysuse-amd:/srv/www/htdocs # systemctl restart apache2.service  #启动 apache2 服务
+mysuse-amd:/srv/www/htdocs # ss -tunlp | grep httpd
+tcp   LISTEN 0      4096               *:80               *:*    users:(("httpd-prefork",pid=42612,fd=4),("httpd-prefork",pid=42611,fd=4),("httpd-prefork",pid=42610,fd=4),("httpd-prefork",pid=42609,fd=4),("httpd-prefork",pid=42608,fd=4),("httpd-prefork",pid=42588,fd=4))
+mysuse-amd:/srv/www/htdocs # curl http://mysuse-amd.lab.example.com  #验证是否可访问站点
+<b>Welcome Page for Apache2</b>
+```
+
+关于 Apache2 HTTPD Server 更多的具体内容可参考以下文档：
+
+- [SUSE Linux Enterprise Server 文档：42 Apache HTTP 服务器](https://documentation.suse.com/zh-cn/sles/15-SP6/html/SLES-all/cha-apache2.html)
+- [Apache HTTP Server 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Apache%20HTTP%20Server%20%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)

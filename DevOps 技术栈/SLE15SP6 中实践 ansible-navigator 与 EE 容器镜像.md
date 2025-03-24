@@ -251,7 +251,7 @@ alberthua@mysuse-amd:~/backup/navigator-devops> mkdir collections
 alberthua@mysuse-amd:~/backup/navigator-devops> vim collections/requirements.yml
 ---
 collections:
-  - name: http://192.168.110.220/packages/community-general-10.3.1.tar.gz
+  - name: http://192.168.110.220/materials/community-general-10.3.1.tar.gz
   # 离线安装：此处已将 collection 的 tarball 下载并存储在指定的 Apache2 HTTPD 服务器中
 
   #- name: community.general
