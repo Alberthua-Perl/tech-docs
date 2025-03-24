@@ -1,102 +1,83 @@
-## SAN 与 iSCSI 存储相关
+# SAN 与 iSCSI 存储相关
 
-### 文档说明：
+## 文档说明
 
 - 该文档为 SAN 与 iSCSI 存储相关原理与操作汇总。
 
-### 文档目录：
+## 文档目录
 
 - SAN 存储介绍
 - iSCSI 原理概述
 - iSCSI 相关术语
-- iSCSI target 与 initiator 部署与配置
+- 🧪 iSCSI target 与 initiator 部署与配置
 - iSCSI 服务端 target 配置示例
 - iSCSI 与 IP SAN 的区别
 - SAN 存储使用配置注意（FC SAN）
 - SAN FC HBA 卡基础
 - SAN 多路径连接示意
-- 案例：EMC SAN 共享存储识别与 multipath 部署
-- 案例：使用 Huawei OceanStor SAN 存储在线 LVM 扩容
-- 案例：Qlogic FC HBA 卡队列深度骤降导致数据库物理机宕机示例
+- 📚 案例：EMC SAN 共享存储识别与 multipath 部署
+- 📚 案例：使用 Huawei OceanStor SAN 存储在线 LVM 扩容
+- 📚 案例：Qlogic FC HBA 卡队列深度骤降导致数据库物理机宕机示例
 
-### SAN 存储介绍：
+## SAN 存储介绍
 
 - SAN：`Storage Area Network`，存储区域网络。
-
 - 根据数据传输过程采用的协议划分：`FC SAN`、`IP SAN`、`IB SAN`
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-san-arch.jpg)
+  ![fc-san-arch](images/fc-san-arch.jpg)
 
-### iSCSI 原理概述：
+## iSCSI 原理概述
 
 - `iSCSI`（internet SCSI）是 IP SAN 的一种实现方式。
-
 - iSCSI 实现的不同方式：
-  
   - 软件实现方式：
-    
     - iSCSI 客户端安装 `iscsi-initiator-utils` 软件包用于解析 iSCSI 协议。
-    
     - 该软件安装后，需要占用服务器 CPU 来处理 iSCSI 协议封装为 TCP/IP 协议，这将降低服务器的计算能力。
-    
     - 但该方法实现简单，价格低廉，无需使用特别的硬件设备。
-    
+
     > 👉 对于物理服务器网卡而言，常规网卡驱动只能识别和处理 TCP/IP 包，要将 SCSI 设备、命令和数据打包成标准 TCP/IP 包，就需要一个软件来实现，这个软件就是 iscsi-initiator 软件。
   
   - 硬件实现方式：
-    
     - iSCSI 客户端可使用 `TOE` 网卡，因此 iscsi-initiator 软件封装 iSCSI 协议，再由 TOE 网卡进一步封装为 TCP/IP 协议，但封装 iSCSI 协议依然由 CPU 完成。
-    
     - 当然，除了 TOE 网卡外，iSCSI 客户端也可直接使用 `iSCSI HBA` 卡，无需安装 iscsi-initiator 软件，由 iSCSI HBA 卡直接封装 iSCSI 协议、TCP/IP 协议等，大大降低 CPU 工作负载，但该方法成本较高。
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-resolve-compare.jpg)
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/SAN-iSCSI-arch.JPG)
+
+    ![iSCSI-resolve-compare](images/iSCSI-resolve-compare.jpg)
+
+    ![SAN-iSCSI-arch](images/SAN-iSCSI-arch.jpg)
 
 - iSCSI 协议的封包与解包过程：
-  
   - iSCSI 数据包结构：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-data-packet.jpg)
+
+    ![iSCSI-data-packet](images/iSCSI-data-packet.jpg)
   
   - iSCSI 客户端与服务端都使用 iSCSI HBA 进行封包与解包：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-transport.jpg)
+
+    ![iSCSI-transport](images/iSCSI-transport.jpg)
 
 - iSCSI 工作流程：
-  
   - 当 iSCSI 客户端应用程序发出数据读写请求后，操作系统会生成一个相应的 SCSI 指令。
-  
   - 该 SCSI 指令在 iSCSI initiator 层被封装成 iSCSI 消息包并通过 TCP/IP 传送到网卡设备。
-  
   - 通过网络 iSCSI 服务端逐层解开 iSCSI 消息包，得到 SCSI 指令的内容，然后传送给 SCSI 设备执行。
-
 - iSCSI 服务端共享的块设备，如磁盘分区、LVM等，均可共享给多个 iSCSI 客户端。
-
 - 💥 务必注意：
-  
+
   若一个节点挂载了共享的 iSCSI 块设备 /dev/sdc1，在节点上显示为 `/dev/sdb`，并格式化创建文件系统后，挂载于该节点。然后，若当该块设备被共享于另一节点上，显示为 /dev/sdc 时，可直接挂载，因为该块设备已在前一节点上创建文件系统，所以直接挂载写入数据即可，**切不可再格式化**，导致数据的丢失！
 
 > 👉 注意：不同客户端使用相同的 iSCSI 共享存储，在 HA 场景中常用。
 
-### iSCSI 相关术语：
+## iSCSI 相关术语
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-terminology-1.JPG)
+![iSCSI-terminology-1](images/iSCSI-terminology-1.jpg)
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-terminology-2.JPG) 
+![iSCSI-terminology-2](images/iSCSI-terminology-2.jpg)
 
-### iSCSI target 与 initiator 部署与配置：
+## 🧪 iSCSI target 与 initiator 部署与配置
 
 - iSCSI target 的部署可使用 `targetcli shell` 交互式命令行或 `targetcli` 命令行直接部署。
-
 - 该示例使用 targetcli 命令行直接部署，并对其中一个 target 启用 `CHAP` 单向会话（`session`）认证。
-
 - CHAP 认证包括：
-  
   - `discovery` 阶段的单向与双向认证
-  
   - `session` 阶段的单向与双向认证
-
 - 🚀 discovery 与 session 的认证方式可只使用其中一种，或两种认证同时使用。
   
   ```bash
@@ -245,46 +226,34 @@
   # 登出该 iSCSI target  
   ```
 
-### iSCSI 服务端 target 配置示例：
+## iSCSI 服务端 target 配置示例
 
 - 如下所示，已配置的 iSCSI 服务端 target 示例：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-target-conf.jpg)
+  ![iSCSI-target-conf](images/iSCSI-target-conf.jpg)
 
 - 💥 由于客户端 /etc/fstab 文件中未添加 `_netdev` 选项而造成客户端系统无法正常启动，进入维护状态。
-
 - 如下所示，RHEL 6.8 中的错误引导过程：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/rhel6.8-iSCSI-error.jpg)
+  ![rhel6.8-iSCSI-error](images/rhel6.8-iSCSI-error.jpg)
 
-### iSCSI 与 IP SAN 的区别：
+## iSCSI 与 IP SAN 的区别
 
-<img src="https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/iSCSI-IP-SAN.jpg" style="zoom: 150%;" />
+![iSCSI-IP-SAN](images/iSCSI-IP-SAN.jpg)
 
-### SAN 存储使用配置注意（FC SAN）：
+## SAN 存储使用配置注意（FC SAN）
 
 - 物理服务器在 FC HBA 卡安装后，若系统已集成 FC HBA 卡驱动程序，将自动加载相应驱动模块识别 FC HBA 卡，若系统未集成相应的 FC HBA 卡驱动程序，需下载并安装相应驱动程序后，才能识别 FC HBA 卡。
-
 - FC HBA 卡识别并加载后，可通过磁盘热添加即可识别 SAN 磁盘，无需多路径软件支持。
+- 多路径软件功能：SAN 存储上的相同磁盘由于多链路原因，在物理服务器上映射为多块磁盘，需进行 `盘符归并` 与 `链路负载均衡`。
 
-- 多路径软件功能：
-  
-  SAN 存储上的相同磁盘由于多链路原因，在物理服务器上映射为多块磁盘，需进行 `盘符归并` 与 `链路负载均衡`。
+## SAN FC HBA 卡基础
 
-### SAN FC HBA 卡基础：
-
-- FC HBA：
-  
-  `Fibre Channel Host Bus Adapter`，光纤通道主机适配器，简称为光纤适配器（FC 网卡）。
-
+- FC HBA：`Fibre Channel Host Bus Adapter`，光纤通道主机适配器，简称为光纤适配器（FC 网卡）。
 - FC HBA 卡与以太网卡的物理 MAC 地址一样，同样具有一种唯一的标识，即 `WWN`（World Wide Name）。
-
 - FC HBA 卡的 WWN 有两种：
-  
   - `WWNN`：Node WWN，每块 FC HBA 卡的唯一标识，可根据 WWNN 判断 FC HBA 卡数量。
-  
   - `WWPN`：Port WWN，每块 FC HBA 卡的每个光纤链路端口的唯一标识，大多数情况下通过该 WWPN 标识进行通信。
-
 - 可通过如下命令于系统上查询：
   
   ```bash
@@ -294,18 +263,17 @@
   # 查看系统中各 FC HBA 卡的状态，包括 WWPN 号与 WWNN 号。
   ```
 
-### SAN 多路径连接示意：
+## SAN 多路径连接示意
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/Typical-Multipath-Connectivity.png)
+![Typical-Multipath-Connectivity](images/Typical-Multipath-Connectivity.png)
 
-### 🚀 案例：EMC SAN 共享存储识别与 multipath 部署
+## 📚 案例：EMC SAN 共享存储识别与 multipath 部署
 
 - 由于业务需要将 2 台 Huawei 物理主机与备机配置成为 HA 集群，另需将 `EMC SAN` 共享存储能被主机与备机挂载使用，以便在 HA 切换时能将主机数据共享给备机，实现块设备共享。
 
 > 该场景下使用的 HA 组件为商用的赛门铁克 VCS 平台。
 
 - 2 台 Huawei 物理主机与备机共同使用 EMC SAN 共享磁盘，并使用 `multipath` 多路径进行盘符归并与链路负载均衡。
-
 - 2 台 Huawei 物理主机与备机 OS 环境：Huawei FushionServer 2288H V5 服务器、RHEL6.9
   
   ```bash
@@ -313,14 +281,14 @@
   # 查看系统开机过程中 FC HBA 卡的相关信息
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/dmesg-fc-hba.jpg)
+  ![dmesg-fc-hba](images/dmesg-fc-hba.jpg)
   
   ```bash
   $ modinfo lpfc
   # 查看该型号的 FC HBA 卡驱动程序（内核模块）信息，该模块在开机过程中已成功加载。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/lpfc-module.jpg)
+  ![lpfc-module](images/lpfc-module.jpg)
   
   ```bash
   $ cd /sys/class/fc_host; ls -lh
@@ -328,9 +296,9 @@
   # 查看系统识别的 FC HBA 卡光纤链路信息
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-hba-info-1.jpg)
+  ![fc-hba-info-1](images/fc-hba-info-1.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/fc-hba-info-2.jpg)
+  ![fc-hba-info-2](images/fc-hba-info-2.jpg)
   
   ```bash
   $ for i in $(seq 0 X); do echo "- - -" > /sys/class/scsi_hosts/host$i/scan; done
@@ -361,18 +329,15 @@
   # 查看盘符归并后的多路径状态
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/multipath-result.jpg)
+  ![multipath-result](images/multipath-result.jpg)
 
-### 🚀 案例：使用 Huawei OceanStor SAN 存储在线 LVM 扩容
+## 📚 案例：使用 Huawei OceanStor SAN 存储在线 LVM 扩容
 
 - SLES 11 SP4 中的实施方法：
-  
   - 使用系统原生多路径软件 `multipath-tools` 查看 SAN 存储磁盘
-  
   - RHEL 6.x/7.x 多路径软件：`device-mapper-multipath`
-  
   - 操作过程如下所示：
-    
+
     ```bash
     $ pvs
     # 查看系统上已创建 PV 的磁盘       
@@ -381,11 +346,11 @@
     $ multipath -ll | grep -E '^mpath'
     # 查看系统上已映射到的多路径 SAN 存储磁盘的盘符
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/sles11sp4-multipath-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/sles11sp4-multipath-2.jpg)
-    
+
+    ![sles11sp4-multipath-1](images/sles11sp4-multipath-1.jpg)
+
+    ![sles11sp4-multipath-2](images/sles11sp4-multipath-2.jpg)
+
     ```bash
     $ ls -l /dev/mappper/mpath*
     # 查看 SAN 存储磁盘对应的多路径盘符    
@@ -402,11 +367,9 @@
     ```
 
 - SLES 12 SP3 中的实施方法：
-  
   - 系统原生多路径软件 multipath-tools 无法识别 SAN 存储磁盘，考虑是否具有相应的多路径存储驱动软件！
-  
   - 使用 OceanStor 对应的多路径存储驱动软件 `UlrtaPath` 查看 SAN 存储磁盘的盘符。
-    
+
     ```bash
     $ upadmin
     # 调用 OceanStor UltraPath 交互式命令行
@@ -417,29 +380,23 @@
     UltraPath CLI #2 >quit
     # 退出 OceanStor UltraPath 交互式命令行
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/UltraPath.jpg)
+
+    ![UltraPath](images/UltraPath.jpg)
 
 - 以上两种场景的难点在于寻找出新添加的 SAN 盘与对应的归并的逻辑盘符，主要将其找出即可非常方便的进行逻辑卷的动态扩容！
 
-### 💥 案例：Qlogic FC HBA 卡队列深度骤降导致数据库物理机宕机
+## 📚 案例：Qlogic FC HBA 卡队列深度骤降导致数据库物理机宕机
 
 - 问题描述：
-  
   - DB2 数据库物理机使用 FC HBA 卡与后端 Huawei OceanStor SAN 存储通信，存储 DB2 数据库业务数据。
-  
   - 系统日志显示 FC HBA 卡队列深度骤降，并且系统宕机后手动重启。
-
 - 原因分析：
-  
   - SLES 官网对 `Ramping down` 的说明：
-    
     - Ramping down 是 `qla2xxx FC HBA` 卡驱动的特性。
-    
     - 该现象说明存储服务端的 I/O 请求队列已满，qla2xxx FC HBA卡驱动将降低 I/O 并发请求发送至存储服务端。
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/ramping-down-1.jpg)
+
+      ![ramping-down-1](images/ramping-down-1.jpg)
   
   - 系统日志信息显示 FC HBA 卡队列深度骤降并持续较长时间，说明 DB2 数据库 I/O 请求持续增高，使得 FC HBA 卡持续发送 I/O 并发请求至存储服务端，而导致 DB2 数据库物理机宕机！
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/san-iscsi-demo/ramping-down-2.jpg)
+
+    ![ramping-down-2](images/ramping-down-2.jpg)
