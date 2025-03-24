@@ -38,6 +38,8 @@
 - [【精华】DNS 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
 - [【精华】Apache HTTP Server 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Apache%20HTTP%20Server%20%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
 - [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
+- [VMware Workstation 15 虚拟机迁移 ESXi 6.7.0 实施方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/VMware%20Workstation%2015%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%20ESXi%206.7.0%20%E5%AE%9E%E6%96%BD%E6%96%B9%E6%B3%95/VMware%20Workstation%2015%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%20ESXi%206.7.0%20%E5%AE%9E%E6%96%BD%E6%96%B9%E6%B3%95.md)
+- [Red Hat Virtualization 4.1 基础架构与命令汇总](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Red%20Hat%20Virtualization%204.1%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB.pdf)
 
 ## 🚀 **Linux 网络虚拟化**
 
