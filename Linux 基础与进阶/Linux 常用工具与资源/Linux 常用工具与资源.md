@@ -308,9 +308,12 @@ Cursor Style: block
 
 -----
 
-## Linux 环境文件设置
+## Linux 实用命令示例
 
 ```bash
+$ echo "<password>" | sudo -S <username>
+# 命令行明文传递密码，sudo 直接为指定用户提权。
+
 $ sudo vim /etc/profile
   echo "##### Welcome to login workstation.lab.example.com! #####"
   export HISTSIZE=500

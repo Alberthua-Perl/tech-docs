@@ -165,15 +165,17 @@
   #   2. 可在此节点上使用 systemctl 命令启动此 osd 守护进程
   $ ceph orch daemon rm osd.$id --force
   # 将指定的 osd 守护进程强制移除
-  $ ceph orch osd rm status
-  # 查看 osd 删除的状态
   $ ceph osd rm $id
   # 将 osd 从集群 osdmap（osd 映射）中删除
   # 注意：
   #   1. 此时，ceph -s 集群状态将显示 crushmap 中依然保留着 osd，而 osdmap 中已移除 osd，两者的状态不匹配。
   #   2. ceph osd tree 显示的 osd 状态为 DNE，当从 crushmap 中移除后将清除。
+  $ ceph orch osd rm status
+  # 查看 osd 删除的状态
+
   $ ceph osd crush rm $id
   # 将 osd 从集群 crushmap（CRUSH 映射）中删除
+  # 注意：若后续还需要将 osd 添加到集群中的话，那么在 crushmap 中可继续保留！
   ```
   
   ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-status-with-noosd-in-osdmap.png)
