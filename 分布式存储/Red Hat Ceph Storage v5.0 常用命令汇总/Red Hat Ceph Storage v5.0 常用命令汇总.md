@@ -25,15 +25,10 @@
 ## Ceph 集群状态
 
 - Red Hat Ceph Storage v5.0 中已不再使用旧式的 systemd 管理守护进程的方式管理 Ceph 进程，而使用 `Podman rootfull` 容器的方式封装运行 Ceph 进程，因此，可使用 `cephadm` 命令行工具取代以往的 `ceph-ansible` 来实现集群的部署与管理。
-
 - 管理 Ceph 集群的两种方式：
-  
   - 1️⃣ 在管理节点上直接使用 ceph 命令。
-  
   - 2️⃣ 进入管理节点的 cephadm shell 临时容器中，使用交互式命令管理。
-
 - cephadm 命令使用：
-  
   cephadm 工具一般安装于部署节点或管理节点中，因此运行以下命令需在对应节点中运行。
   
   ```bash
@@ -60,9 +55,9 @@
   # 查看所有 osd 的版本
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephadm-demo.png)
+  ![cephadm-demo](images/cephadm-demo.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephadm-shell-demo.png)
+  ![cephadm-shell-demo](images/cephadm-shell-demo.png)
   
   ✨ 注意：使用 ceph orch host add 添加额外的节点时，需先将集群公钥导出并同步至节点。
   
@@ -151,7 +146,7 @@
   # 添加指定主机上的 osd 设备
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-orch-daemon-add-osd-demo.png)
+  ![ceph-orch-daemon-add-osd-demo](images/ceph-orch-daemon-add-osd-demo.png)
   
   👉 删除 OSD 设备：
   
@@ -178,15 +173,15 @@
   # 注意：若后续还需要将 osd 添加到集群中的话，那么在 crushmap 中可继续保留！
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-status-with-noosd-in-osdmap.png)
+  ![ceph-status-with-noosd-in-osdmap](images/ceph-status-with-noosd-in-osdmap.png)
   
   ✨ 从 RHCS4 开始引入 `ceph-volume` 命令用于创建基于 `BlueStore` 存储引擎的 OSD，分别使用 `ceph-volume lvm prepare` 与 `ceph-volume lvm activate` 子命令创建与激活 OSD 设备，过程如下示意：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-add-bluestore-osd-backend.jpg)
+  ![ceph-volume-add-bluestore-osd-backend](images/ceph-volume-add-bluestore-osd-backend.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-add-bluestore-osd-backend-status.jpg)
+  ![ceph-volume-add-bluestore-osd-backend-status](images/ceph-volume-add-bluestore-osd-backend-status.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-volume-active-bluestore-osd.jpg)
+  ![ceph-volume-active-bluestore-osd](images/ceph-volume-active-bluestore-osd.jpg)
   
   ```bash
   ### RHCS5 中依然可在
@@ -200,13 +195,13 @@
   
   每个 `ceph monitor` 节点管理一个集中式配置数据库，位于 `/var/lib/ceph/$fsid/mon.$host/store.db/` 中。在集群启动时，Ceph 守护进程解析由命令行选项、环境变量与本地集群配置的配置选项。Ceph 守护进程连接到集群以获取存储在集中式配置数据库中的配置设定。从 RHCS 4 开始弃用 `/etc/ceph/ceph.conf` 集群配置文件，而将集中式配置数据库作为配置存储的首选方式。ceph config set 命令可用于更改集群各类配置，包括 `public_network` 与 `cluster_network`。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-arch-network.png)
+  ![ceph-arch-network](images/ceph-arch-network.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/osd-network-community.jpg)
+  ![osd-network-community](images/osd-network-community.jpg)
   
   ☝ Ceph OSD 节点的网络连接示意（每个 OSD 使用一个端口通过 public 网络与客户端及 Mon 通信，一个端口通过 cluster 网络与其他 OSD 间传输数据，一个端口通过 cluster 网络交换 heatbeat 心跳包）
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/default-ports-rhcs5.jpg)
+  ![default-ports-rhcs5](images/default-ports-rhcs5.jpg)
   
   ☝ RHCS5 中的默认端口范围
   
@@ -370,7 +365,7 @@ $ ceph fs dump
 
 Ceph PG、CRUSH 放置规则与 OSD 之间的关系如下图所示：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/ceph-pg-crush-osd-mapping.png)
+![ceph-pg-crush-osd-mapping](images/ceph-pg-crush-osd-mapping.png)
 
 ```bash
 $ ceph mgr stat
@@ -504,19 +499,19 @@ $ ceph osd pool create <pool-name> \
 
 关于纠删代码 profile 的设置 RedHat 给出以下推荐方式：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/redhat-reasure-code-profile-recommanded.jpg)
+![redhat-reasure-code-profile-recommanded](images/redhat-reasure-code-profile-recommanded.jpg)
 
 ## CephX 认证与用户相关
 
 CephX 认证机制：
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-1.jpg)
+![cephx-request-1](images/cephx-request-1.jpg)
 
 Ceph 客户端使用 CephX 协议向 monitor 发送用户创建请求，当 monitor 创建用户后将存储用户名、keyring 与 capability 等信息，并将相同的 keyring 文件返回给客户端，其中 keyring 文件中的 key 为 `secret key`，用于加密与解密 monitor 生成的会话密钥（`session key`）。
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-2.jpg)
+![cephx-request-2](images/cephx-request-2.jpg)
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-4.png)
+![cephx-request-4](images/cephx-request-4.png)
 
 每个 monitor 都可以对客户端进行身份验证并分发密钥，这意味着认证依靠 monitor 节点完成，不会存在单点和性能瓶颈。monitor 会返回用于身份验证的数据结构，其中包含获取 Ceph 服务时用到的 session key。所谓 session key 就是客户端用来向 monitor 请求所需服务的凭证，`session key` 是通过客户端的 `secret key` 进行加密传输。
 
@@ -524,7 +519,7 @@ Ceph 客户端使用 CephX 协议向 monitor 发送用户创建请求，当 moni
 
 以上过程，需要注意的是，首先，客户端的 secret key 是通过 monitor 节点在创建用户帐号时就生成，所以 monitor 节点有对应客户端的 secret key，通过客户端的 secret key 加密，客户端可以用自身的 secret key 解密。其次，monitor 节点生成的 session key 是有记录的，所以对于不同客户端来说，都有不同的记录，并且该 session key 是有时间限制的，过期即便是对应客户端，也无法正常使用。所以客户端使用对应 session key 向 monitor 请求服务，对应 monitor 都是认可的，monitor 会向其发放 ticket。最后，monitor 和 OSD 都共享客户端的 secret key 和 session key，以及 monitor 发放的 ticket，所以客户端使用 monitor 发放的 ticket，对应 OSD 是认可的。这也意味着不管是哪个 monitor 节点发放的 ticket，对应所有 monitor 节点和 OSD 都可认证。
 
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/cephx-request-3.png)
+![cephx-request-3](images/cephx-request-3.png)
 
 🏷 关于 CephX 认证机制更多可参考 [HIGH AVAILABILITY AUTHENTICATION](https://docs.ceph.com/en/latest/architecture/#high-availabilityauthentication) 中的说明。
 
@@ -576,23 +571,14 @@ $ rm -f /path/to/keyring
 ## Ceph RBD 镜像
 
 - RBD 镜像的特性（feature）如下所示：
-  
   - `layering`：是否支持镜像分层、克隆（BIT 码为 1）
-  
   - `exclusive-lock`：是否支持分布式独占锁机制以限制同时仅能一个客户端访问当前镜像（BIT 码为 4）
-  
   - `object-map`：是否支持对象映射，主要用于加速导入、导出及已用容量统计等操作，依赖于 exclusive-lock 特性（BIT 码为 8）。
-  
   - `fast-diff`：是否支持快照间的快速比较操作，依赖于 object-map 特性（BIT 码为 16）。
-  
   - `deep-flatten`：是否支持克隆分离时解除在克隆镜像时创建的快照与其父镜像之间的关联，即快照扁平化操作（BIT 码为 32）。
-  
   - `journaling`：是否支持日志 I/O 操作，即是否支持记录镜像的修改操作至日志对象，依赖于 exclusive-lock 特性（BIT 码为 64）。
-  
   - `data-pool`：是否支持将镜像的数据对象存储于纠删码存储池，主要用于将镜像的元数据与数据放置于不同的存储池。
-  
   - `striping`: 是否支持数据对象间的数据条带化（BIT 码为 2）
-
 - 常用 RBD 镜像相关命令：
   
   ```bash
@@ -641,9 +627,9 @@ $ rm -f /path/to/keyring
   
   RBD Mirror 的两种模式，包括 `RBD one-way mirroring` 模式（`active-backup mode`）、`RBD two-way mirroring` 模式（`active-active mode`），如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-one-way-mirroring.jpg)
+  ![rbd-one-way-mirroring](images/rbd-one-way-mirroring.jpg)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-two-way-mirroring.jpg)
+  ![rbd-two-way-mirroring](images/rbd-two-way-mirroring.jpg)
   
   🧪 示例：实现 RBD one-way mirroring 的核心命令
   
@@ -814,7 +800,7 @@ $ rm -f /path/to/keyring
   # 禁用 RBD 镜像的指定特性
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/distributed-storage/rbd-mirror-other-cmds.png)
+  ![rbd-mirror-other-cmds](images/rbd-mirror-other-cmds.png)
   
   ✨ RBD Mirror 的故障转移：
   
@@ -836,14 +822,6 @@ $ rm -f /path/to/keyring
 ```bash
 $ ceph fs status
 ```
-
-- `dirty_ratio`：脏页比率
-  
-  物理内存的缓存数据不能超过物理内存的 `30%`，超过后将写入物理磁盘，提高磁盘性能。
-
-- `dirty_backgroud_ratio`：
-  
-  物理内存使用超过 `10%` 时，将在后台将数据写入磁盘。
 
 ## 参考链接
 
