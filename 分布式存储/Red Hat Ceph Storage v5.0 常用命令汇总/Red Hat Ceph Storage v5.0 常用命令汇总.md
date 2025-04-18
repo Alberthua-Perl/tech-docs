@@ -1,10 +1,10 @@
-# 🐙 Red Hat Ceph Storage v5.0 常用命令汇总
+# 🐙 Red Hat Ceph Storage v5.0 常用命令与运维
 
 ## 文档说明
 
 - 此文档涉及的命令已在 `Red Hat Ceph Storage v5.0` 集群中进行验证
 - Red Hat Ceph Storage v5.0 对应 `Ceph 16.2.0 pacific (stable)` 开源版本
-- 此文档将持续更新
+- ✍ 此文档将持续更新
 - 🧪 文档中带有 `Lab` 标记的内容可进行实验验证
 
 ## 文档目录
@@ -777,6 +777,14 @@ Running command: /usr/bin/ceph --cluster ceph --name client.bootstrap-osd --keyr
 # 重新执行创建 osd 的命令完成创建
 ```
 
+❓ 进一步思考的问题：
+
+- 如何分配 osd、wal 与 rocksdb 之间的比例分配关系？
+  - osd 数据盘
+  - wal+rocksdb 缓存盘
+- RocksDB 数据库的结构？如何对它进行深度调优？
+- 如何使用 radosbench 进行 osd 的 IO 测试？
+
 ## RADOS 对象操作
 
 ```bash
@@ -1169,8 +1177,6 @@ $ rbd mirror image promote <pool_name>/<rbd_image_name>
   Image promoted to primary
 # secondary 集群节点：升级指定的 RBD 镜像
 ```
-
-- Ceph iSCSI Gateway 相关命令：
 
 ## CephFS 文件系统
 
