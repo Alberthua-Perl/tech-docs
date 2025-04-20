@@ -11,6 +11,7 @@
 
 - [Ceph 集群状态](#ceph-集群状态)
   - [cephadm 命令](#cephadm-命令)
+  - [Lab: 导出集群公钥并添加集群主机](#lab-导出集群公钥并添加集群主机)
   - [Ceph Orchestrator 编排器使用](#ceph-orchestrator-编排器使用)
   - [Ceph 集群配置](#ceph-集群配置)
 - [Ceph 集群网络](#ceph-集群网络)
@@ -78,33 +79,91 @@ $ cephadm shell -- <command>
 $ cephadm shell -- ceph status  #示例
 # 在集群 bootstrap 节点使用 cephadm shell 以确认集群健康状态
 # 此命令运行过程中将启动一个临时容器以运行指定的命令
-$ cephadm shell --mount /root/<mount-point>
+$ cephadm shell --mount /root/<mount_point>
 # 启动临时容器并将指定目录映射至容器 /mnt 目录上
   
 $ cephadm bootstrap --config /etc/ceph/ceph.conf
 # 集群引导过程中更改集群配置文件以传递修改的配置使其生效
   
 $ ceph versions
+{
+    "mon": {
+        "ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)": 4
+    },
+    "mgr": {
+        "ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)": 4
+    },
+    "osd": {
+        "ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)": 6,
+        "ceph version 16.2.15 (618f440892089921c3e944a991122ddc44e60516) pacific (stable)": 3
+    },
+    "mds": {},
+    "rgw": {
+        "ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)": 2
+    },
+    "overall": {
+        "ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)": 16,
+        "ceph version 16.2.15 (618f440892089921c3e944a991122ddc44e60516) pacific (stable)": 3
+    }
+}
 # 查看集群所有服务组件的版本
+
 $ ceph tell osd.* version
+osd.0: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
+osd.1: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
+...
 # 查看所有 osd 的版本
+
 $ ceph tell mon.* version
+mon.serverc.lab.example.com: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
+mon.serverd: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
+mon.clienta: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
+mon.servere: {
+    "version": "16.2.0-117.el8cp",
+    "release": "pacific",
+    "release_type": "stable"
+}
 # 查看所有 mon 的版本
 ```
   
 ![cephadm-demo](images/cephadm-demo.png)
   
 ![cephadm-shell-demo](images/cephadm-shell-demo.png)
-  
+
+### Lab: 导出集群公钥并添加集群主机
+
 ✨ 注意：使用 ceph orch host add 添加额外的节点时，需先将集群公钥导出并同步至节点。
-  
+
 ```bash
 $ ceph cephadm get-pub-key > /path/to/ceph.pub
 # 生成集群公钥
-$ ssh-copy-id -f -i /path/to/ceph.pub root@<hostname>
+# 使用场景：使用 cephadm 添加主机需使用集群公钥进行 SSH 登录认证
+$ ssh-copy-id -f -i /path/to/ceph.pub root@<host_fqdn>
 # 将集群公钥同步至节点，即可添加此节点。
-$ ceph orch host add <node>
+$ ceph orch host add <host_fqdn>
 # 添加节点为集群节点
+$ ceph orch host rm <host_fqdn>
+# 删除编排器管理的集群节点
 ```
 
 ### Ceph Orchestrator 编排器使用
@@ -142,6 +201,8 @@ $ ceph orch ps [--daemon_type=<name>]
   mon.servere                  servere.lab.example.com  running (12h)  3m ago     2y   -      16.2.0-117.el8cp  2142b60d7974  97319d05259c
 # 查看 Ceph 集群中的服务实例状态
 # 使用 --daemon_type 选项可指定服务实例的名称进行过滤
+$ ceph orch ps <host_fqdn>
+# 查看指定节点上的服务实例状态
   
 $ ceph orch host ls
   HOST                     ADDR           LABELS  STATUS  
@@ -175,6 +236,11 @@ $ ceph orch host maintenance exit <node>
 每个 `ceph monitor` 节点管理一个集中式配置数据库，位于 `/var/lib/ceph/$fsid/mon.$host/store.db/` 中。在集群启动时，Ceph 守护进程解析由命令行选项、环境变量与本地集群配置的配置选项。Ceph 守护进程连接到集群以获取存储在集中式配置数据库中的配置设定。从 RHCS 4 开始弃用 `/etc/ceph/ceph.conf` 集群配置文件，而将集中式配置数据库作为配置存储的首选方式。`ceph config set` 命令可用于更改集群各类配置。
   
 ```bash
+$ sudo systemctl list-units "ceph*"
+# 查看 ceph 节点上的 ceph 单元文件
+$ sudo journalctl -uef ceph-<cluster_id>@<service_name>.service
+# 查看指定 ceph 服务单元文件的实时日志
+
 $ ceph -s
 $ ceph status
 $ ceph -w
@@ -327,6 +393,11 @@ $ ceph mgr module ls
     ],
     ...
 }
+
+$ ceph config get mgr mgr/cephadm/warn_on_stray_daemons
+# 查看 cephadm 模块 warn_on_stray_daemons 参数的设置，此参数用于启用 ceph 编排器管理的守护进程的告警。
+$ ceph config set mgr mgr/cephadm/warn_on_stray_daemons false
+# 关闭 ceph 编排器管理的守护进程的告警
 ```
 
 ### Lab: 配置管理 Ceph Dashboard
@@ -424,24 +495,52 @@ Ceph PG、CRUSH 放置规则与 OSD 之间的关系如下图所示：
 
 
 ```bash
-$ ceph osd pool set <pool_name> pg_autoscale_mode on
-# 启用 mgr 的 pg_autoscaler 模块并启用指定存储池的自动扩展 pg 功能
-
 $ ceph pg stat
   105 pgs: 105 active+clean; 4.9 KiB data, 181 MiB used, 90 GiB / 90 GiB avail
 # 查看集群中所有 pg 的状态
 $ ceph pg map <pg.id>
-# 重要：根据 pd id 查找指定 pg 与 osd 的对应关系
+# 🩺 故障排除：根据 pg id 查找指定 pg 与 osd 的对应关系
+$ ceph pg map 9.1b  #示例
+  osdmap e325 pg 9.1b (9.1b) -> up [8,1,0] acting [8,1,0]
 $ ceph pg <pg.id> query
-# 重要：根据 pg id 查看其详细状态信息
+# 🩺 故障排除：根据 pg id 查看其详细状态信息
 ```
 
 ## Ceph OSD 对象存储设备
 
 ```bash
 $ ceph osd df
+ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP     META     AVAIL    %USE   VAR   PGS  STATUS
+ 1    hdd  0.00980   1.00000  10 GiB   63 MiB  3.9 MiB      0 B   59 MiB  9.9 GiB   0.62  0.09   74      up
+ 3    hdd  0.00980   1.00000  10 GiB   72 MiB  3.9 MiB      0 B   68 MiB  9.9 GiB   0.70  0.11   65      up
+ 5    ssd  0.00980   1.00000  10 GiB   46 MiB  3.9 MiB      0 B   42 MiB   10 GiB   0.45  0.07   62      up
+ 0    hdd  0.00980   1.00000  10 GiB   67 MiB  3.9 MiB      0 B   63 MiB  9.9 GiB   0.65  0.10   67      up
+ 2    hdd  0.00980   1.00000  10 GiB   54 MiB  3.9 MiB      0 B   50 MiB  9.9 GiB   0.53  0.08   67      up
+ 4    ssd  0.00980   1.00000  10 GiB   68 MiB  3.9 MiB      0 B   64 MiB  9.9 GiB   0.67  0.10   67      up
+ 7    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   63      up
+ 8    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   68      up
+ 6    ssd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  318 MiB   10 GiB  16.70  2.52   70      up
+                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64                   
+MIN/MAX VAR: 0.07/2.52  STDDEV: 7.62
 # osd 级别的存储使用情况
 $ ceph osd df tree
+ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP     META     AVAIL    %USE   VAR   PGS  STATUS  TYPE NAME       
+-1         0.09384         -  96 GiB  6.4 GiB   35 MiB      0 B  1.3 GiB   90 GiB   6.64  1.00    -          root default    
+-3         0.02939         -  30 GiB  181 MiB   12 MiB      0 B  169 MiB   30 GiB   0.59  0.09    -              host serverc
+ 1    hdd  0.00980   1.00000  10 GiB   63 MiB  3.9 MiB      0 B   59 MiB  9.9 GiB   0.62  0.09   74      up          osd.1   
+ 3    hdd  0.00980   1.00000  10 GiB   72 MiB  3.9 MiB      0 B   68 MiB  9.9 GiB   0.70  0.11   65      up          osd.3   
+ 5    ssd  0.00980   1.00000  10 GiB   46 MiB  3.9 MiB      0 B   42 MiB   10 GiB   0.45  0.07   62      up          osd.5   
+-5         0.02939         -  30 GiB  189 MiB   12 MiB      0 B  178 MiB   30 GiB   0.62  0.09    -              host serverd
+ 0    hdd  0.00980   1.00000  10 GiB   67 MiB  3.9 MiB      0 B   63 MiB  9.9 GiB   0.65  0.10   67      up          osd.0   
+ 2    hdd  0.00980   1.00000  10 GiB   54 MiB  3.9 MiB      0 B   50 MiB  9.9 GiB   0.53  0.08   67      up          osd.2   
+ 4    ssd  0.00980   1.00000  10 GiB   68 MiB  3.9 MiB      0 B   64 MiB  9.9 GiB   0.67  0.10   67      up          osd.4   
+-9         0.03506         -  36 GiB  6.0 GiB   12 MiB      0 B  966 MiB   30 GiB  16.70  2.52    -              host servere
+ 7    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   63      up          osd.7   
+ 8    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   68      up          osd.8   
+ 6    ssd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  318 MiB   10 GiB  16.70  2.52   70      up          osd.6   
+                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64                                     
+MIN/MAX VAR: 0.07/2.52  STDDEV: 7.62
+
 # osd 级别的存储使用情况并显示 osd 在 CRUSH map 中的位置
 
 $ ceph osd tree
@@ -451,7 +550,7 @@ $ ceph osd stat
 # 查看所有 osd 的状态
 
 $ ceph osd find <osd.id>
-# 根据 osd id 查找 osd 的状态及所在的节点
+# 🩺 故障排除：根据 osd id 查找 osd 的状态及所在的节点
 $ ceph osd find 2  #示例
 {
     "osd": 2,
@@ -479,7 +578,7 @@ $ ceph osd find 2  #示例
 # 查找 osd.2 的状态及所在的节点
 
 $ ceph osd metadata <osd.id>
-# 重要：根据 osd id 查看 osd 的元数据信息
+# 🩺 故障排除：根据 osd id 查看 osd 的元数据信息
 ```
 
 ### Lab: 定位对象与 OSD、PG 的映射关系
@@ -491,7 +590,7 @@ $ rados -p testpool ls  #示例
 test-data
 testobject
 $ ceph osd map <pool_name> <object_name>
-# 重要：
+# 🩺 故障排除：
 #   1. 根据指定的对象名称查找其与 pg 及 osd 的映射关系
 #   2. 此命令相较于 ceph pg map <pg.id> 更进一步，直接查找对象的映射关系。
 $ ceph osd map testpool test-data  #示例
@@ -754,6 +853,26 @@ osd.3  serverc.lab.example.com  running (2d)  9m ago     2d   -      16.2.0-117.
 osd.4  serverd.lab.example.com  running (2d)  9m ago     2d   -      16.2.0-117.el8cp  2142b60d7974  31990acee22c
 osd.5  serverc.lab.example.com  running (2d)  9m ago     2d   -      16.2.0-117.el8cp  2142b60d7974  0a0963f26a56
 # 但请注意，由于是通过手动添加 osd，这些添加的 osd 不被 ceph 编排器管理，因此不在以上返回的 osd 列表中！
+
+[root@servere ~]# ls -lh /var/lib/ceph/osd/ceph-6/
+total 28K
+lrwxrwxrwx. 1 ceph ceph 93 Apr 18 11:22 block -> /dev/ceph-eb4fe887-63fa-4bdf-8bd4-1f0f9a4fbb2a/osd-block-03e01019-a426-4190-b711-b9e3ad21dd5a  #数据分区
+lrwxrwxrwx. 1 ceph ceph  9 Apr 18 11:22 block.db -> /dev/vde2   #rocksdb 分区
+lrwxrwxrwx. 1 ceph ceph  9 Apr 18 11:22 block.wal -> /dev/vde1  #wal 分区
+-rw-------. 1 ceph ceph 37 Apr 18 11:22 ceph_fsid
+-rw-------. 1 ceph ceph 37 Apr 18 11:22 fsid
+-rw-------. 1 ceph ceph 55 Apr 18 11:22 keyring
+-rw-------. 1 ceph ceph  6 Apr 18 11:22 ready
+-rw-------. 1 ceph ceph  3 Apr 18 11:22 require_osd_release
+-rw-------. 1 ceph ceph 10 Apr 18 11:22 type
+-rw-------. 1 ceph ceph  2 Apr 18 11:22 whoami
+# 注意：通过 ceph-volume 单独添加的 osd，其目录结构存在差异。
+[root@servere ~]# df -Th /var/lib/ceph/osd/*
+Filesystem     Type   Size  Used Avail Use% Mounted on
+tmpfs          tmpfs  2.9G   28K  2.9G   1% /var/lib/ceph/osd/ceph-6
+tmpfs          tmpfs  2.9G   28K  2.9G   1% /var/lib/ceph/osd/ceph-7
+tmpfs          tmpfs  2.9G   28K  2.9G   1% /var/lib/ceph/osd/ceph-8
+# osd 的配置目录均被挂载
 ```
 
 如上所示，直接在对应节点上使用 ceph-volume 命令可成功添加 osd，但在 cephadm 运行的容器中使用同样的方法无法完成 osd 的添加。因为在添加 osd 的过程中，将会使用 `systemctl` 管理 osd 服务的守护进程，需连接节点的 bus 总线，而在容器中无法完成而报错。返回如下：
@@ -814,8 +933,7 @@ $ ceph osd pool stats
 ### Ceph 复制池命令
 
 ```bash
-$ ceph osd pool create <pool_name> \
-  <pg_num> <pgp_num> [replicated] <crush_rule_set>
+$ ceph osd pool create <pool_name> <pg_num> <pgp_num> [replicated] <crush_rule_set>
 # 创建复制池
 # 注意：
 #   1. 默认情况下可只指定存储池名称与 PG 数量，也可自定义 CRUSH 放置规则在创建存储池时指定。
@@ -830,11 +948,13 @@ $ ceph osd pool get <pool_name> [size|nodelete|min_size]
 # 查看存储池的指定参数值
 $ ceph osd pool get <pool_name> pg_autoscale_mode
 # 查看存储池的 PG 自动扩展模式
-$ ceph osd pool set <pool_name> [size|nodelete|min_size] <value>
-# 设置存储池的指定参数值
-
 $ ceph osd pool get mon osd_pool_default_size
 # 查看集中配置数据库中定义的默认对象副本数量
+
+$ ceph osd pool set <pool_name> [size|nodelete|min_size] <value>
+# 设置存储池的指定参数值
+$ ceph osd pool set <pool_name> pg_autoscale_mode on
+# 启用 mgr 的 pg_autoscaler 模块并启用指定存储池的自动扩展 pg 功能
 
 $ ceph osd pool rename <old-pool_name> <new-pool_name>
 # 重命名存储池名称（不影响池中存储的数据，但需要注意用户对池的权限）
@@ -972,8 +1092,8 @@ $ rbd showmapped
 #   1. RBD 镜像的映射于客户端上执行
 #   2. 客户端需安装 ceph-common 软件包并加载 rbd 内核模块
   
-$ fsfreeze --freeze /path/to/<mount-point>
-$ fsfreeze --unfreeze /path/to/<mount-point>
+$ fsfreeze --freeze /path/to/<mount_point>
+$ fsfreeze --unfreeze /path/to/<mount_point>
 $ rbd snap create [--id <name>] <pool_name>/<rbd_image_name>@<snap-name>
 $ rbd snap remove [--id <name>] <pool_name>/<rbd_image_name>@<snap-name>
 $ rbd snap list [--id <name>] <pool_name>/<rbd_image_name>

@@ -89,8 +89,8 @@
 
 ## 🐙 **分布式存储**
 
+- [【精华】Red Hat Ceph Storage v5.0 常用命令与运维](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB.md)
 - [【精华】Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
-- [Red Hat Ceph Storage v5.0 常用命令汇总](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB.md)
 
 ## ♾️ **DevOps 技术栈**
 
