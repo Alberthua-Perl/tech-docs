@@ -51,6 +51,8 @@
   - [Lab: `rbd-nbd` 映射使用已 mirroring 的 RBD 镜像](#lab-rbd-nbd-映射使用已-mirroring-的-rbd-镜像)
   - [其他 RBD Mirror 相关命令](#其他-rbd-mirror-相关命令)
   - [RBD Mirror 的故障转移](#rbd-mirror-的故障转移)
+  - [Lab: 部署 Ceph iSCSI Gateway 与创建 target](#lab-部署-ceph-iscsi-gateway-与创建-target)
+  - [Lab: iscsi-initiator 客户端登录认证 iscsi-gateway 实现多路径访问](#lab-iscsi-initiator-客户端登录认证-iscsi-gateway-实现多路径访问)
 - [CephFS 文件系统](#cephfs-文件系统)
 - [参考链接](#参考链接)
 
@@ -242,7 +244,7 @@ $ sudo journalctl -uef ceph-<cluster_id>@<service_name>.service
 # 查看指定 ceph 服务单元文件的实时日志
 
 $ ceph -s
-$ ceph status
+$ ceph status [-f json-pretty]
 $ ceph -w
 # 实时刷新日志
 ```
@@ -1296,6 +1298,176 @@ $ rbd mirror image demote <pool_name>/<rbd_image_name>
 $ rbd mirror image promote <pool_name>/<rbd_image_name>
   Image promoted to primary
 # secondary 集群节点：升级指定的 RBD 镜像
+```
+
+### Lab: 部署 Ceph iSCSI Gateway 与创建 target
+
+使用 [ceph-navigator](https://github.com/Alberthua-Perl/sc-col/blob/master/redhat-ceph-conf/v5.0/ceph-navigator) 脚本并输入 `6`，即可自动安装部署 iscsi-gateway，此服务启动需要一定时间，可参考以下命令查询服务的状态：
+
+```bash
+[root@serverc ~]# ceph orch ls | grep iscsi
+iscsi.my_iscsi_driver        2/2  89s ago    22m  serverc.lab.example.com;servere.lab.example.com                                                  
+[root@serverc ~]# ceph orch ps | grep iscsi
+iscsi.my_iscsi_driver.serverc.musewn  serverc.lab.example.com  running (22m)  97s ago    22m  -              3.5               2142b60d7974  0871e5889d26  
+iscsi.my_iscsi_driver.servere.gsrlcj  servere.lab.example.com  running (22m)  98s ago    22m  -              3.5               2142b60d7974  349595a1a137
+# iscsi-gateway 服务在 serverc 与 servere 上已部署成功
+[root@serverc ~]# rbd create --size 1024M iscsigw-pool/rbd-share0
+# 创建 iSCSI 共享的 RBD 镜像
+[root@serverc ~]# rbd info iscsigw-pool/rbd-share0
+```
+
+登录 Ceph Dashboard 查看已部署的 iscsi-gateway 的状态，并创建 target。
+
+![ceph-iscsi-gateway-1](images/ceph-iscsi-gateway-1.png)
+
+![ceph-iscsi-gateway-2](images/ceph-iscsi-gateway-2.png)
+
+![ceph-iscsi-gateway-3](images/ceph-iscsi-gateway-3.png)
+
+![ceph-iscsi-gateway-4](images/ceph-iscsi-gateway-4.png)
+
+![ceph-iscsi-gateway-5](images/ceph-iscsi-gateway-5.png)
+
+### Lab: iscsi-initiator 客户端登录认证 iscsi-gateway 实现多路径访问
+
+以上 Lab 中成功创建 target 后，可在集群外客户端部署 iscsi-initiator，利用 iscsi-gateway 完成 RBD 镜像至本地的多路径访问。
+
+```bash
+### 笔者环境中客户端节点为 workstation
+[root@workstation ~]# dnf install -y iscsi-initiator-utils
+[root@workstation ~]# vim /etc/iscsi/initiatorname.iscsi  #修改为 target 中对应的 IQN 编号
+InitiatorName=iqn.2025-04.com.example.lab.iscsi-gateway:01-02
+[root@workstation ~]# systemctl enable --now iscsid.service 
+Created symlink /etc/systemd/system/multi-user.target.wants/iscsid.service → /usr/lib/systemd/system/iscsid.service.
+[root@workstation ~]# systemctl status iscsid.service 
+● iscsid.service - Open-iSCSI
+   Loaded: loaded (/usr/lib/systemd/system/iscsid.service; enabled; vendor preset: disabled)
+   Active: active (running) since Mon 2025-04-21 10:33:07 EDT; 7s ago
+     Docs: man:iscsid(8)
+           man:iscsiuio(8)
+           man:iscsiadm(8)
+ Main PID: 13775 (iscsid)
+   Status: "Ready to process requests"
+    Tasks: 1 (limit: 36110)
+   Memory: 4.7M
+   CGroup: /system.slice/iscsid.service
+           └─13775 /usr/sbin/iscsid -f
+
+Apr 21 10:33:07 workstation.lab.example.com systemd[1]: Starting Open-iSCSI...
+Apr 21 10:33:07 workstation.lab.example.com systemd[1]: Started Open-iSCSI.
+
+[root@workstation ~]# iscsiadm --mode discoverydb --type sendtargets --portal serverc.lab.example.com --discover
+172.25.250.12:3260,1 iqn.2025-04.com.example.lab.iscsi-gateway:01-02
+172.25.250.14:3260,2 iqn.2025-04.com.example.lab.iscsi-gateway:01-02
+[root@workstation ~]# iscsiadm --mode discoverydb --type sendtargets --portal servere.lab.example.com --discover
+172.25.250.12:3260,1 iqn.2025-04.com.example.lab.iscsi-gateway:01-02
+172.25.250.14:3260,2 iqn.2025-04.com.example.lab.iscsi-gateway:01-02
+# 分别发现 serverc 与 servere 节点上的 IQN
+
+[root@workstation ~]# iscsiadm --mode node --targetname iqn.2025-04.com.example.lab.iscsi-gateway:01-02 --portal serverc.lab.example.com --login
+Logging in to [iface: default, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.12,3260]
+Login to [iface: default, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.12,3260] successful.
+[root@workstation ~]# iscsiadm --mode node --targetname iqn.2025-04.com.example.lab.iscsi-gateway:01-02 --portal servere.lab.example.com --login
+Logging in to [iface: default, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.14,3260]
+Login to [iface: default, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.14,3260] successful.
+# 分别登录 serverc 与 servere 节点上的 IQN
+# 因此，在本地虽然可见两块不同磁盘编号的磁盘，但是它们来自于同一个 RBD 镜像。
+
+[root@workstation ~]# lsblk -fp  #/dev/sd{a,b} 均来自于 RBD 镜像
+NAME        FSTYPE LABEL UUID                                 MOUNTPOINT
+/dev/sda                                                      
+/dev/sdb                                                      
+/dev/vda                                                      
+├─/dev/vda1                                                   
+├─/dev/vda2 vfat         7B77-95E7                            /boot/efi
+└─/dev/vda3 xfs    root  d47ead13-ec24-428e-9175-46aefa764b26 /
+
+[root@workstation ~]# dnf install -y device-mapper-multipath
+[root@workstation ~]# mpathconf --enable  #生成多路径的默认配置文件
+[root@workstation ~]# udevadm info /dev/sda | grep ID_SERIAL=
+E: ID_SERIAL=36001405b45aa463152441ea9e187cccb
+[root@workstation ~]# udevadm info /dev/sdb | grep SERIAL=
+E: ID_SERIAL=36001405b45aa463152441ea9e187cccb
+# 查询 /dev/sd{a,b} 的 ID_SERIAL，用于多路径配置的 wwid。
+
+[root@workstation ~]# vim /etc/multipath.conf
+...
+### customized mpath configure
+devices {
+  device {
+    vendor                "LIO-ORG"
+    hardware_handle       "1 alua"
+    path_grouping_policy  "failover"
+    path_selector         "queue-length 0"
+    failback              60
+    path_checker          tur
+    prio                  alua
+    prio_args             exclusive_pref_bit
+    fast_io_fail_tmo      25
+    no_path_retry         queue
+  }
+}
+
+multipaths {
+  multipath {
+    wwid   36001405b45aa463152441ea9e187cccb
+    alias  mpatha
+  }
+}
+
+[root@workstation ~]# systemctl enable --now multipathd.service
+[root@workstation ~]# systemctl status multipathd.service
+
+[root@workstation ~]# multipath -ll
+Apr 21 10:43:17 | /etc/multipath.conf line 28, invalid keyword: hardware_handle
+Apr 21 10:43:17 | device config in /etc/multipath.conf missing vendor or product parameter
+mpatha (36001405b45aa463152441ea9e187cccb) dm-0 LIO-ORG,TCMU device
+size=1.0G features='0' hwhandler='1 alua' wp=rw
+|-+- policy='service-time 0' prio=50 status=active
+| `- 6:0:0:0 sda 8:0  active ready running
+`-+- policy='service-time 0' prio=10 status=enabled
+  `- 7:0:0:0 sdb 8:16 active ready running
+[root@workstation ~]# lsblk -fp
+NAME                 FSTYPE       LABEL UUID                                 MOUNTPOINT
+/dev/sda             mpath_member                                            
+└─/dev/mapper/mpatha                                                         
+/dev/sdb             mpath_member                                            
+└─/dev/mapper/mpatha                                                         
+/dev/vda                                                                     
+├─/dev/vda1                                                                  
+├─/dev/vda2          vfat               7B77-95E7                            /boot/efi
+└─/dev/vda3          xfs          root  d47ead13-ec24-428e-9175-46aefa764b26 /
+# 多路径配置完成
+
+[root@workstation ~]# mkfs.xfs /dev/mapper/mpatha 
+meta-data=/dev/mapper/mpatha     isize=512    agcount=4, agsize=65536 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1
+data     =                       bsize=4096   blocks=262144, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+Discarding blocks...Done.
+[root@workstation ~]# mkdir /mnt/iscsi
+[root@workstation ~]# mount /dev/mapper/mpatha /mnt/iscsi
+[root@workstation ~]# echo "Test iscsi-gateway" > /mnt/iscsi/testfile
+[root@workstation ~]# cat /mnt/iscsi/testfile
+Test iscsi-gateway
+# 测试多路径磁盘是否可用
+```
+
+若不再使用 iscsi-gateway，需登出此服务，可参考如下：
+
+```bash
+[root@workstation ~]# iscsiadm --mode node --targetname iqn.2025-04.com.example.lab.iscsi-gateway:01-02 --portal serverc.lab.example.com --logout
+Logging out of session [sid: 1, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.12,3260]
+Logout of [sid: 1, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.12,3260] successful.
+[root@workstation ~]# iscsiadm --mode node --targetname iqn.2025-04.com.example.lab.iscsi-gateway:01-02 --portal servere.lab.example.com --logout
+Logging out of session [sid: 2, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.14,3260]
+Logout of [sid: 2, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, portal: 172.25.250.14,3260] successful.
 ```
 
 ## CephFS 文件系统
