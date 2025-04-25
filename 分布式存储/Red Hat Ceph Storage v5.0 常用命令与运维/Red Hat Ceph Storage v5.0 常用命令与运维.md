@@ -25,8 +25,11 @@
   - [Ceph balancer 均衡器](#ceph-balancer-均衡器)
 - [Ceph Cluster Map 集群映射](#ceph-cluster-map-集群映射)
 - [Ceph CRUSH Map 映射](#ceph-crush-map-映射)
-- [Ceph PG 放置组](#ceph-pg-放置组)
+- [Ceph PG（Placement Group）放置组](#ceph-pgplacement-group放置组)
   - [Ceph PG 常用管理命令](#ceph-pg-常用管理命令)
+  - [PG 数量的计算与规划](#pg-数量的计算与规划)
+  - [PG 状态汇总](#pg-状态汇总)
+  - [修复 unknown 状态的 PG](#修复-unknown-状态的-pg)
 - [Ceph OSD 对象存储设备](#ceph-osd-对象存储设备)
   - [Lab: 定位对象与 OSD、PG 的映射关系](#lab-定位对象与-osdpg-的映射关系)
   - [Lab: 标记 OSD 在集群中的状态](#lab-标记-osd-在集群中的状态)
@@ -45,15 +48,18 @@
   - [CephX 用户认证管理命令](#cephx-用户认证管理命令)
 - [Ceph RBD 镜像](#ceph-rbd-镜像)
   - [RBD 镜像的特性（feature）](#rbd-镜像的特性feature)
-  - [RBD 镜像常用命令](#rbd-镜像常用命令)
+  - [管理 RBD 镜像：创建、删除、查询、映射、快照、克隆、扁平化](#管理-rbd-镜像创建删除查询映射快照克隆扁平化)
   - [Ceph RBD Mirror 集群模式](#ceph-rbd-mirror-集群模式)
   - [Lab: 实现 RBD one-way mirroring](#lab-实现-rbd-one-way-mirroring)
-  - [Lab: `rbd-nbd` 映射使用已 mirroring 的 RBD 镜像](#lab-rbd-nbd-映射使用已-mirroring-的-rbd-镜像)
+  - [Lab: rbd-nbd 映射使用已 mirroring 的 RBD 镜像](#lab-rbd-nbd-映射使用已-mirroring-的-rbd-镜像)
   - [其他 RBD Mirror 相关命令](#其他-rbd-mirror-相关命令)
   - [RBD Mirror 的故障转移](#rbd-mirror-的故障转移)
   - [Lab: 部署 Ceph iSCSI Gateway 与创建 target](#lab-部署-ceph-iscsi-gateway-与创建-target)
   - [Lab: iscsi-initiator 客户端登录认证 iscsi-gateway 实现多路径访问](#lab-iscsi-initiator-客户端登录认证-iscsi-gateway-实现多路径访问)
 - [CephFS 文件系统](#cephfs-文件系统)
+  - [Lab: 部署多个 cephfs 文件系统与 standby 切换验证](#lab-部署多个-cephfs-文件系统与-standby-切换验证)
+  - [Lab: 删除 CephFS](#lab-删除-cephfs)
+  - [Lab: 设置 CephFS 具备多个活跃的 MDS 服务器](#lab-设置-cephfs-具备多个活跃的-mds-服务器)
 - [参考链接](#参考链接)
 
 ## Ceph 集群状态
@@ -194,6 +200,9 @@ $ ceph orch ls --service_type=mon
   NAME  RUNNING  REFRESHED  AGE  PLACEMENT                                                                                        
   mon       4/4  3m ago     2y   clienta.lab.example.com;serverc.lab.example.com;serverd.lab.example.com;servere.lab.example.com
 # 查看 mon 服务的状态
+
+$ ceph orch restart osd.default_drive_group
+# 重启名称为 osd.default_drive_group 的所有 OSD 守护进程
   
 $ ceph orch ps [--daemon_type=<name>]
   NAME                         HOST                     STATUS         REFRESHED  AGE  PORTS  VERSION           IMAGE ID      CONTAINER ID  
@@ -227,9 +236,9 @@ $ ceph orch device ls [--wide]
 $ sudo systemctl list-units --all "ceph*"
 # 登录 Ceph 集群节点查看所有的 ceph 服务单元
   
-$ ceph orch host maintenance enter <node>
+$ ceph orch host maintenance enter <fqdn> [--force]
 # 将指定节点设置为维护模式
-$ ceph orch host maintenance exit <node>
+$ ceph orch host maintenance exit <fqdn>
 # 将指定节点退出维护模式
 ```
 
@@ -243,6 +252,8 @@ $ sudo systemctl list-units "ceph*"
 $ sudo journalctl -uef ceph-<cluster_id>@<service_name>.service
 # 查看指定 ceph 服务单元文件的实时日志
 
+$ ceph health detail
+  HEALTH_OK
 $ ceph -s
 $ ceph status [-f json-pretty]
 $ ceph -w
@@ -378,7 +389,13 @@ $ ceph mgr stat
 }
 # 确认 mgr 的整体状态
 
-$ ceph mgr module enable pg_autoscaler
+$ ceph mgr services
+{
+    "dashboard": "https://172.25.250.12:8443/",
+    "prometheus": "http://172.25.250.12:9283/"
+}
+# 查看 mgr 管理的模块发布地址
+
 $ ceph mgr module ls
 {
     "always_on_modules": [
@@ -395,6 +412,9 @@ $ ceph mgr module ls
     ],
     ...
 }
+# 查看 mgr 管理的模块详细信息
+$ ceph mgr module enable pg_autoscaler
+# 启用 pg_autoscaler 模块
 
 $ ceph config get mgr mgr/cephadm/warn_on_stray_daemons
 # 查看 cephadm 模块 warn_on_stray_daemons 参数的设置，此参数用于启用 ceph 编排器管理的守护进程的告警。
@@ -487,7 +507,7 @@ $ ceph fs dump
 
 🚀 关于 `CRUSH map` 的说明可参考 [Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md#-ceph-crush-map-%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0)
 
-## Ceph PG 放置组
+## Ceph PG（Placement Group）放置组
 
 ### Ceph PG 常用管理命令
 
@@ -495,17 +515,109 @@ Ceph PG、CRUSH 放置规则与 OSD 之间的关系如下图所示：
 
 <center><img src="images/ceph-pg-crush-osd-mapping.png" style="width:80%"></center>
 
-
 ```bash
 $ ceph pg stat
   105 pgs: 105 active+clean; 4.9 KiB data, 181 MiB used, 90 GiB / 90 GiB avail
 # 查看集群中所有 pg 的状态
+
+$ ceph pg dump [all|summary|sum|delta|pools|osds|pgs|pgs_brief...]
+# show human-readable versions of pg map (only 'all' valid with plain)
+$ ceph pg dump --format json | jq .
+# 以 JSON 格式查看 pg map
+$ ceph pg dump_json [all|summary|sum|pools|osds|pgs...]
+# show human-readable version of pg map in json only
+$ pg dump_pools_json
+# show pg pools info in json only
+$ ceph pg dump_stuck [inactive|unclean|stale|undersized|degraded...] [<threshold:int>]
+# show information about stuck pgs
+
 $ ceph pg map <pg.id>
 # 🩺 故障排除：根据 pg id 查找指定 pg 与 osd 的对应关系
 $ ceph pg map 9.1b  #示例
   osdmap e325 pg 9.1b (9.1b) -> up [8,1,0] acting [8,1,0]
 $ ceph pg <pg.id> query
 # 🩺 故障排除：根据 pg id 查看其详细状态信息
+```
+
+### PG 数量的计算与规划
+
+增加 PG 的数量可以使负载更加均匀地分散到集群中的 OSD。不过，如果设置的 PG 数量过高，它会大幅增加 CPU 和内存使用量。RedHat 建议每个 OSD 大约 100 到 200 个 PG。
+
+计算集群中 PG 的数量：
+
+$$
+  \begin{align*}
+    \text{Total PGs} = \frac{\text{Total number of OSDs * 100}}{\text{Number of replicas}}
+  \end{align*}
+$$
+
+其中，OSDs 为集群中的 OSD 设备总数，100 为每个 OSD 中的 PG 数，$Number\;of\;replicas$ 为对象副本的数量。
+
+💥 但每个存储池中 PG 数量最好接近或等于 $2^n$
+
+例如：有 100 个 OSD，2 副本，5 个 pool，则
+
+$$\begin{align*}
+  \text{Total PGs} = \frac{100 * 100 }{2} = 5000
+\end{align*}$$
+
+每个 pool 的 $PG = \frac{5000}{5} = 1000$，那么创建 pool 的时候就指定 PG 为 1024，即使用命令 ceph osd pool create <pool_name> 1024。也就是说，存储池中的 PG 数量在集群规模扩容的时候，动态进行调整以满足相对较佳的 PG 数量提供存储性能。
+
+### PG 状态汇总
+
+| 状态 | 描述 |
+|-----|-----|
+| creating | PG 正在被创建 |
+| peering | PG 正在执行同步处理。PG 处于 peering 过程中，peering 由主 OSD 发起，使存放 PG 副本的所有 OSD 就 PG 的所有对象和元数据的状态达成一致的过程，peering 过程完成后，主 OSD 就可以接受客户端写请求。 |
+| peered | peering 已经完成，但还不能处理客户端的读写请求，PG 当前 acting set 数量小于存储池的最小副本数（min_size）。recovery 可能发生这种状态。 |
+| activating | peering 已经完成，PG 正在等待所有 PG 实例同步并固化 peered 的结果（info、log 等）。 |
+| active | 激活状态。PG 可以正常处理来自客户端的读写请求。 |
+| unactive | 非激活状态。PG 不能处理来自客户端的读写请求。 |
+| clean | 干净状态。PG 当前不存在待修复的对象，acting set 和 up set 内容一致（具有正确数量的副本），并且大小等于存储池的副本数。 |
+| unclean | 非干净状态。PG 不能从上一个失败中恢复。 |
+| degraded | 降级状态。peering 完成后，PG 检测到任意一个 PG 实例存在不一致（需要被同步/修复）的对象（primary OSD 中的对象副本还未完全同步至 secondary OSD 中），或者当前 acting set 小于存储池副本数。 |
+| undersized | 已被分配到 OSD 上的 PG 数量小于存储池的副本数；或者预期分配的 PG 数量大于当前可用的 OSD 数量，这种情况极大可能是由于 CRUSH map 未设置正确，导致无法找到满足 CRUSH 规则的 OSD，致使 PG 处于 undersized 状态。 |
+| remapped | PG 重新映射状态。PG 中的对象数据从旧的活动的 OSD 集到新的活动的 OSD 集的迁移。在迁移期间还是用原先的 primary OSD 处理客户端请求，一旦迁移完成后新的活动的 OSD 集中 primary OSD 开始处理。 |
+| down | PG 处于失效、离线状态。peering 过程中，PG 检测到某个不能被跳过的 interval 中（如该 interval 期间，PG 完成了 peering，并且成功切换至 active 状态，从而有可能正常处理了来自客户端的读写请求），当前剩余在线的 OSD 不足以完成数据修复。 |
+| recovery_wait | PG 正在等待队列中等待恢复。 |
+| recovering | PG 正在恢复。PG 中的对象正在迁移或副本正在同步。 |
+| incomplete | Ceph 检测到 PG 缺少关于可能发生的写入的信息，或者没有任何健康的对象副本。如果看到这种状态，请尝试启动任何可能包含所需信息的失败 OSD。peering 过程中，由于无法选出权威日志，或通过 choose_acting 选出的 acting set 后续不足以完成数据修复，导致 peering 无法正常完成。 |
+| inconsistent | PG 中的多个对象副本不一致。集群清理（scrub）或深度清理（deep-scrub）后检测到 PG 中的对象副本存在不一致，如对象的大小不一致或 recovery 后的某个对象副本丢失。 |
+| repair | PG 在执行 scrub 过程中，如果发现存在不一致的对象副本，并且能够修复，则自动进行修复状态。 |
+| backfill_wait | PG 正在开始回填的等待队列中。 |
+| backfilling | PG 正在执行数据回填。backfill 是 recovery 的一种特殊场景。当 peering 结束后，如果基于当前权威日志无法对 up set 中的 PG 实例实施增量同步（如承载这些 PG 实例的 OSD 离线太久，或者新的 OSD 加入集群导致的 PG 实例整体迁移），则通过完全拷贝当前 primary OSD 中的所有对象的方式进行全量同步。 |
+| backfill_toofull | 某个需要被 backfill 的 PG 实例，其所在的 OSD 超过了 backfillfull-ratio，backfill 流程被挂起。 |
+| scrubbing | PG 正在或即将进行对象副本元数据的不一致性检测 |
+| deep | PG 正在或即将进行对象副本数据已保存的校验和（checksums）的检测 |
+| stale | PG 处于未知的状态（未刷新状态）。PG 状态没有被任何 OSD 更新，说明所有存储该 PG 的 OSD 可能挂掉，或者 mon 没有检测到 primary OSD 的统计信息（可能存在网络抖动）。 |
+| unknown | 自 Mgr 启动，ceph-magr 还未接收到来自于 PG 的任何消息。 |
+
+### 修复 unknown 状态的 PG
+
+PG 出现 stale 状态，也就是处于僵死状态（长时间处于错误状态），该状态无法处理客户端新的请求，新的请求过来只会阻塞，这种情况一般是由于所有 PG 副本所在的 OSD 都挂了。要模拟其实也很简单，比如设置存储池为 2 副本，然后 PG 映射的 2 个 OSD 挂掉即可出现。最好的恢复方法当然是重新拉起这两个 OSD，但有时可能出现这样的情况，两个 OSD 永远也拉不起来，然后将这两个 OSD 踢出集群，然后这些 PG 就是 stale 的状态，这时的恢复方法只能是丢掉此 PG 中的对象数据，重新创建 PG。
+
+PG 出现 unknown 状态，这通常表明该 PG 的数据可能已经丢失或无法正常访问。这种情况下，可先尝试从其他 PG 副本恢复数据，若此方法依然不能恢复 PG，那么尝试强制重建 PG。但请注意，此操作可能会导致数据丢失，因此仅在确定 PG 数据已经无法恢复时使用。
+
+```bash
+### 场景1：尝试从其他 PG 中恢复对象副本进行修复
+$ ceph pg dump_stuck [stale|inactive|unclean]
+$ ceph pg <pg.id> query | jq .recovery_state
+# 查看 PG 当前可能出现的问题
+# 若可返回指定 pg.id 的详细信息，可继续执行以下命令；若无法找到该 pg.id，可直接使用场景2修复。
+$ ceph pg deep-scrub <pg.id>
+# 若能查询到 pg.id，执行指定 PG 的深度清理，检查 PG 的实际状态。
+
+$ ceph pg <pg.id> mark_unfound_lost revert
+# 标记 PG 为丢失，并从其他 PG 中尝试恢复数据（即回滚对象数据至上一个版本）。
+$ ceph pg <pg.id> mark_unfound_lost delete  #可选步骤
+# 若以上命令依然不能恢复 pg 状态，那么删除 pg 中的对象副本，这将造成数据的丢失！
+$ ceph pg repair <pg.id>
+# 触发 PG 修复
+# 若修复成功，那么 PG 进入正常状态（active+clean）。
+
+### 场景2：无法查询 pg.id 重建 PG
+$ ceph osd force-create-pg <pg.id> --yes-i-really-mean-it
+# 根据 pg.id 强制重建指定的 PG
 ```
 
 ## Ceph OSD 对象存储设备
@@ -522,25 +634,25 @@ ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP     META     AVAIL 
  7    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   63      up
  8    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   68      up
  6    ssd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  318 MiB   10 GiB  16.70  2.52   70      up
-                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64                   
+                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64
 MIN/MAX VAR: 0.07/2.52  STDDEV: 7.62
 # osd 级别的存储使用情况
 $ ceph osd df tree
-ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP     META     AVAIL    %USE   VAR   PGS  STATUS  TYPE NAME       
--1         0.09384         -  96 GiB  6.4 GiB   35 MiB      0 B  1.3 GiB   90 GiB   6.64  1.00    -          root default    
+ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP     META     AVAIL    %USE   VAR   PGS  STATUS  TYPE NAME
+-1         0.09384         -  96 GiB  6.4 GiB   35 MiB      0 B  1.3 GiB   90 GiB   6.64  1.00    -          root default
 -3         0.02939         -  30 GiB  181 MiB   12 MiB      0 B  169 MiB   30 GiB   0.59  0.09    -              host serverc
- 1    hdd  0.00980   1.00000  10 GiB   63 MiB  3.9 MiB      0 B   59 MiB  9.9 GiB   0.62  0.09   74      up          osd.1   
- 3    hdd  0.00980   1.00000  10 GiB   72 MiB  3.9 MiB      0 B   68 MiB  9.9 GiB   0.70  0.11   65      up          osd.3   
- 5    ssd  0.00980   1.00000  10 GiB   46 MiB  3.9 MiB      0 B   42 MiB   10 GiB   0.45  0.07   62      up          osd.5   
+ 1    hdd  0.00980   1.00000  10 GiB   63 MiB  3.9 MiB      0 B   59 MiB  9.9 GiB   0.62  0.09   74      up          osd.1
+ 3    hdd  0.00980   1.00000  10 GiB   72 MiB  3.9 MiB      0 B   68 MiB  9.9 GiB   0.70  0.11   65      up          osd.3
+ 5    ssd  0.00980   1.00000  10 GiB   46 MiB  3.9 MiB      0 B   42 MiB   10 GiB   0.45  0.07   62      up          osd.5
 -5         0.02939         -  30 GiB  189 MiB   12 MiB      0 B  178 MiB   30 GiB   0.62  0.09    -              host serverd
- 0    hdd  0.00980   1.00000  10 GiB   67 MiB  3.9 MiB      0 B   63 MiB  9.9 GiB   0.65  0.10   67      up          osd.0   
- 2    hdd  0.00980   1.00000  10 GiB   54 MiB  3.9 MiB      0 B   50 MiB  9.9 GiB   0.53  0.08   67      up          osd.2   
- 4    ssd  0.00980   1.00000  10 GiB   68 MiB  3.9 MiB      0 B   64 MiB  9.9 GiB   0.67  0.10   67      up          osd.4   
+ 0    hdd  0.00980   1.00000  10 GiB   67 MiB  3.9 MiB      0 B   63 MiB  9.9 GiB   0.65  0.10   67      up          osd.0
+ 2    hdd  0.00980   1.00000  10 GiB   54 MiB  3.9 MiB      0 B   50 MiB  9.9 GiB   0.53  0.08   67      up          osd.2
+ 4    ssd  0.00980   1.00000  10 GiB   68 MiB  3.9 MiB      0 B   64 MiB  9.9 GiB   0.67  0.10   67      up          osd.4
 -9         0.03506         -  36 GiB  6.0 GiB   12 MiB      0 B  966 MiB   30 GiB  16.70  2.52    -              host servere
- 7    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   63      up          osd.7   
- 8    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   68      up          osd.8   
- 6    ssd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  318 MiB   10 GiB  16.70  2.52   70      up          osd.6   
-                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64                                     
+ 7    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   63      up          osd.7
+ 8    hdd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  324 MiB   10 GiB  16.70  2.52   68      up          osd.8
+ 6    ssd  0.01169   1.00000  12 GiB  2.0 GiB  3.9 MiB      0 B  318 MiB   10 GiB  16.70  2.52   70      up          osd.6
+                       TOTAL  96 GiB  6.4 GiB   35 MiB  8.5 KiB  1.3 GiB   90 GiB   6.64
 MIN/MAX VAR: 0.07/2.52  STDDEV: 7.62
 
 # osd 级别的存储使用情况并显示 osd 在 CRUSH map 中的位置
@@ -581,6 +693,19 @@ $ ceph osd find 2  #示例
 
 $ ceph osd metadata <osd.id>
 # 🩺 故障排除：根据 osd id 查看 osd 的元数据信息
+
+$ ceph osd perf
+osd  commit_latency(ms)  apply_latency(ms)
+  8                   0                  0
+  7                   0                  0
+  6                   0                  0
+  1                   0                  0
+  0                   0                  0
+  2                   0                  0
+  3                   0                  0
+  4                   0                  0
+  5                   0                  0
+# 观测所有 osd 的性能统计信息  
 ```
 
 ### Lab: 定位对象与 OSD、PG 的映射关系
@@ -601,6 +726,8 @@ osdmap e664 pool 'testpool' (9) object 'test-data' -> pg 9.4a628b60 (9.0) -> up 
 ```
 
 ### Lab: 标记 OSD 在集群中的状态
+
+OSD 在集群中的标记（flag）：`noup`, `nodown`, `noin`, `noout`, `norecover`, `nobackfill`, `norebalance`, `noscrub`, `nodeep-scrub`
 
 ```bash
 $ ceph osd out <osd.id>
@@ -664,8 +791,60 @@ $ ceph orch apply -i ./osd-spec.yaml
 ### Lab: 删除 OSD 设备
   
 ```bash
-$ ceph device ls | awk /<hostname>/
+### 确认需要更换 OSD 设备，可使用以下方式 ###
+$ ceph osd set noscrub; ceph osd set nodeep-scrub
+# 暂时设置集群禁用清理与深度清理
+
+$ ceph osd out $id
+# 将指定 osd 踢出集群
+# 此 osd 上 pg 中的对象副本将迁移重平衡至其他 osd 的 pg 副本中，使用 ceph -w 观察 pg 状态，
+# 等待 pg 状态恢复 active+clean 后继续执行以下步骤。
+
+$ while ! ceph osd safe-to-destroy osd.$id ; do sleep 10s ; done
+# 检测指定的 osd 是否可被安全地破坏。
+# 若命令返回 0，表明 osd 可安全地破坏，取反操作可让 while 判断通过，执行接下来的语句。
+
+$ ceph device ls | awk /<fqdn>/
 # 查看指定节点上磁盘设备与 osd 的对应关系
+
+### 可选操作：$ ceph osd reweight $id <weight>
+# 调整指定 osd 的 reweight 权重值
+### 可选操作：$ ceph osd reweight $id 0.0
+# 调整指定 osd 的 reweight 权重值为 0.0，使得该 osd 上 pg 中的对象副本迁移至其他 osd 上。
+# 注意：调整完 reweight 后，集群状态发生变化，等待集群 HEALTH_OK 后再删除 osd 设备。
+# $ ceph osd reweight 7 0.0  #示例
+# $ ceph -s
+#  cluster:
+#    id:     0b870ad2-8968-11ed-868b-52540000fa0c
+#    health: HEALTH_WARN
+#            Degraded data redundancy: 11/885 objects degraded (1.243%), 8 pgs degraded
+#
+#  services:
+#    mon: 4 daemons, quorum serverc.lab.example.com,clienta,serverd,servere (age 4h)
+#    mgr: serverc.lab.example.com.pqcbzl(active, since 4h), standbys: serverd.xlpfgs, clienta.jfnnze, servere.heelmi
+#    osd: 9 osds: 9 up (since 4h), 8 in (since 8s); 3 remapped pgs
+#    rgw: 2 daemons active (2 hosts, 1 zones)
+#
+#  data:
+#    pools:   11 pools, 297 pgs
+#    objects: 295 objects, 6.2 MiB
+#    usage:   309 MiB used, 80 GiB / 80 GiB avail
+#    pgs:     11/885 objects degraded (1.243%)
+#             64/885 objects misplaced (7.232%)
+#             278 active+clean
+#             9   active+remapped+backfill_wait
+#             8   active+recovery_wait+degraded
+#             1   active+recovering
+#             1   active+remapped+backfilling
+#
+#  io:
+#    client:   1.3 KiB/s rd, 1 op/s rd, 0 op/s wr
+#    recovery: 197 B/s, 3 keys/s, 2 objects/s
+#
+#  progress:
+#    Global Recovery Event (0s)
+#      [............................]
+
 $ ceph orch daemon stop osd.$id
 # 停止指定的 osd 守护进程
 # 注意：
@@ -681,7 +860,10 @@ $ ceph osd rm $id
 $ ceph orch osd rm status
 # 查看 osd 删除的状态
 
-$ ceph osd crush rm $id
+$ ceph osd unset noscrub; ceph osd unset nodeep-scrub
+# 取消集群禁用清理与深度清理
+
+### 可选步骤：$ ceph osd crush rm $id
 # 将 osd 从集群 crushmap（CRUSH 映射）中删除
 # 注意：若后续还需要将 osd 添加到集群中的话，那么在 crushmap 中可继续保留！
 ```
@@ -806,38 +988,38 @@ Running command: /usr/bin/systemctl start ceph-osd@6
 [root@servere ~]# lsblk
 NAME                                                                                                  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 ...
-vdb                                                                                                   252:16   0   10G  0 disk 
+vdb                                                                                                   252:16   0   10G  0 disk
 └─ceph--eb4fe887--63fa--4bdf--8bd4--1f0f9a4fbb2a-osd--block--03e01019--a426--4190--b711--b9e3ad21dd5a 253:0    0   10G  0 lvm
 ...
 # osd.6 对应的逻辑卷已创建
 [root@servere ~]# ceph osd tree
 ID  CLASS  WEIGHT   TYPE NAME         STATUS  REWEIGHT  PRI-AFF
--1         0.07047  root default                               
--3         0.02939      host serverc                           
+-1         0.07047  root default
+-3         0.02939      host serverc
  1    hdd  0.00980          osd.1         up   1.00000  1.00000
  3    hdd  0.00980          osd.3         up   1.00000  1.00000
  5    hdd  0.00980          osd.5         up   1.00000  1.00000
--5         0.02939      host serverd                           
+-5         0.02939      host serverd
  0    hdd  0.00980          osd.0         up   1.00000  1.00000
  2    hdd  0.00980          osd.2         up   1.00000  1.00000
  4    hdd  0.00980          osd.4         up   1.00000  1.00000
--9         0.01169      host servere                           
+-9         0.01169      host servere
  6    hdd  0.01169          osd.6         up   1.00000  1.00000  #osd.6 已加入集群
 
 [root@servere ~]# ceph-volume lvm create --bluestore --data /dev/vdc --block.wal /dev/vde3 --block.db /dev/vde4
 [root@servere ~]# ceph-volume lvm create --bluestore --data /dev/vdd --block.wal /dev/vde5 --block.db /dev/vde6
 [root@servere ~]# ceph osd tree
 ID  CLASS  WEIGHT   TYPE NAME         STATUS  REWEIGHT  PRI-AFF
--1         0.09384  root default                               
--3         0.02939      host serverc                           
+-1         0.09384  root default
+-3         0.02939      host serverc
  1    hdd  0.00980          osd.1         up   1.00000  1.00000
  3    hdd  0.00980          osd.3         up   1.00000  1.00000
  5    hdd  0.00980          osd.5         up   1.00000  1.00000
--5         0.02939      host serverd                           
+-5         0.02939      host serverd
  0    hdd  0.00980          osd.0         up   1.00000  1.00000
  2    hdd  0.00980          osd.2         up   1.00000  1.00000
  4    hdd  0.00980          osd.4         up   1.00000  1.00000
--9         0.03506      host servere                           
+-9         0.03506      host servere
  6    hdd  0.01169          osd.6         up   1.00000  1.00000
  7    hdd  0.01169          osd.7         up   1.00000  1.00000
  8    hdd  0.01169          osd.8         up   1.00000  1.00000
@@ -928,8 +1110,49 @@ $ rados df
 # RADOS 层面查询集群状态
 $ ceph df
 # Ceph 集群与存储池级别的存储使用情况
+[root@serverc ~]# ceph df  #示例
+--- RAW STORAGE ---
+CLASS    SIZE   AVAIL     USED  RAW USED  %RAW USED
+hdd    90 GiB  90 GiB  463 MiB   463 MiB       0.50
+TOTAL  90 GiB  90 GiB  463 MiB   463 MiB       0.50
+
+--- POOLS ---
+POOL                   ID  PGS   STORED  OBJECTS     USED  %USED  MAX AVAIL
+device_health_metrics   1    1      0 B        0      0 B      0     28 GiB
+.rgw.root               2   32  1.3 KiB        4   48 KiB      0     28 GiB
+default.rgw.log         3   32  3.6 KiB      209  408 KiB      0     28 GiB
+default.rgw.control     4   32      0 B        8      0 B      0     28 GiB
+default.rgw.meta        5    8      0 B        0      0 B      0     28 GiB
+iscsigw-pool            6   32  2.3 MiB       11  7.0 MiB      0     28 GiB
+mycephfs0_data          7   32      0 B        0      0 B      0     28 GiB
+mycephfs0_metadata      8   32      0 B        0      0 B      0     28 GiB
+mycephfs1_metadata      9   32      0 B        0      0 B      0     28 GiB
+mycephfs1_data         10   32      0 B        0      0 B      0     28 GiB  #90/3 = 30GiB 左右容量
+sizetest               11   32      0 B        0      0 B      0     42 GiB  #90/2 = 45GiB 左右容量
+# 注意：存储池的容量与集群的总容量及存储池的副本数有关。如，集群容量为 90GiB，创建的存储池副本数为 3，
+# 那么，该存储池的容量在 30GiB 左右，与其他存储池的容量无关。
+
 $ ceph osd pool stats
-# 确认所有存储池的性能统计信息
+# 确认所有存储池的读写事件
+[root@serverc ~]# ceph osd pool stats  #示例
+pool device_health_metrics id 1
+  nothing is going on
+
+pool .rgw.root id 2
+  nothing is going on
+
+pool default.rgw.log id 3
+  nothing is going on
+
+pool default.rgw.control id 4
+  nothing is going on
+
+pool default.rgw.meta id 5
+  nothing is going on
+
+pool iscsigw-pool id 6
+  client io 2.7 KiB/s rd, 2 op/s rd, 0 op/s wr
+...
 ```
 
 ### Ceph 复制池命令
@@ -1065,7 +1288,7 @@ $ rm -f /path/to/keyring
 - `data-pool`：是否支持将镜像的数据对象存储于纠删码存储池，主要用于将镜像的元数据与数据放置于不同的存储池。
 - `striping`: 是否支持数据对象间的数据条带化（BIT 码为 2）
 
-### RBD 镜像常用命令
+### 管理 RBD 镜像：创建、删除、查询、映射、快照、克隆、扁平化
   
 ```bash
 $ rbd pool init <pool_name>
@@ -1103,7 +1326,7 @@ $ rbd snap protect [--id <name>] <pool_name>/<rbd_image_name>@<snap-name>
 $ rbd clone [--id <name>] <pool_name>/<rbd_image_name>@<snap-name> <pool_name>/<clone_name>
 # 创建基于 RBD 镜像快照的克隆
 $ rbd flatten <rbd-image-clone_name>
-#创建扁平化克隆
+# 创建扁平化克隆
   
 $ blockdev --getro /path/to/device
 ```
@@ -1119,7 +1342,7 @@ RBD Mirror 的两种模式，包括 `RBD one-way mirroring` 模式（`active-bac
 ### Lab: 实现 RBD one-way mirroring
   
 ```bash
-### RBD Mirror Primary 集群（pool 模式）###
+### RBD Mirror Primary 集群（pool 模式） ###
 $ rbd mirror pool enable <pool_name> <mirror-mode>
 # 指定存储池启用 RBD Mirror 的指定模式（pool 模式、image 模式）
 $ rbd mirror pool enable rbd pool  #示例
@@ -1139,7 +1362,7 @@ $ rbd mirror pool peer bootstrap create \
   --site-name <site-name> <pool_name> > /path/to/mirror-bootstrap-token
 # 创建引导对等存储集群的 bootstrap token（active-passive 集群模式）
   
-### RBD Mirror Secondary 集群（pool 模式）###
+### RBD Mirror Secondary 集群（pool 模式） ###
 $ ceph orch apply rbd-mirror --placement=<fqdn>
 # 指定节点启用 rbd-mirror 守护进程
 $ ceph orch apply rbd-mirror --placement=serverf.lab.example.com  #示例
@@ -1160,7 +1383,7 @@ $ rbd mirror pool info rbd  #示例
   Mode: pool
   Site Name: bup
   
-  Peer Sites: 
+  peer Sites:
   
   UUID: 763de4dc-ba66-4672-aaec-582b68cf9cf1
   Name: prod
@@ -1182,13 +1405,13 @@ $ rbd rm rbd/image1
   cannot obtain exclusive lock - not removing
   Removing image: 0% complete...failed.
   rbd: error: image still has watchers
-  This means the image is still open or the client using it crashed. Try again after closing/unmapping it or waiting 
+  This means the image is still open or the client using it crashed. Try again after closing/unmapping it or waiting
   30s for the crashed client to timeout.
 # 由于 primary 集群存储池中镜像设置了分布式锁（exclusive-lock）特性，
 # 因此，secondary 集群中无法删除镜像，只能从 primary 集群中删除。
 ```
   
-### Lab: `rbd-nbd` 映射使用已 mirroring 的 RBD 镜像
+### Lab: rbd-nbd 映射使用已 mirroring 的 RBD 镜像
   
 笔者环境中已部署 RBD Mirror Primary 与 Secondary 集群，两套集群中均已创建 rbd 存储池并启用 pool 模式的 RBD Mirror。primary 集群的 rbd 存储池中已创建 image1 镜像，此镜像已启用 `exclusive-lock` 与 `journaling` 特性。现将此镜像映射给客户端虚拟机作虚拟磁盘使用，如下所示：
   
@@ -1198,7 +1421,7 @@ $ sudo dnf install -y ceph-common
 # 安装 rbd 命令
 $ sudo rbd map rbd/image1
   rbd: sysfs write failed
-  RBD image feature set mismatch. You can disable features unsupported by 
+  RBD image feature set mismatch. You can disable features unsupported by
   the kernel with "rbd feature disable image1 journaling"
   In some cases useful info is found in syslog - try "dmesg | tail".
   rbd: map failed: (6) No such device or address
@@ -1228,7 +1451,7 @@ $ sudo dnf info rbd-nbd
   From repo    : rhceph-5-tools-for-rhel-8-x86_64-rpms
   Summary      : Ceph RBD client base on NBD
   URL          : http://ceph.com/
-  License      : LGPL-2.1 and LGPL-3.0 and CC-BY-SA-3.0 and GPL-2.0 and 
+  License      : LGPL-2.1 and LGPL-3.0 and CC-BY-SA-3.0 and GPL-2.0 and
                  BSL-1.0 and BSD-3-Clause and MIT
   Description  : NBD based client to map Ceph rbd images to local device
 $ sudo lsmod | egrep 'rbd|nbd'
@@ -1246,7 +1469,7 @@ $ sudo dd if=/dev/zero of=/mnt/rbd/test-data1 oflag=direct bs=4M count=10
   10+0 records in
   10+0 records out
   41943040 bytes (42 MB, 40 MiB) copied, 0.747552 s, 56.1 MB/s
-$ sudo ls -lh /mnt/rbd/test-data1 
+$ sudo ls -lh /mnt/rbd/test-data1
   -rw-r--r--. 1 root root 40M Oct  7 23:05 /mnt/rbd/test-data1
 # 创建测试数据文件
   
@@ -1260,8 +1483,8 @@ $ rbd info rbd/image1
         block_name_prefix: rbd_data.8569a03bc09a
         format: 2
         features: exclusive-lock, journaling
-        op_features: 
-        flags: 
+        op_features:
+        flags:
         create_timestamp: Sat Oct  7 17:41:54 2023
         access_timestamp: Sun Oct  8 03:05:02 2023
         modify_timestamp: Sun Oct  8 03:05:02 2023  # 镜像中已写入数据
@@ -1306,7 +1529,7 @@ $ rbd mirror image promote <pool_name>/<rbd_image_name>
 
 ```bash
 [root@serverc ~]# ceph orch ls | grep iscsi
-iscsi.my_iscsi_driver        2/2  89s ago    22m  serverc.lab.example.com;servere.lab.example.com                                                  
+iscsi.my_iscsi_driver        2/2  89s ago    22m  serverc.lab.example.com;servere.lab.example.com
 [root@serverc ~]# ceph orch ps | grep iscsi
 iscsi.my_iscsi_driver.serverc.musewn  serverc.lab.example.com  running (22m)  97s ago    22m  -              3.5               2142b60d7974  0871e5889d26  
 iscsi.my_iscsi_driver.servere.gsrlcj  servere.lab.example.com  running (22m)  98s ago    22m  -              3.5               2142b60d7974  349595a1a137
@@ -1328,6 +1551,32 @@ iscsi.my_iscsi_driver.servere.gsrlcj  servere.lab.example.com  running (22m)  98
 
 ![ceph-iscsi-gateway-5](images/ceph-iscsi-gateway-5.png)
 
+```bash
+[root@serverc ~]# ceph -s
+  cluster:
+    id:     0b870ad2-8968-11ed-868b-52540000fa0c
+    health: HEALTH_WARN
+            2 stray daemon(s) not managed by cephadm
+
+  services:
+    mon:         4 daemons, quorum serverc.lab.example.com,clienta,serverd,servere (age 16h)
+    mgr:         serverc.lab.example.com.pqcbzl(active, since 16h), standbys: serverd.xlpfgs, servere.heelmi, clienta.jfnnze
+    osd:         9 osds: 9 up (since 16h), 9 in (since 2y)
+    rgw:         2 daemons active (2 hosts, 1 zones)
+    tcmu-runner: 2 portals active (2 hosts)  #target 中的 portal 已可用
+
+  data:
+    pools:   6 pools, 137 pgs
+    objects: 232 objects, 6.2 MiB
+    usage:   385 MiB used, 90 GiB / 90 GiB avail
+    pgs:     137 active+clean
+
+  io:
+    client:   1.7 KiB/s rd, 1 op/s rd, 0 op/s wr
+# Ceph Dashboard 中创建完成 target 的 portal 后，再次使用 ceph -s 查看集群状态将返回 tcmu-runner 的状态信息。
+# 若将 portal 删除，则 tcmu-runner 不再显示。
+```
+
 ### Lab: iscsi-initiator 客户端登录认证 iscsi-gateway 实现多路径访问
 
 以上 Lab 中成功创建 target 后，可在集群外客户端部署 iscsi-initiator，利用 iscsi-gateway 完成 RBD 镜像至本地的多路径访问。
@@ -1337,9 +1586,9 @@ iscsi.my_iscsi_driver.servere.gsrlcj  servere.lab.example.com  running (22m)  98
 [root@workstation ~]# dnf install -y iscsi-initiator-utils
 [root@workstation ~]# vim /etc/iscsi/initiatorname.iscsi  #修改为 target 中对应的 IQN 编号
 InitiatorName=iqn.2025-04.com.example.lab.iscsi-gateway:01-02
-[root@workstation ~]# systemctl enable --now iscsid.service 
+[root@workstation ~]# systemctl enable --now iscsid.service
 Created symlink /etc/systemd/system/multi-user.target.wants/iscsid.service → /usr/lib/systemd/system/iscsid.service.
-[root@workstation ~]# systemctl status iscsid.service 
+[root@workstation ~]# systemctl status iscsid.service
 ● iscsid.service - Open-iSCSI
    Loaded: loaded (/usr/lib/systemd/system/iscsid.service; enabled; vendor preset: disabled)
    Active: active (running) since Mon 2025-04-21 10:33:07 EDT; 7s ago
@@ -1375,10 +1624,10 @@ Login to [iface: default, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-0
 
 [root@workstation ~]# lsblk -fp  #/dev/sd{a,b} 均来自于 RBD 镜像
 NAME        FSTYPE LABEL UUID                                 MOUNTPOINT
-/dev/sda                                                      
-/dev/sdb                                                      
-/dev/vda                                                      
-├─/dev/vda1                                                   
+/dev/sda
+/dev/sdb
+/dev/vda
+├─/dev/vda1
 ├─/dev/vda2 vfat         7B77-95E7                            /boot/efi
 └─/dev/vda3 xfs    root  d47ead13-ec24-428e-9175-46aefa764b26 /
 
@@ -1429,17 +1678,17 @@ size=1.0G features='0' hwhandler='1 alua' wp=rw
   `- 7:0:0:0 sdb 8:16 active ready running
 [root@workstation ~]# lsblk -fp
 NAME                 FSTYPE       LABEL UUID                                 MOUNTPOINT
-/dev/sda             mpath_member                                            
-└─/dev/mapper/mpatha                                                         
-/dev/sdb             mpath_member                                            
-└─/dev/mapper/mpatha                                                         
-/dev/vda                                                                     
-├─/dev/vda1                                                                  
+/dev/sda             mpath_member
+└─/dev/mapper/mpatha
+/dev/sdb             mpath_member
+└─/dev/mapper/mpatha
+/dev/vda
+├─/dev/vda1
 ├─/dev/vda2          vfat               7B77-95E7                            /boot/efi
 └─/dev/vda3          xfs          root  d47ead13-ec24-428e-9175-46aefa764b26 /
 # 多路径配置完成
 
-[root@workstation ~]# mkfs.xfs /dev/mapper/mpatha 
+[root@workstation ~]# mkfs.xfs /dev/mapper/mpatha
 meta-data=/dev/mapper/mpatha     isize=512    agcount=4, agsize=65536 blks
          =                       sectsz=512   attr=2, projid32bit=1
          =                       crc=1        finobt=1, sparse=1, rmapbt=0
@@ -1474,16 +1723,160 @@ Logout of [sid: 2, target: iqn.2025-04.com.example.lab.iscsi-gateway:01-02, port
 
 ```bash
 $ ceph fs status
+# 查看各个 cephfs 文件系统的状态
+[root@serverc ~]# ceph fs status  #示例
+mycephfs0 - 0 clients
+=========
+RANK  STATE             MDS                ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  mycephfs0.serverc.xqikij  Reqs:    0 /s    10     13     12      0
+       POOL           TYPE     USED  AVAIL  
+mycephfs0_metadata  metadata   111k  28.1G  
+  mycephfs0_data      data       0   28.1G  
+mycephfs1 - 0 clients
+=========
+RANK  STATE             MDS                ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  mycephfs1.serverc.gjllbn  Reqs:    0 /s    10     13     12      0
+       POOL           TYPE     USED  AVAIL  
+mycephfs1_metadata  metadata   134k  28.1G  
+  mycephfs1_data      data       0   28.1G  
+      STANDBY MDS
+mycephfs1.servere.javarf  
+mycephfs1.serverd.xsqsch  
+mycephfs0.servere.apdcgl  
+mycephfs0.serverd.hkfahf  
+MDS version: ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)
+
+$ ceph mds stat
+# 查看各个 cephfs 文件系统 active 的 mds 服务器
+[root@serverc ~]# ceph mds stat  #示例
+mycephfs0:1 mycephfs1:1 {mycephfs0:0=mycephfs0.serverc.xqikij=up:active,mycephfs1:0=mycephfs1.serverc.gjllbn=up:active} 4 up:standby
 ```
+
+### Lab: 部署多个 cephfs 文件系统与 standby 切换验证
+
+```bash
+[root@serverc ~]# ceph osd pool create mycephfs0_metadata 32 32
+[root@serverc ~]# ceph osd pool create mycephfs0_data 32 32
+[root@serverc ~]# ceph fs new mycephfs1 mycephfs0_metadata mycephfs0_data
+# 创建 mycephfs0 cephfs
+
+[root@serverc ~]# ceph osd pool create mycephfs1_metadata 32 32
+[root@serverc ~]# ceph osd pool create mycephfs1_data 32 32
+[root@serverc ~]# ceph fs new mycephfs1 mycephfs1_metadata mycephfs1_data
+# 创建 mycephfs1 cephfs
+
+[root@serverc ~]# ceph orch apply mds mycephfs0 --placement="3 serverc.lab.example.com serverd.lab.example.com servere.lab.example.com"
+Scheduled mds.mycephfs0 update...
+[root@serverc ~]# ceph orch apply mds mycephfs1 --placement="3 serverc.lab.example.com serverd.lab.example.com servere.lab.example.com"
+Scheduled mds.mycephfs1 update...
+# 在3个节点上分别部署 mds 服务
+
+[root@serverc ~]# ceph fs status
+mycephfs0 - 0 clients
+=========
+RANK  STATE             MDS                ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  mycephfs0.serverc.xqikij  Reqs:    0 /s    10     13     12      0
+       POOL           TYPE     USED  AVAIL  
+mycephfs0_metadata  metadata   110k  28.2G  
+  mycephfs0_data      data       0   28.2G  
+mycephfs1 - 0 clients
+=========
+RANK  STATE             MDS                ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  mycephfs1.serverd.xsqsch  Reqs:    0 /s    10     13     12      0
+       POOL           TYPE     USED  AVAIL  
+mycephfs1_metadata  metadata   133k  28.2G  
+  mycephfs1_data      data       0   28.2G  
+      STANDBY MDS
+mycephfs1.serverc.gjllbn  
+mycephfs0.serverd.hkfahf  
+mycephfs1.servere.javarf  
+mycephfs0.servere.apdcgl  
+MDS version: ceph version 16.2.0-117.el8cp (0e34bb74700060ebfaa22d99b7d2cdc037b28a57) pacific (stable)
+# 查看各个 cephfs 文件系统的状态
+[root@serverc ~]# ceph mds stat
+mycephfs0:1 mycephfs1:1 {mycephfs0:0=mycephfs0.serverc.xqikij=up:active,mycephfs1:0=mycephfs1.serverd.xsqsch=up:active} 4 up:standby
+# 查看各个 cephfs 文件系统 active 的 mds 服务器
+
+# 注意：此时关闭系统 serverd，观察 mycephfs1 文件系统的 mds 服务是否可完成切换。
+[root@serverc ~]# ceph -w
+...
+2025-04-22T12:02:22.650782-0400 mon.serverc.lab.example.com [WRN] Replacing daemon mds.mycephfs1.serverd.xsqsch as rank 0 with standby daemon mds.mycephfs1.serverc.gjllbn
+2025-04-22T12:02:22.650878-0400 mon.serverc.lab.example.com [INF] MDS daemon mds.mycephfs1.serverd.xsqsch is removed because it is dead or otherwise unavailable.
+2025-04-22T12:02:22.650893-0400 mon.serverc.lab.example.com [INF] MDS daemon mds.mycephfs0.serverd.hkfahf is removed because it is dead or otherwise unavailable.
+2025-04-22T12:02:22.653507-0400 mon.serverc.lab.example.com [WRN] Health check failed: 1 filesystem is degraded (FS_DEGRADED)
+2025-04-22T12:02:24.722995-0400 mon.serverc.lab.example.com [INF] daemon mds.mycephfs1.serverc.gjllbn is now active in filesystem mycephfs1 as rank 0
+...
+# 以上日志反应 mycephfs1 文件系统的 mds 服务已切换至 serverc
+```
+
+### Lab: 删除 CephFS
+
+```bash
+[root@serverc ~]# ceph fs set mycephfs0 down true
+mycephfs0 marked down.
+[root@serverc ~]# ceph fs set mycephfs1 down true
+mycephfs1 marked down.
+# 将活动的 cephfs 设置为 down 状态
+# 注意：请务必卸载所有的客户端挂载！
+[root@serverc ~]# ceph fs ls
+name: mycephfs0, metadata pool: mycephfs0_metadata, data pools: [mycephfs0_data ]
+name: mycephfs1, metadata pool: mycephfs1_metadata, data pools: [mycephfs1_data ]
+[root@serverc ~]# ceph mds stat
+mycephfs0:1 mycephfs1:1 {mycephfs0:0=mycephfs0.serverc.xqikij=up:stopping,mycephfs1:0=mycephfs1.serverc.gjllbn=up:stopping} 4 up:standby
+# cephfs 全部处于 stopping 状态
+
+[root@serverc ~]# ceph fs rm mycephfs0 --yes-i-really-mean-it
+[root@serverc ~]# ceph fs rm mycephfs1 --yes-i-really-mean-it
+# 删除指定的 cephfs
+
+[root@serverc ~]# ceph fs ls
+No filesystems enabled
+# 查看 cephfs 是否已经删除成功
+```
+
+### Lab: 设置 CephFS 具备多个活跃的 MDS 服务器
+
+```bash
+$ ceph fs get <fs_name>
+# 查看指定 cephfs 文件系统的配置参数
+$ ceph fs get mycephfs0 | grep max_mds
+
+[root@serverc ~]# ceph fs get mycephfs0 | grep max_mds
+max_mds 1
+# 查看指定 cephfs 文件系统的最大活跃 mds 服务器
+[root@serverc ~]# ceph fs set mycephfs0 max_mds 2
+[root@serverc ~]# ceph mds stat
+mycephfs0:2 mycephfs1:1 {mycephfs0:0=mycephfs0.serverc.xqikij=up:active,mycephfs0:1=mycephfs0.servere.apdcgl=up:active,mycephfs1:0=mycephfs1.serverc.gjllbn=up:active} 3 up:standby
+# 设置多个活跃的 mds 服务器的优点：
+#   1. 高可用性：为了确保高可用性，建议 max_mds 的值至少比实际运行的 MDS 守护进程数量少 1，以便有足够的备用守护进程接管故障。
+#   2. 性能优化：增加 max_mds 的值可以提高元数据性能，但需要根据实际工作负载进行调整。
+#      对于大规模系统，多个活跃的 MDS 守护进程可以分担元数据工作负载。
+```
+
+`max_mds` 参数的说明：
+
+- 每一 Ceph 文件系统 (CephFS) 具有多个等级，默认为一，从零开始。
+- 等级定义在多个元数据服务器 (MDS) 守护进程之间共享元数据工作负载的方式。等级数是一次可以处于活跃状态的最大 MDS 守护进程数。每个 MDS 守护进程处理分配给该等级的 CephFS 元数据子集。
+- 每个 MDS 守护进程最初启动且没有等级。Ceph 监控器将排名分配到 守护进程。MDS 守护进程一次只能有一个排名。后台程序仅在停止时丢失等级。
+- max_mds 设置控制将创建等级数。
+- 只有备用守护进程可用于接受新等级时，CephFS 中实际的排名数量才会增加。
 
 ## 参考链接
 
+- [使用 cephadm 搭建 ceph (octopus) 过程](https://juejin.cn/post/7160585472538837006)
 - [Product Documentation for Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/zh-cn/red_hat_ceph_storage/5)
+- ❤ [Placement Group States | Ceph Docs](https://docs.ceph.com/en/pacific/rados/operations/pg-states/)
+- ❤ [Chapter 17. PG Command Line Reference | RedHat Docs](https://docs.redhat.com/en/documentation/red_hat_ceph_storage/1.2.3/html/storage_strategies/pg-command-line-reference#pg-command-line-reference)
+- ❤ [Detailed explanation of PG state of distributed storage Ceph](https://programmer.group/detailed-explanation-of-pg-state-of-distributed-storage-ceph.html)
+- [Chapter 2. Management of services using the Ceph Orchestrator Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/5/html/operations_guide/management-of-services-using-the-ceph-orchestrator#deploying-the-ceph-daemons-using-the-service-specification_ops)
 - ❤ [5.4. 使用 Ceph Manager 负载均衡器模块 Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/zh-cn/red_hat_ceph_storage/5/html/operations_guide/using-the-ceph-manager-balancer-module_ops)
 - [SERVICE MANAGEMENT | Ceph Docs](https://docs.ceph.com/en/latest/cephadm/services/?highlight=service_id#)
-- [使用 cephadm 搭建 ceph（octopus）过程](https://juejin.cn/post/7160585472538837006)
-- [Chapter 2. Management of services using the Ceph Orchestrator Red Hat Ceph Storage 5 | Red Hat Customer Portal](https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/5/html/operations_guide/management-of-services-using-the-ceph-orchestrator#deploying-the-ceph-daemons-using-the-service-specification_ops)
-- [Stray daemon tcmu-runner is reported not managed by cephadm - Red Hat Customer Portal](https://access.redhat.com/solutions/6472281)
-- [Ceph - mapping rbd image is failing with RBD image feature set mismatch or image uses unsupported features - Red Hat Customer Portal](https://access.redhat.com/solutions/4270092)
-- [maillist - rbd map image with journaling](https://lists.ceph.io/hyperkitty/list/ceph-users@ceph.io/thread/377S7XFN74MUYKVSXXRAN534FNZTDICK/)
 - [使用命令行界面更改 Ceph 仪表板密码](https://www.ibm.com/docs/zh/storage-ceph/6?topic=ia-changing-ceph-dashboard-password-using-command-line-interface)
+- [Stray daemon tcmu-runner is reported not managed by cephadm | Red Hat Customer Portal](https://access.redhat.com/solutions/6472281)
+- [Ceph - mapping rbd image is failing with RBD image feature set mismatch or image uses unsupported features | Red Hat Customer Portal](https://access.redhat.com/solutions/4270092)
+- [maillist - rbd map image with journaling](https://lists.ceph.io/hyperkitty/list/ceph-users@ceph.io/thread/377S7XFN74MUYKVSXXRAN534FNZTDICK/)
+- ❤ [文件系统指南 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_ceph_storage/5/html/file_system_guide/index)
+- [2.3. 元数据服务器排名 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_ceph_storage/5/html/file_system_guide/metadata-server-ranks_fs#metadata-server-ranks_fs)
+
+
+[def]: #参考链接
