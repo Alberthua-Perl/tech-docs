@@ -41,6 +41,7 @@
 - [RADOS 对象操作](#rados-对象操作)
 - [Ceph Pool 存储池](#ceph-pool-存储池)
   - [Ceph 存储池状态](#ceph-存储池状态)
+  - [ceph 存储池属性](#ceph-存储池属性)
   - [Ceph 复制池命令](#ceph-复制池命令)
   - [Ceph 纠删代码池命令](#ceph-纠删代码池命令)
 - [CephX 认证与用户](#cephx-认证与用户)
@@ -585,7 +586,7 @@ $$\begin{align*}
 | inconsistent | PG 中的多个对象副本不一致。集群清理（scrub）或深度清理（deep-scrub）后检测到 PG 中的对象副本存在不一致，如对象的大小不一致或 recovery 后的某个对象副本丢失。 |
 | repair | PG 在执行 scrub 过程中，如果发现存在不一致的对象副本，并且能够修复，则自动进行修复状态。 |
 | backfill_wait | PG 正在开始回填的等待队列中。 |
-| backfilling | PG 正在执行数据回填。backfill 是 recovery 的一种特殊场景。当 peering 结束后，如果基于当前权威日志无法对 up set 中的 PG 实例实施增量同步（如承载这些 PG 实例的 OSD 离线太久，或者新的 OSD 加入集群导致的 PG 实例整体迁移），则通过完全拷贝当前 primary OSD 中的所有对象的方式进行全量同步。 |
+| backfilling | PG 正在执行数据回填（对象副本从一个 OSD 复制到另一个 OSD 的过程）。backfill 是 recovery 的一种特殊场景。当 peering 结束后，如果基于当前权威日志无法对 up set 中的 PG 实例实施增量同步（如承载这些 PG 实例的 OSD 离线太久，或者新的 OSD 加入集群导致的 PG 实例整体迁移），则通过完全拷贝当前 primary OSD 中的所有对象的方式进行全量同步。 |
 | backfill_toofull | 某个需要被 backfill 的 PG 实例，其所在的 OSD 超过了 backfillfull-ratio，backfill 流程被挂起。 |
 | scrubbing | PG 正在或即将进行对象副本元数据的不一致性检测 |
 | deep | PG 正在或即将进行对象副本数据已保存的校验和（checksums）的检测 |
@@ -1155,18 +1156,9 @@ pool iscsigw-pool id 6
 ...
 ```
 
-### Ceph 复制池命令
+### Ceph 存储池属性
 
 ```bash
-$ ceph osd pool create <pool_name> <pg_num> <pgp_num> [replicated] <crush_rule_set>
-# 创建复制池
-# 注意：
-#   1. 默认情况下可只指定存储池名称与 PG 数量，也可自定义 CRUSH 放置规则在创建存储池时指定。
-#   2. 若设置了相同的 pg_num 与 pgp_num，之后再调整 pg_num 将自动调整 pgp_num。
-
-$ ceph osd pool application enable <pool_name> [rbd|rgw|cephfs]
-# 设置指定的存储池为 rbd、rgw 或 cephfs 应用类型
-
 $ ceph osd pool get <pool_name> all
 # 查看存储池的所有参数值
 $ ceph osd pool get <pool_name> [size|nodelete|min_size]
@@ -1180,6 +1172,20 @@ $ ceph osd pool set <pool_name> [size|nodelete|min_size] <value>
 # 设置存储池的指定参数值
 $ ceph osd pool set <pool_name> pg_autoscale_mode on
 # 启用 mgr 的 pg_autoscaler 模块并启用指定存储池的自动扩展 pg 功能
+
+```
+
+### Ceph 复制池命令
+
+```bash
+$ ceph osd pool create <pool_name> <pg_num> <pgp_num> [replicated] <crush_rule_set>
+# 创建复制池
+# 注意：
+#   1. 默认情况下可只指定存储池名称与 PG 数量，也可自定义 CRUSH 放置规则在创建存储池时指定。
+#   2. 若设置了相同的 pg_num 与 pgp_num，之后再调整 pg_num 将自动调整 pgp_num。
+
+$ ceph osd pool application enable <pool_name> [rbd|rgw|cephfs]
+# 设置指定的存储池为 rbd、rgw 或 cephfs 应用类型
 
 $ ceph osd pool rename <old-pool_name> <new-pool_name>
 # 重命名存储池名称（不影响池中存储的数据，但需要注意用户对池的权限）
