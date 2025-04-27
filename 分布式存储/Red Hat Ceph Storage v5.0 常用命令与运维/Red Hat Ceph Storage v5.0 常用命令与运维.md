@@ -506,7 +506,7 @@ $ ceph fs dump
 
 ## Ceph CRUSH Map 映射
 
-🚀 关于 `CRUSH map` 的说明可参考 [Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md#-ceph-crush-map-%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0)
+🚀 关于 `CRUSH map` 的说明可参考 [Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
 
 ## Ceph PG（Placement Group）放置组
 
