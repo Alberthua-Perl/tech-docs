@@ -395,7 +395,7 @@ $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
 - RHEL8 安装 `Google Chrome`：
 
 ```bash
-$ sudo vim /etc/yum.repos.d/google-chrome.repo                                                                                 
+$ sudo vim /etc/yum.repos.d/google-chrome.repo
 [google-chrome]
 name=google-chrome
 baseurl=https://dl.google.com/linux/chrome/rpm/stable/x86_64
