@@ -69,6 +69,7 @@
 ## ☸ **Kubernetes & Golang**
 
 - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/Go%20%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
+- [minikube 快速上手管理 Kubernetes 集群](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/minukube%20%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E7%AE%A1%E7%90%86%20Kubernetes%20%E9%9B%86%E7%BE%A4/minikube%20%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E7%AE%A1%E7%90%86%20Kubernetes%20%E9%9B%86%E7%BE%A4.md)
 - [【项目】Kani - Ansible 快速部署与管理 Kubernetes v1.22.1](https://github.com/Alberthua-Perl/kani)
 - [Kubernetes 集群与资源管理基础](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/Kubernetes%20%E9%9B%86%E7%BE%A4%E4%B8%8E%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%9F%BA%E7%A1%80/Kubernetes%20%E9%9B%86%E7%BE%A4%E4%B8%8E%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%9F%BA%E7%A1%80.md)
 - [kubeadm 更新 Kubernetes 集群到期证书](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/kubeadm%20%E6%9B%B4%E6%96%B0%20Kubernetes%20%E9%9B%86%E7%BE%A4%E5%88%B0%E6%9C%9F%E8%AF%81%E4%B9%A6.md)
