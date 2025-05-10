@@ -392,6 +392,10 @@ $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
   redhat-internal-NetworkManager-openvpn-profiles-0.1-61.el7.noarch.rpm
 ```
 
+- RHEL8 安装 `Google Chrome`：
+
+
+
 - RHEL9 安装 `Google Chrome`：
 
 ```bash

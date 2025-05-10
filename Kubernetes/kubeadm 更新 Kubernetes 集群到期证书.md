@@ -1,37 +1,29 @@
-## kubeadm 更新 Kubernetes 集群到期证书
+# kubeadm 更新 Kubernetes 集群到期证书
 
-### 环境说明：
+## 环境说明
 
 - Kubernetes 版本：`v1.22.1`
-
 - kubeadm 版本：`v1.22.1`
 
-### 处理方法：
+## 处理方法
 
 - kubeadm 更新集群证书从 Kubernetes `v1.15` 进入 `stable` 状态，可在 GA 环境中使用。
-
 - 默认情况下，由 kubeadm 为集群生成的所有证书在 1 年后到期。
-
 - 更新（重新签发）集群证书需根据其部署方式而定，通过二进制部署的集群需手动更新集群证书，而通过 kubeadm 部署的集群可使用 kubeadm 更新证书，也可重新编译 kubeadm 用以生成自定义有效期的证书。
-
 - 👉 笔者环境中直接使用 kubeadm 更新证书。
-
 - 集群证书更新方式，步骤如下：
-  
   - 检查集群证书有效期（通常于 `master` 节点执行）：
-    
+
     ```bash
     $ kubeadm certs check-expiration
     $ openssl x509 -noout -in /etc/kubernetes/pki/apiserver.crt -dates
     # 也可通过以上命令单独查看证书是否过期
     ```
-  
+
   - 集群 master 节点上的 `/etc/kubernetes/pki/*` 的证书在更新之前应继续保留在节点上不可删除，删除后将导致集群异常无法恢复。
-  
   - 🏷 kubeadm 更新集群 master 节点上的证书，而 worker 节点上 `kubelet` 证书默认自动轮换更新，无需关心证书到期问题。`kube-apiserver` 访问 kubelet 时，并不校验 kubelet 服务端证书，kubeadm 也并不提供更新 kubelet 服务端证书的办法。
-  
   - 更新延期集群证书 1 年有效期：
-    
+
     ```bash
     $ kubeadm certs renew all --config ./kubeadm-conf.yml
       W1213 21:45:40.125346   15197 strict.go:55] error unmarshaling configuration schema.GroupVersionKind{Group:"kubelet.config.k8s.io", Version:"v1beta1", Kind:"KubeletConfiguration"}: error converting YAML to JSON: yaml: unmarshal errors:
@@ -79,11 +71,11 @@
       1 directory, 22 files
     # 查看更新后的所有集群证书
     ```
-    
+
     🔗 上述 kubeadm-conf.yml 可参考此 [链接](https://github.com/Alberthua-Perl/kani/blob/main/files/kube-utils/kubeadm-conf.yml)，可根据自身的实际情况进行修改后运行。
   
   - 更新集群证书后，需更新集群 `kubeconfig` 配置文件：
-    
+
     ```bash
     $ mkdir ~/kubeconfig-backup
     $ mv /etc/kubernetes/*.conf ~/kubeconfig-backup/
@@ -110,7 +102,7 @@
     ```
   
   - 更新完成后检查集群所有证书有效期：
-    
+
     ```bash
     $ kubeadm certs check-expiration
      [check-expiration] Reading configuration from the cluster...
@@ -137,10 +129,8 @@
 
 - 💥 需要注意的是，此时新生成的集群 `/etc/kubernetes/admin.conf` 配置文件嵌套新的证书，在集群外部或可使用 kubectl 命令连接至集群的节点上需使用该文件更新节点 `$HOME/.kube/config` 文件，否则无法连接至集群中，直接报错 `error: You must be logged in to the server (Unauthorized)`。
 
-### 参考文档：
+## 参考文档
 
 - [Kubernetes Doc - 使用 kubeadm 进行证书管理](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
-
 - [Kubernetes Doc - PKI 证书和要求](https://kubernetes.io/zh-cn/docs/setup/best-practices/certificates/)
-
 - [Kubeadm 证书过期时间调整](https://www.cnblogs.com/skymyyang/p/11093686.html)

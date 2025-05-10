@@ -28,6 +28,7 @@
 - [Ceph PG（Placement Group）放置组](#ceph-pgplacement-group放置组)
   - [Ceph PG 常用管理命令](#ceph-pg-常用管理命令)
   - [PG 数量的计算与规划](#pg-数量的计算与规划)
+  - [PG 的 acting set 与 up set](#pg-的-acting-set-与-up-set)
   - [PG 状态汇总](#pg-状态汇总)
   - [修复 unknown 状态的 PG](#修复-unknown-状态的-pg)
 - [Ceph OSD 对象存储设备](#ceph-osd-对象存储设备)
@@ -564,12 +565,46 @@ $$\begin{align*}
 
 每个 pool 的 $PG = \frac{5000}{5} = 1000$，那么创建 pool 的时候就指定 PG 为 1024，即使用命令 ceph osd pool create <pool_name> 1024。也就是说，存储池中的 PG 数量在集群规模扩容的时候，动态进行调整以满足相对较佳的 PG 数量提供存储性能。
 
+### PG 的 acting set 与 up set
+
+在 Ceph 中，PG 的 `acting set` 和 `up set` 是与 PG 相关的两个重要概念，具体如下：
+
+`acting set`：
+
+- **定义**：acting set 是一个有序的 OSD 列表，表示当前负责处理某个 PG 的 OSD 集合。列表中的第一个 OSD 是主 OSD（primary OSD），它负责协调 PG 的操作，如接受客户端的写请求。
+- **作用**：Ceph 使用 acting set 中的 OSD 来处理客户端对该 PG 的请求。当客户端发起请求时，请求会被发送到 acting set 中的主 OSD，主 OSD 再与其他副本 OSD 协调操作。
+- **变化情况**：当集群中的 OSD 发生故障、添加或移除 OSD 等情况时，CRUSH 算法可能会重新分配 PG 的 acting set。例如，原本的 acting set 是 [0,1,2]，如果 osd0 出现故障，CRUSH 可能会将 acting set 重新分配为 [3,1,2]。
+
+`up set`：
+
+- **定义**：up set 也是一个有序的 OSD 列表，表示应该包含某个 PG 副本的 OSD 集合。在正常情况下，up set 和 acting set 是相同的。
+- **作用**：up set 是 CRUSH 算法根据当前的集群状态和 CRUSH map 计算出来的，用于确定 PG 副本的存储位置。当 PG 的副本需要迁移或重新分配时，up set 会作为目标位置。
+- **变化情况**：当 acting set 发生变化时，up set 也可能随之改变，但它们的变化并不总是同步的。例如，在 backfill（回填）过程中，up set 可能会包含一个临时的 OSD，而 acting set 仍然保持原来的值。
+
+`acting set` 与 `up set` 的区别：
+
+- **正常情况**：在大多数情况下，acting set 和 up set 是相同的。这意味着 PG 的副本存储在相同的 OSD 上，并且这些 OSD 负责处理客户端的请求。
+- **特殊情况**：当集群中出现 OSD 故障、添加或移除 OSD 等情况时，acting set 和 up set 可能会不同。例如，在 backfill 过程中，PG 的副本可能暂时存储在一个临时的 OSD 上，此时 up set 会包含这个临时的 OSD，而 acting set 仍然保持原来的值。
+
+`acting set` 与 peering 的联系：
+
+在 peering 过程中，acting set 中的主 OSD 负责协调整个过程。主 OSD 会与副本 OSD 通信，以确定它们对 PG 状态的共识。acting set 中的 OSD 需要通过 peering 来确保它们对 PG 的操作历史达成一致，从而保证数据的一致性。如果某个 OSD 在 acting set 中但无法参与 peering（例如因为故障），可能会导致 PG 的状态变为 degraded 或其他非正常状态。
+
+`up set` 与 peering 的联系：
+
+up set 是 CRUSH 算法根据当前集群状态计算出的 PG 的目标 OSD 集合。在正常情况下，up set 和 acting set 是相同的，但在某些特殊情况下（如 OSD 故障或正在进行 backfill 操作）它们可能会不同。当 up set 和 acting set 不一致时，例如在 backfill 过程中，peering 过程会更加复杂。主 OSD 可能会根据 up set 的信息来决定如何处理 PG 的数据迁移和副本更新。
+
+特殊情况：
+
+- **临时 PG temp**：在某些情况下，如主 OSD 故障但尚未完成数据回填时，会使用 PG temp（临时活跃集）来临时替代 acting set。例如，假设 acting set 是 [0,1,2]，osd.0 故障后，acting set 变为 [3,1,2]，但 osd.3 还没有数据，此时会创建一个 PG temp [1,2,3]，让 osd.1 暂时成为主 OSD，直到 osd.3 完成回填。
+- **acting set 和 up set 的不一致**：当 acting set 和 up set 不一致时，peering 过程可能会受到影响。例如，如果某个 OSD 在 acting set 中但不在 up set 中，可能是因为它正在从集群中移除，或者正在进行数据迁移。
+
 ### PG 状态汇总
 
 | 状态 | 描述 |
 |-----|-----|
 | creating | PG 正在被创建 |
-| peering | PG 正在执行同步处理。PG 处于 peering 过程中，peering 由主 OSD 发起，使存放 PG 副本的所有 OSD 就 PG 的所有对象和元数据的状态达成一致的过程，peering 过程完成后，主 OSD 就可以接受客户端写请求。 |
+| peering | peering 是 PG 的主 OSD（acting set 中的第一个 OSD）与其他副本 OSD 之间达成一致的过程，目的是确保所有副本 OSD 对 PG 中对象的状态和元数据达成共识。但需要注意的是，完成 peering 并不意味着每个副本都具有最新的内容。peering 过程完成后，PG 才能进入 active 状态，主 OSD 才可以接受客户端写请求。 |
 | peered | peering 已经完成，但还不能处理客户端的读写请求，PG 当前 acting set 数量小于存储池的最小副本数（min_size）。recovery 可能发生这种状态。 |
 | activating | peering 已经完成，PG 正在等待所有 PG 实例同步并固化 peered 的结果（info、log 等）。 |
 | active | 激活状态。PG 可以正常处理来自客户端的读写请求。 |
@@ -1883,6 +1918,3 @@ mycephfs0:2 mycephfs1:1 {mycephfs0:0=mycephfs0.serverc.xqikij=up:active,mycephfs
 - [maillist - rbd map image with journaling](https://lists.ceph.io/hyperkitty/list/ceph-users@ceph.io/thread/377S7XFN74MUYKVSXXRAN534FNZTDICK/)
 - ❤ [文件系统指南 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_ceph_storage/5/html/file_system_guide/index)
 - [2.3. 元数据服务器排名 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_ceph_storage/5/html/file_system_guide/metadata-server-ranks_fs#metadata-server-ranks_fs)
-
-
-[def]: #参考链接
