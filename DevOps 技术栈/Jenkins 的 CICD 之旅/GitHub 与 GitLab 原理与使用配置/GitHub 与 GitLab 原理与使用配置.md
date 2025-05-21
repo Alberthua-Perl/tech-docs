@@ -5,7 +5,7 @@
 - OS 版本：CentOS Linux release 7.4.1708 (Core)
 - Git 版本：git-1.8.3.1-20.el7.x86_64
 - GitLab 版本：gitlab-ce-12.7.0-ce.0.el7.x86_64
-- 该文档中若未指定具体版本均已上述版本为例。
+- 该文档中若未指定具体版本均已上述版本为例，若提及不同版本，请注意不同版本间的特性与 Web UI 界面的差异。
 - ✨ 该文档中所涉及的 GitLab 命令、配置与故障排除将持续更新。
 
 ## 文档目录
@@ -277,21 +277,22 @@ $ sudo ss -ntulp | grep 80
 
 #### 常规容器化部署方式
 
-💥 说明：此次部署使用 **Podman 容器引擎**，GitLab-CE 版本为 **17.9.8-ce.0**。
+💥 说明：此次部署使用 Podman 容器引擎版本 **4.9.4-rhel**，GitLab-CE 版本为 **17.9.8-ce.0**。
 
 ```bash
+$ PREFIX=/opt/gitlab-ce
 $ sudo podman pull docker.io/gitlab/gitlab-ce:17.9.8-ce.0
 # 若无法拉取以上镜像，可使用 quay.io/alberthua/gitlab-ce:17.9.8-ce.0 代替，此镜像为以上镜像的同步，两者完全相同。
 # 可选步骤：$ podman pull quay.io/alberthua/gitlab-ce:17.9.8-ce.0
-$ sudo mkdir -p /opt/gitlab-ce/{config,data,logs}
-$ sudo chmod -R 0777 /opt/gitlab-ce
+$ sudo mkdir -p ${PREFIX}/{config,data,logs}
+$ sudo chmod -R 0777 ${PREFIX}
 $ sudo podman run --detach --restart always \
     --security-opt seccomp=unconfined \
     --hostname gitlab-ce.lab.example.com --name gitlab-ce \
     --publish 8080:80 --publish 8443:443 --publish 2222:22 \
-    --volume /opt/gitlab-ce/config:/etc/gitlab:Z \
-    --volume /opt/gitlab-ce/logs:/var/log/gitlab:Z \
-    --volume /opt/gitlab-ce/data:/var/opt/gitlab:Z \
+    --volume ${PREFIX}/config:/etc/gitlab:Z \
+    --volume ${PREFIX}/logs:/var/log/gitlab:Z \
+    --volume ${PREFIX}/data:/var/opt/gitlab:Z \
     docker.io/gitlab/gitlab-ce:17.9.8-ce.0
 # 🎯 当前 podman 版本中设置 --security-opt 选项是为了避免容器启动过程中 OCI runtime runc 调用系统调用权限不足而导致容器运行失败。
 # 默认的 podman 容器引擎 seccomp 规则文件位于 /usr/share/containers/seccomp.json
@@ -337,9 +338,7 @@ root 更新完毕后，需创建常规用户。用户创建完成后，需让 ro
 $ sudo podman stop gitlab-ce
 $ sudo podman rm gitlab-ce
 # 停止并删除容器
-$ sudo rm -rf /opt/gitlab-ce/config/*
-$ sudo rm -rf /opt/gitlab-ce/logs/*
-$ sudo rm -rf /opt/gitlab-ce/data/*
+$ sudo rm -rf ${PREFIX}/config/* ${PREFIX}/logs/* ${PREFIX}/data/*
 # 删除残留的 gitlab-ce 配置文件与相关数据
 ```
 
@@ -471,6 +470,7 @@ $ sudo gitlab-rails console production
 ## 参考链接
 
 - ❤ [GitLab Docs](https://docs.gitlab.com)
+- ❤ [极狐GitLab 文档](https://gitlab.cn/docs/jh/)
 - [gitlab's repos](https://packages.gitlab.com/gitlab)
 - ❤ [使用 Docker Engine 安装极狐GitLab | GitLab Docs](https://gitlab.cn/docs/jh/install/docker/installation.html#%E4%BD%BF%E7%94%A8-docker-engine-%E5%AE%89%E8%A3%85%E6%9E%81%E7%8B%90gitlab)
 - [GitLab Architecture | GitLab Docs](https://docs.gitlab.com/development/architecture/)

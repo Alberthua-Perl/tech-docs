@@ -415,7 +415,7 @@ Write password to /home/alberthua/.vnc/passwd?  [y]/n y
 Password written to: /home/alberthua/.vnc/passwd
 alberthua@mysuse-amd:~> x11vnc -display :0 -forever -usepw -noxdamage
 # 以普通用户身份前台运行 vncserver
-# -display 选项：显示编号
+# -display 选项：显示编号。若当前的显示编号已被使用，可顺延编号使用。
 # -forever 选项：表示 x11vnc 服务器会持续运行，即使客户端断开连接也不会自动退出。它会一直监听连接请求，直到手动停止服务器。
 # -usepw 选项：使用用户设置的 VNC 登录密码登录
 # -noxdamage 选项：用于禁止 x11vnc 服务器对 X 服务器的损坏事件进行检测和处理。损坏事件通常是指 X 服务器上的某些区域需要重绘或更新。
