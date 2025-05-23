@@ -117,7 +117,7 @@
   - [Nexus3 的部署与常规设置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md)
   - [Node.js 之 npm 常用方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.md)
   - [Jenkins 概述与部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Jenkins%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%83%A8%E7%BD%B2/Jenkins%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%83%A8%E7%BD%B2.md)
--【两种方式】简易 CI/CD 平台部署与 Java 应用发布
+- 简易 CI/CD 平台部署与 Java 应用发布【两种方式】
   - [【二进制部署】基于 GitLab + Jenkins + Harbor + Podman 的 Java 应用 CI/CD 示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20GitLab%20%2B%20Jenkins%20%2B%20Harbor%20%2B%20Podman%20%E7%9A%84%20CICD%20%E7%A4%BA%E4%BE%8B/%E5%9F%BA%E4%BA%8E%20GitLab%20%2B%20Jenkins%20%2B%20Harbor%20%2B%20Podman%20%E7%9A%84%20CICD%20%E7%A4%BA%E4%BE%8B.md)
   - [【Ansible 部署】Deploy and manage GitLab-CE and Jenkins CI platform by Ansible](https://github.com/Alberthua-Perl/ansible-demo/tree/master/ansible-cicd-plt)
 
