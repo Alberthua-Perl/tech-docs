@@ -1,4 +1,10 @@
-# Jenkins 的 CI/CD 之旅（）—— Node.js 之 npm 常用方法
+# Jenkins 的 CI/CD 之旅 —— Node.js 之 npm 常用方法
+
+## 文档目录
+
+- [安装 Node.js 环境](#安装-nodejs-环境)
+- [安装 pnpm 包管理器](#安装-pnpm-包管理器)
+- [使用 npm 管理包](#使用-npm-管理包)
 
 ## 安装 Node.js 环境
 
@@ -40,7 +46,9 @@ added 1 package in 27s
 # 全局安装 pnpm 包管理器
 ```
 
-## npm 包管理
+## 使用 npm 管理包
+
+注意：应用目录中直接运行 npm 检索当前目录中存在的模块
 
 ```bash
 $ npm config ls -l
@@ -62,81 +70,4 @@ $ sudo npm list -g --depth=0
 
 $ npm -v
 # 查看 npm 的版本
-```
-
-## 🧪 编译并发布 etherpad-lite 应用
-
-```bash
-[devops@serverb etherpad-lite]$ pnpm install
-Scope: all 6 workspace projects
-Lockfile is up to date, resolution step is skipped
-Packages: +1
-+
-Progress: resolved 1, reused 0, downloaded 1, added 1, done
-Done in 5.7s
-# 在当前的项目目录的 node_modules/ 中安装包
-
-[devops@serverb etherpad-lite]$ pnpm run build:etherpad
-
-> etherpad@2.3.0 build:etherpad /home/devops/etherpad-lite
-> pnpm --filter admin run build-copy && pnpm --filter ui run build-copy
-
-
-> admin@2.3.0 build-copy /home/devops/etherpad-lite/admin
-> tsc && vite build --outDir ../src/templates/admin --emptyOutDir
-
-vite v6.3.5 building for production...
-✓ 1742 modules transformed.
-../src/templates/admin/index.html                   0.49 kB │ gzip:   0.31 kB
-../src/templates/admin/assets/index-BSQTLHmC.css   10.89 kB │ gzip:   3.19 kB
-../src/templates/admin/assets/index-CmBU3i6n.js   479.31 kB │ gzip: 154.07 kB
-[vite-plugin-static-copy] Copied 1 items.
-✓ built in 9.51s
-
-> ui@0.0.0 build-copy /home/devops/etherpad-lite/ui
-> tsc && vite build --outDir ../src/static/oidc --emptyOutDir
-
-vite v6.3.5 building for production...
-✓ 6 modules transformed.
-../src/static/oidc/consent.html               1.01 kB │ gzip: 0.49 kB
-../src/static/oidc/login.html                 2.60 kB │ gzip: 1.03 kB
-../src/static/oidc/assets/style-CLgJS82q.css  1.58 kB │ gzip: 0.75 kB
-../src/static/oidc/assets/main-BcSxKxdW.js    0.15 kB │ gzip: 0.15 kB
-../src/static/oidc/assets/style-CNP0ENT6.js   0.71 kB │ gzip: 0.40 kB
-../src/static/oidc/assets/nested-DhUhjXU9.js  1.06 kB │ gzip: 0.53 kB
-✓ built in 185ms
-# 编译应用
-
-[devops@serverb etherpad-lite]$ pnpm run prod
-
-> etherpad@2.3.0 prod /home/devops/etherpad-lite
-> pnpm --filter ep_etherpad-lite run prod
-
-
-> ep_etherpad-lite@2.3.0 prod /home/devops/etherpad-lite/src
-> cross-env NODE_ENV=production node --require tsx/cjs node/server.ts
-
-[2025-05-19T22:35:22.481] [INFO] settings - All relative paths will be interpreted relative to the identified Etherpad base dir: /home/devops/etherpad-lite
-[2025-05-19T22:35:22.485] [WARN] settings - No settings file found in /home/devops/etherpad-lite/settings.json. Continuing using defaults!
-[2025-05-19T22:35:22.486] [INFO] settings - No credentials file found in /home/devops/etherpad-lite/credentials.json. Ignoring.
-[2025-05-19T22:35:22.487] [WARN] settings - loglevel: INFO
-[2025-05-19T22:35:22.492] [WARN] settings - logLayoutType: colored
-[2025-05-19T22:35:22.493] [WARN] settings - No "skinName" parameter found. Please check out settings.json.template and update your settings.json. Falling back to the default "colibris".
-[2025-05-19T22:35:22.494] [INFO] settings - Using skin "colibris" in dir: /home/devops/etherpad-lite/src/static/skins/colibris
-[2025-05-19T22:35:22.494] [WARN] settings - File location: /home/devops/etherpad-lite/var/rusty.db
-[2025-05-19T22:35:22.495] [INFO] settings - Random string used for versioning assets: 7718e753
-[2025-05-19T22:35:23.851] [INFO] server - Starting Etherpad...
-[2025-05-19T22:35:23.911] [INFO] plugins - check installed plugins for migration
-[2025-05-19T22:35:23.921] [INFO] plugins - pnpm --version: 8.15.9
-[2025-05-19T22:35:23.924] [INFO] plugins - Loading plugin ep_etherpad-lite...
-[2025-05-19T22:35:23.925] [INFO] plugins - Loaded 1 plugins
-[2025-05-19T22:35:25.491] [INFO] server - Installed plugins:
-[2025-05-19T22:35:25.493] [INFO] settings - Report bugs at https://github.com/ether/etherpad-lite/issues
-[2025-05-19T22:35:25.494] [INFO] settings - Your Etherpad version is 2.3.0 (3a9e126)
-[2025-05-19T22:35:29.306] [INFO] http - HTTP server listening for connections
-[2025-05-19T22:35:29.307] [INFO] settings - You can access your Etherpad instance at http://0.0.0.0:9001/
-[2025-05-19T22:35:29.307] [WARN] settings - Admin username and password not set in settings.json. To access admin please uncomment and edit "users" in settings.json
-[2025-05-19T22:35:29.308] [INFO] server - Etherpad is running
-...
-# 运行测试应用
 ```

@@ -1,4 +1,4 @@
-# GitHub 与 GitLab 基础与常规应用
+# Jenkins 的 CI/CD 之旅 —— GitHub 与 GitLab 基础与常规应用
 
 ## 文档说明
 
@@ -286,7 +286,9 @@ $ sudo podman pull docker.io/gitlab/gitlab-ce:17.9.8-ce.0
 # 可选步骤：$ podman pull quay.io/alberthua/gitlab-ce:17.9.8-ce.0
 $ sudo mkdir -p ${PREFIX}/{config,data,logs}
 $ sudo chmod -R 0777 ${PREFIX}
-$ sudo podman run --detach --restart always \
+$ sudo podman run \
+    --detach \
+    --restart always \
     --security-opt seccomp=unconfined \
     --hostname gitlab-ce.lab.example.com --name gitlab-ce \
     --publish 8080:80 --publish 8443:443 --publish 2222:22 \
