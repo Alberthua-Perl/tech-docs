@@ -1,4 +1,4 @@
-# 基于 GitLab、Jenkins、Harbor、Podman 的 CI/CD 示例
+# 基于 GitLab + Jenkins + Harbor + Podman 的 Java 应用 CI/CD 示例
 
 ## 文档说明
 
