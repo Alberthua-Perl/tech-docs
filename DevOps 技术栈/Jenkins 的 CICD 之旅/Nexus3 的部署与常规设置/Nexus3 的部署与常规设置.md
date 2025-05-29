@@ -388,3 +388,6 @@ npm notice Publishing to http://nexus3.lab.example.com:8881/repository/npm-hoste
 
 - ❤ [Sonatype Nexus Repository | Documentation](https://help.sonatype.com/en/sonatype-nexus-repository.html)
 - [sonatype/nexus | DockerHub](https://hub.docker.com/r/sonatype/nexus)
+- 🔥 [nexus3 代理仓库的使用](https://www.cnblogs.com/hukey/p/18532480#%E9%85%8D%E7%BD%AEdocker%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93)
+- [nexus 配置管理 docker 镜像](https://blog.csdn.net/LG_15011399296/article/details/127687599)
+- [「docker 仓库」搭建 Nexus 私服](https://zhuanlan.zhihu.com/p/716123466)

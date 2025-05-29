@@ -36,6 +36,7 @@
   - [RHEL9 安装 EPEL9 软件源](#rhel9-安装-epel9-软件源)
   - [安装 Chinese lang pack](#安装-chinese-lang-pack)
   - [安装 rdesktop 软件包连接 Windows RDP 桌面](#安装-rdesktop-软件包连接-windows-rdp-桌面)
+  - [RHEL9 安装 ToDesk](#rhel9-安装-todesk)
 - [dnf 下载软件包及其依赖](#dnf-下载软件包及其依赖)
 - [dnf 实现软件包安全检测与更新](#dnf-实现软件包安全检测与更新)
 - [RedHat 订阅服务使用](#redhat-订阅服务使用)
@@ -510,6 +511,17 @@ $ sudo dnf install -y rdesktop
 $ rdesktop -u <remote_user> -d <domain> -p <password> <hostname_or_ip>:<port>
 $ rdesktop -u hwuser88 -d bestvdc -p Ansible2024! redhat.bestvdc.com:23353
 # 登录 Cloudshell bestvdc desktop
+```
+
+### RHEL9 安装 ToDesk
+
+```bash
+$ wget https://rh-course-materials.oss-cn-hangzhou.aliyuncs.com/todesk-v4.7.2.0-x86_64.rpm
+$ sudo rpm -ivh todesk-v4.7.2.0-x86_64.rpm
+$ sudo dnf install -y libappindicator-gtk3
+# 安装 todesk 软件包依赖
+$ sudo systemctl enable --now todeskd.service
+# 启动并设置开机自启服务
 ```
 
 -----
