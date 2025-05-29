@@ -112,7 +112,7 @@
 ## ♾️ **DevOps 技术栈**
 
 - [【精华】Git 基础进阶与场景实践](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Git%20%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%9C%BA%E6%99%AF%E5%AE%9E%E8%B7%B5/Git%20%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%9C%BA%E6%99%AF%E5%AE%9E%E8%B7%B5.md)
-- 🎯 **Jenkins 的 CI/CD 之旅 —— Java/Node.js/Flask/Golang 应用的构建与发布**
+- 🎯 **[Jenkins 的 CI/CD 之旅 —— Java/Node.js/Flask/Golang 应用的构建与发布](https://github.com/Alberthua-Perl/tech-docs/tree/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85)**
   - [GitHub 与 GitLab 基础与常规应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/GitHub%20%E4%B8%8E%20GitLab%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8/GitHub%20%E4%B8%8E%20GitLab%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8.md)
   - [Nexus3 的部署与常规设置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md)
   - [Node.js 之 npm 常用方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.md)
