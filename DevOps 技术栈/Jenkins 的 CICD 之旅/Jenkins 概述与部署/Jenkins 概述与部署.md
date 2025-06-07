@@ -10,16 +10,16 @@
 
 ## 文档目录
 
-- [Jenkins 基础](#jenkins-基础)
-  - [Jenkins 是什么？](#jenkins-是什么)
-  - [Jenkins 的特点](#jenkins-的特点)
-- [Jenkins 系统组件](#jenkins-系统组件)
-- [Jenkins 安装与配置](#jenkins-安装与配置)
-- [Jenkins 的插件设置](#jenkins-的插件设置)
+- [1. Jenkins 基础](#1-jenkins-基础)
+  - [1.1 Jenkins 是什么？](#11-jenkins-是什么)
+  - [1.2 Jenkins 的特点](#12-jenkins-的特点)
+- [2. Jenkins 系统组件](#2-jenkins-系统组件)
+- [3. Jenkins 安装与配置](#3-jenkins-安装与配置)
+- [4. Jenkins 的插件设置](#4-jenkins-的插件设置)
 
-## Jenkins 基础
+## 1. Jenkins 基础
 
-### Jenkins 是什么？
+### 1.1 Jenkins 是什么？
 
 <center><img src="images/jenkins-logo.webp" style="width:80%"></center>
 
@@ -27,7 +27,7 @@
 - Jenkins 用 Java 语言编写，可在 Tomcat 等流行的 `servlet` 容器中运行，也可通过 Java 环境独立使用 `war` 包运行，也可通过容器化运行。通常与版本控制工具（SCM）、构建工具结合使用。Jenkins 可以很好地支持各种语言的项目构建，也完全兼容 `Maven`、`Ant`、`Gradle` 等多种第三方构建工具，同时跟 SVN、Git 等常用的版本控制工具无缝集成，也支持直接对接 GitHub 等源代码托管网站。
 - 💥 **Jenkins 的版本可分为 `1.x` 与 `2.x`，目前主流已使用 `2.x` 版本。后文若未说明版本，均为 `2.x`。**
 
-### Jenkins 的特点
+### 1.2 Jenkins 的特点
 
 - `DSL` 是 Jenkins 2 的核心组件，作为构建模块让其他核心的用户导向特性成为可能。
 - 支持将原本写在 Jenkins 中的代码提取到一个 `Jenkinsfile` 文件中，从而以一种更加结构化的方法来创建工作流，即声明式流水线，它比传统的脚本式流水线有着更加清晰、可预期的结构，以及更强大的 DSL 元素和结构体。
@@ -44,7 +44,7 @@
 
   <center><img src="images/contrast-cicd-gitops.gif" style="width:80%"></center>
 
-## Jenkins 系统组件
+## 2. Jenkins 系统组件
 
 - 在 Jenkins 2 中，节点（node）是一个基础概念，代表了任何可以执行 Jenkins 任务的系统。
 - 节点中包含 **主节点（master）** 和 **代理节点（agent）** 两种类型，但主节点一般用于完成任务分配等管理功能，而代理节点才会执行各类具体的任务。
@@ -58,7 +58,7 @@
 
     > 注意：一般而言，执行器的数量小于或等于所在节点的 CPU 核心数，当然，也需要根据任务的负载来做数量上的调整。
 
-## Jenkins 安装与配置
+## 3. Jenkins 安装与配置
 
 - Jenkins 具有两种不同的软件发行周期：
   - 长期稳定版（`LTS`）：每12周更新一次，每4周发布 bug 修复与安全补丁加固。
@@ -84,11 +84,32 @@
 
   根据以上步骤即可完成节点上基于 RPM 方式的 Jenkins 安装部署。
 
-- 访问 Jenkins 守护进程所在的节点，即 jenkins-master.lab.example.com:8080（Jenkins 默认 8080 端口），根据 Web 提示输入初始化管理员密码、侦测网络环境并安装插件、创建管理员账号与密码并登录 Jenkins。
+- 访问 Jenkins 守护进程所在的节点，即 http://jenkins-master.lab.example.com:8080（Jenkins 默认 8080 端口）。
+- 输入 `/var/lib/jenkins/secrets/initialAdminPassword` 中的初始化密码：
 
-  > 注意：由于国内网络问题，经常造成插件下载超时而导致安装失败，因此，可参考以下 “Jenkins 的插件设置” 部分解决此问题。
+  <center><img src="images/jenkins-install-1.jpg" style="width:80%"></center>
 
-## Jenkins 的插件设置
+- 初始化密码输入后进入安装插件界面，由于国内网络环境原因，常常超时而导致安装失败，因此，可直接选择第一个选项 "安装推荐的插件"，即使安装失败也无妨，可在后续 Jenkins 插件源中更换为国内源加速插件安装。插件安装后，进入设置管理员用户界面，可参考以下完成设置：
+
+  <center><img src="images/jenkins-install-6.png" style="width:80%"></center>
+
+  <center><img src="images/jenkins-install-7.png" style="width:80%"></center>
+
+  <center><img src="images/jenkins-install-2.jpg" style="width:80%"></center>
+
+- 管理员账号设置完成后，Jenkins 返回可访问 Web UI 界面的地址：
+
+  <center><img src="images/jenkins-install-3.jpg" style="width:80%"></center>
+
+  <center><img src="images/jenkins-install-4.jpg" style="width:80%"></center>
+
+- 访问 Jenkins 的 Web UI 界面：
+
+  <center><img src="images/jenkins-install-5.jpg" style="width:80%"></center>
+
+  > 再次提示：由于国内网络问题，经常造成插件下载超时而导致安装失败，因此，可参考以下 “Jenkins 的插件设置” 部分解决此问题。
+
+## 4. Jenkins 的插件设置
 
 - Jenkins 最大的优势在于具有众多的 **插件**（plugin），实际工作的是插件。
 - Jenkins 使用插件的源位于 [jenkins.io](https://updates.jenkins.io/update-center.json) 官方站点，下载更新速度很慢，时常由于连接超时问题而导致插件安装失败，因此，可更换为国内的插件源。

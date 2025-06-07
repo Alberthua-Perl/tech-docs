@@ -472,11 +472,13 @@ $ sudo gitlab-rails console production
 ## 参考链接
 
 - ❤ [GitLab Docs](https://docs.gitlab.com)
-- ❤ [极狐GitLab 文档](https://gitlab.cn/docs/jh/)
+- ❤ [极狐 GitLab 文档](https://gitlab.cn/docs/jh/)
 - [gitlab's repos](https://packages.gitlab.com/gitlab)
 - ❤ [使用 Docker Engine 安装极狐GitLab | GitLab Docs](https://gitlab.cn/docs/jh/install/docker/installation.html#%E4%BD%BF%E7%94%A8-docker-engine-%E5%AE%89%E8%A3%85%E6%9E%81%E7%8B%90gitlab)
 - [GitLab Architecture | GitLab Docs](https://docs.gitlab.com/development/architecture/)
 - [GitLab 架构](https://blog.csdn.net/kikajack/article/details/80354774)
 - [GitLab 搭建遇到的问题记录](https://blog.csdn.net/huohongpeng/article/details/113856718)
-- [GitLab启动所有服务的方式](http://www.doocr.com/articles/58aef65448fad94044cf13cc)
+- [GitLab 启动所有服务的方式](http://www.doocr.com/articles/58aef65448fad94044cf13cc)
 - [GitLab 操作手册](https://blog.51cto.com/14241151/2366621?source=dra)
+- ❤ [GitHub 使用教程详解 —— 官网操作指南（翻译）](https://www.cnblogs.com/keessi/p/7232451.html)
+- ❤ [Hello World —— Follow this Hello World exercise to learn GitHub's pull request workflow.](https://docs.github.com/en/get-started/start-your-journey/hello-world)

@@ -128,6 +128,33 @@ dos> route print
 
 ## Shell 脚本补充
 
+- 用户登录时加载 bash 配置文件的过程：
+  - 登录式 shell（login shell）加载配置文件过程：
+
+    ```plaintext
+    /etc/profile --> /etc/profile.d/*.sh --> ~/.bash_profile --> ~/.bashrc --> /etc/bashrc
+    ```
+
+  - 非登录式 shell（non-login shell）加载配置文件过程：
+
+    ```plaintext
+    ~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh
+    ```
+
+- 关于重定向说明：
+  - `<`：输出重定向（将原来需要由键盘输入的数据，改由文件内容来取代）
+
+  ```bash
+  tr 'a-z' 'A-Z' < /path/to/file
+  ```
+
+  - `<<`：代表结束的输入字符
+
+  ```bash
+  cat << END
+  cat > /path/to/file << EOF
+  ```
+
 - Shell 内部字段分隔符（Internal Field Separator）：`IFS`
   - IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
   - 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
@@ -150,6 +177,15 @@ dos> route print
   
   $ sh -n /path/to/<shell_script>
   # 检查 shell 语法
+
+  $ set -C
+  # 禁止对已经存在文件使用覆盖重定向（>）；强制覆盖重定向，则使用 >|。
+  $ echo "Hello world!" > ./testfile
+  # 设置以上命令后，执行覆盖重定向操作将返回 "cannot overwrite existing file" 报错。
+  $ echo "Hello world!" >| ./testfile
+  # 强制重定向覆盖
+  $ set +C
+  # 关闭上述功能
   ```
 
 -----
