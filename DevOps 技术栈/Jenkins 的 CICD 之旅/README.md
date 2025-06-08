@@ -20,17 +20,25 @@
   - [5.3 重置 GitLab-CE 的 root 密码](#53-重置-gitlab-ce-的-root-密码)
   - [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](#54-创建与批准-gitlab-ce-的-devuser0-开发者用户)
   - [5.5 创建新项目 etherpad-lite-postgres](#55-创建新项目-etherpad-lite-postgres)
-  - [5.6 GitLab-CE 中导入外部代码库（etherpad-lite-postgres）](#56-gitlab-ce-中导入外部代码库etherpad-lite-postgres)
+  - [5.6 Node.js 应用：导入外部代码库 etherpad-lite-postgres](#56-nodejs-应用导入外部代码库-etherpad-lite-postgres)
 - [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
   - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
   - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
-  - [6.3 创建 Nexus3 的容器镜像仓库](#63-创建-nexus3-的容器镜像仓库)
+  - [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](#63-创建-nexus3-的容器镜像仓库hosted-类型)
   - [6.4 创建 Nexus3 的 npm 构建仓库（proxy 类型）](#64-创建-nexus3-的-npm-构建仓库proxy-类型)
-- [7. 部署 npm 运行及构建环境](#7-部署-npm-运行及构建环境)
+- [7. 部署应用运行及构建环境](#7-部署应用运行及构建环境)
+  - [7.1 Node.js 运行环境](#71-nodejs-运行环境)
 - [8. 部署与设置 PostgreSQL 数据库](#8-部署与设置-postgresql-数据库)
   - [8.1 安装部署 PostgreSQL 数据库](#81-安装部署-postgresql-数据库)
   - [8.2 数据库服务器中创建 etherpad-lite 应用相关用户与数据库](#82-数据库服务器中创建-etherpad-lite-应用相关用户与数据库)
 - [9. 部署 Jenkins Master 服务](#9-部署-jenkins-master-服务)
+- [10. 运行自由风格的作业（Free Style Project）](#10-运行自由风格的作业free-style-project)
+  - [10.1 Node.js 应用 —— 构建测试 etherpad-lite 应用及容器镜像](#101-nodejs-应用--构建测试-etherpad-lite-应用及容器镜像)
+    - [10.1.1 创建基于 SSH 私钥的凭据连接 GitLab-CE](#1011-创建基于-ssh-私钥的凭据连接-gitlab-ce)
+    - [10.1.2 安装 Jenkins 的 Blue Ocean 插件](#1012-安装-jenkins-的-blue-ocean-插件)
+    - [10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置](#1013-jenkins-用户的-ssh-连接代码库的主机密钥校验与配置)
+    - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
+    - [10.1.5 创建与运行作业](#1015-创建与运行作业)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -55,6 +63,7 @@
 
   | 主机名 | 主机别名 | IPv4 | vCPU | 内存 | 节点角色 |
   | ----- | ----- | ----- | ----- | ----- | ----- |
+  | foundation0.ilt.example.com | NA | 172.25.254.250 | 8 | 48 | Virtual Host |
   | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 6 | GitLab CE |
   | servera.lab.example.com | jenkins-master.lab.example.com | 172.25.250.10 | 4 | 4 | Jenkins Master |
   | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent |
@@ -79,16 +88,16 @@
 
 ### 2.3 创建与附加 raw 磁盘镜像
 
-workstation 节点用作 GitLab-CE 运行节点需要更多的计算资源与较大的存储空间用于存储配置、数据与日志，但由于 workstation 节点的存储空间有限，因此，需要创建额外的 raw 格式磁盘镜像，并将其附加（attach）至该节点上，可参考以下步骤：
+workstation 节点用作 GitLab-CE 运行节点需要更多的计算资源与较大的存储空间用于存储配置、数据与日志，但由于 workstation 节点的存储空间有限，因此，需要创建额外的 raw 格式磁盘镜像，并将其附加（attach）至此节点上，可参考以下步骤：
 
 ```bash
 ## 注意：
 ##   1. 为 foundation0 分配一个新磁盘 90G
-##   2. 将该磁盘创建为逻辑卷并挂载 /mnt/vmdisk，该目录用于存储 workstation 的额外存储。
+##   2. 将此磁盘创建为逻辑卷并挂载 /mnt/vmdisk，此目录用于存储 workstation 的额外存储。
 [root@foundation0 ~]# cd /mnt/vmdisk  #切换至已挂载逻辑卷的目录中
 [root@foundation0 vmdisk]# qemu-img create -f raw /mnt/vmdisk/workstation-vdb-10G.raw 10G
 [root@foundation0 vmdisk]# chown qemu:qemu /mnt/vmdisk/workstation-vdb-10G.raw  #更改为 qemu 用户与用户组
-[root@foundation0 vmdisk]# virsh attach-disk workstation --source /mnt/vmdisk/workstation-vdb-10G.raw --target vdb --persistent --cache none  #--persistent 选项：持久化添加 vdb 磁盘（否则关机后将自动删除该磁盘）
+[root@foundation0 vmdisk]# virsh attach-disk workstation --source /mnt/vmdisk/workstation-vdb-10G.raw --target vdb --persistent --cache none  #--persistent 选项：持久化添加 vdb 磁盘（否则关机后将自动删除此磁盘）
 
 ## 登录 devops@workstation 执行
 [devops@workstation ~]$ sudo pvcreate /dev/vdb
@@ -198,7 +207,7 @@ total 8.0K
 ### [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/GitHub%20%E4%B8%8E%20GitLab%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8/GitHub%20%E4%B8%8E%20GitLab%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8.md#%E4%BD%BF%E7%94%A8%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E9%83%A8%E7%BD%B2)
 
 - Web 注册界面创建 devuser0 开发者用户
-- 设置该用户的 SSH 连接公钥（此处使用 `devops@workstation` 中名为 devops-jenkins.pub 的 SSH 公钥）
+- 设置此用户的 SSH 连接公钥（此处使用 `devops@workstation` 中名为 devops-jenkins.pub 的 SSH 公钥）
 
 ### 5.5 创建新项目 etherpad-lite-postgres
 
@@ -210,9 +219,9 @@ total 8.0K
 
 <center><img src="images/gitlab-create-new-project-3.png" style="width:80%"></center>
 
-### 5.6 GitLab-CE 中导入外部代码库（etherpad-lite-postgres）
+### 5.6 Node.js 应用：导入外部代码库 etherpad-lite-postgres
 
-下载 etherpad-lite-postgres.tar 源码文件并推送至 GitLab-CE 中：
+下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中：
 
 ```bash
 [devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/etherpad-lite-postgres.tar
@@ -318,11 +327,15 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 ### [6.2 创建 Nexus3 的 devuser0 用户](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#2-%E5%88%9B%E5%BB%BA-nexus3-%E7%94%A8%E6%88%B7)
 
-### [6.3 创建 Nexus3 的容器镜像仓库](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#41-%E5%88%9B%E5%BB%BA-docker-hosted-%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93)
+### [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#41-%E5%88%9B%E5%BB%BA-docker-hosted-%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93)
 
 ### [6.4 创建 Nexus3 的 npm 构建仓库（proxy 类型）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#5-npm-%E6%9E%84%E4%BB%B6%E5%BA%93)
 
-## 7. 部署 npm 运行及构建环境
+## 7. 部署应用运行及构建环境
+
+### 7.1 Node.js 运行环境
+
+Jenkins Master 节点与 Agent 节点使用 Node.js 管理工具构建与管理模块与应用，因此，各节点需安装 node 运行环境、npm 与 pnpm 工具，可参考以下步骤：
 
 ```bash
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-nodejs-env.yml
@@ -330,7 +343,7 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 ## 8. 部署与设置 PostgreSQL 数据库
 
-该 postgresql 数据库服务器用于 Node.js 应用 etherpad-lite 在运行后的数据连接。etherpad-lite 应用在容器镜像构建过程中通过本地的 Nexus3 的 npm-proxy 仓库安装依赖模块，构建与指定执行应用方式。当应用容器镜像构建完成，可将其推送至本地 Nexus3 的 docker-hosted 镜像仓库中，待到部署此应用时拉取运行即可。连接 postgresql 服务器的应用，如果通过应用 Web 界面编辑文本，那么这些文本将存储于数据库中。
+此 postgresql 数据库服务器用于 Node.js 应用 etherpad-lite 在运行后的数据连接。etherpad-lite 应用在容器镜像构建过程中通过本地的 Nexus3 的 npm-proxy 仓库安装依赖模块，构建与指定执行应用方式。当应用容器镜像构建完成，可将其推送至本地 Nexus3 的 docker-hosted 镜像仓库中，待到部署此应用时拉取运行即可。连接 postgresql 服务器的应用，如果通过应用 Web 界面编辑文本，那么这些文本将存储于数据库中。
 
 ### 8.1 安装部署 PostgreSQL 数据库
 
@@ -350,13 +363,13 @@ logout
 
 ### 8.2 数据库服务器中创建 etherpad-lite 应用相关用户与数据库
 
-构建的 etherpad-lite 应用可通过源码中的 settings.json 文件定义的数据库服务器对接。因此，此处创建相关用户与数据库，如下所示：
+构建的 etherpad-lite 应用可通过源代码中的 settings.json 文件定义的数据库服务器对接。因此，此处创建相关用户与数据库，如下所示：
 
 ```bash
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tag create_user_db
 ```
 
-若用户创建或数据库创建失败或报错，可执行以下命令回退：
+如果用户创建或数据库创建失败或报错，可执行以下命令回退：
 
 ```bash
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tag revoke_user_db
@@ -369,9 +382,13 @@ logout
 # 部署 Jenkins Master 节点服务
 ```
 
-## 10. 创建运行 Node.js 的自由风格作业 —— 构建 etherpad-lite 应用镜像
+Jenkins Master 服务部署完成后需登录 Web UI 继续设置，可参考 [Jenkins 安装与配置](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Jenkins%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%83%A8%E7%BD%B2/Jenkins%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%83%A8%E7%BD%B2.md#3-jenkins-%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE)中的部分内容。
 
-### 10.1 创建基于 SSH 私钥的凭据连接 GitLab-CE
+## 10. 运行自由风格的作业（Free Style Project）
+
+### 10.1 Node.js 应用 —— 构建测试 etherpad-lite 应用及容器镜像
+
+#### 10.1.1 创建基于 SSH 私钥的凭据连接 GitLab-CE
 
 此处创建的凭据后续用于连接 GitLab-CE 代码库
 
@@ -385,15 +402,15 @@ logout
 
 <center><img src="images/jenkins-create-credentials-7.png" style="width:80%"></center>
 
-### 10.2 安装 Jenkins 的 Blue Ocean 插件
+#### 10.1.2 安装 Jenkins 的 Blue Ocean 插件
 
-点击 `Dashboard > Manage Jenkins > Plugins > Available plugins`，搜索 `Blue Ocean` 插件，点击 Install 即可逐步安装。该插件可作为新一代的 Jenkins 作业构建面板。
+点击 `Dashboard > Manage Jenkins > Plugins > Available plugins`，搜索 `Blue Ocean` 插件，点击 Install 即可逐步安装。此插件可作为新一代的 Jenkins 作业构建面板。
 
 <center><img src="images/blue-ocean-plugin-install-1.png" style="width:80%"></center>
 
 <center><img src="images/blue-ocean-plugin-install-2.jpg" style="width:80%"></center>
 
-### 10.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置
+#### 10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置
 
 配置自由风格作业的过程中，如需连接远程代码库，那么要指定连接远程代码库的凭据，此处使用基于 SSH 私钥的凭据。本次采用容器化部署的 gitlab-ce 远程代码库，其对外暴露的 SSH 监听端口不再是默认的 22/tcp 端口，而是映射至宿主机的 8882/tcp 端口，因此，Jenkins Master 节点使用 SSH 连接时需执行以下步骤：
 
@@ -407,16 +424,16 @@ jenkins:x:977:977:Jenkins Automation Server:/var/lib/jenkins:/bin/false
 [jenkins@servera ~]$ pwd  #jenkins 用户家目录
 /var/lib/jenkins
 
-### 步骤2：指定远程代码仓库监听的 SSH 端口
+### 步骤2：指定远程代码库监听的 SSH 端口
 [jenkins@servera ~]$ cat > ~/.ssh/config <<EOF
 > Host workstation.lab.example.com gitlab-ce.lab.example.com
 >   Port 8882
 > EOF
-# 直接在 jenkins 用户家目录中创建 SSH 配置文件，指定远程代码仓库监听的 SSH 端口（gitlab-ce 容器映射至宿主机的端口）。
+# 直接在 jenkins 用户家目录中创建 SSH 配置文件，指定远程代码库监听的 SSH 端口（gitlab-ce 容器映射至宿主机的端口）。
 [jenkins@servera ~]$ ls -lh ~/.ssh/config  #确认 SSH 配置文件的权限
 -rw-r--r--. 1 jenkins jenkins 71 Jun  6 11:33 /var/lib/jenkins/.ssh/config
 
-### 步骤3：接受远程代码仓库的 SSH 主机公钥
+### 步骤3：接受远程代码库的 SSH 主机公钥
 [jenkins@servera ~]$ ssh devops@workstation.lab.example.com
 The authenticity of host '[workstation.lab.example.com]:8882 ([172.25.250.9]:8882)' can't be established.
 ED25519 key fingerprint is SHA256:IO2evgSVI11S4LZh75hWb7F/bS9kY1zHW1dkFasDiQM.
@@ -437,25 +454,143 @@ devops@gitlab-ce.lab.example.com: Permission denied (publickey).
 [jenkins@servera ~]$ cat ~/.ssh/known_hosts  
 [workstation.lab.example.com]:8882 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnWFj9xJ4k3/OLAX5pDCNiISbbuAduzECuQHOo1GCOJ
 [gitlab-ce.lab.example.com]:8882 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnWFj9xJ4k3/OLAX5pDCNiISbbuAduzECuQHOo1GCOJ
-# 满足 SSH 主机公钥加密算法 ed25519，远程代码仓库监听的 SSH 端口（gitlab-ce 容器映射至宿主机的端口）。
+# 满足 SSH 主机公钥加密算法 ed25519，远程代码库监听的 SSH 端口（gitlab-ce 容器映射至宿主机的端口）。
 ```
 
-以上 3 步保证在创建自由风格作业的过程中，连接远程代码仓库时，避免出现以下报错：
+以上 3 步保证在创建自由风格作业的过程中，连接远程代码库时，避免出现以下报错：
 
-- Jenkins 连接远程代码仓库时需验证该节点的主机公钥，因此需验证该公钥以免连接失败（步骤3）。当然，也可在 Jenkins 的 Dashboard 中设置，如下图所示，但关闭主机 SSH 公钥验证将降低 Jenkins 安全性（此方法不推荐）。
+- Jenkins 连接远程代码库时需验证此节点的主机公钥，因此需验证此公钥以免连接失败（步骤3）。当然，也可在 Jenkins 的 Dashboard 中设置，如下图所示，但关闭主机 SSH 公钥验证将降低 Jenkins 安全性（此方法不推荐）。
 
   <center><img src="images/host-key-checking.png" style="width:80%"></center>
 
-- 连接的远程代码仓库对外映射的 SSH 端口为 8882/tcp，如果直接在源代码 url 地址中指定端口的话，Jenkins 解析地址失败，因此可直接在 jenkins 用户的 SSH 连接配置中直接指定映射至宿主机的监听端口解决（步骤2）。
+- 连接的远程代码库对外映射的 SSH 端口为 8882/tcp，如果直接在源代码 url 地址中指定端口的话，Jenkins 解析地址失败，因此可直接在 jenkins 用户的 SSH 连接配置中直接指定映射至宿主机的监听端口解决（步骤2）。
 
+#### 10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境
 
+自由风格的作业中以 jenkins 用户运行 podman 构建应用容器镜像，而 jenkins 用户作为非特权用户需以 rootless 模式执行构建，如果此用户未在 `/etc/subuid` 与 `/etc/subgid` 中设置子用户与子用户组映射的话，在 Jenkins 作业执行过程中 Blue Ocean 界面报错如下：
 
+<center><img src="images/jenkins-create-freestyle-job-nodejs-6.png" style="width:80%"></center>
 
+可执行以下步骤解决此问题：
 
+```bash
+[devops@servera ~]$ sudo su -
+[root@servera ~]# loginctl enable-linger 977  #jenkins 的 UID
+[root@servera ~]# vim /etc/subuid
+devops:100000:65536
+jenkins:165536:65536
+[root@servera ~]# vim /etc/subgid
+devops:100000:65536
+jenkins:165536:65536
+# 分别添加 jenkins 用户的子用户与用户组映射
+```
 
+#### 10.1.5 构建与上传 node-pnpm 容器镜像
 
+etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建，因此需预先构建此类基础镜像，再推送至 Nexus3 容器镜像仓库中。
 
+```bash
+## 注意：由于其他节点的存储空间有限，因此在 foundation0 节点中构建容器镜像。
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/rockylinux-9.3.tar
+# docker.io 中的容器镜像，由于拉取超时失败，因此已提前准备。
+[kiosk@foundation0 ~]$ podman load -i rockylinux-9.3.tar
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/node-pnpm.tar
+[kiosk@foundation0 ~]$ tar -xf node-pnpm.tar
+[kiosk@foundation0 ~]$ cd node-pnpm
+[kiosk@foundation0 node-pnpm]$ podman build -t node-pnpm:10.11.0 --format=docker .
+# 上传至 Nexus3 中的容器镜像不支持 oci 格式，在构建时指定兼容 docker 镜像格式（v2s2），否则后续推送镜像直接失败！
+[kiosk@foundation0 node-pnpm]$ podman tag localhost/node-pnpm:10.11.0 nexus3.lab.example.com:8882/node-pnpm:10.11.0
+[kiosk@foundation0 node-pnpm]$ podman login --tls-verify=false --username devuser0 --password 1qazZSE$ nexus3.lab.example.com:8882
+[kiosk@foundation0 node-pnpm]$ podman push --tls-verify=false nexus3.lab.example.com:8882/node-pnpm:10.11.0
+```
 
+#### 10.1.6 创建与运行作业
+
+1️⃣ 点击 Dashboard > Create a job 创建作业：
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-1.png" style="width:80%"></center>
+
+2️⃣ 指定创建的作业名称，以及作业的类型，此处选择自由风格的作业（项目）类型：
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-2.png" style="width:80%"></center>
+
+3️⃣ 点击 Source Code Management，选择 Git 源代码仓库选项，填入 Repository URL，即 `git@workstation.lab.example.com:devuser0/etherpad-lite-postgres.git`（5.6 中已导入），并选择相应的连接凭据 devuser0（10.1.1 中已创建）。
+
+> 注意：💥 如果未在 10.1.3 中完成设置，那么在选择完 devuser0 凭据后，可能出现连接的远程代码仓库 SSH 主机公钥验证失败或者指定的源代码 namespace 不存在，亦或访问权限不足等报错。
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-3.jpg" style="width:80%"></center>
+
+4️⃣ 构建需指定源代码分支，此处选择 *master* 分支：
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-4.jpg" style="width:80%"></center>
+
+5️⃣ Build Steps 中选择 Execute shell，编写作业的执行逻辑，最后点击 Save 保存此作业。此脚本的执行思路：先构建、测试源码，成功通过后再使用 Containerfile 构建此应用的容器镜像，并推送至 Nexus3 中待后续部署。
+
+```bash
+#!/bin/bash
+
+# 说明：
+#   Jenkins 的作业存储于 /var/lib/jenkins/workspace/<job_name>/ 目录中，因此，拉取的源代码目录中的内容直接保存于此目录中。
+#   因此，当前作业目录中直接保存了所有源代码文件。
+echo -e "\n---> Create app build env..."
+mkdir build/  #创建新目录
+shopt -s extglob  #设置 shell 通配符扩展，如果不设置，那么下一步命令无法执行。
+mv !(build) build/ && mv .[a-zA-Z]* build/
+#将源代码文件及隐藏文件全部移入 build/ 目录中，方便之后在当前目录中创建 Containerfile 用于构建应用镜像。
+
+echo -e "\n---> Show local dir structure..."
+tree -L 2 .  #查看当前目录结构
+
+echo -e "\n---> Test etherpad-lite-postgres app..."
+cd build/
+pnpm install --no-frozen-lockfile --force  #强制安装应用依赖模块，不使用 --force 选项将停滞在是否安装模块选项中。
+pnpm run build:etherpad  #构建应用
+[[ $? -eq 0 ]] || exit 10  #构建成功继续执行，否则错误退出。
+
+echo -e "\n---> Generate app Containerfile..."
+cd ../  #切换至源码目录外
+cat > Containerfile <<EOF  #生成 Containerfile
+FROM nexus3.lab.example.com:8882/node-pnpm:10.11.0  #此基础镜像需提前上传至 Nexus3 中
+MAINTAINER hualongfeiyyy@163.com
+
+RUN mkdir /app
+ADD ./build /app  #将源码文件全部拷贝至容器镜像中
+WORKDIR /app
+RUN pnpm install --no-frozen-lockfile --force && \
+    pnpm run build:etherpad
+
+EXPOSE 9001  #暴露 9001 端口
+ENTRYPOINT ["pnpm", "run", "prod"]  #运行应用
+EOF
+
+echo -e "\n---> Login and pull base image..."
+podman login --tls-verify=false --username devuser0 --password 1qazZSE$ nexus3.lab.example.com:8882
+podman pull --tls-verify=false nexus3.lab.example.com:8882/node-pnpm:10.11.0  
+#提前拉取镜像，如果构建时自动拉取镜像，会由于连接 Nexus3 镜像仓库的证书认证失败而导致拉取失败！
+podman build -t etherpad-lite-postgres:v1.0 --format=docker .  #指定构建镜像格式执行构建
+if [[ $? -eq 0 ]]; then
+  podman tag localhost/etherpad-lite-postgres:v1.0 nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+  podman push --tls-verify=false nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+else
+  echo -e "\n---> [ERROR] Build failure..."
+  exit 10
+fi
+#如果构建成功，那么推送镜像，反之退出作业流程。
+```
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-5.jpg" style="width:80%"></center>
+
+以上构建脚本可参考 [jenkins-ci-plt/jenkins/free-style-demo/etherpad-lite-postgres-job.sh](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/free-style-demo/etherpad-lite-postgres-job.sh)
+
+6️⃣ 点击 Build Now 开始构建，也可点击 Open Blue Ocean 打开浏览构建过程：
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-7.png" style="width:80%"></center>
+
+7️⃣ 应用构建、测试与容器镜像构建、推送完成：
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-9.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-8.png" style="width:80%"></center>
 
 ## 附录A. PostgreSQL 常用命令
 
@@ -466,7 +601,7 @@ devops@gitlab-ce.lab.example.com: Permission denied (publickey).
 $ psql -U <username> -d <db_name> -h <pg_server> -p <port>
 # 指定数据库登录用户名、密码、连接的服务器地址与监听端口（默认监听 5432 端口）
 $ psql -U etherpad_user -d etherpad_db -h 172.25.250.13
-Password for user etherpad_user:  #输入该用户密码即可登录 
+Password for user etherpad_user:  #输入此用户密码即可登录 
 psql (13.7)
 Type "help" for help.
 
@@ -488,7 +623,7 @@ postgres=#
 
 ```bash
 (root)$ su - postgres
-# PostgreSQL 服务器节点切换至 postgres 用户，该用户作为 PostgreSQL 服务器的管理员用户。
+# PostgreSQL 服务器节点切换至 postgres 用户，此用户作为 PostgreSQL 服务器的管理员用户。
 (postgres)$ psql -c "ALTER USER postgres WITH PASSWORD '<password>';"
 # 更新 postgres 管理员用户密码
 ```
@@ -552,3 +687,5 @@ postgres=# \l  #查看所以数据库
 - [Automate container and pod deployments with Podman and Ansible | RedHat Blog](https://www.redhat.com/en/blog/ansible-podman-container-deployment)
 - [Community.Postgresql  | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/community/postgresql/index.html)
 - [community.postgresql | Galaxy Docs](https://galaxy.ansible.com/ui/repo/published/community/postgresql/?version=4.0.0)
+- [How to use 'mv' command to move files except those in a specific directory? | stack overflow](https://stackoverflow.com/questions/4612157/how-to-use-mv-command-to-move-files-except-those-in-a-specific-directory)
+- [Cannot run docker commands through Jenkin's Blue Ocean: ERRO[0000] No subuid ranges found for user “jenkins” in /etc/subuid | stack overflow](https://stackoverflow.com/questions/58855758/cannot-run-docker-commands-through-jenkins-blue-ocean-erro0000-no-subuid-ran)
