@@ -20,7 +20,8 @@
   - [5.3 重置 GitLab-CE 的 root 密码](#53-重置-gitlab-ce-的-root-密码)
   - [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](#54-创建与批准-gitlab-ce-的-devuser0-开发者用户)
   - [5.5 创建新项目 etherpad-lite-postgres](#55-创建新项目-etherpad-lite-postgres)
-  - [5.6 Node.js 应用：导入外部代码库 etherpad-lite-postgres](#56-nodejs-应用导入外部代码库-etherpad-lite-postgres)
+  - [5.6 Node.js 应用：导入 etherpad-lite-postgres 外部代码库](#56-nodejs-应用导入-etherpad-lite-postgres-外部代码库)
+  - [5.7 Flask 应用：导入 cnn_mnist_train 外部代码库](#57-flask-应用导入-cnn_mnist_train-外部代码库)
 - [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
   - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
   - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
@@ -38,7 +39,8 @@
     - [10.1.2 安装 Jenkins 的 Blue Ocean 插件](#1012-安装-jenkins-的-blue-ocean-插件)
     - [10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置](#1013-jenkins-用户的-ssh-连接代码库的主机密钥校验与配置)
     - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
-    - [10.1.5 创建与运行作业](#1015-创建与运行作业)
+    - [10.1.5 构建与上传 node-pnpm 容器镜像](#1015-构建与上传-node-pnpm-容器镜像)
+    - [10.1.6 创建与运行作业](#1016-创建与运行作业)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -61,18 +63,20 @@
 
 - 本实验使用 RedHat RH294v9.0 实验环境，各节点的资源调整如下：
 
+  > 说明：如果读者具有相应的计算与存储资源也可根据以下资源需求构建自定义实验环境。
+
   | 主机名 | 主机别名 | IPv4 | vCPU | 内存 | 节点角色 |
   | ----- | ----- | ----- | ----- | ----- | ----- |
-  | foundation0.ilt.example.com | NA | 172.25.254.250 | 8 | 48 | Virtual Host |
-  | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 6 | GitLab CE |
-  | servera.lab.example.com | jenkins-master.lab.example.com | 172.25.250.10 | 4 | 4 | Jenkins Master |
-  | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent |
-  | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent |
-  | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 4 | 6 | Nexus3 & PostgreSQL Server |
-  | utility.lab.example.com | NA | 172.25.250.220 | 2 | 4 | Application Test & RedHat AAP2.2 |
+  | foundation0.ilt.example.com | NA | 172.25.254.250 | 8 | 48 | 虚拟机宿主机 & 应用部署 |
+  | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 6 | GitLab CE 容器 |
+  | servera.lab.example.com | jenkins-master.lab.example.com | 172.25.250.10 | 4 | 4 | Jenkins Master 节点 |
+  | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent 节点 |
+  | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent 节点 |
+  | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 4 | 6 | Nexus3 容器 & PostgreSQL 数据库 |
 
-- 💥 servera, serverb 与 serverc 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。
-- 💥 调整每个节点的 vCPU 与内存直接通过在 foundation0 节点上运行以下命令完成：
+  > 💥 注意：servera，serverb，serverc，serverd 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。
+
+- 调整每个节点的 vCPU 与内存直接通过在 foundation0 节点上运行以下命令完成：
 
   ```bash
   [kiosk@foundation0 ~]$ su -  #密码：Asimov
@@ -219,9 +223,34 @@ total 8.0K
 
 <center><img src="images/gitlab-create-new-project-3.png" style="width:80%"></center>
 
-### 5.6 Node.js 应用：导入外部代码库 etherpad-lite-postgres
+### 5.6 Node.js 应用：导入 etherpad-lite-postgres 外部代码库
 
-下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中：
+下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支，并在源代码目录中新增 `.npmrc` 与 `settings.json` 文件。前者用于 Nexus3 的 npm(proxy) 与 docker(hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。如下所示：
+
+```bash
+### file: .npmrc
+### 注意：Nexus3 的资源在 `6. 部署与设置 Nexus3 容器` 中设置完成
+registry=http://nexus3.lab.example.com:8881/repository/npm-proxy/
+always-auth=true
+//nexus3.lab.example.com:8881/repository/npm-proxy/:_auth="ZGV2dXNlcjA6MXFhelpTRSQ="
+//nexus3.lab.example.com:8881/repository/npm-hosted/:_auth="ZGV2dXNlcjA6MXFhelpTRSQ="
+
+### settings.json
+### 注意：PostgreSQL 服务器资源在 `8. 部署与设置 PostgreSQL 数据库` 中设置完成（通过 ansible playbook 实现）
+{
+  "dbType": "postgres",  #连接数据库类型
+  "dbSettings": {
+    "user": "etherpad_user",  #数据库用户
+    "host": "serverd.lab.example.com",  #数据库节点
+    "port": 5432,  #数据库监听端口
+    "password": "redhat",  #数据库用户密码
+    "database": "etherpad_db"  #数据库名称（存储 etherpad-lite 应用数据）
+  },
+  "ip": "0.0.0.0",  #应用监听地址
+  "port": 9001,  #应用监听端口
+  "title": "Etherpad"
+}
+```
 
 ```bash
 [devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/etherpad-lite-postgres.tar
@@ -248,7 +277,7 @@ Welcome to GitLab, @devuser0!
 #/settings.json
 ...
 [devops@workstation etherpad-lite-postgres]$ git remote set-url origin git@gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
-# 更新上游源代码仓库地址
+# 💥 此应用为 GitHub 中应用的克隆，具有原始 github 源地址，因此使用上述命令更新上游源代码仓库地址。
 [devops@workstation etherpad-lite-postgres]$ cat .git/config
 [core]
         repositoryformatversion = 0
@@ -315,6 +344,62 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 导入完成后的仓库后续将用于 etherpad-lite 应用的构建与测试，如下所示：
 
 <center><img src="images/gitlab-create-new-project-4.png" style="width:80%"></center>
+
+### 5.7 Flask 应用：导入 cnn_mnist_train 外部代码库
+
+本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 访问此应用。
+
+<center><img src="images/gitlab-create-cnn-demo-1.png" style="width:80%"></center>
+
+<center><img src="images/gitlab-create-cnn-demo-2.png" style="width:80%"></center>
+
+<center><img src="images/gitlab-create-cnn-demo-3.png" style="width:80%"></center>
+
+```bash
+[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/cnn_mnist_train.tar
+[devops@workstation ~]$ tar -xf cnn_mnist_train.tar
+[devops@workstation ~]$ cd cnn_mnist_train
+[devops@workstation cnn_mnist_train]$ git config --global init.defaultBranch main  #设置默认的初始化分支名称
+[devops@workstation cnn_mnist_train]$ git init .  #此应用首次上传至源代码仓库中，原目录中不具有 git 仓库的信息，需执行初始化。
+Initialized empty Git repository in /home/devops/cnn_mnist_train/.git/
+[devops@workstation cnn_mnist_train]$ git remote add origin git@gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
+#添加远程代码仓库地址
+[devops@workstation cnn_mnist_train]$ git pull origin main  #拉取远程代码仓库中内容合并至本地 main 分支
+From gitlab-ce.lab.example.com:devuser0/cnn_mnist_train
+ * branch            main       -> FETCH_HEAD
+# 注意：
+#   1. 如果仅仅执行 git pull 命令拉取远程代码仓库，那么 git 无法合并分支代码，因此需指定合并的本地代码分支（main 分支）。
+#   2. 如下所示，仅仅执行 git pull 的返回，提示需执行合并的分支：
+#        There is no tracking information for the current branch.
+#        Please specify which branch you want to merge with.
+#        See git-pull(1) for details.
+#
+#            git pull <remote> <branch>
+#
+#        If you wish to set tracking information for this branch you can do so with:
+#
+#            git branch --set-upstream-to=origin/<branch> main
+
+[devops@workstation cnn_mnist_train]$ ls -lh
+total 16K
+-rw-r--r--. 1 devops devops 1.8K Jun  8 03:21 app.py
+-rw-r--r--. 1 devops devops 6.1K Jun  9 01:38 README.md  #远程代码库中的文件被拉取至本地
+drwxr-xr-x. 2 devops devops   24 Jun  8 09:10 templates
+-rw-r--r--. 1 devops devops 1.7K Jun  8 03:21 train_mnist_model_tf.py
+[devops@workstation cnn_mnist_train]$ git add .
+[devops@workstation cnn_mnist_train]$ git commit -m "Update cnn project"
+[devops@workstation cnn_mnist_train]$ git push origin main  #推送本地源代码
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (6/6), 3.62 KiB | 3.62 MiB/s, done.
+Total 6 (delta 0), reused 0 (delta 0), pack-reused 0
+To gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
+   9f5c478..fb1d868  main -> main
+```
+
+<center><img src="images/gitlab-create-cnn-demo-4.png" style="width:80%"></center>
 
 ## 6. 部署与设置 Nexus3 容器
 
