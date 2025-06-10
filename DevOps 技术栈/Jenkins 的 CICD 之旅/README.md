@@ -19,9 +19,12 @@
   - [5.2 部署 GitLab-CE 容器](#52-部署-gitlab-ce-容器)
   - [5.3 重置 GitLab-CE 的 root 密码](#53-重置-gitlab-ce-的-root-密码)
   - [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](#54-创建与批准-gitlab-ce-的-devuser0-开发者用户)
-  - [5.5 创建新项目 etherpad-lite-postgres](#55-创建新项目-etherpad-lite-postgres)
-  - [5.6 Node.js 应用：导入 etherpad-lite-postgres 外部代码库](#56-nodejs-应用导入-etherpad-lite-postgres-外部代码库)
-  - [5.7 Flask 应用：导入 cnn_mnist_train 外部代码库](#57-flask-应用导入-cnn_mnist_train-外部代码库)
+  - [5.5 Node.js 应用导入](#55-nodejs-应用导入)
+    - [5.5.1 创建新项目 etherpad-lite-postgres](#551-创建新项目-etherpad-lite-postgres)
+    - [5.5.2 导入 etherpad-lite-postgres 外部代码库](#552-导入-etherpad-lite-postgres-外部代码库)
+  - [5.6 Flask 应用导入](#56-flask-应用导入)
+    - [5.6.1 创建新项目 cnn_mnist_train](#561-创建新项目-cnn_mnist_train)
+    - [5.6.2 导入 cnn_mnist_train 外部代码库](#562-导入-cnn_mnist_train-外部代码库)
 - [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
   - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
   - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
@@ -213,7 +216,9 @@ total 8.0K
 - Web 注册界面创建 devuser0 开发者用户
 - 设置此用户的 SSH 连接公钥（此处使用 `devops@workstation` 中名为 devops-jenkins.pub 的 SSH 公钥）
 
-### 5.5 创建新项目 etherpad-lite-postgres
+### 5.5 Node.js 应用导入
+
+#### 5.5.1 创建新项目 etherpad-lite-postgres
 
 以 devuser0 用户登录代码库创建新项目：
 
@@ -223,7 +228,7 @@ total 8.0K
 
 <center><img src="images/gitlab-create-new-project-3.png" style="width:80%"></center>
 
-### 5.6 Node.js 应用：导入 etherpad-lite-postgres 外部代码库
+#### 5.5.2 导入 etherpad-lite-postgres 外部代码库
 
 下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支，并在源代码目录中新增 `.npmrc` 与 `settings.json` 文件。前者用于 Nexus3 的 npm(proxy) 与 docker(hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。如下所示：
 
@@ -345,15 +350,21 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 <center><img src="images/gitlab-create-new-project-4.png" style="width:80%"></center>
 
-### 5.7 Flask 应用：导入 cnn_mnist_train 外部代码库
+### 5.6 Flask 应用导入
 
-本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 访问此应用。
+#### 5.6.1 创建新项目 cnn_mnist_train
+
+以 devuser0 用户登录代码库创建新项目：
 
 <center><img src="images/gitlab-create-cnn-demo-1.png" style="width:80%"></center>
 
 <center><img src="images/gitlab-create-cnn-demo-2.png" style="width:80%"></center>
 
 <center><img src="images/gitlab-create-cnn-demo-3.png" style="width:80%"></center>
+
+#### 5.6.2 导入 cnn_mnist_train 外部代码库
+
+本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 访问此应用。
 
 ```bash
 [devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/cnn_mnist_train.tar
@@ -572,7 +583,7 @@ jenkins:165536:65536
 
 #### 10.1.5 构建与上传 node-pnpm 容器镜像
 
-etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建，因此需预先构建此类基础镜像，再推送至 Nexus3 容器镜像仓库中。
+etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建，因此需预先构建此类基础镜像，再推送至 Nexus3 容器镜像仓库中。构建此镜像的 Containerfile 可使用 [node-pnpm | GitHub](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/node-pnpm)，容器镜像存储于 [node-pnpm | DockerHub](https://hub.docker.com/repository/docker/alberthua/node-pnpm/general) 中。
 
 ```bash
 ## 注意：由于其他节点的存储空间有限，因此在 foundation0 节点中构建容器镜像。
@@ -769,8 +780,12 @@ postgres=# \l  #查看所以数据库
 ## 参考链接
 
 - [containers.podman.podman_container module – Manage podman containers | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_container_module.html)
-- [Automate container and pod deployments with Podman and Ansible | RedHat Blog](https://www.redhat.com/en/blog/ansible-podman-container-deployment)
-- [Community.Postgresql  | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/community/postgresql/index.html)
+- [Community.Postgresql | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/community/postgresql/index.html)
+- [ansible.builtin.pip module – Manages Python library dependencies | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pip_module.html)
 - [community.postgresql | Galaxy Docs](https://galaxy.ansible.com/ui/repo/published/community/postgresql/?version=4.0.0)
+- [Automate container and pod deployments with Podman and Ansible | RedHat Blog](https://www.redhat.com/en/blog/ansible-podman-container-deployment)
 - [How to use 'mv' command to move files except those in a specific directory? | stack overflow](https://stackoverflow.com/questions/4612157/how-to-use-mv-command-to-move-files-except-those-in-a-specific-directory)
 - [Cannot run docker commands through Jenkin's Blue Ocean: ERRO[0000] No subuid ranges found for user “jenkins” in /etc/subuid | stack overflow](https://stackoverflow.com/questions/58855758/cannot-run-docker-commands-through-jenkins-blue-ocean-erro0000-no-subuid-ran)
+- [pip cannot uninstall <package>: "It is a distutils installed project" | stack overflow](https://stackoverflow.com/questions/53807511/pip-cannot-uninstall-package-it-is-a-distutils-installed-project)
+- [tensorflow/tensorflow | DockerHub](https://hub.docker.com/r/tensorflow/tensorflow/tags/)
+- [PostgreSQL 入门指南：安装、配置与基本命令](https://developer.aliyun.com/article/1655700)
