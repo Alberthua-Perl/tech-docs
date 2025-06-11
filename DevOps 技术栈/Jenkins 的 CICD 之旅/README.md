@@ -1,4 +1,4 @@
-# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Java、Node.js、Flask 与 Golang 应用
+# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Node.js、Flask 与 Golang 应用
 
 ## 文档说明
 
@@ -7,6 +7,7 @@
 
 ## 文档目录
 
+- [0. Lab 环境架构与实现](#0-lab-环境架构与实现)
 - [1. Lab 相关用户名与登录密码](#1-lab-相关用户名与登录密码)
 - [2. Foundation 中设置节点资源](#2-foundation-中设置节点资源)
   - [2.1 调整虚拟机计算资源](#21-调整虚拟机计算资源)
@@ -55,6 +56,10 @@
   - [A.4 psql 常用的元命令](#a4-psql-常用的元命令)
 - [参考链接](#参考链接)
 
+## 0. Lab 环境架构与实现
+
+![0-ansible-navigator-jenkins-nodejs-flask-golang](images/0-ansible-navigator-jenkins-nodejs-flask-golang.png)
+
 ## 1. Lab 相关用户名与登录密码
 
 | 节点角色 | 管理员用户 | 管理员密码 | 普通用户 | 普通用户密码 |
@@ -81,7 +86,7 @@
   | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent 节点 |
   | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 4 | 6 | Nexus3 容器 & PostgreSQL 数据库 |
 
-  > 💥 注意：servera，serverb，serverc，serverd 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。
+  > 💥 注意：servera，serverb，serverc，serverd 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。workstation 节点需根据 2.3 添加新磁盘以满足存储需求。
 
 - 调整每个节点的 vCPU 与内存直接通过在 foundation0 节点上运行以下命令完成：
 
