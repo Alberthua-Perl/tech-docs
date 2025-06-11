@@ -1,4 +1,4 @@
-# 🧪 基于 Ansible Navigator 部署分布式 Jenkins CI/CD 平台 —— 构建发布 Java、Node.js、Flask 与 Golang 应用
+# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Java、Node.js、Flask 与 Golang 应用
 
 ## 文档说明
 
@@ -42,8 +42,12 @@
     - [10.1.2 安装 Jenkins 的 Blue Ocean 插件](#1012-安装-jenkins-的-blue-ocean-插件)
     - [10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置](#1013-jenkins-用户的-ssh-连接代码库的主机密钥校验与配置)
     - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
-    - [10.1.5 构建与上传 node-pnpm 容器镜像](#1015-构建与上传-node-pnpm-容器镜像)
+    - [10.1.5 构建与推送 node-pnpm 容器镜像](#1015-构建与推送-node-pnpm-容器镜像)
     - [10.1.6 创建与运行作业](#1016-创建与运行作业)
+  - [10.2 Flask 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像](#102-flask-应用--训练-cnn-模型构建-app-tf-flask-应用及推理容器镜像)
+    - [10.2.1 推送 tf-flask 构建用容器镜像](#1021-推送-tf-flask-构建用容器镜像)
+    - [10.2.2 安装 AnsiColor 插件](#1022-安装-ansicolor-插件)
+    - [10.2.3 创建与运行作业](#1023-创建与运行作业)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -89,7 +93,7 @@
 ### 2.2 配置 classroom 可实现外网连接
 
 ```bash
-[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/set_classroom_extnet
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/00-set_classroom_extnet
 [kiosk@foundation0 ~]$ ./set_classroom_extnet
 ```
 
@@ -258,7 +262,7 @@ always-auth=true
 ```
 
 ```bash
-[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/etherpad-lite-postgres.tar
+[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/etherpad-lite-postgres.tar
 [devops@workstation ~]$ tar -xf etherpad-lite-postgres.tar
 # 下载应用源代码
 
@@ -367,7 +371,7 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 访问此应用。
 
 ```bash
-[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/cnn_mnist_train.tar
+[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/cnn_mnist_train.tar
 [devops@workstation ~]$ tar -xf cnn_mnist_train.tar
 [devops@workstation ~]$ cd cnn_mnist_train
 [devops@workstation cnn_mnist_train]$ git config --global init.defaultBranch main  #设置默认的初始化分支名称
@@ -581,16 +585,16 @@ jenkins:165536:65536
 # 分别添加 jenkins 用户的子用户与用户组映射
 ```
 
-#### 10.1.5 构建与上传 node-pnpm 容器镜像
+#### 10.1.5 构建与推送 node-pnpm 容器镜像
 
 etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建，因此需预先构建此类基础镜像，再推送至 Nexus3 容器镜像仓库中。构建此镜像的 Containerfile 可使用 [node-pnpm | GitHub](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/node-pnpm)，容器镜像存储于 [node-pnpm | DockerHub](https://hub.docker.com/repository/docker/alberthua/node-pnpm/general) 中。
 
 ```bash
-## 注意：由于其他节点的存储空间有限，因此在 foundation0 节点中构建容器镜像。
-[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/rockylinux-9.3.tar
+### 注意：由于其他节点的存储空间有限，因此在 foundation0 节点中构建容器镜像。
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/container-images/rockylinux-9.3.tar
 # docker.io 中的容器镜像，由于拉取超时失败，因此已提前准备。
 [kiosk@foundation0 ~]$ podman load -i rockylinux-9.3.tar
-[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/node-pnpm.tar
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/node-pnpm.tar
 [kiosk@foundation0 ~]$ tar -xf node-pnpm.tar
 [kiosk@foundation0 ~]$ cd node-pnpm
 [kiosk@foundation0 node-pnpm]$ podman build -t node-pnpm:10.11.0 --format=docker .
@@ -687,6 +691,93 @@ fi
 <center><img src="images/jenkins-create-freestyle-job-nodejs-9.png" style="width:80%"></center>
 
 <center><img src="images/jenkins-create-freestyle-job-nodejs-8.png" style="width:80%"></center>
+
+### 10.2 Flask 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像
+
+> ✍ 容器镜像说明：tf-flask 为构建用镜像（包含 TensorFlow 等深度学习框架）、app-tf-flask 为推理容器镜像（包含 TensorFlow、Flask 等框架）
+
+#### 10.2.1 推送 tf-flask 构建用容器镜像
+
+`5.6 Flask 应用导入` 中已介绍此项目的相关信息，此处使用自由风格作业方式完成持续构建。在后续的 app-tf-flask 容器镜像构建过程中依赖 nexus3.lab.example.com:8882/tf-flask:2.18.0 基础镜像，构建此镜像的 Containerfile 可使用 [tf-flask | GitHub](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/tf-flask)，容器镜像存储于 [tf-flask | DockerHub](https://hub.docker.com/repository/docker/alberthua/tf-flask/general)，并将其推送至 Nexus3 仓库中。如下所示：
+
+```bash
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/container-images/tf-flask-2.18.0.tar
+[kiosk@foundation0 ~]$ podman load -i tf-flask-2.18.0.tar
+[kiosk@foundation0 ~]$ podman images  #此容器镜像已直接推送至 Nexus3 中
+[kiosk@foundation0 ~]$ podman push --tls-verify=false nexus3.lab.example.com:8882/tf-flask:2.18.0  #推送构建用镜像
+```
+
+#### 10.2.2 安装 AnsiColor 插件
+
+在后续的 CNN 模型训练过程中，Blue Ocean 界面无法以 ANSI 形式进度条的方式显示，因此先预安装 `AnsiColor` 插件支持此功能。安装方法可参考 `10.1.2` 的方式。
+
+#### 10.2.3 创建与运行作业
+
+可参考以下步骤完成 CNN 模型训练与推理容器镜像（Flask 应用）的构建及推送：
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-1.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-2.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-3.jpg" style="width:80%"></center>
+
+以上 Shell 脚本的执行思路：在 Jenkins 节点上使用 MNIST 数据集训练 CNN 模型，并将模型的训练结果保存于本地，拉取构建用基础镜像，创建 Containerfile，构建推理容器镜像（Flask 应用中部署模型），将构建的镜像推送至 Nexus3 中。如下所示：
+
+```bash
+#!/bin/bash
+
+echo -e "\n---> Create build env..."
+mkdir build/
+shopt -s extglob
+mv !(build) build/
+
+echo -e "\n---> Train MNIST and generate module..."
+cd build/
+python ./train_mnist_model_tf.py  #训练与保存 CNN 模型
+tree .
+
+echo -e "\n---> Generate Containerfile..."
+cd ../
+cat > Containerfile <<EOF
+FROM nexus3.lab.example.com:8882/tf-flask:2.18.0
+
+ADD build/ /app
+WORKDIR /app
+EXPOSE 5000
+
+ENTRYPOINT ["python", "app.py"]
+EOF
+
+echo -e "\n---> Login and pull tf-flask image..."
+podman login --tls-verify=false --username devuser0 --password 1qazZSE$ nexus3.lab.example.com:8882
+podman pull --tls-verify=false nexus3.lab.example.com:8882/tf-flask:2.18.0
+
+echo -e "\n---> Build app-tf-flask app image..."
+podman build -t app-tf-flask:v1.0 --format=docker .  #构建推理容器镜像
+if [[ $? -eq 0 ]]; then
+  podman tag localhost/app-tf-flask:v1.0 nexus3.lab.example.com:8882/app-tf-flask:v1.0
+  podman push --tls-verify=false nexus3.lab.example.com:8882/app-tf-flask:v1.0
+  if [[ $? -eq 0 ]]; then
+    echo -e "\n--> Remove local builded image..."
+    podman rmi localhost/app-tf-flask:v1.0 nexus3.lab.example.com:8882/app-tf-flask:v1.0  #移除本地构建的镜像，释放存储空间。
+  fi
+else
+  echo -e "\n---> [ERROR] Build failure..."
+  exit 10
+fi
+```
+
+以上脚本可参考 [jenkins-ci-plt/jenkins/free-style-demo/cnn-mnist-train-job.sh](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/free-style-demo/cnn-mnist-train-job.sh)。
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-4.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-5.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-6.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-cnn-7.jpg" style="width:80%"></center>
+
+Nexus3 中已存储推送的 app-tf-flask 容器镜像
 
 ## 附录A. PostgreSQL 常用命令
 
