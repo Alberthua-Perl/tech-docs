@@ -7,30 +7,68 @@
 
 ## 文档目录
 
-- 基础架构即代码
-- Git 简介
-- 设置 Git 代理
-- 设置 Git 环境
-- Git 工作流描述
-- 初始化 Git 仓库
-- 克隆远程代码仓库
-- Git 工作区、暂存区操作
-- Git 暂存操作
-- Git 本地仓库、远程代码库操作
-- Git 提交日志规范的说明
-- 🛠 git push 推送的故障排查
-- Git 日志检索
-- Git 分支描述
-- Git 分支操作
-- 从旧提交创建分支
-- 🔥 Git 合并分支
-- 🔥 Git 变基
-- Git 版本回退
-- Git 还原提交
-- Git 拣选
-- 参考链接
+- [1. 基础架构即代码](#1-基础架构即代码)
+- [2. Git 简介](#2-git-简介)
+  - [2.1 Git 管理文件的区域](#21-git-管理文件的区域)
+  - [2.2 Git 目录结构](#22-git-目录结构)
+  - [2.3 设置 Git 代理](#23-设置-git-代理)
+- [3. 设置 Git 环境](#3-设置-git-环境)
+- [4. Git 工作流描述](#4-git-工作流描述)
+- [5. 初始化 Git 仓库](#5-初始化-git-仓库)
+- [6. 克隆远程代码仓库](#6-克隆远程代码仓库)
+- [7. Git 工作区、暂存区操作](#7-git-工作区暂存区操作)
+  - [7.1 撤销工作区中未暂存文件的更改](#71-撤销工作区中未暂存文件的更改)
+  - [7.2 忽略跟踪修改](#72-忽略跟踪修改)
+  - [7.3 删除暂存区中的文件（不删除工作区中的同名文件）](#73-删除暂存区中的文件不删除工作区中的同名文件)
+  - [7.4 示例 —— git rm 与 git rm --cached 的区别](#74-示例--git-rm-与-git-rm---cached-的区别)
+  - [7.5 示例 —— git add 针对于工作区已删除文件的操作](#75-示例--git-add-针对于工作区已删除文件的操作)
+- [8. Git 暂存操作](#8-git-暂存操作)
+- [9. Git 本地仓库、远程代码库操作](#9-git-本地仓库远程代码库操作)
+- [10. Git 提交日志规范的说明](#10-git-提交日志规范的说明)
+- [11. git push 推送的故障排查](#11-git-push-推送的故障排查)
+  - [11.1 故障示例1](#111-故障示例1)
+  - [11.2 故障示例2](#112-故障示例2)
+  - [11.3 故障示例3](#113-故障示例3)
+  - [11.4 故障示例4](#114-故障示例4)
+  - [11.5 故障示例5](#115-故障示例5)  
+- [12. Git 日志检索](#12-git-日志检索)
+- [13. Git 分支描述](#13-git-分支描述)
+  - [13.1 Git 提交介绍](#131-git-提交介绍)
+  - [13.2 Git 常用分支类型](#132-git-常用分支类型)
+    - [13.2.1 主分支](#1321-主分支)
+    - [13.2.2 辅助分支](#1322-辅助分支)
+    - [13.2.3 各分支关系示意](#1323-各分支关系示意)
+    - [13.2.4 GitHub Flow 工作流](#1324-github-flow-工作流)
+- [14. Git 分支操作](#14-git-分支操作)
+  - [14.1 基本命令](#141-基本命令)
+  - [14.2 删除并更新远程代码仓库分支](#142-删除并更新远程代码仓库分支)
+  - [14.3 分支操作示例 —— 从 *master* 主分支当前的 *38fe8f9* commit 上创建 *feature* 分支](#143-分支操作示例--从-master-主分支当前的-38fe8f9-commit-上创建-feature-分支)
+  - [14.4 分支操作示例 —— 删除并更新远程代码仓库分支](#144-分支操作示例--删除并更新远程代码仓库分支)
+- [15. 从旧提交创建分支](#15-从旧提交创建分支)
+- [16. Git 合并分支](#16-git-合并分支)
+  - [16.1 基本命令](#161-基本命令)
+  - [16.2 Git 的两种合并类型 —— `fast-forward (--ff)` 和 `no-fast-forward (--no-ff)`](#162-git-的两种合并类型--fast-forward---ff-和-no-fast-forward---no-ff)
+    - [16.2.1 Fast-forward (--ff) 说明](#1621-fast-forward---ff-说明)
+    - [16.2.2 No-fast-forward (--no-ff) 说明](#1622-no-fast-forward---no-ff-说明)
+  - [16.3 合并冲突（merge conflict）](#163-合并冲突merge-conflict)
+- [17. Git 变基](#17-git-变基)
+  - [17.1 变基基础](#171-变基基础)
+  - [17.2 变基示例](#172-变基示例)
+  - [17.3 推荐使用场景](#173-推荐使用场景)
+- [18. Git 版本回退](#18-git-版本回退)
+  - [18.1 基本命令](#181-基本命令)
+  - [18.2 版本回退（重置）—— 软重置、硬重置](#182-版本回退重置-软重置硬重置)
+    - [18.2.1 软重置](#1821-软重置)
+    - [18.2.2 硬重置](#1822-硬重置)
+    - [18.2.3 问题：软重置与硬重置后真的无法再回退至当前提交之后的提交（即未来版本）吗？](#1823-问题软重置与硬重置后真的无法再回退至当前提交之后的提交即未来版本吗)
+    - [18.2.4 推荐使用场景](#1824-推荐使用场景)
+- [19. Git 还原提交](#19-git-还原提交)
+  - [19.1 示例 —— git revert 还原提交 *903d6*](#191-示例--git-revert-还原提交-903d6)
+  - [19.2 推荐使用场景](#192-推荐使用场景)
+- [20. Git 拣选](#20-git-拣选)
+- [参考链接](#参考链接)
 
-## 基础架构即代码
+## 1. 基础架构即代码
 
 - 一个关键的 `DevOps` 概念是基础架构即代码（infrastructure as code）。
 - 不必手动管理基础架构，而是通过运行自动化代码来定义和构建系统。
@@ -40,7 +78,7 @@
 - 可以将更改提交到分支，并在非关键性开发和 QA 环境中测试这些更改。
 - 确认更改后，可以将它们合并到主生产代码，并将更改应用到生产基础架构。
 
-## Git 简介
+## 2. Git 简介
 
 > 💥 注意：Git v1.x 与 Git v2.x 存在差异！
 
@@ -66,13 +104,13 @@
   
   > 💥 文件提交到本地仓库后，可以通过远程代码仓库来推送或拉取提交。
 
-### Git 管理文件的区域
+### 2.1 Git 管理文件的区域
   
   Local Working Tree -> Staging Area -> Local Repository -> Remote Repositiry (upstream)
   
-  ![git-manage-files-foue-areas](images/git-manage-files-foue-areas.png)
+  <center><img src="images/git-manage-files-foue-areas.png" style="width:30%"></center>
 
-### Git 目录结构
+### 2.2 Git 目录结构
   
   ```bash
   $ mkdir -p gitlab-data/demoGit && cd gitlab-data/demoGit
@@ -109,29 +147,29 @@
   10 directories, 13 files
   ```
 
-### 设置 Git 代理
+### 2.3 设置 Git 代理
 
 - 由于国内特殊的网络环境，使用 Git 与 GitHub 交互时经常会出现无法访问或访问超时的现象。因此，可配置 Git 代理解决此问题。
 - 设置 Git 代理需使用魔法上网，请确保自身的魔法可正常使用。
 - 笔者的开发环境中宿主机为 Windows 10，使用 VMware 运行 RHEL8.5 虚拟机环境。Windows 中的魔法使用 Clash 实现，其转发的端口为 `7890`。开发环境位于虚拟机中，需对其中的 Git 设置代理，设置步骤如下所示：
-  - Clash 打开 7890 端口
+  - Clash 打开 7890 端口：
 
-    ![open-clash-port-7890](images/open-clash-port-7890.png)
+    <center><img src="images/open-clash-port-7890.png" style="width:80%"></center>
   
-  - Windows 防火墙放行 Clash 应用
+  - Windows 防火墙放行 Clash 应用：
 
-    ![firewall-allow-clash](images/firewall-allow-clash.png)
+    <center><img src="images/firewall-allow-clash.png" style="width:80%"></center>
   
   - 虚拟机中由于使用 SSH 远程连接认证 GitHub 中的私有仓库，需在 `$HOME/.ssh/config` 配置文件中添加红框中的参数，而 Git 代理依赖 `nc` 程序，应预安装 `nmap-ncat` 软件包(此处未使用 HTTPS 方式进行认证)：
 
-    ![ssh-client-add-git-proxy](images/ssh-client-add-git-proxy.png)
+    <center><img src="images/ssh-client-add-git-proxy.png" style="width:80%"></center>
 
     以上 `--proxy` 参数中指定的 IPv4 地址只需将其替换为自身环境中 Clash 所在节点的 IPv4 地址即可，若未使用默认的 7890 端口需自行定义。
   - SSH 客户端配置完成后，进一步运行 git config 命令，以满足 git pull 或 push 命令时的代理。
 
-    ![git-add-proxy](images/git-add-proxy.png)
+    <center><img src="images/git-add-proxy.png" style="width:80%"></center>
 
-## 设置 Git 环境
+## 3. 设置 Git 环境
 
 - 由于 Git 用户经常与多个贡献者一起修改项目，Git 会在每一次提交时记录用户的名称和电子邮件地址。
 - 这些值可以在项目级别上定义，但也可为用户设置全局默认值。
@@ -141,7 +179,6 @@
   $ man git-config
   # 查看 git config 的配置详细信息
   
-  ### Git 全局设置 ###
   $ git config --global user.name "<git_developer_name>"
   $ git config --global user.email "<git_developer_email>"
   # 配置 git 用户名与对应的邮箱，默认情况下，user、author 与 committer 相同。
@@ -191,20 +228,20 @@
   #   1. $ git config --global --edit：直接进入 Vim 编辑 ~/.gitconfig 文件
   #   2. Git 局部设置只需去除 --global 选项即可
   ```
-  
-  ![git-config-user-info](images/git-config-user-info.png)
+
+  <center><img src="images/git-config-user-info.png" style="width:80%"></center>
   
   👨‍🏫 示例：使用 git config 的 `credential` 配置参数，在推送本地仓库代码至远程代码仓库时，可能需要输入远程代码仓库中指定 git 用户的密码作为认证凭据，并且该远程仓库可能属于另一 git 用户所有，如下所示：
 
   👉 使用 `student` 用户推送本地仓库代码
+
+  <center><img src="images/git-config-credential.jpg" style="width:80%"></center>
   
-  ![git-config-credential](images/git-config-credential.jpg)
-  
-  ![git-config-credential-gitlab-1](images/git-config-credential-gitlab-1.jpg)
+  <center><img src="images/git-config-credential-gitlab-1.jpg" style="width:80%"></center>
   
   👉 该 GitLab 仓库属于名为 `git` 的用户，仓库状态为 `public` 状态。
   
-  ![git-config-credential-gitlab-2](images/git-config-credential-gitlab-2.jpg)
+  <center><img src="images/git-config-credential-gitlab-2.jpg" style="width:80%"></center>
 
 - git 软件包附带的 `git-prompt.sh` 脚本可报告工作树状态。
 - 使用该脚本修改 shell 提示符，将以下行添加到 `~/.bashrc` 文件中，如下所示：
@@ -230,19 +267,19 @@
   
   > 👉 除了使用 git-prompt.sh 脚本设置 PS1 环境变量外，也可使用如 `oh-my-bash` 等 shell 命令行配置工具更改 theme 以获得不同的 PS1 环境变量的样式。
   >
-  > ![oh-my-bash-ps1](images/oh-my-bash-ps1.jpg)
+  > <center><img src="images/oh-my-bash-ps1.jpg" style="width:80%"></center>
 
-## Git 工作流描述
+## 4. Git 工作流描述
 
 - Git 工作流涉及工作区、暂存区、本地仓库与远程代码仓库的相互协作。
 - 开发人员工作过程中，会在当前项目的工作区中创建新文件、修改现有的文件，使工作区变为 `dirty` 状态。
 - 🚀 Git 目录结构与 Git 命令对应关系：
   
-  ![git-workflow-1](images/git-workflow-1.png)
-  
-  ![git-workflow-2](images/git-workflow-2.png)
+  <center><img src="images/git-workflow-1.png" style="width:80%"></center>
 
-## 初始化 Git 仓库
+  <center><img src="images/git-workflow-2.png" style="width:80%"></center>
+
+## 5. 初始化 Git 仓库
 
 ```bash
 $ man 7 gittutorial
@@ -260,9 +297,9 @@ $ git init --bare --shared=true
 #      还必须设置服务器，以便用户使用 HTTPS 或 SSH 协议来克隆、拉取和推送到仓库。
 ```
 
-![git-init-clone](images/git-init-clone.png)
+<center><img src="images/git-init-clone.png"></center>
 
-## 克隆远程代码仓库
+## 6. 克隆远程代码仓库
 
 ```bash
 $ git clone git@github.com:Alberthua-Perl/kani.git [--branch <remote_branch>]
@@ -275,22 +312,29 @@ $ git clone <repository_url> <destination_dir>
 # 克隆远程代码仓库至本地指定的目录中
 ```
 
-## Git 工作区、暂存区操作
+## 7. Git 工作区、暂存区操作
 
 ```bash
 $ git status
 # 查看当前分支的 Git 工作区、暂存区的状态
+```
 
-### 撤销工作区中未暂存文件的更改 ###
+### 7.1 撤销工作区中未暂存文件的更改
+
+```bash
 $ git checkout -- <file>
 # 注意：该文件未暂存至暂存区只在工作区中发生改变
 * $ git restore <file>
 * # 该命令在高版本 Git 中可使用与上述命令效果相同，但该命令处于实验阶段！
+```
 
-### 忽略跟踪修改 ###
+### 7.2 忽略跟踪修改
+
+```bash
 # 方式 1：
 $ touch /path/to/project/.gitignore
 # 本地工作目录中创建 .gitignore 文件，该文件中指定的文件不被跟踪至暂存区。
+#
 # 方式 2：
 $ git update-index --assume-unchanged <file>
 # 忽略对指定文件的跟踪修改，即使使用 git add -f 命令也无法跟踪与暂存。
@@ -315,8 +359,11 @@ $ git add --all
 #   1. 在下一次提交时，仅会将暂存到暂存区的文件保存到本地仓库中。
 #   2. 若用户同时处理两个更改，则可以将文件组织到两个提交中，以更好地跟踪更改。
 #   3. 先暂存并提交其中一组更改，然后暂存和提交其余的更改。
+```
 
-### 删除暂存区中的文件（不删除工作区中的同名文件） ###
+### 7.3 删除暂存区中的文件（不删除工作区中的同名文件）
+
+```bash
 $ git restore --staged <file>
 # 撤销暂存区中的跟踪文件（不将文件添加至未跟踪列表中）
 $ git reset HEAD <file>
@@ -337,23 +384,23 @@ $ git rm --force <file>
 # 同时删除工作区与暂存区中的同名文件
 ```
 
-👨‍🏫 示例：`git rm` 与 `git rm --cached` 的区别
+### 7.4 示例 —— git rm 与 git rm --cached 的区别
 
-![git-rm-working-tree-and-staged](images/git-rm-working-tree-and-staged.jpg)
+<center><img src="images/git-rm-working-tree-and-staged.jpg" style="width:80%"></center>
 
-![git-rm-f-cached-staged](images/git-rm-f-cached-staged.jpg)
+<center><img src="images/git-rm-f-cached-staged.jpg" style="width:80%"></center>
 
-👨‍🏫 示例：git add 针对于工作区已删除文件的操作
+### 7.5 示例 —— git add 针对于工作区已删除文件的操作
 
 由于工作区中将已提交至本地仓库的文件删除，该文件进入未跟踪的状态（`untracked`），若要跟踪该已删除的文件可使用 `git add --all <pathspec>` 将其添加至暂存区中，待 commit 提交至本地仓库。
 
-![git-add-removed-file-in-working-tree](images/git-add-removed-file-in-working-tree.jpg)
+<center><img src="images/git-add-removed-file-in-working-tree.jpg" style="width:80%"></center>
 
-## Git 暂存操作
+## 8. Git 暂存操作
 
 由于当前活动分支上还存在未暂存的或未提交的文件，在切换至其他分支时将出现如下报错（切换至其他分支时文件的修改将被覆盖）：
 
-![git-stash-checkout-error](images/git-stash-checkout-error.png)
+<center><img src="images/git-stash-checkout-error.png" style="width:80%"></center>
 
 因此，可通过当前活动分支中的暂存操作解决，即暂存当前活动分支中的修改，切换至其他分支完成提交后，再恢复暂存继续修改即可。
 
@@ -370,7 +417,7 @@ $ git stash drop stash@{n}
 # 移除当前活动分支中的指定暂存
 ```
 
-## Git 本地仓库、远程代码库操作
+## 9. Git 本地仓库、远程代码库操作
 
 ```bash
 $ git commit -m "<commit_message>"
@@ -419,15 +466,15 @@ $ git push --delete origin <branch_name>
 # 删除远程代码仓库中的分支
 ```
 
-![git-add-commit](images/git-add-commit.png)
+<center><img src="images/git-add-commit.png" style="width:80%"></center>
 
-![git-fetch](images/git-fetch.gif)
+<center><img src="images/git-fetch.gif" style="width:80%"></center>
 
-![git-pull](images/git-pull.gif)
+<center><img src="images/git-pull.gif" style="width:80%"></center>
 
-![git-pull-push](images/git-pull-push.png)
+<center><img src="images/git-pull-push.png" style="width:80%"></center>
 
-## Git 提交日志规范的说明
+## 10. Git 提交日志规范的说明
 
 - 在一个团队协作的项目中，开发人员需要经常提交一些代码去修复 bug 或者实现新的 feature。而项目中的文件和实现什么功能、解决什么问题都会渐渐淡忘，最后需要浪费时间去阅读代码。但是好的日志规范 `commit messages` 编写有帮助到我们，它也反映了一个开发人员是否是良好的协作者。
 - commit messages 要求：
@@ -483,24 +530,24 @@ $ git push --delete origin <branch_name>
   
   5️⃣ footer：描述下与之关联的 issue 或 break change
 
-## 🛠 git push 推送的故障排查
+## 11. git push 推送的故障排查
 
-👨‍🏫 示例 1：
+### 11.1 故障示例1
 
 远程代码仓库的分支中已存在其他开发者提交的新代码，而在本地工作区与本地仓库中无这些更新，因此本地仓库推送更新的代码至远程代码仓库的分支中时会由于两者的状态不一致而产生冲突（`conflict`），此时可将远程的更新拉取（`pull`）至本地工作区与本地仓库，同步两者的状态后即可重新推送，如下所示：
 
-![git-push-error-resolv-1](images/git-push-error-resolv-1.jpg)
+<center><img src="images/git-push-error-resolv-1.jpg" style="width:80%"></center>
 
-![git-push-error-resolv-2](images/git-push-error-resolv-2.jpg)
+<center><img src="images/git-push-error-resolv-2.jpg" style="width:80%"></center>
 
-👨‍🏫 示例 2：
+### 11.2 故障示例2
 
 本地工作区新建并切换至新分支，将代码更新提交至本地仓库中，但该工作区中的 `origin` 远程代码仓库中还未创建该分支，依然指向原先的远程分支，因此，若不使用 `-u` 或 `--set-upstream` 选项的话，将无法将本地仓库的新分支与远程分支关联，使用该选项后可推送成功。
 💥 远程代码仓库中的分支无需手动创建，使用上述选项后将自动创建！
 
-![git-push-set-upstream-branch](images/git-push-set-upstream-branch.jpg)
+<center><img src="images/git-push-set-upstream-branch.jpg" style="width:80%"></center>
 
-👨‍🏫 示例 3：
+### 11.3 故障示例3
 
 将本地未初始化的代码目录推送至远程代码仓库时，必须先在远程代码仓库上创建仓库，再对本地目录执行 `git init` 初始化，且需进行 `git commit` 提交后再推送至远程代码仓库，若不执行 commit 操作，报错如下：
 
@@ -546,7 +593,7 @@ To gitlab.domain12.example.com:devuser/haproxy-lamp.git
 Branch 'master' set up to track remote branch 'master' from 'origin'.
 ```
 
-👨‍🏫 示例 4：
+### 11.4 故障示例4
 
 在使用 `GitHub Personal Access Token` 推送代码至远程代码仓库时，显示如下 WARNING 信息，虽然不影响代码的推送，但是任需将其排除：
 
@@ -565,7 +612,7 @@ $ echo "unset SSH_ASKPASS" >> $HOME/.bashrc
 $ source $HOME/.bashrc
 ```
 
-👨‍🏫 示例 5：
+### 11.5 故障示例5
 
 若不使用 SSH 的方式认证登录 GitHub，以 `GitHub Personal Access Token` 认证登录的话，可单独在代码库 `.git/config` 文件的 `[remote "origin"]` 部分中更新如下配置：
 
@@ -575,7 +622,7 @@ $ source $HOME/.bashrc
         fetch = +refs/heads/*:refs/remotes/origin/*
 ```
 
-## Git 日志检索
+## 12. Git 日志检索
 
 - 版本控制系统的部分要点是跟踪提交日志记录。
 - 每个提交都由提交哈希（commit hash）来标识。
@@ -640,195 +687,210 @@ $ source $HOME/.bashrc
   # 比较 main 分支与 test 分支之间的差异
   ```
   
-  ![git-log-commit-info](images/git-log-commit-info.png)
+  <center><img src="images/git-log-commit-info.png" style="width:80%"></center>
 
-  ![git-show-example](images/git-show-example.png)
+  <center><img src="images/git-show-example.png" style="width:80%"></center>
 
 - 命令中不需要输入完整的哈希，只需其中的足够部分来唯一标识仓库中的特定提交。
 - 这些哈希还可用于恢复到之前的提交，或者查看版本控制系统的历史记录。
 
-## Git 分支描述
+## 13. Git 分支描述
 
-- Git 提交（commit）包含 Git 为仓库创建和处理整个历史记录所需的全部信息，具体包括：
-  - 提交的唯一 `ID`，采用 `40` 位 `十六进制` 字符串格式，是提交内容的 `SHA-1` 哈希。 
-  - 更改的仓库文件的列表，以及对每个文件的确切更改。
-  - 更改可以是行的增减、重命名或删除。
-  - ✨ 父级提交的 ID，即在应用当前提交更改之前定义仓库状态的提交的 ID。
-  - 提交的作者和创建者（或提交者）。
-  - 提交中还包含一个 `HEAD` 引用列表（a list of references）。
-- 🚀 Git 中 `HEAD` 的说明：
-  HEAD 是当前活动分支引用的指针，它总是指向某次提交，默认是上一次的提交。这表示 HEAD 将是下一次提交的父结点。通常，可以把 HEAD 看做上一次提交的快照。当然 HEAD 的指向是可以改变的，比如可指向提交（`commit`）、标签（`tag`）或分支（`branch`）等。
+### 13.1 Git 提交介绍
+
+Git 提交（commit）包含 Git 为仓库创建和处理整个历史记录所需的全部信息，具体包括：
+
+- 提交的唯一 `ID`，采用 `40` 位 `十六进制` 字符串格式，是提交内容的 `SHA-1` 哈希。
+- 更改的仓库文件的列表，以及对每个文件的确切更改。
+- 更改可以是行的增减、重命名或删除。
+- ✨ 父级提交的 ID，即在应用当前提交更改之前定义仓库状态的提交的 ID。
+- 提交的作者和创建者（或提交者）。
+- 提交中还包含一个 `HEAD` 引用列表（a list of references）。
+
+🚀 Git 中 `HEAD` 的说明：HEAD 是当前活动分支引用的指针，它总是指向某次提交，默认是上一次的提交。这表示 HEAD 将是下一次提交的父结点。通常，可以把 HEAD 看做上一次提交的快照。当然 HEAD 的指向是可以改变的，比如可指向提交（`commit`）、标签（`tag`）或分支（`branch`）等。
   
-  ![git-head-log](images/git-head-log.jpg)
+<center><img src="images/git-head-log.jpg" style="width:80%"></center>
 
-- 若在工作区中进行更改，使用 git add 命令进行暂存，并使用 git commit 命令进行提交，则将创建一个新的提交，以最新的提交作为其父项，并且 `HEAD` 将转为指向新的提交。
-- Git Flow 有主分支和辅助分支两类分支，通常主分支也被称为长期分支。
-  - 主分支用于组织与软件开发、部署相关的活动
-    - 主分支是所有开发活动的核心分支。
-    - 所有的开发活动产生的输出物最终都会反映到主分支的代码中。
-  - 辅助分支组织为了解决特定的问题而进行的各种活动
-- Git 常用分支类型：
-  - 主分支：
-    - 1️⃣ **`master`** 分支：
-      - 一个项目只能有一个 master 分支
-      - master 分支存放的是随时可供在生产环境中部署的稳定版本代码
-      - 仅在发布新的可供部署的代码时才更新 master 分支上的代码，任何时间都不能直接修改代码。
-      - master 分支保存官方发布版本历史，release tag 标识不同的发布版本。
-      - 每次更新 master，都需对 master 添加指定格式的 tag，用于发布或回滚。
-      - master 分支是保护分支，不可直接 push 到远程仓库 master 分支。
-      - master 分支代码只能被 release 分支或 hotfix 分支合并
-    - 2️⃣ **`develop`** 分支：
-      - 一个项目只能有一个 develop 分支
-      - develop 分支为开发分支，一般包含正在开发的所有新特性。
-      - 始终保持最新完成以及 bug 修复后的代码，一般开发新功能时，feature 分支都是基于 develop 分支下创建的。
-      - 开发者在自己的分支上开发完成后，向 develop 分支合并。
-      - develop 分支不能与 master 分支直接交互
-      - develop 分支衍生出各个 feature 分支
-      - develop 分支是保护分支，不可直接 push 到远程仓库 develop 分支。
+若在工作区中进行更改，使用 git add 命令进行暂存，并使用 git commit 命令进行提交，则将创建一个新的提交，以最新的提交作为其父项，并且 `HEAD` 将转为指向新的提交。
 
-      > **注意：** 一般来说，选择将 master 分支和 develop 分支作为长期分支，长期分支是不会被删除的，会和项目共存亡。即除非项目不再需要了，否则，这两个分支切出来以后就永远都不允许删除。当然也有一些特例，比如某些公司会将 develop 分支也进行删除，只保留 master 分支。
+Git Flow 有主分支和辅助分支两类分支，通常主分支也被称为长期分支。
+
+- 主分支用于组织与软件开发、部署相关的活动
+  - 主分支是所有开发活动的核心分支。
+  - 所有的开发活动产生的输出物最终都会反映到主分支的代码中。
+- 辅助分支组织为了解决特定的问题而进行的各种活动
+
+### 13.2 Git 常用分支类型
+
+#### 13.2.1 主分支
+
+- 1️⃣ *`master`* 分支：
+  - 一个项目只能有一个 master 分支
+  - master 分支存放的是随时可供在生产环境中部署的稳定版本代码
+  - 仅在发布新的可供部署的代码时才更新 master 分支上的代码，任何时间都不能直接修改代码。
+  - master 分支保存官方发布版本历史，release tag 标识不同的发布版本。
+  - 每次更新 master，都需对 master 添加指定格式的 tag，用于发布或回滚。
+  - master 分支是保护分支，不可直接 push 到远程仓库 master 分支。
+  - master 分支代码只能被 release 分支或 hotfix 分支合并
+- 2️⃣ *`develop`* 分支：
+  - 一个项目只能有一个 develop 分支
+  - develop 分支为开发分支，一般包含正在开发的所有新特性。
+  - 始终保持最新完成以及 bug 修复后的代码，一般开发新功能时，feature 分支都是基于 develop 分支下创建的。
+  - 开发者在自己的分支上开发完成后，向 develop 分支合并。
+  - develop 分支不能与 master 分支直接交互
+  - develop 分支衍生出各个 feature 分支
+  - develop 分支是保护分支，不可直接 push 到远程仓库 develop 分支。
+
+    > **注意：** 一般来说，选择将 master 分支和 develop 分支作为长期分支，长期分支是不会被删除的，会和项目共存亡。即除非项目不再需要了，否则，这两个分支切出来以后就永远都不允许删除。当然也有一些特例，比如某些公司会将 develop 分支也进行删除，只保留 master 分支。
   
-  - 辅助分支：
-    用于组织解决特定问题的各种软件活动的分支。辅助分支主要用于组织软件新功能的并行开发、简化新功能开发代码的跟踪、辅助完成版本发布工作以及对生产代码的缺陷进行紧急修复工作、以及对版本代码的测试。这些分支与主分支不同，通常只会在有限的时间范围内存在。这个有限的时间范围比如说一个开发周期，规定在两个礼拜，那么到了第二个礼拜的最后一天开发周期完成，代码合并，该分支就应该被删除掉。
-    - 1️⃣ **`feature`** 分支：
-      - 命名规则：`feature/*` 或 `feature/JID-N/developerName`
-      - develop 分支的功能分支
-      - feature 分支使用 develop 分支作为它们的父类分支
-      - 以功能为单位从 develop 分支拉一个 feature 分支
-      - 每个 feature 分支颗粒要尽量小，以利于快速迭代和避免冲突。
-      - 当其中一个 feature 分支完成后，它会合并回 develop 分支。
-      - 当一个功能因为各种原因不开发了或者放弃了，这个分支直接废弃，不影响 develop 分支。
-      - feature 分支代码可以保存在开发者自己的代码库中而不强制提交到主代码库里
-      - feature 分支只与 develop 分支交互，不能与 master 分支直接交互。
+#### 13.2.2 辅助分支
 
-      > **说明：**
-      >
-      > - 如有几个同事同时开发，需要分割成几个小功能，每个人都需要从 develop 中拉出一个 feature 分支，但是每个 feature 颗粒要尽量小，因为它需要我们能尽早 merge 回 develop 分支，否则冲突解决起来就没完没了。
-      >
-      > - 也正是因为可能多个同事协同开发同一个生命周期的项目的不同功能，因此在这里 feature 分支命名中加入了第二种命名规则，JID-N 表示的是哪个任务 ID 号，developerName 表示开发者名称，用以方便区分是哪个任务下哪个开发者的分支。
+用于组织解决特定问题的各种软件活动的分支。辅助分支主要用于组织软件新功能的并行开发、简化新功能开发代码的跟踪、辅助完成版本发布工作以及对生产代码的缺陷进行紧急修复工作、以及对版本代码的测试。这些分支与主分支不同，通常只会在有限的时间范围内存在。这个有限的时间范围比如说一个开发周期，规定在两个礼拜，那么到了第二个礼拜的最后一天开发周期完成，代码合并，该分支就应该被删除掉。
 
-    - 2️⃣ **`release`** 分支：
-      - 命名规则：`release/*`，"*" 以本次发布的版本号为标识。
-      - release 分支为预发布分支，主要用来为发布新版的测试、修复做准备。
-      - 当需要为发布新版做准备时，从 develop 分支衍生出一个 release 分支。
-      - release 分支可以从 develop 分支上指定 commit 派生出（从旧提交创建）
-      - release 分支测试通过后，合并到 master 分支并且给 master 标记一个版本号。
-      - release 分支一旦建立就将独立，不可再从其他分支 pull 代码。
-      - 必须合并回 develop 分支和 master 分支
+- 1️⃣ *`feature`* 分支：
+  - 命名规则：`feature/*` 或 `feature/JID-N/developerName`
+  - develop 分支的功能分支
+  - feature 分支使用 develop 分支作为它们的父类分支
+  - 以功能为单位从 develop 分支拉一个 feature 分支
+  - 每个 feature 分支颗粒要尽量小，以利于快速迭代和避免冲突。
+  - 当其中一个 feature 分支完成后，它会合并回 develop 分支。
+  - 当一个功能因为各种原因不开发了或者放弃了，这个分支直接废弃，不影响 develop 分支。
+  - feature 分支代码可以保存在开发者自己的代码库中而不强制提交到主代码库里
+  - feature 分支只与 develop 分支交互，不能与 master 分支直接交互。
 
-      > **说明：**
-      >
-      > - release 分支是为发布新的产品版本而设计的。在这个分支上的代码允许做小的缺陷修正、准备发布版本所需的各项说明信息（版本号、发布时间、编译时间等）。通过在 release 分支上进行这些工作可以让 develop 分支空闲出来以接受新的 feature 分支上的代码提交，进入新的软件开发迭代周期。
-      >
-      > - 当 develop 分支上的代码已经包含了所有即将发布的版本中所计划包含的软件功能，并且已通过所有测试时，我们就可以考虑准备创建 release 分支了。而所有在当前即将发布的版本之外的业务需求一定要确保不能混到 release 分支之内（避免由此引入一些不可控的系统缺陷）。
-      >
-      > - 成功地派生了 release 分支，并被赋予版本号之后，develop 分支就可以为 "下一个版本" 服务了。所谓的 "下一个版本" 是在当前即将发布的版本之后发布的版本。版本号的命名可以依据项目定义的版本号命名规则进行。
+  > **说明：**
+  >
+  > - 如有几个同事同时开发，需要分割成几个小功能，每个人都需要从 develop 中拉出一个 feature 分支，但是每个 feature 颗粒要尽量小，因为它需要我们能尽早 merge 回 develop 分支，否则冲突解决起来就没完没了。
+  >
+  > - 也正是因为可能多个同事协同开发同一个生命周期的项目的不同功能，因此在这里 feature 分支命名中加入了第二种命名规则，JID-N 表示的是哪个任务 ID 号，developerName 表示开发者名称，用以方便区分是哪个任务下哪个开发者的分支。
 
-    - 3️⃣ **`hotfix`** 分支：
-      - 命名规则：`hotfix/*`
-      - 线上出现紧急问题时，如快速给已发布产品修复 bug 或微调功能，以 master 分支为基线，创建 hotfix 分支。
-      - 只能从 master 分支指定 tag 版本衍生出来
-      - 一旦完成修复 bug，必须合并回 master 分支和 develop 分支。
-      - master 被合并后，应该被标记一个新的版本号。
-      - hotfix 分支一旦建立就将独立，不可再从其他分支 pull 代码。
+- 2️⃣ *`release`* 分支：
+  - 命名规则：`release/*`，"*" 以本次发布的版本号为标识。
+  - release 分支为预发布分支，主要用来为发布新版的测试、修复做准备。
+  - 当需要为发布新版做准备时，从 develop 分支衍生出一个 release 分支。
+  - release 分支可以从 develop 分支上指定 commit 派生出（从旧提交创建）
+  - release 分支测试通过后，合并到 master 分支并且给 master 标记一个版本号。
+  - release 分支一旦建立就将独立，不可再从其他分支 pull 代码。
+  - 必须合并回 develop 分支和 master 分支
 
-      > **说明：**
-      >
-      > - 除了是计划外创建的以外，hotfix 分支与 release 分支十分相似：都可以产生一个新的可供在生产环境部署的软件版本。
-      >
-      > - 当生产环境中的软件遇到了异常情况或者发现了严重到必须立即修复的软件缺陷的时候，就需要从 master 分支上指定的 tag 版本派生 hotfix 分支来组织代码的紧急修复工作。
-      >
-      > - 这样做的显而易见的好处是不会打断正在进行的 develop 分支的开发工作，能够让团队中负责新功能开发的人与负责代码紧急修复的人并行的开展工作。
+  > **说明：**
+  >
+  > - release 分支是为发布新的产品版本而设计的。在这个分支上的代码允许做小的缺陷修正、准备发布版本所需的各项说明信息（版本号、发布时间、编译时间等）。通过在 release 分支上进行这些工作可以让 develop 分支空闲出来以接受新的 feature 分支上的代码提交，进入新的软件开发迭代周期。
+  >
+  > - 当 develop 分支上的代码已经包含了所有即将发布的版本中所计划包含的软件功能，并且已通过所有测试时，我们就可以考虑准备创建 release 分支了。而所有在当前即将发布的版本之外的业务需求一定要确保不能混到 release 分支之内（避免由此引入一些不可控的系统缺陷）。
+  >
+  > - 成功地派生了 release 分支，并被赋予版本号之后，develop 分支就可以为 "下一个版本" 服务了。所谓的 "下一个版本" 是在当前即将发布的版本之后发布的版本。版本号的命名可以依据项目定义的版本号命名规则进行。
 
-    - 4️⃣ **`bugfix`** 分支：
-      - 修补分支：软件发布以后，难免会出现 bug。这时就需要创建一个分支，进行 bug 修补。
-      - bugfix 分支是从 master 或 release 分支上面分出来的。修补结束以后，再合并进 master 和 develop 以及 release 对应版本分支。它的命名，可以采用 `fixbug-*`（日期）的形式。
-- 上述各分支关系示意：
+- 3️⃣ *`hotfix`* 分支：
+  - 命名规则：`hotfix/*`
+  - 线上出现紧急问题时，如快速给已发布产品修复 bug 或微调功能，以 master 分支为基线，创建 hotfix 分支。
+  - 只能从 master 分支指定 tag 版本衍生出来
+  - 一旦完成修复 bug，必须合并回 master 分支和 develop 分支。
+  - master 被合并后，应该被标记一个新的版本号。
+  - hotfix 分支一旦建立就将独立，不可再从其他分支 pull 代码。
+
+  > **说明：**
+  >
+  > - 除了是计划外创建的以外，hotfix 分支与 release 分支十分相似：都可以产生一个新的可供在生产环境部署的软件版本。
+  >
+  > - 当生产环境中的软件遇到了异常情况或者发现了严重到必须立即修复的软件缺陷的时候，就需要从 master 分支上指定的 tag 版本派生 hotfix 分支来组织代码的紧急修复工作。
+  >
+  > - 这样做的显而易见的好处是不会打断正在进行的 develop 分支的开发工作，能够让团队中负责新功能开发的人与负责代码紧急修复的人并行的开展工作。
+
+- 4️⃣ *`bugfix`* 分支：
+  - 修补分支：软件发布以后，难免会出现 bug。这时就需要创建一个分支，进行 bug 修补。
+  - bugfix 分支是从 master 或 release 分支上面分出来的。修补结束以后，再合并进 master 和 develop 以及 release 对应版本分支。它的命名，可以采用 `fixbug-*`（日期）的形式。
+
+#### 13.2.3 各分支关系示意
   
-  ![git-branch-workflow](images/git-branch-workflow.png)
+<center><img src="images/git-branch-workflow.png" style="width:80%"></center>
   
-  主分支 master 和 develop 是保护分支，只能进行合并请求（merge request），均不可直接提交代码。
+- 主分支 master 和 develop 是保护分支，只能进行合并请求（merge request），均不可直接提交代码。
 
 > **注意：** 合并请求（merge request）是 GitLab 中的合并方式，而拉取请求（pull request）是 GitHub 中的合并方式，两者本质都是合并，只是称呼不同（见文末参考链接）。
 
 - 分支对应的环境：
   
-  | 分支类型                 | 所在环境          |
-  | -------------------- | ------------- |
+  | 分支类型 | 所在环境 |
+  | ----- | ----- |
   | master/hotfix/bugfix | 生产环境（release） |
-  | develop              | 开发环境（alpha）   |
-  | release              | 预发布（RC）环境     |
+  | develop | 开发环境（alpha） |
+  | release | 预发布（RC）环境 |
 
-- GitHub Flow 工作流示意：
+#### 13.2.4 GitHub Flow 工作流
   
-  ![git-branch-workflow-from-github](images/git-branch-workflow-from-github.png)
+<center><img src="images/git-branch-workflow-from-github.png" style="width:80%"></center>
 
-## Git 分支操作
+## 14. Git 分支操作
 
 - Git 中的不同分支允许不同的工作流在统一 Git 仓库上并行演变。
 - Git 创建分支实际上是创建了一个可以移动的新的指针，该指针将指向当前分支的新的提交。
-- Git 分支相关操作：
-  
-  ```bash
-  $ git branch <branch_name>
-  # 从当前的 HEAD 引用提交创建一个新的分支，但不切换至该分支（HEAD 引用不指向该分支）。
-  $ git branch -M <spec_branch_name>
-  # 使用指定名称重命名当前分支名称
-  # 注意：需在当前分支中先提交才能更改其名称！
-  
-  $ git branch [--list]
-  # 查看本地仓库的分支
-  $ git branch --list --all
-  # 查看本地仓库与远程代码仓库中的分支
-  $ git branch --remote
-  # 查看远程代码仓库的分支
-  $ git branch -v
-  # 查看所有分支的最后一次提交
-  $ git branch -d <branch_name>
-  # 删除指定的本地分支（如果分支已合并）
-  # 注意：删除分支，必须将其合并入其原始分支，否则无法删除！
-  $ git branch -D <branch_name>
-  # 强制删除本地分支
-  
-  $ git checkout <branch_name>
-  # 切换至指定分支，将 HEAD 引用指向该分支。
-  $ git checkout -b <branch_name>
-  # 创建并切换分支，该命令即 git branch 与 git checkout 的集合，HEAD 引用指向该分支。 
-  # 注意：
-  #   切换分支的时候，如果当前分支有改动没有提交，则不能切换分支，需要先把改动的内容提交
-  #   或者放入暂存区。
-  $ git checkout -
-  # 切换至之前的分支
-  
-  $ git checkout --orphan <orphan_branch_name>
-  # 创建并切换至孤儿分支（即无父分支与任何提交记录的分支）
-  # 注意：
-  #   1. 孤儿分支未做任何提交时无法被识别
-  #   2. 孤儿分支中创建提交后无法被常规删除，需合并分支后删除，或使用 git branch -D <orphan_branch_name> 
-  #      强制删除。
-  
-  ### 删除并更新远程代码仓库分支 ###
-  $ git branch -r -d origin/<branch_name>
-  # 删除本地的跟踪远程代码仓库分支
-  $ git branch --set-upstream-to=origin/<branch_name> <branch_name>
-  # 关联本地分支与本地的跟踪远程代码仓库分支
-  # 使用场景示例：可能由于本地分支改名并删除原跟踪分支，而远程代码库中也已改名，因此需重新关联本地与远程仓库。
 
-  $ git push origin --delete <branch_name>
-  # 删除远程代码库分支
-  $ git push origin --set-upstream :<branch_name>
-  # 更新远程代码库分支
-  ```
+### 14.1 基本命令
   
-  👨‍🏫 示例：从 `master` 主分支当前的 `38fe8f9` commit 上创建 `feature` 分支
+```bash
+$ git branch <branch_name>
+# 从当前的 HEAD 引用提交创建一个新的分支，但不切换至该分支（HEAD 引用不指向该分支）。
+$ git branch -M <spec_branch_name>
+# 使用指定名称重命名当前分支名称
+# 注意：需在当前分支中先提交才能更改其名称！
   
-  ![git-different-branch-checkout](images/git-different-branch-checkout.jpg)
+$ git branch [--list]
+# 查看本地仓库的分支
+$ git branch --list --all
+# 查看本地仓库与远程代码仓库中的分支
+$ git branch --remote
+# 查看远程代码仓库的分支
+$ git branch -v
+# 查看所有分支的最后一次提交
+$ git branch -d <branch_name>
+# 删除指定的本地分支（如果分支已合并）
+# 注意：删除分支，必须将其合并入其原始分支，否则无法删除！
+$ git branch -D <branch_name>
+# 强制删除本地分支
   
-  ![git-branch-checkout](images/git-branch-checkout.png)
+$ git checkout <branch_name>
+# 切换至指定分支，将 HEAD 引用指向该分支。
+$ git checkout -b <branch_name>
+# 创建并切换分支，该命令即 git branch 与 git checkout 的集合，HEAD 引用指向该分支。 
+# 注意：
+#   切换分支的时候，如果当前分支有改动没有提交，则不能切换分支，需要先把改动的内容提交
+#   或者放入暂存区。
+$ git checkout -
+# 切换至之前的分支
   
-  👨‍🏫 示例：删除并更新远程代码仓库分支
+$ git checkout --orphan <orphan_branch_name>
+# 创建并切换至孤儿分支（即无父分支与任何提交记录的分支）
+# 注意：
+#   1. 孤儿分支未做任何提交时无法被识别
+#   2. 孤儿分支中创建提交后无法被常规删除，需合并分支后删除，或使用 git branch -D <orphan_branch_name> 
+#      强制删除。
+```
+
+### 14.2 删除并更新远程代码仓库分支
+
+```bash
+$ git branch -r -d origin/<branch_name>
+# 删除本地的跟踪远程代码仓库分支
+$ git branch --set-upstream-to=origin/<branch_name> <branch_name>
+# 关联本地分支与本地的跟踪远程代码仓库分支
+# 使用场景示例：可能由于本地分支改名并删除原跟踪分支，而远程代码库中也已改名，因此需重新关联本地与远程仓库。
+
+$ git push origin --delete <branch_name>
+# 删除远程代码库分支
+$ git push origin --set-upstream :<branch_name>
+# 更新远程代码库分支
+```
   
-  ![delete-remote-repository-branch](images/delete-remote-repository-branch.png)
+### 14.3 分支操作示例 —— 从 *master* 主分支当前的 *38fe8f9* commit 上创建 *feature* 分支
+
+<center><img src="images/git-different-branch-checkout.jpg" style="width:80%"></center>
+
+<center><img src="images/git-branch-checkout.png" style="width:80%"></center>
+  
+### 14.4 分支操作示例 —— 删除并更新远程代码仓库分支
+
+<center><img src="images/delete-remote-repository-branch.png" style="width:80%"></center>
 
 > 💥 注意：
 >
@@ -840,88 +902,93 @@ $ source $HOME/.bashrc
 >
 > 4. 若 Git 不能干净利落地完成这个任务，它将禁止切换分支。
 
-## 从旧提交创建分支
+## 15. 从旧提交创建分支
 
-- 除了从当前分支的最新提交上创建新分支外，也可从其他分支的旧 `commit` 中创建新分支。
+除了从当前分支的最新提交上创建新分支外，也可从其他分支的旧 `commit` 中创建新分支。
   
-  ```bash
-  $ git checkout <previous_commit_hash>
-  # 指定某分支之前的提交，用于在该提交上创建分支，即 HEAD 引用指向该提交。
-  $ git checkout -b <branch_name>
-  # 创建并切换至新分支中
-  ```
+```bash
+$ git checkout <previous_commit_hash>
+# 指定某分支之前的提交，用于在该提交上创建分支，即 HEAD 引用指向该提交。
+$ git checkout -b <branch_name>
+# 创建并切换至新分支中
+```
   
-  ![git-create-new-branch-from-previous-commit](images/git-create-new-branch-from-previous-commit.png)
+<center><img src="images/git-create-new-branch-from-previous-commit.png" style="width:80%"></center>
 
-## 🔥 Git 合并分支
+## 16. Git 合并分支
 
 - 分支上的工作完成后，可以将该分支与其他分支合并（通常为 master 分支或 main 分支）。
 - 这允许并行操作新功能和漏洞修复，而主分支则没有未完成或未经测试的工作。
-- 分支合并命令如下：
-  
-  ```bash
-  $ git checkout main
-  $ git merge feature1 [--no-ff|--ff] -m '<merge_commit>'  # main 分支
-  # 将 feature1 分支合并入 main 分支
-  # 注意：默认 Fast-forward 方式（--ff），也可指定 No-fast-forward 方式（--no-ff）。
-  
-  $ git branch --merged
-  # 查看与当前活动分支合并过的分支
-  $ git branch --no-merged
-  # 查看与当前活动分支未合并过的分支
-  ```
 
-- Git 可执行两种类型的合并：`fast-forward (--ff)` 和 `no-fast-forward (--no-ff)`
+### 16.1 基本命令
+  
+```bash
+$ git checkout main
+$ git merge feature1 [--no-ff|--ff] -m '<merge_commit>'  # main 分支
+# 将 feature1 分支合并入 main 分支
+# 注意：默认 Fast-forward 方式（--ff），也可指定 No-fast-forward 方式（--no-ff）。
+  
+$ git branch --merged
+# 查看与当前活动分支合并过的分支
+$ git branch --no-merged
+# 查看与当前活动分支未合并过的分支
+```
 
-  1️⃣ Fast-forward (--ff) 的说明：
+### 16.2 Git 的两种合并类型 —— `fast-forward (--ff)` 和 `no-fast-forward (--no-ff)`
 
-  - 在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
-  - Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
-  
-  ![git-fast-forward-detail_sm](images/git-fast-forward-detail_sm.png)
-  
-  ![git-merge-ff](images/git-merge-ff.gif)
-  
-  ![git-merge-demo](images/git-merge-demo.png)
-  
-  2️⃣ No-fast-forward (--no-ff) 的说明：
+#### 16.2.1 Fast-forward (--ff) 说明
 
-  - 如果当前分支相比于想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果在当前分支上提交想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。关闭 fast-forward 模式，使用 no-fast-forward 合并，在提交的时候，Git 会在当前活动分支上创建一个 merge 的提交信息，然后将合并分支，此时 HEAD 引用指向当前活动分支。
+- 在当前分支相比于要合并的分支没有额外的提交时，可以执行 fast-forward 合并。即 Git 合并两个分支时，如果顺着一个分支走下去可以到达另一个分支的话，那么 Git 在合并两者时，只会简单地把指针右移，叫做 "快进"（fast-forward）。不过这种情况如果删除分支，则会丢失 merge 分支信息。
+- Git 很懒，首先会尝试执行最简单的选项 fast-forward！这类合并不会创建新的提交，而是会将正在合并的分支上的提交直接合并到当前分支。
   
-  ![cannot-git-fast-forward-detail_sm](images/cannot-git-fast-forward-detail_sm.png)
+<center><img src="images/git-fast-forward-detail_sm.png" style="width:80%"></center>
   
-  ![git-merge-no-ff](images/git-merge-no-ff.gif)
+<center><img src="images/git-merge-ff.gif" style="width:80%"></center>
+
+<center><img src="images/git-merge-demo.png" style="width:80%"></center>
   
-  ![git-no-fast-forward-detail_sm](images/git-no-fast-forward-detail_sm.png)
+#### 16.2.2 No-fast-forward (--no-ff) 说明
+
+- 如果当前分支相比于想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果在当前分支上提交想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。关闭 fast-forward 模式，使用 no-fast-forward 合并，在提交的时候，Git 会在当前活动分支上创建一个 merge 的提交信息，然后将合并分支，此时 HEAD 引用指向当前活动分支。
   
-  ![git-merge-no-ff-notification](images/git-merge-no-ff-notification.png)
+<center><img src="images/cannot-git-fast-forward-detail_sm.png" style="width:80%"></center>
   
-  ![git-merge-no-ff-demo](images/git-merge-no-ff-demo.png)
+<center><img src="images/git-merge-no-ff.gif" style="width:80%"></center>
+
+<center><img src="images/git-no-fast-forward-detail_sm.png" style="width:80%"></center>
+
+<center><img src="images/git-merge-no-ff-notification.png" style="width:80%"></center>
+
+<center><img src="images/git-merge-no-ff-demo.png" style="width:80%"></center>
+
+<center><img src="images/git-merge-no-ff-log.png" style="width:80%"></center>
   
-  ![git-merge-no-ff-log](images/git-merge-no-ff-log.png)
-  
-  - 从以上提交历史与提交时间戳可知，ea4b 提交不在要合并的 dev 分支中，并且该提交的时间在 dev 分支最后一次提交（49be）之后，因此将使用 No-fast-forward 模式合并。合并过程中 Git 要求说明合并的原因，并单独创建一个提交，这种方式由于新建提交可说明合并进入的分支，而 Fast-forward 方式无法确定哪个分支合并进入。
+- 从以上提交历史与提交时间戳可知，ea4b 提交不在要合并的 dev 分支中，并且该提交的时间在 dev 分支最后一次提交（49be）之后，因此将使用 No-fast-forward 模式合并。合并过程中 Git 要求说明合并的原因，并单独创建一个提交，这种方式由于新建提交可说明合并进入的分支，而 Fast-forward 方式无法确定哪个分支合并进入。
 
 > ✨ 最佳实践：推荐使用 No-fast-forward 模式，由于在合并过程中新建提交信息，可有效的区分合并的分支，而 Fast-forward 模式无法实现，以此来区分 master 分支或 main 分支的提交历史！
 
-- 💥 合并冲突（merge conflict）：
-  尽管 Git 能够很好地决定如何合并分支以及如何向文件添加修改，但它并不总是能完全自己做决定。**当想要合并的两个分支的同一文件中的同一行代码上有不同的修改，或者一个分支删除了一个文件而另一个分支修改了这个文件时，Git 就不知道如何取舍了。这种情况称为合并冲突，需要通过编辑受影响的文件来手动解决。**
-  在这样的情况下，Git 会询问想要保留哪种选择？假设在这两个分支中，都编辑了 README.md 的第一行。
-  
-  ![git-merge-conflict](images/git-merge-conflict.gif)
+### 16.3 合并冲突（merge conflict）
 
-## 🔥 Git 变基
+尽管 Git 能够很好地决定如何合并分支以及如何向文件添加修改，但它并不总是能完全自己做决定。**当想要合并的两个分支的同一文件中的同一行代码上有不同的修改，或者一个分支删除了一个文件而另一个分支修改了这个文件时，Git 就不知道如何取舍了。这种情况称为合并冲突，需要通过编辑受影响的文件来手动解决。**
+
+在这样的情况下，Git 会询问想要保留哪种选择？假设在这两个分支中，都编辑了 README.md 的第一行。
+  
+<center><img src="images/git-merge-conflict.gif" style="width:80%"></center>
+
+## 17. Git 变基
+
+### 17.1 变基基础
 
 - 可通过执行 git merge 将一个分支的修改应用到另一个分支。另一种可将一个分支的修改融入到另一个分支的方式是执行变基（rebase）。
 - 通过简单的提交节点图解感受一下 rebase 在干什么：
   
-  ![git-rebase-intro-1](images/git-rebase-intro-1.png)
+  <center><img src="images/git-rebase-intro-1.png" style="width:80%"></center>
   
   - 构造两个分支 master 和 feature，其中 feature 是在提交点 B 处从 master 上拉出的分支。
   - master 上有一个新提交 M，feature 上有两个新提交 C 和 D。
   - 此时切换到 feature 分支上，执行 rebase 命令，相当于是想要把 master 分支合并到feature 分支。这一步的场景就可以类比为在自己的分支 feature 上开发了一段时间，准备从主干 master 上拉一下最新改动，模拟了 `git pull --rebase` 的情形。
   
-  ![git-rebase-intro-2](images/git-rebase-intro-2.png)
+  <center><img src="images/git-rebase-intro-2.png" style="width:80%"></center>
   
   - feature：待变基分支、当前分支
   - master：基分支、目标分支
@@ -935,122 +1002,130 @@ $ source $HOME/.bashrc
   - 确认两个分支中是否存在引起合并冲突的文件修改。若不存在合并冲突，那么可直接完成 rebase；若存在合并冲突，需手动解决合并冲突，才能完成 rebase（该场景见下文示例）。
 - 上述示例可抽象为如下实际工作场景：
   远程代码库上有一个 master 分支目前开发到 B 了。张三从 B 拉了代码到本地的 feature 分支进行开发，目前提交了两次，开发到 D了；李四也从 B 拉到本地的 master 分支，他提交到了 M，然后合到远程代码库的 master 上了。此时张三想从远程库 master 拉下最新代码，于是他在feature 分支上执行了 `git pull origin master:feature --rebase`（注意要加 `--rebase` 参数），即把远程代码库 master 分支给 rebase 下来，由于李四更早开发完，此时远程 master 上是李四的最新内容，rebase 后再看张三的历史提交记录，就相当于是张三是基于李四的最新提交 M 进行的开发了。（但实际上张三更早拉代码下来，李四拉的晚但提交早。）
-- 👨‍🏫 示例：
-  
-  本地 main 分支与 feature 分支间的 rebase，并解决 rebase 过程中的合并冲突。
-  
-  ![git-rebase-demo-1](images/git-rebase-demo-1.png)
-  
-  ![git-rebase-demo-2](images/git-rebase-demo-2.png)
 
-  如上图所示，提交 8e7324f 是 main 分支与 feature 分支的共同祖先。因此，在 feature 分支中执行 rebase 操作后，新提交将以 main 分支中的最新提交 5f97dfe 为基础连接上去。
+### 17.2 变基示例
   
+本地 main 分支与 feature 分支间的 rebase，并解决 rebase 过程中的合并冲突。
+  
+<center><img src="images/git-rebase-demo-1.png" style="width:80%"></center>
+
+<center><img src="images/git-rebase-demo-2.png" style="width:80%"></center>
+  
+如上图所示，提交 8e7324f 是 main 分支与 feature 分支的共同祖先。因此，在 feature 分支中执行 rebase 操作后，新提交将以 main 分支中的最新提交 5f97dfe 为基础连接上去。
+  
+```bash
+$ git rebase main feature
+$ git rebase <基分支> <待变基分支>
+# 可使用图中命令实现，也可使用此命令实现变基。
+```
+  
+<center><img src="images/git-rebase-demo-3.png" style="width:80%"></center>
+  
+如上图所示，由于 main 分支中的提交 5f97dfe 与 feature 分支中的提交 b379af8 均对源码文件的同一部分进行更改，因此在 rebase 过程中出现合并冲突。此时需手动解决冲突，决定保留哪个提交中的修改内容。
+  
+<center><img src="images/git-rebase-demo-4-5.png" style="width:80%"></center>
+
+如上图所示，手动解决合并冲突后即可完成 rebase。以下为 rebase 后的 feature 分支提交日志记录，可见 rebase 后的新提交连接在提交 5f97dfe 之后。
+  
+<center><img src="images/git-rebase-demo-6.png" style="width:80%"></center>
+
+### 17.3 推荐使用场景
+
+- **拉公共分支最新代码：rebase**
+
   ```bash
-  $ git rebase main feature
-  $ git rebase <基分支> <待变基分支>
-  # 可使用图中命令实现，也可使用此命令实现变基。
+  git pull origin master:<branch_name> --rebase
   ```
   
-  ![git-rebase-demo-3](images/git-rebase-demo-3.png)
-  
-  如上图所示，由于 main 分支中的提交 5f97dfe 与 feature 分支中的提交 b379af8 均对源码文件的同一部分进行更改，因此在 rebase 过程中出现合并冲突。此时需手动解决冲突，决定保留哪个提交中的修改内容。
-  
-  ![git-rebase-demo-4-5](images/git-rebase-demo-4-5.png)
+- **往公共分支上合代码：merge**
 
-  如上图所示，手动解决合并冲突后即可完成 rebase。以下为 rebase 后的 feature 分支提交日志记录，可见 rebase 后的新提交连接在提交 5f97dfe 之后。
-  
-  ![git-rebase-demo-6](images/git-rebase-demo-6.png)
+  ```bash
+  git push origin --set-upstream :<branch_name>
+  ```
 
-- ✨ 推荐使用场景：
-  - **拉公共分支最新代码：rebase**
+- 一般在没有特殊要求的前提下，一律使用 merge 的方式！
 
-    ```bash
-    $ git pull origin master:<branch_name> --rebase
-    ```
-  
-  - **往公共分支上合代码：merge**
-
-    ```bash
-    $ git push origin --set-upstream :<branch_name>
-    ```
-
-  - 一般在没有特殊要求的前提下，一律使用 merge 的方式！
-
-## Git 版本回退
+## 18. Git 版本回退
 
 - Git 的版本回退（重置）实际上是将当前分支的 HEAD 引用指向旧提交。
-- 版本回退（重置）相关命令：
-  
-  ```bash
-  $ git reflog
-  # 查看 HEAD 引用的历史列表，已经执行过的所有动作的日志。包括合并、重置、还原等，
-  # 基本上包含对分支所做的任何修改。
-  # 注意：
-  #   git log 命令只能查看当前提交及之前的提交历史信息，而无法查看提交回退的历史信息。
-  #   因此，可使用 git reflog 命令查看当前分支及其原分支的所有提交。
-  
-  $ git reset [--soft|--hard] [<commit_hash>|HEAD@{n}]
-  # 回退版本至当前分支的指定提交，在工作区与暂存区中保留该提交之后的所有修改过的文件。
-  # 可直接使用提交的哈希值，也可使用 reflog 查询到的提交对应的 HEAD 索引号（n）。
-  
-  $ git reset --hard HEAD    # 硬重置回退到当前最新提交
-  $ git reset --hard HEAD^   # 硬重置回退到上次提交
-  $ git reset --hard HEAD~n  # 硬重置回退到上n次提交
-  ```
-  
-  ![git-reflog](images/git-reflog.gif)
 
-- 版本回退（重置）可分为：软重置、硬重置
-
-  💥 注意：以下软重置与硬重置均已回退至旧提交为例
-- 1️⃣ 软重置：
-  - 软重置会将 HEAD 移至指定的提交（或与 HEAD 相比的提交的索引），而不会移除该提交之后加入的修改！
-  - 如下图，若不想保留添加了一个 style.css 文件的提交 9e78i，而且也不想保留添加了一个 index.js 文件的提交 035cc。但是，确实又想要保留新添加的 style.css 和 index.js 文件。这是软重置的一个完美用例。
+### 18.1 基本命令
   
-  ![git-reset-soft](images/git-reset-soft.gif)
+```bash
+$ git reflog
+# 查看 HEAD 引用的历史列表，已经执行过的所有动作的日志。包括合并、重置、还原等，
+# 基本上包含对分支所做的任何修改。
+# 注意：
+#   git log 命令只能查看当前提交及之前的提交历史信息，而无法查看提交回退的历史信息。
+#   因此，可使用 git reflog 命令查看当前分支及其原分支的所有提交。
+  
+$ git reset [--soft|--hard] [<commit_hash>|HEAD@{n}]
+# 回退版本至当前分支的指定提交，在工作区与暂存区中保留该提交之后的所有修改过的文件。
+# 可直接使用提交的哈希值，也可使用 reflog 查询到的提交对应的 HEAD 索引号（n）。
+  
+$ git reset --hard HEAD    # 硬重置回退到当前最新提交
+$ git reset --hard HEAD^   # 硬重置回退到上次提交
+$ git reset --hard HEAD~n  # 硬重置回退到上n次提交
+```
+
+<center><img src="images/git-reflog.gif" style="width:80%"></center>
+
+### 18.2 版本回退（重置）—— 软重置、硬重置
+
+> 💥 注意：以下软重置与硬重置均已回退至旧提交为例
+
+#### 18.2.1 软重置
+
+- 软重置会将 HEAD 移至指定的提交（或与 HEAD 相比的提交的索引），而不会移除该提交之后加入的修改！
+- 如下图，若不想保留添加了一个 style.css 文件的提交 9e78i，而且也不想保留添加了一个 index.js 文件的提交 035cc。但是，确实又想要保留新添加的 style.css 和 index.js 文件。这是软重置的一个完美用例。
+  
+<center><img src="images/git-reset-soft.gif" style="width:80%"></center>
 
   输入 git status 后，仍然可以访问在之前的提交上做过的所有修改。它们依然在暂存区中，可以被修改与提交。
   
-  ![git-reset-soft](images/git-reset-soft.png)
+<center><img src="images/git-reset-soft.png" style="width:80%"></center>
   
-  - 如上图所示，使用软重置版本回退至指定的提交，该提交之后的所有提交在 git log 中消失，但是该提交后的修改过的文件全部保留在工作区与暂存区中，依然可以再次修改与提交。
+- 如上图所示，使用软重置版本回退至指定的提交，该提交之后的所有提交在 git log 中消失，但是该提交后的修改过的文件全部保留在工作区与暂存区中，依然可以再次修改与提交。
 
-- 2️⃣ 硬重置：
-  直接重置到指定的提交状态，该提交之后的所有提交在 git log 中消失，并且之后提交中修改的文件在工作区与暂存区中也一起被删除。
-  
-  ![git-reset-hard-5](images/git-reset-hard-5.gif)
-  
-  ![git-reset-hard-1](images/git-reset-hard-1.png)
-  
-  ![git-reset-hard-2](images/git-reset-hard-2.png)
-  
-  如上图所示，根据 git log 与 git reflog 确认需回退的提交，可直接使用提交的哈希值，也可使用 HEAD 索引（此处使用 HEAD 索引）。
-  
-  ![git-reset-hard-3](images/git-reset-hard-3.png)
-  
-  如上图所示，硬重置后在工作区与暂存区中不存在修改过的文件。
-  
-  ![git-reset-hard-4](images/git-reset-hard-4.png)
-  
-  硬重置后的 HEAD 引用指向指定的提交，在 git log 中无法查看该提交之后的更改。但是可使用 git reflog 查看所有的 Git 相关操作。
+#### 18.2.2 硬重置
 
-- 🔥 问题：软重置与硬重置后真的无法再回退至当前提交之后的提交（即未来版本）吗？
-  由于 git log 无法显示分支回退的提交历史，因此也就无法查看回退版本前的提交历史。使用 git reflog 查看完整的 Git 操作历史记录，确定需要回退的当前提交之后的提交哈希或 HEAD 索引，再使用软重置或硬重置回退即可。
+直接重置到指定的提交状态，该提交之后的所有提交在 git log 中消失，并且之后提交中修改的文件在工作区与暂存区中也一起被删除。
   
-  ![git-log-reflog-1](images/git-log-reflog-1.png)
-  
-  如上图所示，当前 test 分支的最新提交为 ea4b，需回退到 test 分支中该提交之后的 HEAD 索引 49 的提交。如果只是从 git log（上图左侧）确认的话就无法实现，而通过 git reflog（上图右侧）的话即可实现。
-  
-  ![git-log-reflog-2](images/git-log-reflog-2.png)
-  
-  如上图所示，回退后已修改的文件在工作区与暂存区中都存在。
-  
-  ![git-log-reflog-3](images/git-log-reflog-3.png)
+<center><img src="images/git-reset-hard-5.gif" style="width:80%"></center>
 
-- ✨ 推荐使用场景：
-  **如果想恢复到之前某个提交的版本，且那个版本之后提交的版本都不要了，就可以用这种方法。**
+<center><img src="images//git-reset-hard-1.png" style="width:80%"></center>
 
-## Git 还原提交
+<center><img src="images//git-reset-hard-2.png" style="width:80%"></center>
+  
+如上图所示，根据 git log 与 git reflog 确认需回退的提交，可直接使用提交的哈希值，也可使用 HEAD 索引（此处使用 HEAD 索引）。
+  
+<center><img src="images//git-reset-hard-3.png" style="width:80%"></center>
+  
+如上图所示，硬重置后在工作区与暂存区中不存在修改过的文件。
+  
+<center><img src="images/git-reset-hard-4.png" style="width:80%"></center>
+  
+硬重置后的 HEAD 引用指向指定的提交，在 git log 中无法查看该提交之后的更改。但是可使用 git reflog 查看所有的 Git 相关操作。
+
+#### 18.2.3 问题：软重置与硬重置后真的无法再回退至当前提交之后的提交（即未来版本）吗？
+
+由于 git log 无法显示分支回退的提交历史，因此也就无法查看回退版本前的提交历史。使用 git reflog 查看完整的 Git 操作历史记录，确定需要回退的当前提交之后的提交哈希或 HEAD 索引，再使用软重置或硬重置回退即可。
+  
+<center><img src="images/git-log-reflog-1.png" style="width:80%"></center>
+  
+如上图所示，当前 test 分支的最新提交为 ea4b，需回退到 test 分支中该提交之后的 HEAD 索引 49 的提交。如果只是从 git log（上图左侧）确认的话就无法实现，而通过 git reflog（上图右侧）的话即可实现。
+  
+<center><img src="images/git-log-reflog-2.png" style="width:80%"></center>
+  
+如上图所示，回退后已修改的文件在工作区与暂存区中都存在。
+
+<center><img src="images/git-log-reflog-3.png" style="width:80%"></center>
+
+#### 18.2.4 推荐使用场景
+
+**如果想恢复到之前某个提交的版本，且那个版本之后提交的版本都不要了，就可以用这种方法。**
+
+## 19. Git 还原提交
 
 - 除了使用版本回退（重置）以撤销指定提交及之后的提交外，如果要单独撤销指定的提交，可使用还原（revert），还原过程中将创建新的提交来说明此次还原的相关信息，同时也不会修改分支的历史。
   
@@ -1065,24 +1140,25 @@ $ source $HOME/.bashrc
   #   --no-commit 选项：只抵消暂存区和工作区的文件变化，不产生新的提交。
   ```
   
-  ![git-revert](images/git-revert.gif)
+  <center><img src="images/git-revert.gif" style="width:80%"></center>
 
-- 👨‍🏫 示例：git revert 还原提交 903d6
+### 19.1 示例 —— git revert 还原提交 *903d6*
   
-  ![git-revert-1](images/git-revert-1.png)
-  
-  ![git-revert-3](images/git-revert-3.png)
+  <center><img src="images/git-revert-1.png" style="width:80%"></center>
+
+  <center><img src="images/git-revert-3.png" style="width:80%"></center>
   
   如下图所示：使用 git revert 还原提交时创建新的提交说明
   
-  ![git-revert-2](images/git-revert-2.png)
+  <center><img src="images/git-revert-2.png" style="width:80%"></center>
   
   如下图所示：执行 git log -p 903d6 查看该提交的原始更改已经被还原
   
-  ![git-revert-4](images/git-revert-4.png)
+  <center><img src="images/git-revert-4.png" style="width:80%"></center>
 
-- ✨ 推荐使用场景：
-  **如果想撤销之前的某一版本，但是又想保留该目标版本后面的版本，记录下这整个版本变动流程，就可以用这种方法。**
+### 19.2 推荐使用场景
+
+- **如果想撤销之前的某一版本，但是又想保留该目标版本后面的版本，记录下这整个版本变动流程，就可以用这种方法。**
 - revert 还原可指定提交以恢复为该提交之前的状态，但无法直接更细粒度地恢复提交中文件在提交之前的状态。因此，可使用以下方式指定提交与文件还原：
   
   ```bash
@@ -1091,9 +1167,9 @@ $ source $HOME/.bashrc
   # 还原的文件恢复至暂存区与工作区，可用于还原误操作的文件。
   ```
   
-  ![git-checkout-commit-demo](images/git-checkout-commit-demo.png)
+  <center><img src="images/git-checkout-commit-demo.png" style="width:80%"></center>
 
-## Git 拣选
+## 20. Git 拣选
 
 - 当一个特定分支包含活动分支需要的某个提交时，可对那个提交执行拣选（cherry-pick）。对一个提交执行拣选时，会在活动分支上创建一个新的提交，其中包含由拣选出来的提交所引入的修改。
   
@@ -1104,11 +1180,11 @@ $ source $HOME/.bashrc
 
 - 如下图所示，假设 dev 分支上的提交 76d12 为 index.js 文件添加了一项修改，而希望将其整合到 master 分支中，且不想要整个 dev 分支，而只需要这个提交。
   
-  ![git-cherry-pick](images/git-cherry-pick.gif)
+  <center><img src="images/git-cherry-pick.gif" style="width:80%"></center>
 
 - 如下图所示，将 test 分支中的提交 f5ac0 拣选至 main 分支中，main 分支中新建了 .gitignore 文件修改的提交。
   
-  ![git-cherry-pick](images/git-cherry-pick.png)
+  <center><img src="images/git-cherry-pick.png" style="width:80%"></center>
 
 ## 参考链接
 

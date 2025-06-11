@@ -16,6 +16,7 @@
 - [2. Jenkins 系统组件](#2-jenkins-系统组件)
 - [3. Jenkins 安装与配置](#3-jenkins-安装与配置)
 - [4. Jenkins 的插件设置](#4-jenkins-的插件设置)
+- [5. 参考链接](#参考链接)
 
 ## 1. Jenkins 基础
 
@@ -85,6 +86,9 @@
   根据以上步骤即可完成节点上基于 RPM 方式的 Jenkins 安装部署。
 
 - 访问 Jenkins 守护进程所在的节点，即 http://jenkins-master.lab.example.com:8080（Jenkins 默认 8080 端口）。
+
+  > 注意：如果将 Jenkins 在 Kubernetes 中发布，那么需注意 ingress 资源中端口的定义！
+
 - 输入 `/var/lib/jenkins/secrets/initialAdminPassword` 中的初始化密码：
 
   <center><img src="images/jenkins-install-1.jpg" style="width:80%"></center>
@@ -120,3 +124,7 @@
     ![jenkins-plugins-repo.jpg](images/jenkins-plugins-repo.png)
 
     > 注意：清华与阿里云的插件源是 Jenkins 官方的镜像同步，在这两个源中已不存在 updates 目录而无法再同步！
+
+## 5. 参考链接
+
+- [什么是 CI/CD？| RedHat](https://www.redhat.com/zh/topics/devops/what-is-ci-cd#)
