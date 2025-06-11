@@ -58,7 +58,7 @@
 
 ## 0. Lab 环境架构与实现
 
-![ansible-navigator-jenkins-nodejs-flask-golang](images/ansible-navigator-jenkins-nodejs-flask-golang.png)
+![ansible-navigator-jenkins-nodejs-flask-golang](images/ansible-navigator-jenkins-nodejs-flask-golang.jpg)
 
 ## 1. Lab 相关用户名与登录密码
 
