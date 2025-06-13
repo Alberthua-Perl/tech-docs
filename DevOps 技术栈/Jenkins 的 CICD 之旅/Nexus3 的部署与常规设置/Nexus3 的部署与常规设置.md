@@ -25,7 +25,11 @@
   - [5.4 测试 npm (hosted) 类型构件库](#54-测试-npm-hosted-类型构件库)
     - [5.4.1 .npmrc 文件添加 npm-hosted 构件库认证](#541-npmrc-文件添加-npm-hosted-构件库认证)
     - [5.4.2 推送应用构件至 npm-hosted 构件库](#542-推送应用构件至-npm-hosted-构件库)
-- [6. 参考链接](#6-参考链接)
+- [6. maven 构件库]()
+  - [6.1 创建 maven (proxy) 类型构件库]()
+  - [6.2 创建 maven (hosted) 类型构件库]()
+  - [6.3 创建 maven (group) 类型构件库]()
+- [7. 参考链接](#6-参考链接)
 
 ## 1. 容器化部署 Nexus3
 
@@ -384,7 +388,15 @@ npm notice Publishing to http://nexus3.lab.example.com:8881/repository/npm-hoste
 
 <center><img src="images/npm-hosted-repo.png" style="width:80%"></center>
 
-## 6. 参考链接
+## 6. maven 构件库
+
+### 6.1 创建 maven (proxy) 类型构件库
+
+### 6.2 创建 maven (hosted) 类型构件库
+
+### 6.3 创建 maven (group) 类型构件库
+
+## 7. 参考链接
 
 - ❤ [Sonatype Nexus Repository | Documentation](https://help.sonatype.com/en/sonatype-nexus-repository.html)
 - [sonatype/nexus | DockerHub](https://hub.docker.com/r/sonatype/nexus)

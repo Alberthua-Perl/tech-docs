@@ -1197,3 +1197,4 @@ $ git reset --hard HEAD~n  # 硬重置回退到上n次提交
 - [About pull requests - GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)
 - [🌳🚀 CS Visualized: Useful Git Commands](https://dev.to/lydiahallie/cs-visualized-useful-git-commands-37p1)
 - [Git 分支使用规范](https://mp.weixin.qq.com/s/3i5XHoACpqpyGRVkPMSbzw)
+- [git status 显示中文和解决中文乱码](https://blog.csdn.net/u012145252/article/details/81775362)

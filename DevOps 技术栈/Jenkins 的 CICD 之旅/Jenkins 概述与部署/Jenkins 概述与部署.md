@@ -125,6 +125,17 @@
 
     > 注意：清华与阿里云的插件源是 Jenkins 官方的镜像同步，在这两个源中已不存在 updates 目录而无法再同步！
 
+## 5. 重启、重载与停止 Jenkins
+
+```bash
+$ sudo systemctl reload jenkins.service
+#重载服务，等同于访问 http://<jenkins_node_url>:8080/reload
+$ sudo systemctl restart jenkins.service
+#重启服务，等同于访问 http://<jenkins_node_url>:8080/restart
+$ sudo systemctl stop jenkins.service
+#停止服务，等同于访问 http://<jenkins_node_url>:8080/exit
+```
+
 ## 5. 参考链接
 
 - [什么是 CI/CD？| RedHat](https://www.redhat.com/zh/topics/devops/what-is-ci-cd#)

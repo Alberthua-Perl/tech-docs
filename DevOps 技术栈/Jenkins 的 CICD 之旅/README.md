@@ -1,4 +1,4 @@
-# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Node.js、Flask 与 Golang 应用
+# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Java、Node.js、Flask 与 Golang 应用
 
 ## 文档说明
 
@@ -237,9 +237,11 @@ total 8.0K
 
 <center><img src="images/gitlab-create-new-project-3.png" style="width:80%"></center>
 
+💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+
 #### 5.5.2 导入 etherpad-lite-postgres 外部代码库
 
-下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支，并在源代码目录中新增 `.npmrc` 与 `settings.json` 文件。前者用于 Nexus3 的 npm(proxy) 与 docker(hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。如下所示：
+下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [ether/etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支的克隆。此源代码目录中新增 `.npmrc` 与 `settings.json` 文件，前者用于 Nexus3 的 npm(proxy) 与 docker(hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。如下所示：
 
 ```bash
 ### file: .npmrc
@@ -291,7 +293,7 @@ Welcome to GitLab, @devuser0!
 #/settings.json
 ...
 [devops@workstation etherpad-lite-postgres]$ git remote set-url origin git@gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
-# 💥 此应用为 GitHub 中应用的克隆，具有原始 github 源地址，因此使用上述命令更新上游源代码仓库地址。
+# 💥 此应用为 GitHub 中应用的克隆，具有原始 github 源地址，因此使用上述命令更新远程源代码仓库地址。
 [devops@workstation etherpad-lite-postgres]$ cat .git/config
 [core]
         repositoryformatversion = 0
@@ -371,9 +373,11 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 <center><img src="images/gitlab-create-cnn-demo-3.png" style="width:80%"></center>
 
+💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+
 #### 5.6.2 导入 cnn_mnist_train 外部代码库
 
-本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 访问此应用。
+本示例使用基于 MNIST 数据集进行 CNN 模型的训练，并将训练好的模型部署于 Flask 中，用户可访问 Flask 应用页面完成手写数字识别。可参考 [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E3%80%90Lab%E3%80%91%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb) 了解此项目。
 
 ```bash
 [devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/cnn_mnist_train.tar
@@ -383,12 +387,12 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 [devops@workstation cnn_mnist_train]$ git init .  #此应用首次上传至源代码仓库中，原目录中不具有 git 仓库的信息，需执行初始化。
 Initialized empty Git repository in /home/devops/cnn_mnist_train/.git/
 [devops@workstation cnn_mnist_train]$ git remote add origin git@gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
-#添加远程代码仓库地址
-[devops@workstation cnn_mnist_train]$ git pull origin main  #拉取远程代码仓库中内容合并至本地 main 分支
+#添加远程代码库地址
+[devops@workstation cnn_mnist_train]$ git pull origin main  #拉取远程代码库中内容合并至本地 main 分支
 From gitlab-ce.lab.example.com:devuser0/cnn_mnist_train
  * branch            main       -> FETCH_HEAD
 # 注意：
-#   1. 如果仅仅执行 git pull 命令拉取远程代码仓库，那么 git 无法合并分支代码，因此需指定合并的本地代码分支（main 分支）。
+#   1. 如果仅仅执行 git pull 命令拉取远程代码库，那么 git 无法合并分支代码，因此需指定合并的本地代码分支（main 分支）。
 #   2. 如下所示，仅仅执行 git pull 的返回，提示需执行合并的分支：
 #        There is no tracking information for the current branch.
 #        Please specify which branch you want to merge with.
@@ -419,7 +423,57 @@ To gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
    9f5c478..fb1d868  main -> main
 ```
 
+导入完成后的仓库后续将用于 cnn_mnist_train 应用的构建与测试，如下所示：
+
 <center><img src="images/gitlab-create-cnn-demo-4.png" style="width:80%"></center>
+
+### 5.7 Java 应用导入
+
+#### 5.7.1 创建新项目 spring-boot-helloworld
+
+以 devuser0 用户登录代码库创建新项目：
+
+<center><img src="images/gitlab-create-java-demo-1.png" style="width:80%"></center>
+
+<center><img src="images/gitlab-create-java-demo-2.png" style="width:80%"></center>
+
+<center><img src="images/gitlab-create-java-demo-3.png" style="width:80%"></center>
+
+💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+
+#### 5.7.2 导入 spring-boot-helloworld 外部代码库
+
+本示例基于 Spring Boot 框架构建的 helloworld 应用演示 Java 语言应用在 Jenkins 中的持续构建过程。此项目源代码可参考 [iKubernetes/spring-boot-helloWorld | GitHub](https://github.com/iKubernetes/spring-boot-helloWorld#)。如下所示，将源代码导入远程代码库：
+
+```bash
+[devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/spring-boot-helloworld.tar
+[devops@workstation ~]$ tar -xf spring-boot-helloworld.tar
+[devops@workstation ~]$ cd spring-boot-helloworld
+[devops@workstation spring-boot-helloworld]$ git remote set-url origin git@gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
+# 💥 此应用为 GitHub 中应用的克隆，具有原始 github 源地址，因此使用上述命令更新远程源代码仓库地址。
+[devops@workstation spring-boot-helloworld]$ git push --set-upstream origin --all  #推送分支代码至仓库中
+Enumerating objects: 178, done.
+Counting objects: 100% (178/178), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (92/92), done.
+Writing objects: 100% (178/178), 22.95 KiB | 22.95 MiB/s, done.
+Total 178 (delta 55), reused 178 (delta 55), pack-reused 0
+remote: Resolving deltas: 100% (55/55), done.
+To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
+ * [new branch]      main -> main
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+[devops@workstation spring-boot-helloworld]$ git push origin --tags  #推送本地 tag 至远程代码库
+Enumerating objects: 1, done.
+Counting objects: 100% (1/1), done.
+Writing objects: 100% (1/1), 155 bytes | 155.00 KiB/s, done.
+Total 1 (delta 0), reused 1 (delta 0), pack-reused 0
+To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
+ * [new tag]         v0.9.6 -> v0.9.6
+```
+
+导入完成后的仓库后续将用于 spring-boot-helloworld 应用的构建与测试，如下所示：
+
+<center><img src="images/gitlab-create-java-project.png" style="width:80%"></center>
 
 ## 6. 部署与设置 Nexus3 容器
 
@@ -526,7 +580,7 @@ Jenkins Master 服务部署完成后需登录 Web UI 继续设置，可参考 [J
 jenkins:x:977:977:Jenkins Automation Server:/var/lib/jenkins:/bin/false
 # jenkins 用户不具有登录 shell，因此切换至此用户需指定登录的 shell 类型。
 [root@servera ~]# su - -s /bin/bash jenkins  #切换至 jenkins 用户
-[jenkins@servera ~]$ pwd  #jenkins 用户家目录
+[jenkins@servera ~]$ pwd  #jenkins 用户家目录，$JENKINS_HOME 环境变量引用。
 /var/lib/jenkins
 
 ### 步骤2：指定远程代码库监听的 SSH 端口
@@ -621,7 +675,7 @@ etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建
 
 3️⃣ 点击 Source Code Management，选择 Git 源代码仓库选项，填入 Repository URL，即 `git@workstation.lab.example.com:devuser0/etherpad-lite-postgres.git`（5.6 中已导入），并选择相应的连接凭据 devuser0（10.1.1 中已创建）。
 
-> 注意：💥 如果未在 10.1.3 中完成设置，那么在选择完 devuser0 凭据后，可能出现连接的远程代码仓库 SSH 主机公钥验证失败或者指定的源代码 namespace 不存在，亦或访问权限不足等报错。
+> 注意：💥 如果未在 10.1.3 中完成设置，那么在选择完 devuser0 凭据后，可能出现连接的远程代码库 SSH 主机公钥验证失败或者指定的源代码 namespace 不存在，亦或访问权限不足等报错。
 
 <center><img src="images/jenkins-create-freestyle-job-nodejs-3.jpg" style="width:80%"></center>
 
@@ -634,9 +688,9 @@ etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建
 ```bash
 #!/bin/bash
 
-# 说明：
+# 注意：
 #   Jenkins 的作业存储于 /var/lib/jenkins/workspace/<job_name>/ 目录中，因此，拉取的源代码目录中的内容直接保存于此目录中。
-#   因此，当前作业目录中直接保存了所有源代码文件。
+#   在当前作业目录中直接保存了所有源代码文件。
 echo -e "\n---> Create app build env..."
 mkdir build/  #创建新目录
 shopt -s extglob  #设置 shell 通配符扩展，如果不设置，那么下一步命令无法执行。
@@ -885,3 +939,4 @@ postgres=# \l  #查看所以数据库
 - [pip cannot uninstall <package>: "It is a distutils installed project" | stack overflow](https://stackoverflow.com/questions/53807511/pip-cannot-uninstall-package-it-is-a-distutils-installed-project)
 - [tensorflow/tensorflow | DockerHub](https://hub.docker.com/r/tensorflow/tensorflow/tags/)
 - [PostgreSQL 入门指南：安装、配置与基本命令](https://developer.aliyun.com/article/1655700)
+- [python 报错 Missing dependencies for SOCKS support 解决方法](https://blog.csdn.net/whatday/article/details/109287343)
