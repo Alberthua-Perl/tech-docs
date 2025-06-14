@@ -549,8 +549,8 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
 
 ### 6.5 创建 Nexus3 的 maven 构件仓库
 
-- [创建 proxy 类型仓库]()
-- [创建 group 类型仓库]()
+- [创建 maven（proxy）类型仓库](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#63-%E5%88%9B%E5%BB%BA-maven-proxy-%E7%B1%BB%E5%9E%8B%E6%9E%84%E4%BB%B6%E5%BA%93)
+- [创建 maven（group）类型仓库](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#64-%E5%88%9B%E5%BB%BA-maven-group-%E7%B1%BB%E5%9E%8B%E6%9E%84%E4%BB%B6%E5%BA%93)
 
 ## 7. 部署应用运行及构建环境
 

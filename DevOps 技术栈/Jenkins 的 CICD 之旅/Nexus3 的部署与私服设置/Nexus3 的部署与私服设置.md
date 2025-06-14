@@ -1,4 +1,4 @@
-# Jenkins 的 CI/CD 之旅 —— Nexus3 的部署与常规设置
+# Jenkins 的 CI/CD 之旅 —— Nexus3 的部署与私服设置
 
 ## 文档说明
 
