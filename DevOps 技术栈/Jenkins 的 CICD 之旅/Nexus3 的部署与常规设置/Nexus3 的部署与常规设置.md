@@ -26,8 +26,10 @@
     - [5.4.1 .npmrc 文件添加 npm-hosted 构件库认证](#541-npmrc-文件添加-npm-hosted-构件库认证)
     - [5.4.2 推送应用构件至 npm-hosted 构件库](#542-推送应用构件至-npm-hosted-构件库)
 - [6. maven 构件库](#6-maven-构件库)
-  - [6.1 创建 maven (proxy) 类型构件库](#61-nexus3-中-maven-默认仓库介绍)
-  - [6.2 创建 maven (group) 类型构件库](#62-创建-maven-group-类型构件库)
+  - [6.1 Nexus3 中 maven 默认仓库介绍](#61-nexus3-中-maven-默认仓库介绍)
+  - [6.2 maven 仓库拉取 jar 包流程](#62-maven-仓库拉取-jar-包流程)
+  - [6.3 创建 maven (proxy) 类型构件库](#63-创建-maven-proxy-类型构件库)
+  - [6.4 创建 maven (group) 类型构件库](#64-创建-maven-group-类型构件库)
 - [7. 参考链接](#6-参考链接)
 
 ## 1. 容器化部署 Nexus3
@@ -430,7 +432,7 @@ graph LR
   D-->E[缓存至 maven (proxy) 类型构件库中];
 ```
 
-### 6.1 创建 maven (proxy) 类型构件库
+### 6.3 创建 maven (proxy) 类型构件库
 
 <center><img src="images/nexus3-create-maven-proxy-1.png" style="width:80%"></center>
 
@@ -446,7 +448,7 @@ graph LR
 
 <center><img src="images/nexus3-create-maven-proxy-7.png" style="width:80%"></center>
 
-### 6.2 创建 maven (group) 类型构件库
+### 6.4 创建 maven (group) 类型构件库
 
 maven (group) 类型构件库可将多个构件库组织在一起一并管理，因此使用此类仓库管理上更加方便。其创建方法与前者类似，以下给出关键步骤：
 
