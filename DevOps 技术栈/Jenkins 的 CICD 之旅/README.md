@@ -26,13 +26,19 @@
   - [5.6 Flask 应用导入](#56-flask-应用导入)
     - [5.6.1 创建新项目 cnn_mnist_train](#561-创建新项目-cnn_mnist_train)
     - [5.6.2 导入 cnn_mnist_train 外部代码库](#562-导入-cnn_mnist_train-外部代码库)
+  - [5.7 Java 应用导入](#57-java-应用导入)
+    - [5.7.1 创建新项目 spring-boot-helloworld](#571-创建新项目-spring-boot-helloworld)
+    - [5.7.2 导入 spring-boot-helloworld 外部代码库](#572-导入-spring-boot-helloworld-外部代码库)
 - [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
   - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
   - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
   - [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](#63-创建-nexus3-的容器镜像仓库hosted-类型)
   - [6.4 创建 Nexus3 的 npm 构件仓库（proxy 类型）](#64-创建-nexus3-的-npm-构件仓库proxy-类型)
+  - [6.5 创建 Nexus3 的 maven 构件仓库](#65-创建-nexus3-的-maven-构件仓库)
 - [7. 部署应用运行及构建环境](#7-部署应用运行及构建环境)
   - [7.1 Node.js 运行环境](#71-nodejs-运行环境)
+  - [7.2 Maven 构建环境](#72-maven-构建环境)
+  - [7.3 使用 spring-boot 应用测试 maven (group) 类型构件库](#73-使用-spring-boot-应用测试-maven-group-类型构件库)
 - [8. 部署与设置 PostgreSQL 数据库](#8-部署与设置-postgresql-数据库)
   - [8.1 安装部署 PostgreSQL 数据库](#81-安装部署-postgresql-数据库)
   - [8.2 数据库服务器中创建 etherpad-lite 应用相关用户与数据库](#82-数据库服务器中创建-etherpad-lite-应用相关用户与数据库)
@@ -495,7 +501,8 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
                     <enabled>true</enabled>  
                 </snapshots>                 
             </repository>                    
-        </repositories>                      
+        </repositories>
+
         <pluginRepositories>                 
             <pluginRepository>
             <!-- 插件仓库的信息与上述配置相同 -->               
@@ -509,7 +516,21 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
                     <enabled>false</enabled> 
                 </snapshots>                 
             </pluginRepository>              
-        </pluginRepositories>                
+        </pluginRepositories>
+
+        <!-- 推送构件至私服中的配置段 -->
+        <distributionManagement>
+            <repository>
+                <id>maven-group</id>
+                <name>Maven2 Group Local Repository</name>
+                <url>http://nexus3.lab.example.com:8881/repository/maven-group/</url>
+            </repository>
+            <snapshotRepository>
+                <id>maven-group</id>
+                <name>Maven2 Group Local Repository</name>
+                <url>http://nexus3.lab.example.com:8881/repository/maven-group/</url>
+            </snapshotRepository>
+        </distributionManagement>                
         <!-- edited by hualongfeiyyy@163.com -->
 
 [devops@workstation spring-boot-helloworld]$ git .
@@ -527,6 +548,8 @@ Total 4 (delta 2), reused 0 (delta 0), pack-reused 0
 To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
    fea6fe4..86758fa  main -> main
 ```
+
+🔗 以上 pom.xml 文件可直接参考此文件的拷贝 [jenkins-ci-plt/files/pom.xml.bak | GitHub](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/files/pom.xml.bak)
 
 导入完成后的仓库后续将用于 spring-boot-helloworld 应用的构建与测试，如下所示：
 
@@ -564,13 +587,244 @@ Jenkins Master 节点与 Agent 节点使用 Node.js 管理工具构建与管理�
 
 ### 7.2 Maven 构建环境
 
-Jenkins Master 节点与 Agent 节点使用 Maven 工具构建与管理 Java 项目，因此，各节点需安装 maven。此处不使用 Jenkins Dashboard 中全局工具配置提供的安装 maven 方式，而是直接使用如下 playbook 安装与设置 maven，以及同步 settings.xml 配置文件，以满足 maven-proxy 私服的认证连接，此私服可缓存来自外部仓库的各个 jar 包，方便后续应用构建使用。
+Jenkins Master 节点与 Agent 节点使用 Maven 构建与管理 Java 项目，因此，各节点需安装 maven。此处不使用 Jenkins Dashboard 中 "全局工具" 提供的 maven 安装方式，而是直接使用以下 playbook 安装与设置 maven，以及同步 maven 的 settings.xml 配置文件，以满足 maven-proxy 私服的认证连接，此私服可缓存来自外部仓库的各个 jar 包，方便后续应用构建使用。
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ 
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-maven-env.yml
 ```
 
 ### 7.3 使用 spring-boot 应用测试 maven (group) 类型构件库
+
+可选择一个 Jenkins Agent 节点（serverb 节点为例）克隆应用代码并使用 maven 测试，如下所示：
+
+```bash
+[devops@workstation ~]$ scp -r spring-boot-helloworld devops@serverb:~  #同步源代码至 serverb 节点上
+[devops@serverb ~]$ cd spring-boot-helloworld
+[devops@serverb spring-boot-helloworld]$ export PATH=$PATH:/usr/local/apache-maven-3.9.9/bin/  #设置 mvn 命令环境变量
+[devops@serverb spring-boot-helloworld]$ mvn --version
+Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+Maven home: /usr/local/apache-maven-3.9.9
+Java version: 17.0.3, vendor: Red Hat, Inc., runtime: /usr/lib/jvm/java-17-openjdk-17.0.3.0.7-1.el9_0.x86_64
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "5.14.0-70.13.1.el9_0.x86_64", arch: "amd64", family: "unix"
+
+[devops@serverb spring-boot-helloworld]$ mvn dependency:tree  #显示项目的依赖树
+[INFO] Scanning for projects...
+Downloading from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/springframework/boot/spring-boot-starter-parent/2.1.3.RELEASE/spring-boot-starter-parent-2.1.3.RELEASE.pom
+Downloaded from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/springframework/boot/spring-boot-starter-parent/2.1.3.RELEASE/spring-boot-starter-parent-2.1.3.RELEASE.pom (12 kB at 12 kB/s)
+Downloading from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/springframework/boot/spring-boot-dependencies/2.1.3.RELEASE/spring-boot-dependencies-2.1.3.RELEASE.pom
+...
+[WARNING] Could not validate integrity of download from http://nexus3.lab.example.com:8881/repository/maven-group/com/fasterxml/oss-parent/34/oss-parent-34.pom
+...
+[INFO] com.neo:spring-boot-helloworld:jar:0.9.6-SNAPSHOT
+[INFO] +- org.springframework.boot:spring-boot-starter-web:jar:2.1.3.RELEASE:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:2.1.3.RELEASE:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:2.1.3.RELEASE:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.2.3:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.2.3:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.11.2:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.11.2:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:1.7.25:compile
+[INFO] |  |  +- javax.annotation:javax.annotation-api:jar:1.3.2:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:1.23:runtime
+[INFO] |  +- org.springframework.boot:spring-boot-starter-json:jar:2.1.3.RELEASE:compile
+[INFO] |  |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.9.8:compile
+[INFO] |  |  |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.9.0:compile
+[INFO] |  |  |  \- com.fasterxml.jackson.core:jackson-core:jar:2.9.8:compile
+[INFO] |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.9.8:compile
+[INFO] |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.9.8:compile
+[INFO] |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.9.8:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.1.3.RELEASE:compile
+[INFO] |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.16:compile
+[INFO] |  |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:9.0.16:compile
+[INFO] |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:9.0.16:compile
+[INFO] |  +- org.hibernate.validator:hibernate-validator:jar:6.0.14.Final:compile
+[INFO] |  |  +- javax.validation:validation-api:jar:2.0.1.Final:compile
+[INFO] |  |  +- org.jboss.logging:jboss-logging:jar:3.3.2.Final:compile
+[INFO] |  |  \- com.fasterxml:classmate:jar:1.4.0:compile
+[INFO] |  +- org.springframework:spring-web:jar:5.1.5.RELEASE:compile
+[INFO] |  |  \- org.springframework:spring-beans:jar:5.1.5.RELEASE:compile
+[INFO] |  \- org.springframework:spring-webmvc:jar:5.1.5.RELEASE:compile
+[INFO] |     +- org.springframework:spring-aop:jar:5.1.5.RELEASE:compile
+[INFO] |     +- org.springframework:spring-context:jar:5.1.5.RELEASE:compile
+[INFO] |     \- org.springframework:spring-expression:jar:5.1.5.RELEASE:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-test:jar:2.1.3.RELEASE:test
+[INFO] |  +- org.springframework.boot:spring-boot-test:jar:2.1.3.RELEASE:test
+[INFO] |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:2.1.3.RELEASE:test
+[INFO] |  +- com.jayway.jsonpath:json-path:jar:2.4.0:test
+[INFO] |  |  +- net.minidev:json-smart:jar:2.3:test
+[INFO] |  |  |  \- net.minidev:accessors-smart:jar:1.2:test
+[INFO] |  |  |     \- org.ow2.asm:asm:jar:5.0.4:test
+[INFO] |  |  \- org.slf4j:slf4j-api:jar:1.7.25:compile
+[INFO] |  +- junit:junit:jar:4.12:test
+[INFO] |  +- org.assertj:assertj-core:jar:3.11.1:test
+[INFO] |  +- org.mockito:mockito-core:jar:2.23.4:test
+[INFO] |  |  +- net.bytebuddy:byte-buddy:jar:1.9.10:test
+[INFO] |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.9.10:test
+[INFO] |  |  \- org.objenesis:objenesis:jar:2.6:test
+[INFO] |  +- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] |  +- org.hamcrest:hamcrest-library:jar:1.3:test
+[INFO] |  +- org.skyscreamer:jsonassert:jar:1.5.0:test
+[INFO] |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  +- org.springframework:spring-core:jar:5.1.5.RELEASE:compile
+[INFO] |  |  \- org.springframework:spring-jcl:jar:5.1.5.RELEASE:compile
+[INFO] |  +- org.springframework:spring-test:jar:5.1.5.RELEASE:test
+[INFO] |  \- org.xmlunit:xmlunit-core:jar:2.6.2:test
+[INFO] |     \- javax.xml.bind:jaxb-api:jar:2.3.1:test
+[INFO] |        \- javax.activation:javax.activation-api:jar:1.2.0:test
+[INFO] \- org.springframework.boot:spring-boot-devtools:jar:2.1.3.RELEASE:compile (optional) 
+[INFO]    +- org.springframework.boot:spring-boot:jar:2.1.3.RELEASE:compile
+[INFO]    \- org.springframework.boot:spring-boot-autoconfigure:jar:2.1.3.RELEASE:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:05 min
+[INFO] Finished at: 2025-06-14T10:00:23-04:00
+[INFO] ------------------------------------------------------------------------
+# 从以上输出可见，mvn 已连接 Nexus3 中的 maven 私服，此私服仓库可缓存 Jar 包。
+
+[devops@serverb spring-boot-helloworld]$ mvn clean install -DskipTest  #跳过单元测试，安装项目到本地 maven 仓库。
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.neo:spring-boot-helloworld >-------------------
+[INFO] Building spring-boot-helloworld 0.9.6-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.1.0:clean (default-clean) @ spring-boot-helloworld ---
+Downloading from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.pom
+Downloaded from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.pom (5.6 kB at 76 kB/s)
+Downloading from maven-group: http://nexus3.lab.example.com:8881/repository/maven-group/org/codehaus/plexus/plexus-utils/2.0.4/plexus-utils-2.0.4.jar
+...
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.3.RELEASE)
+
+2025-06-14 10:02:22.860  INFO 9672 --- [           main] com.neo.ApplicationTests                 : Starting ApplicationTests on serverc.lab.example.com with PID 9672 (started by devops in /home/devops/spring-boot-helloworld)
+2025-06-14 10:02:22.884  INFO 9672 --- [           main] com.neo.ApplicationTests                 : No active profile set, falling back to default profiles: default
+2025-06-14 10:02:24.792  INFO 9672 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2025-06-14 10:02:25.011  INFO 9672 --- [           main] com.neo.ApplicationTests                 : Started ApplicationTests in 2.508 seconds (JVM running for 3.613)
+hello word
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.452 s - in com.neo.ApplicationTests
+[INFO] Running com.neo.controller.HelloTests
+...
+[INFO] Installing /home/devops/spring-boot-helloworld/target/spring-boot-helloworld-0.9.6-SNAPSHOT.jar to /home/devops/.m2/repository/com/neo/spring-boot-helloworld/0.9.6-SNAPSHOT/spring-boot-helloworld-0.9.6-SNAPSHOT.jar
+[INFO] Installing /home/devops/spring-boot-helloworld/pom.xml to /home/devops/.m2/repository/com/neo/spring-boot-helloworld/0.9.6-SNAPSHOT/spring-boot-helloworld-0.9.6-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.444 s
+[INFO] Finished at: 2025-06-14T10:02:29-04:00
+[INFO] ------------------------------------------------------------------------
+
+[devops@serverb spring-boot-helloworld]$ mvn test  #运行项目的单元测试
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.neo:spring-boot-helloworld >-------------------
+[INFO] Building spring-boot-helloworld 0.9.6-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.1.0:resources (default-resources) @ spring-boot-helloworld ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- compiler:3.8.0:compile (default-compile) @ spring-boot-helloworld ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.1.0:testResources (default-testResources) @ spring-boot-helloworld ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/devops/spring-boot-helloworld/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.8.0:testCompile (default-testCompile) @ spring-boot-helloworld ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:2.22.1:test (default-test) @ spring-boot-helloworld ---
+...
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 s - in com.neo.controller.HelloWorldControlerTests
+2025-06-14 10:03:04.205  INFO 9779 --- [       Thread-2] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.037 s
+[INFO] Finished at: 2025-06-14T10:03:04-04:00
+[INFO] ------------------------------------------------------------------------
+
+[devops@serverb spring-boot-helloworld]$ mvn package  #打包项目
+...
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.3.RELEASE)
+
+2025-06-14 12:08:04.154  INFO 10642 --- [           main] com.neo.ApplicationTests                 : Starting ApplicationTests on serverc.lab.example.com with PID 10642 (started by devops in /home/devops/spring-boot-helloworld)
+2025-06-14 12:08:04.156  INFO 10642 --- [           main] com.neo.ApplicationTests                 : No active profile set, falling back to default profiles: default
+2025-06-14 12:08:05.238  INFO 10642 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2025-06-14 12:08:05.432  INFO 10642 --- [           main] com.neo.ApplicationTests                 : Started ApplicationTests in 1.484 seconds (JVM running for 2.035)
+hello word
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.057 s - in com.neo.ApplicationTests
+[INFO] Running com.neo.controller.HelloTests
+...
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s - in com.neo.controller.HelloWorldControlerTests
+2025-06-14 12:08:05.809  INFO 10642 --- [       Thread-2] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.1.1:jar (default-jar) @ spring-boot-helloworld ---
+[INFO] Building jar: /home/devops/spring-boot-helloworld/target/spring-boot-helloworld-0.9.6-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:2.1.3.RELEASE:repackage (repackage) @ spring-boot-helloworld ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.509 s
+[INFO] Finished at: 2025-06-14T12:08:06-04:00
+[INFO] ------------------------------------------------------------------------
+
+[devops@serverb spring-boot-helloworld]$ java -jar target/spring-boot-helloworld-0.9.6-SNAPSHOT.jar 
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.3.RELEASE)
+
+2025-06-14 12:13:30.719  INFO 10693 --- [           main] com.neo.Application                      : Starting Application v0.9.6-SNAPSHOT on serverc.lab.example.com with PID 10693 (/home/devops/spring-boot-helloworld/target/spring-boot-helloworld-0.9.6-SNAPSHOT.jar started by devops in /home/devops/spring-boot-helloworld)
+2025-06-14 12:13:30.721  INFO 10693 --- [           main] com.neo.Application                      : No active profile set, falling back to default profiles: default
+2025-06-14 12:13:31.662  INFO 10693 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-06-14 12:13:31.702  INFO 10693 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-14 12:13:31.703  INFO 10693 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+2025-06-14 12:13:31.713  INFO 10693 --- [           main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib]
+2025-06-14 12:13:31.779  INFO 10693 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-14 12:13:31.780  INFO 10693 --- [           main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1011 ms
+2025-06-14 12:13:32.005  INFO 10693 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2025-06-14 12:13:32.183  INFO 10693 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2025-06-14 12:13:32.187  INFO 10693 --- [           main] com.neo.Application                      : Started Application in 1.798 seconds (JVM running for 2.109)
+
+
+### 打开其他节点访问测试
+[devops@workstation ~]$ curl http://serverc.lab.example.com:8080
+Hello Spring Boot 2.0!
+```
 
 ## 8. 部署与设置 PostgreSQL 数据库
 
