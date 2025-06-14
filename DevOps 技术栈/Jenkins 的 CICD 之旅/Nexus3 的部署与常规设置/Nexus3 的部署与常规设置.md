@@ -25,10 +25,9 @@
   - [5.4 测试 npm (hosted) 类型构件库](#54-测试-npm-hosted-类型构件库)
     - [5.4.1 .npmrc 文件添加 npm-hosted 构件库认证](#541-npmrc-文件添加-npm-hosted-构件库认证)
     - [5.4.2 推送应用构件至 npm-hosted 构件库](#542-推送应用构件至-npm-hosted-构件库)
-- [6. maven 构件库]()
-  - [6.1 创建 maven (proxy) 类型构件库]()
-  - [6.2 创建 maven (hosted) 类型构件库]()
-  - [6.3 创建 maven (group) 类型构件库]()
+- [6. maven 构件库](#6-maven-构件库)
+  - [6.1 创建 maven (proxy) 类型构件库](#61-nexus3-中-maven-默认仓库介绍)
+  - [6.2 创建 maven (group) 类型构件库](#62-创建-maven-group-类型构件库)
 - [7. 参考链接](#6-参考链接)
 
 ## 1. 容器化部署 Nexus3
@@ -46,7 +45,7 @@ $ sudo podman run \
     --restart always \
     --hostname nexus3.lab.example.com \
     --name nexus3 \
-    --publish 8881:8081 --publish 8882:8082 --publish 8883:8083 \
+    --publish 8881:8081 --publish 8882:8082 --publish 8883:8083 --publish 8884:8084 --publish 8885:8085 \
     --volume /opt/nexus-data:/nexus-data:Z \
     --memory 4096m \
     docker.io/sonatype/nexus3:3.9.0
@@ -74,8 +73,8 @@ Nexus3 运行后即可创建用户以区别 admin 用户，用于日常开发、
 
 Nexus3 仓库（repository）类型分为三种类型：
 
-- 代理仓库（Proxy）：用来代理公共的远程仓库，在本地持久化存储远程仓库下载的构件，当再次请求该构件时将从 Nexus 私服下载。
-- 宿主仓库（Hosted）：通常宿主仓库在保存构件时分为以下 3 个常用类型
+- 代理仓库（proxy）：用来代理公共的远程仓库，在本地持久化存储远程仓库下载的构件，当再次请求该构件时将从 Nexus 私服下载。
+- 宿主仓库（hosted）：通常宿主仓库在保存构件时分为以下 3 个常用类型
 
   | 宿主仓库类型 | 说明 |
   | ----- | ----- |
@@ -83,7 +82,7 @@ Nexus3 仓库（repository）类型分为三种类型：
   | releases | 保存内部发布的正式稳定版本。 |
   | snapshots | 保存内部发布的快照，为不稳定版本。 |
 
-- 仓库组（Group）：管理多个仓库，客户端直接请求仓库组即可请求到组中的多个仓库。宿主仓库主要用于发布公司内部项目构建、第三方项目构件（如购买的商业构件），以及其他无法从公用仓库获取的构件。
+- 仓库组（group）：管理多个仓库，客户端直接请求仓库组即可请求到组中的多个仓库。宿主仓库主要用于发布公司内部项目构建、第三方项目构件（如购买的商业构件），以及其他无法从公用仓库获取的构件。
 
 ## 4. 容器镜像仓库
 
@@ -150,7 +149,7 @@ Writing manifest to image destination
 
 ### 5.1 创建 npm (proxy) 类型构件库
 
-应用目录的 `.npmrc` 文件或 `$HOME/.npmrc` 文件中定义了此类仓库的地址的话，那么使用 `pnpm install` 或 `npm install` 安装应用依赖的模块时，将从此类仓库中下载安装，但仓库内不存在对应模块的话，仓库将从定义的上游仓库中（本例使用淘宝的 npm 仓库）拉取下载模块至仓库中，再提供给应用。因此，若其他应用使用相同的的模块，此类仓库可直接提供而无需再从上游仓库中下载。
+- 应用目录的 `.npmrc` 文件或 `$HOME/.npmrc` 文件中定义了此类仓库的地址的话，那么使用 `pnpm install` 或 `npm install` 安装应用依赖的模块时，将从此类仓库中下载安装，但仓库内不存在对应模块的话，仓库将从定义的上游仓库中（本例使用淘宝的 npm 仓库）拉取下载模块至仓库中，再提供给应用。因此，若其他应用使用相同的的模块，此类仓库可直接提供而无需再从上游仓库中下载。
 
 <center><img src="images/npm-proxy-demo-1.jpg" style="width:80%"></center>
 
@@ -163,6 +162,18 @@ Writing manifest to image destination
 <center><img src="images/npm-proxy-demo-5.jpg" style="width:80%"></center>
 
 <center><img src="images/npm-proxy-demo-6.jpg" style="width:80%"></center>
+
+- npm（proxy）类型构件库拉取 npm 包流程：
+
+```mermaid
+graph LR
+  A[npm 或 pnpm]-->B{npm（proxy）
+  类型构件库};
+  B-->|存在构件| C[直接下载使用];
+  B-->|不存在构件| D[外部仓库中下载（如 taobao 仓库）];
+  D-->E[缓存至 npm（proxy）
+  类型构件库中];
+```
 
 ### 5.2 测试 npm (proxy) 类型构件库
 
@@ -390,11 +401,58 @@ npm notice Publishing to http://nexus3.lab.example.com:8881/repository/npm-hoste
 
 ## 6. maven 构件库
 
+### 6.1 Nexus3 中 maven 默认仓库介绍
+
+- `maven-central`：maven 中央库，默认从 https://repo1.maven.org/maven2/ 拉取 jar。
+- `maven-releases`：私库发行版 jar
+- `maven-snapshots`：私库快照（调试版本）jar
+- `maven-public`：仓库分组，把上面三个仓库组合在一起对外提供服务，在本地 maven 基础配置 settings.xml 中使用。
+
+> 注意：以上仓库的名字可以随便取，关键是它对应哪种仓库类型。
+
+除了 `3. Nexus3 仓库类型的说明` 中介绍的仓库类型外，maven 特定的仓库类型如下：
+
+- group（仓库组类型）：又叫组仓库，即用于方便开发人员自己设定的仓库。
+- hosted（宿主类型）：内部项目的发布仓库，即内部开发人员发布上去存放的仓库。
+- proxy（代理类型）：从远程中央仓库中寻找数据的仓库。
+- virtual（虚拟类型）：虚拟仓库
+
+Policy（策略）：表示此仓库为发布（Release）版本仓库还是快照（Snapshot）版本仓库
+
+### 6.2 maven 仓库拉取 jar 包流程
+
+```mermaid
+graph LR
+  A[maven]-->B{maven (proxy) 
+  类型构件库};
+  B-->|存在构件| C[直接下载使用];
+  B-->|不存在构件| D[外部仓库中下载（如中央仓库或 aliyun 仓库）];
+  D-->E[缓存至 maven (proxy) 类型构件库中];
+```
+
 ### 6.1 创建 maven (proxy) 类型构件库
 
-### 6.2 创建 maven (hosted) 类型构件库
+<center><img src="images/nexus3-create-maven-proxy-1.png" style="width:80%"></center>
 
-### 6.3 创建 maven (group) 类型构件库
+<center><img src="images/nexus3-create-maven-proxy-2.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-proxy-3.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-proxy-4.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-proxy-5.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-proxy-6.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-proxy-7.png" style="width:80%"></center>
+
+### 6.2 创建 maven (group) 类型构件库
+
+maven (group) 类型构件库可将多个构件库组织在一起一并管理，因此使用此类仓库管理上更加方便。其创建方法与前者类似，以下给出关键步骤：
+
+<center><img src="images/nexus3-create-maven-group-1.png" style="width:80%"></center>
+
+<center><img src="images/nexus3-create-maven-group-2.png" style="width:80%"></center>
 
 ## 7. 参考链接
 

@@ -30,7 +30,7 @@
   - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
   - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
   - [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](#63-创建-nexus3-的容器镜像仓库hosted-类型)
-  - [6.4 创建 Nexus3 的 npm 构建仓库（proxy 类型）](#64-创建-nexus3-的-npm-构建仓库proxy-类型)
+  - [6.4 创建 Nexus3 的 npm 构件仓库（proxy 类型）](#64-创建-nexus3-的-npm-构件仓库proxy-类型)
 - [7. 部署应用运行及构建环境](#7-部署应用运行及构建环境)
   - [7.1 Node.js 运行环境](#71-nodejs-运行环境)
 - [8. 部署与设置 PostgreSQL 数据库](#8-部署与设置-postgresql-数据库)
@@ -241,7 +241,7 @@ total 8.0K
 
 #### 5.5.2 导入 etherpad-lite-postgres 外部代码库
 
-下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [ether/etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支的克隆。此源代码目录中新增 `.npmrc` 与 `settings.json` 文件，前者用于 Nexus3 的 npm(proxy) 与 docker(hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。如下所示：
+下载 etherpad-lite-postgres.tar 源代码文件并推送至 GitLab-CE 中。此应用的源代码为 [ether/etherpad-lite | GitHub](https://github.com/ether/etherpad-lite) 项目的 *master* 分支的克隆。源代码目录中新增 `.npmrc` 与 `settings.json` 文件，前者用于 Nexus3 的 npm (proxy) 与 docker (hosted) 仓库的认证连接，后者用于应用运行后与已部署的 PostgreSQL 服务器的连接认证。其中 npm (proxy) 仓库可从外部仓库中缓存 npm 包（如果不存在相应包的话），PostgreSQL 数据库用于应用的连接与数据存储。如下所示：
 
 ```bash
 ### file: .npmrc
@@ -469,6 +469,63 @@ Writing objects: 100% (1/1), 155 bytes | 155.00 KiB/s, done.
 Total 1 (delta 0), reused 1 (delta 0), pack-reused 0
 To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
  * [new tag]         v0.9.6 -> v0.9.6
+
+[devops@workstation spring-boot-helloworld]$ mkdir ./backup && cp pom.xml ./backup
+[devops@workstation spring-boot-helloworld]$ vim pom.xml
+# 💥 添加 Nexus3 Maven 私服仓库配置，以满足后续 spring-boot 应用从 maven-proxy 仓库中拉取 jar 包的需求。
+### 注意：
+###   设置 Maven 连接 Nexus3 中的私服仓库，必须配置以下两个文件：
+###     1. Maven 的 settings.xml 配置文件，编辑 servers 部分与 mirrors 部分（见 `7.2 Maven 构建环境` 中 playbook 的设置）
+###     2. 父项目中的 pom.xml（见以下文件） 
+...
+        <!-- Modify to use local nexus3 group repo -->                                                                                                  
+        <repositories>                       
+            <repository>                     
+                <id>maven-group</id>
+                <!-- 指定 Nexus3 中的 maven-group 仓库 ID -->
+                <name>Maven2 Group Local Repository</name>
+                <!-- 自定义以上仓库的名称 -->                                                                                              
+                <url>http://nexus3.lab.example.com:8881/repository/maven-group/</url>
+                <!-- 指定 maven-group 仓库的 URL 地址，可在 Browse 仓库列表页 Copy 此地址。 -->                                                                   
+                <releases>                   
+                    <enabled>true</enabled>  
+                </releases>                  
+                <snapshots>                  
+                    <!-- <enabled>false</enabled> -->                                                                                                   
+                    <enabled>true</enabled>  
+                </snapshots>                 
+            </repository>                    
+        </repositories>                      
+        <pluginRepositories>                 
+            <pluginRepository>
+            <!-- 插件仓库的信息与上述配置相同 -->               
+                <id>maven-group</id>         
+                <name>Maven2 Group Local Repository</name>                                                                                              
+                <url>http://nexus3.lab.example.com:8881/repository/maven-group/</url>                                                                   
+                <releases>                   
+                    <enabled>true</enabled>  
+                </releases>                  
+                <snapshots>                  
+                    <enabled>false</enabled> 
+                </snapshots>                 
+            </pluginRepository>              
+        </pluginRepositories>                
+        <!-- edited by hualongfeiyyy@163.com -->
+
+[devops@workstation spring-boot-helloworld]$ git .
+[devops@workstation spring-boot-helloworld]$ git commit -m "Update nexus3 group repo info"
+[main 86758fa] Update nexus3 group repo info
+ 2 files changed, 90 insertions(+), 5 deletions(-)
+ create mode 100644 backup/pom.xml
+[devops@workstation spring-boot-helloworld]$ git push origin main  #推送修改后的 pom.xml 
+Enumerating objects: 6, done.
+Counting objects: 100% (6/6), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 615 bytes | 615.00 KiB/s, done.
+Total 4 (delta 2), reused 0 (delta 0), pack-reused 0
+To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
+   fea6fe4..86758fa  main -> main
 ```
 
 导入完成后的仓库后续将用于 spring-boot-helloworld 应用的构建与测试，如下所示：
@@ -488,7 +545,12 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
 
 ### [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#41-%E5%88%9B%E5%BB%BA-docker-hosted-%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93)
 
-### [6.4 创建 Nexus3 的 npm 构建仓库（proxy 类型）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#5-npm-%E6%9E%84%E4%BB%B6%E5%BA%93)
+### [6.4 创建 Nexus3 的 npm 构件仓库（proxy 类型）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE/Nexus3%20%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%B8%B8%E8%A7%84%E8%AE%BE%E7%BD%AE.md#5-npm-%E6%9E%84%E4%BB%B6%E5%BA%93)
+
+### 6.5 创建 Nexus3 的 maven 构件仓库
+
+- [创建 proxy 类型仓库]()
+- [创建 group 类型仓库]()
 
 ## 7. 部署应用运行及构建环境
 
@@ -499,6 +561,16 @@ Jenkins Master 节点与 Agent 节点使用 Node.js 管理工具构建与管理�
 ```bash
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-nodejs-env.yml
 ```
+
+### 7.2 Maven 构建环境
+
+Jenkins Master 节点与 Agent 节点使用 Maven 工具构建与管理 Java 项目，因此，各节点需安装 maven。此处不使用 Jenkins Dashboard 中全局工具配置提供的安装 maven 方式，而是直接使用如下 playbook 安装与设置 maven，以及同步 settings.xml 配置文件，以满足 maven-proxy 私服的认证连接，此私服可缓存来自外部仓库的各个 jar 包，方便后续应用构建使用。
+
+```bash
+[devops@workstation jenkins-ci-plt]$ 
+```
+
+### 7.3 使用 spring-boot 应用测试 maven (group) 类型构件库
 
 ## 8. 部署与设置 PostgreSQL 数据库
 
