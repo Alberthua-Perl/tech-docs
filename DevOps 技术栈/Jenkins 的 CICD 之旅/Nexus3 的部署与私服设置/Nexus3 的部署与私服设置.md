@@ -464,3 +464,6 @@ maven (group) 类型构件库可将多个构件库组织在一起一并管理，
 - 🔥 [nexus3 代理仓库的使用](https://www.cnblogs.com/hukey/p/18532480#%E9%85%8D%E7%BD%AEdocker%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93)
 - [nexus 配置管理 docker 镜像](https://blog.csdn.net/LG_15011399296/article/details/127687599)
 - [「docker 仓库」搭建 Nexus 私服](https://zhuanlan.zhihu.com/p/716123466)
+- [使用 Docker 安装 nexus3，搭建 maven 私服](https://www.cnblogs.com/lipg/p/13878133.html)
+- ❤ [Linux 下搭建 maven(maven3.6+nexus3.2) 私服](https://blog.csdn.net/GeoffA/article/details/103736545?spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-3-103736545-blog-111517384.pc_relevant_aa2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-3-103736545-blog-111517384.pc_relevant_aa2&utm_relevant_index=3)
+- ❤ [Nexus3 作为 maven 私有仓库和制品库](https://www.cnblogs.com/h-z-y/p/14499157.html)

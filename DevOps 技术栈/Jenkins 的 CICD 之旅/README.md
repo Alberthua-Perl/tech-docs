@@ -1,4 +1,4 @@
-# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布 Java、Node.js、Flask 与 Golang 应用
+# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布容器化 Node.js、Python、Java 应用
 
 ## 文档说明
 
@@ -23,7 +23,7 @@
   - [5.5 Node.js 应用导入](#55-nodejs-应用导入)
     - [5.5.1 创建新项目 etherpad-lite-postgres](#551-创建新项目-etherpad-lite-postgres)
     - [5.5.2 导入 etherpad-lite-postgres 外部代码库](#552-导入-etherpad-lite-postgres-外部代码库)
-  - [5.6 Flask 应用导入](#56-flask-应用导入)
+  - [5.6 Python 应用导入](#56-python-应用导入)
     - [5.6.1 创建新项目 cnn_mnist_train](#561-创建新项目-cnn_mnist_train)
     - [5.6.2 导入 cnn_mnist_train 外部代码库](#562-导入-cnn_mnist_train-外部代码库)
   - [5.7 Java 应用导入](#57-java-应用导入)
@@ -51,10 +51,13 @@
     - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
     - [10.1.5 构建与推送 node-pnpm 容器镜像](#1015-构建与推送-node-pnpm-容器镜像)
     - [10.1.6 创建与运行作业](#1016-创建与运行作业)
-  - [10.2 Flask 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像](#102-flask-应用--训练-cnn-模型构建-app-tf-flask-应用及推理容器镜像)
+  - [10.2 Python 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像](#102-python-应用--训练-cnn-模型构建-app-tf-flask-应用及推理容器镜像)
     - [10.2.1 推送 tf-flask 构建用容器镜像](#1021-推送-tf-flask-构建用容器镜像)
     - [10.2.2 安装 AnsiColor 插件](#1022-安装-ansicolor-插件)
     - [10.2.3 创建与运行作业](#1023-创建与运行作业)
+  - [10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像](#103-java-应用--构建测试-spring-boot-应用及容器镜像)
+    - [10.3.1 推送 openjdk-17 构建用容器镜像](#1031-推送-openjdk-17-构建用容器镜像)
+    - [10.3.2 创建与运行作业](#1032-创建与运行作业)  
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -367,7 +370,7 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 <center><img src="images/gitlab-create-new-project-4.png" style="width:80%"></center>
 
-### 5.6 Flask 应用导入
+### 5.6 Python 应用导入
 
 #### 5.6.1 创建新项目 cnn_mnist_train
 
@@ -450,6 +453,8 @@ To gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
 #### 5.7.2 导入 spring-boot-helloworld 外部代码库
 
 本示例基于 Spring Boot 框架构建的 helloworld 应用演示 Java 语言应用在 Jenkins 中的持续构建过程。此项目源代码可参考 [iKubernetes/spring-boot-helloWorld | GitHub](https://github.com/iKubernetes/spring-boot-helloWorld#)。如下所示，将源代码导入远程代码库：
+
+> 说明：Spring 应用生成可参考 [spring initializr | spring.io](https://start.spring.io/)
 
 ```bash
 [devops@workstation ~]$ wget http://content.example.com/jenkins-ci-plt/code-examples/spring-boot-helloworld.tar
@@ -1009,7 +1014,11 @@ etherpad-lite-postgres 应用容器镜像基于 node 运行环境与 pnpm 构建
 
 <center><img src="images/jenkins-create-freestyle-job-nodejs-4.jpg" style="width:80%"></center>
 
-5️⃣ Build Steps 中选择 Execute shell，编写作业的执行逻辑，最后点击 Save 保存此作业。此脚本的执行思路：先构建、测试源码，成功通过后再使用 Containerfile 构建此应用的容器镜像，并推送至 Nexus3 中待后续部署。
+5️⃣ Build Steps 中选择 Execute shell，编写作业的执行逻辑，最后点击 Save 保存此作业。
+
+<center><img src="images/jenkins-create-freestyle-job-nodejs-5.jpg" style="width:80%"></center>
+
+此脚本的执行思路：先构建、测试源码，成功通过后再使用 Containerfile 构建此应用的容器镜像，并推送至 Nexus3 中待后续部署。
 
 ```bash
 #!/bin/bash
@@ -1055,15 +1064,17 @@ podman pull --tls-verify=false nexus3.lab.example.com:8882/node-pnpm:10.11.0
 podman build -t etherpad-lite-postgres:v1.0 --format=docker .  #指定构建镜像格式执行构建
 if [[ $? -eq 0 ]]; then
   podman tag localhost/etherpad-lite-postgres:v1.0 nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+  echo -e "\n---> Push etherpad-lite-postgres app image..."
   podman push --tls-verify=false nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+  if [[ $? -eq 0 ]]; then
+    podman rmi localhost/etherpad-lite-postgres:v1.0 nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+  fi  
 else
   echo -e "\n---> [ERROR] Build failure..."
   exit 10
 fi
 #如果构建成功，那么推送镜像，反之退出作业流程。
 ```
-
-<center><img src="images/jenkins-create-freestyle-job-nodejs-5.jpg" style="width:80%"></center>
 
 以上构建脚本可参考 [jenkins-ci-plt/jenkins/free-style-demo/etherpad-lite-postgres-job.sh](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/free-style-demo/etherpad-lite-postgres-job.sh)
 
@@ -1077,7 +1088,7 @@ fi
 
 <center><img src="images/jenkins-create-freestyle-job-nodejs-8.png" style="width:80%"></center>
 
-### 10.2 Flask 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像
+### 10.2 Python 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像
 
 > ✍ 容器镜像说明：tf-flask 为构建用镜像（包含 TensorFlow 等深度学习框架）、app-tf-flask 为推理容器镜像（包含 TensorFlow、Flask 等框架）
 
@@ -1088,7 +1099,7 @@ fi
 ```bash
 [kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/container-images/tf-flask-2.18.0.tar
 [kiosk@foundation0 ~]$ podman load -i tf-flask-2.18.0.tar
-[kiosk@foundation0 ~]$ podman images  #此容器镜像已直接推送至 Nexus3 中
+[kiosk@foundation0 ~]$ podman images  #此容器镜像已标记为 Nexus3 仓库
 [kiosk@foundation0 ~]$ podman push --tls-verify=false nexus3.lab.example.com:8882/tf-flask:2.18.0  #推送构建用镜像
 ```
 
@@ -1106,7 +1117,7 @@ fi
 
 <center><img src="images/jenkins-create-freestyle-job-cnn-3.jpg" style="width:80%"></center>
 
-以上 Shell 脚本的执行思路：在 Jenkins 节点上使用 MNIST 数据集训练 CNN 模型，并将模型的训练结果保存于本地，拉取构建用基础镜像，创建 Containerfile，构建推理容器镜像（Flask 应用中部署模型），将构建的镜像推送至 Nexus3 中。如下所示：
+此脚本的执行思路：在 Jenkins 节点上使用 MNIST 数据集训练 CNN 模型，并将模型的训练结果保存于本地，拉取构建用基础镜像，创建 Containerfile，构建推理容器镜像（Flask 应用中部署模型），将构建的镜像推送至 Nexus3 中。
 
 ```bash
 #!/bin/bash
@@ -1141,6 +1152,7 @@ echo -e "\n---> Build app-tf-flask app image..."
 podman build -t app-tf-flask:v1.0 --format=docker .  #构建推理容器镜像
 if [[ $? -eq 0 ]]; then
   podman tag localhost/app-tf-flask:v1.0 nexus3.lab.example.com:8882/app-tf-flask:v1.0
+  echo -e "\n---> Push app-tf-flask app image..."
   podman push --tls-verify=false nexus3.lab.example.com:8882/app-tf-flask:v1.0
   if [[ $? -eq 0 ]]; then
     echo -e "\n--> Remove local builded image..."
@@ -1162,7 +1174,101 @@ fi
 
 <center><img src="images/jenkins-create-freestyle-job-cnn-7.jpg" style="width:80%"></center>
 
-Nexus3 中已存储推送的 app-tf-flask 容器镜像
+如上图所示，Nexus3 中已存储推送的 app-tf-flask 容器镜像。
+
+### 10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像
+
+#### 10.3.1 推送 openjdk-17 构建用容器镜像
+
+openjdk-17 容器镜像作为 spring-boot 应用的构建用镜像，需上传至 Nexus3 仓库中以便后续自由风格的作业或流水线风格的作业中应用的持续构建。此容器镜像来源于 [openjdk | DockerHub](https://hub.docker.com/_/openjdk)。如下所示：
+
+```bash
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/container-images/openjdk-17-jdk-alpine.tar
+[kiosk@foundation0 ~]$ podman load -i openjdk-17-jdk-alpine.tar
+[kiosk@foundation0 ~]$ podman images  #此容器镜像已标记为 Nexus3 仓库
+[kiosk@foundation0 ~]$ podman push --tls-verify=false nexus3.lab.example.com:8882/openjdk:17-jdk-alpine
+#推送构建用镜像
+```
+
+#### 10.3.2 创建与运行作业
+
+此 spring-boot 应用的自由风格的作业创建过程可参考如下：
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-1.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-2.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-3.png" style="width:80%"></center>
+
+如上图所示，可勾选 `Build Environment > Color ANSI Console Output`，选择 `xterm` 或其他选项，使持续构建的过程输出支持颜色显示。
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-4.png" style="width:80%"></center>
+
+此脚本的执行思路：mvn 工具为当前 spring boot 项目安装所需依赖 jar 包，测试应用，将生成的应用 jar 包通过 Containerfile 封装构建为应用容器镜像，再将此镜像推送至 Nexus3 仓库中用于之后的容器化部署。
+
+```bash
+#!/bin/bash
+
+echo -e "\n---> Create build env..."
+mkdir build/
+shopt -s extglob
+mv !(build) build/ && mv .[a-zA-Z]* build/
+
+echo -e "\n---> Install mvn modules and test..."
+cd build/
+export PATH=$PATH:/usr/local/apache-maven-3.9.9/bin
+# 💥 根据 `7.2 Maven 构建环境` 的说明，由于使用自定义的安装方式，MAVEN_HOME 与默认路径不同，因此，直接指定 PATH 环境变量。
+mvn clean install -DskipTest
+
+echo -e "\n---> Test spring app..."
+mvn test
+
+echo -e "\n---> Generate Containerfile..."
+cd ../
+cat > Containerfile <<EOF
+FROM nexus3.lab.example.com:8882/openjdk:17-jdk-alpine
+MAINTAINER hualongfeiyyy@163.com
+
+RUN mkdir /app
+ADD ./build/target/spring-boot-helloworld-0.9.6-SNAPSHOT.jar /app
+
+WORKDIR /app
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "/opt/openjdk-17/bin/java -jar spring-boot-helloworld-0.9.6-SNAPSHOT.jar --server.port=80]
+EOF
+
+echo -e "\n---> Login and pull base image..."
+podman login --tls-verify=false --username devuser0 --password 1qazZSE$ nexus3.lab.example.com:8882
+podman pull --tls-verify=false nexus3.lab.example.com:8882/openjdk:17-jdk-alpine
+
+echo -e "\n---> Build spring app image..."
+podman build -t spring-boot-app:v1.0 --format=docker .
+if [[ $? -eq 0 ]]; then
+  podman tag localhost/spring-boot-app:v1.0 nexus3.lab.example.com:8882/spring-boot-app:v1.0
+  echo -e "\n---> Push spring app image..."
+  podman push --tls-verify=false nexus3.lab.example.com:8882/spring-boot-app:v1.0
+  if [[ $? -eq 0 ]]; then
+    echo -e "\n--> Remove local builded image..."
+    podman rmi localhost/spring-boot-app:v1.0 nexus3.lab.example.com:8882/spring-boot-app:v1.0
+  fi
+else
+  echo -e "\n---> [ERROR] Build failure..."
+fi
+```
+
+以上脚本可参考 [jenkins-ci-plt/jenkins/free-style-demo/spring-boot-app.sh | GitHub](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/free-style-demo/spring-boot-app.sh)
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-5.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-6.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-7.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-create-freestyle-job-spring-boot-8.png" style="width:80%"></center>
+
+如上图所示，spring boot 应用构建测试完成，并将构建的应用镜像已推送至 Nexus3 中。
 
 ## 附录A. PostgreSQL 常用命令
 
@@ -1255,6 +1361,7 @@ postgres=# \l  #查看所以数据库
 
 ## 参考链接
 
+- 📚 [Apache Maven 3.x | Maven](https://maven.apache.org/ref/3.9.9/)
 - [containers.podman.podman_container module – Manage podman containers | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_container_module.html)
 - [Community.Postgresql | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/community/postgresql/index.html)
 - [ansible.builtin.pip module – Manages Python library dependencies | Ansible Docs](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pip_module.html)

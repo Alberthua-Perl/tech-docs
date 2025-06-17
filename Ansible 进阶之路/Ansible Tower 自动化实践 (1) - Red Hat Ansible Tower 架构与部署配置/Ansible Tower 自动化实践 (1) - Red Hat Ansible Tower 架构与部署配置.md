@@ -12,13 +12,13 @@
 
 ## 文档目录
 
-- 系统环境说明
-- Ansible Tower 概述
-- Ansible Tower 的部署架构
-- Ansible Tower 安装要求
-- Ansible Tower 安装部署与验证
-- Ansible Tower 常见故障排查
-- 参考链接
+- [系统环境说明](#系统环境说明)
+- [Ansible Tower 概述](#ansible-tower-概述)
+- [Ansible Tower 的部署架构](#ansible-tower-的部署架构)
+- [Ansible Tower 安装要求](#ansible-tower-安装要求)
+- [Ansible Tower 安装部署与验证](#ansible-tower-安装部署与验证)
+- [Ansible Tower 常见故障排查](#ansible-tower-常见故障排查)
+- [参考链接](#参考链接)
 
 ## 系统环境说明
 
@@ -34,7 +34,7 @@
 - Red Hat 为 Ansible 提供了一个 `Web UI`，即 `Ansible Tower`，使用它可以免费管理 `10` 台以内的主机。
 - Ansible Tower 是 `Django` Web 应用，可在 Linux 服务器上作为企业内自托管方案运行，架设于企业的现有 Ansible 基础架构之上。
   
-  ![ansible-tower-logical-architecture](images/ansible-tower-logical-architecture.png)
+  <center><img src="images/ansible-tower-logical-architecture.png" style="width:80%"></center>
 
 - 用户通过 Ansible Tower 的 `Web UI` 或 `RESTful API` 与其底层 Ansible 基础架构交互。
   - Web UI 是图形界面，通过执行对 Ansible Tower RESTful API 的调用来执行操作。
@@ -67,9 +67,9 @@
   - 🤘 Ansible Tower 若配置为高可用集群，至少需要三个节点，并且是奇数个。
   - Ansible Tower 高可用架构示意：
 
-    ![Ansible-Tower-HA-cluster-architecture-1](images/Ansible-Tower-HA-cluster-architecture-1.png)
+    <center><img src="images/Ansible-Tower-HA-cluster-architecture-1.png" style="width:80%"></center>
 
-    ![Ansible-Tower-HA-cluster-architecture-2](images/Ansible-Tower-HA-cluster-architecture-2.jpg)
+    <center><img src="images/Ansible-Tower-HA-cluster-architecture-2.jpg" style="width:80%"></center>
 
     - 如上所示，三个 Ansible Tower 节点组成的集群共享一个 `PostgreSQL` 数据库。
     - 当然也可以给数据库做高可用，如 `hot standby/streaming replication` 或者 `warm standby/log shipping` 方式，具体方法可参考 PostgreSQL 相关技术文档。
@@ -149,8 +149,8 @@
   ```
   
   该 inventory 清单文件如下所示：
-  
-  ![ansible-tower-setup-inventory-demo](images/ansible-tower-setup-inventory-demo.png)
+
+  <center><img src="images/ansible-tower-setup-inventory-demo.png" style="width:80%"></center>
   
   ```bash
   $ ./setup.sh
@@ -158,7 +158,7 @@
   # 配置部署过程需执行 15 分钟左右
   ```
   
-  ![ansible-tower-install-success](images/ansible-tower-install-success.jpg)
+  <center><img src="images/ansible-tower-install-success.jpg" style="width:80%"></center>
   
   - 该脚本创建 Ansible Tower 安装所需的 yum 源。
   - 💥 安装过程中若相关软件包或依赖安装失败，需将 yum 源中的 `gpgcheck` 与 `gppkey` 全部禁用，并且启用 `ansible-tower.repo`。
@@ -168,22 +168,22 @@
   # 查看 Ansible Tower 服务组件的监听端口（Nginx、RabbitMQ、PostgreSQL、Postfix）
   ```
   
-  ![ansible-tower-service-listen-port](images/ansible-tower-service-listen-port.jpg)
+  <center><img src="images/ansible-tower-service-listen-port.jpg" style="width:80%"></center>
 
 - 登录 Ansible Tower：
   - Ansible Tower 使用 `Nginx` 监听前端 Web 请求，登录 URL 访问。
 
-    ![login-ansible-tower](images/login-ansible-tower.png)
+    <center><img src="images/login-ansible-tower.png" style="width:80%"></center>
   
   - 首次登录 Ansible Tower 需要验证 `License`。
 
-    ![login-ansible-tower-license](images/login-ansible-tower-license.png)
+    <center><img src="images/login-ansible-tower-license.png" style="width:80%"></center>
 
     - 登录 Ansible Tower 必须导入 License 才能使用。
     - 可通过点击 `REQUEST LICENSE` 申请 License，或通过反编译 Python 程序破解 License。
     - 申请 License 后，将向注册邮箱发送邮件，其中包含 License。
 
-      ![require-ansible-tower-license](images/require-ansible-tower-license.png)
+      <center><img src="images/require-ansible-tower-license.png" style="width:80%"></center>
 
     > 🤘 该示例使用反编译的方式破解 License。
   
@@ -195,7 +195,7 @@
     $ tree -F .
     ```
 
-    ![change-license-1](images/change-license-1.png)
+    <center><img src="images/change-license-1.png" style="width:80%"></center>
 
     ```bash
     $ pip install uncompyle
@@ -213,7 +213,7 @@
     # 允许无 License 访问。
     ```
 
-    ![change-license-2](images/change-license-2.png)
+    <center><img src="images/change-license-2.png" style="width:80%"></center>
 
     ```bash
     $ python -m py_compile __init__.py
@@ -235,7 +235,7 @@
   
   - 重新登录 Ansible Tower 则无需 License，部署完成。
 
-    ![login-ansible-tower-again-success](images/login-ansible-tower-again-success.png)
+    <center><img src="images/login-ansible-tower-again-success.png" style="width:80%"></center>
 
 ## Ansible Tower 常见故障排查
 
@@ -245,7 +245,7 @@
   - 解决方法：
     更改相应项目目录的所有者与所属组都为 `awx`，在 Ansible Tower 中再次刷新查看即可。
 
-    ![sync-ansible-tower-project-status-failed(images/sync-ansible-tower-project-status-failed.png)
+    <center><img src="images/sync-ansible-tower-project-status-failed.png" style="width:80%"></center>
 
 ### 参考链接
 
