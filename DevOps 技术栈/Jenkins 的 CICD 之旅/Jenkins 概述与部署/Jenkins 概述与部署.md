@@ -15,8 +15,10 @@
   - [1.2 Jenkins 的特点](#12-jenkins-的特点)
 - [2. Jenkins 系统组件](#2-jenkins-系统组件)
 - [3. Jenkins 安装与配置](#3-jenkins-安装与配置)
-- [4. Jenkins 的插件设置](#4-jenkins-的插件设置)
-- [5. 参考链接](#5-参考链接)
+- [4. Manage Jenkins 主要功能介绍](#4-manage-jenkins-主要功能介绍)
+- [5. Jenkins 的插件设置](#5-jenkins-的插件设置)
+- [6. 重启、重载与停止 Jenkins](#6-重启重载与停止-jenkins)
+- [7. 参考链接](#7-参考链接)
 
 ## 1. Jenkins 基础
 
@@ -113,7 +115,42 @@
 
   > 再次提示：由于国内网络问题，经常造成插件下载超时而导致安装失败，因此，可参考以下 “Jenkins 的插件设置” 部分解决此问题。
 
-## 4. Jenkins 的插件设置
+## 4. Manage Jenkins 主要功能介绍
+
+<center><img src="images/manage-jenkins-1.png" style="width:80%"></center>
+
+<center><img src="images/manage-jenkins-2.png" style="width:80%"></center>
+
+- System Configuration —— System（配置系统）
+  - Jenkins 本身的一些系统设置，简要介绍如下：
+    - Home directory：`/var/lib/jenkins` 为 Jenkins 配置保存主目录，删除将清理当前 Jenkins 及其所有配置。
+    - System Message：可向其它共用 Jenkins 的用户发送消息
+    - of executors：设置 Jenkins 每次可执行多少个任务，数量越大意味着可执行的作业越多，但 CPU 和内存的压力也越大，可能导致宕机。
+    - Jenkins URL：访问 Jenkins 地址
+    - System Admin e-mail address：系统管理员邮件地址，用于接收消息的管理员邮箱。
+    - Resource Root URL：资源根目录
+    - Environment variables：环境变量设置
+    - GitHub：GitHub 配置
+    - Git plugin：Git 插件配置
+    - Shell：Shell 配置
+- System Configuration —— Tools（全局工具配置）：常见或已安装的插件配置位置 JDK、Git installations、Gradle、Ant、Maven。
+- System Configuration —— Plugins（插件管理）
+  - 安装或更新需要的插件
+  - 常见的插件包括但不限于：
+    - AnsiColor
+    - Ant Plugin
+    - Blue Ocean
+    - Folders Plugin
+    - Git plugin
+    - Git client plugin
+    - GitHub plugin
+    - Pipeline
+- Security —— Security（配置全局安全性）：配置授权、代理、跨域等内容
+- Security —— Credentials（凭据）：管理用户凭据信息，如 Git 账号密码等。
+- Security —— Users（管理用户）：管理所有的 Jenkins 用户
+- Status Information —— System Log（系统日志）：查看所有的系统日志
+
+## 5. Jenkins 的插件设置
 
 - Jenkins 最大的优势在于具有众多的 **插件**（plugin），实际工作的是插件。
 - Jenkins 使用插件的源位于 [jenkins.io](https://updates.jenkins.io/update-center.json) 官方站点，下载更新速度很慢，时常由于连接超时问题而导致插件安装失败，因此，可更换为国内的插件源。
@@ -125,7 +162,7 @@
 
     > 注意：清华与阿里云的插件源是 Jenkins 官方的镜像同步，在这两个源中已不存在 updates 目录而无法再同步！
 
-## 5. 重启、重载与停止 Jenkins
+## 6. 重启、重载与停止 Jenkins
 
 ```bash
 $ sudo systemctl reload jenkins.service
@@ -136,6 +173,6 @@ $ sudo systemctl stop jenkins.service
 #停止服务，等同于访问 http://<jenkins_node_url>:8080/exit
 ```
 
-## 5. 参考链接
+## 7. 参考链接
 
 - [什么是 CI/CD？| RedHat](https://www.redhat.com/zh/topics/devops/what-is-ci-cd#)

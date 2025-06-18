@@ -146,14 +146,29 @@
   <center>GitLab 17.x 架构图</center>
 
 - GitLab 各组件服务构成：
-  - nginx：静态 Web 服务器
-  - `gitlab-workhorse`：轻量级的反向代理服务器
-  - `gitlab-shell`：用于处理 `Git` 命令和修改 `authorized_keys` 列表
-  - logrotate：日志文件管理工具
-  - `unicorn`：该服务用于 `GitLab Rails` 应用的托管
-  - redis：缓存数据库
-  - postgresql：PG 数据库
-  - `sidekiq`：用于在后台执行队列任务（异步执行）
+  - Gitaly：Git RPC service for handing all Git calls made by GitLab
+  - GitLab Exporter：GitLab 指标暴露器
+  - GitLab Page：GitLab 的静态 Web 站点
+  - GitLab self-monitoring 的多个组件：Prometheus、Alertmanager、Grafana、Sentry 和 Jaeger
+  - GitLab shell (gitlab-shell)：处理基于 ssh 会话的 git 命令
+  - GitLab Workhorse (gitlab-workhorse)：智能反向代理，处理高并发的 HTTP 请求。
+  - Inbound emails（SMPT）：接收用于更新 issue 的邮件
+  - Outbound email (SMTP)：向用户发送邮件通知
+  - LDAP Authentication：LDAP 认证集成
+  - Nginx：静态 Web 服务器，将请求路由到正确的组件上，并终止 SSL 会话。
+  - Praefect：Git 客户端和 Gitaly 存储节点之间的透明代理
+  - Node Exporter：节点指标暴露器
+  - PostgreqSQL：数据库，还有一个用于暴露其指标的 PostgreSQL Exporter 组件。
+  - Puma (GitLab Rails)：处理发往 Web 接口和 API 的请求
+  - Redis：缓存服务，还有一个用于暴露其指标的 Redis Exporter 组件。
+  - Registry：容器注册表，支持 Image 的 push 和 pull 操作。
+  - Runner：执行 GitLab 的 CI/CD 作业
+  - Sentry integration：跟踪部署的各应用的错误信息
+  - Sidekiq：后台作业处理器，异步执行。
+  - Unicorn：GitLab Rails 应用的托管
+  - Mattermost：开源的 Slack
+  - MinIO：对象存储服务
+  - Logrotate：日志文件管理工具
 - GitLab 默认内置用户：
   GitLab 安装完成后将自动创建以下用户：
   - `git`：Git 管理用户

@@ -67,7 +67,7 @@
 
 ## 0. Lab 环境架构与实现
 
-![ansible-navigator-jenkins-nodejs-flask-golang](images/ansible-navigator-jenkins-nodejs-flask-golang.jpg)
+![ansible-navigator-jenkins-nodejs-python-java.png](images/ansible-navigator-jenkins-nodejs-python-java.png)
 
 ## 1. Lab 相关用户名与登录密码
 
@@ -1269,6 +1269,20 @@ fi
 <center><img src="images/jenkins-create-freestyle-job-spring-boot-8.png" style="width:80%"></center>
 
 如上图所示，spring boot 应用构建测试完成，并将构建的应用镜像已推送至 Nexus3 中。
+
+## 11. 构建 Jenkins 分布式构建环境
+
+### 11.1 连接 Master 与 Agent —— 配置 jnlp Agent
+
+#### 11.1.1
+
+#### 11.1.2
+
+### 11.2 连接 Master 与 Agent —— 配置 SSH Agent
+
+#### 11.2.1
+
+#### 11.2.2
 
 ## 附录A. PostgreSQL 常用命令
 
