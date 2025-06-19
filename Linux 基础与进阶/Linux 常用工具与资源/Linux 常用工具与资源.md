@@ -4,54 +4,57 @@
 
 ## 文档目录
 
-- [常用公共服务器](#常用公共服务器)
-  - [镜像站点](#镜像站点)
-  - [NTP 时间同步服务器](#ntp-时间同步服务器)
-  - [DNS 名称服务器](#dns-名称服务器)
-  - [UTC 时间、GMT 时间、EST 时间、CST 时间的区别](#utc-时间gmt-时间est-时间cst-时间的区别)
-- [常用 DOS 命令](#常用-dos-命令)
-- [Shell 脚本补充](#shell-脚本补充)
-- [oh-my-bash 终端字体（fonts）的安装](#oh-my-bash-终端字体fonts的安装)
-- [grep 常用命令示例](#grep-常用命令示例)
-- [Markdown 语法配置](#markdown-语法配置)
-  - [设置字体颜色](#设置字体颜色)
-  - [标题选项](#标题选项)
-  - [加粗文本](#加粗文本)
-  - [删除文本（添加中横线）](#删除文本添加中横线)
-- [VSCode 常用 Settings 参数](#vscode-常用-settings-参数)
-- [Chrome 扩展安装与使用](#chrome-扩展安装与使用)
-  - [更改 GitHub 页面 logo](#更改-github-页面-logo)
-  - [更改 GitHub 默认的代码字体](#更改-github-默认的代码字体)
-- [Tabby 自定义 CSS](#tabby-自定义-css)
-- [Linux 实用命令示例](#linux-实用命令示例)
-- [安装额外软件包](#安装额外软件包)
-  - [安装 qpdf 并解密 PDF 文件](#安装-qpdf-并解密-pdf-文件)
-  - [RHEL 7/8 安装 exfat 驱动](#rhel-78-安装-exfat-驱动)
-  - [安装 xfce4-terminal 软件包](#安装-xfce4-terminal-软件包)
-  - [RHEL8/9 安装 openvpn-gnome 客户端](#rhel89-安装-openvpn-gnome-客户端)
-  - [RHEL8 安装 Google Chrome](#rhel8-安装-google-chrome)
-  - [RHEL9 安装 Google Chrome](#rhel9-安装-google-chrome)
-  - [RHEL8 安装 VScode](#rhel8-安装-vscode)
-  - [RHEL9 安装 VScode](#rhel9-安装-vscode)
-  - [RHEL9 安装 EPEL9 软件源](#rhel9-安装-epel9-软件源)
-  - [安装 Chinese lang pack](#安装-chinese-lang-pack)
-  - [安装 rdesktop 软件包连接 Windows RDP 桌面](#安装-rdesktop-软件包连接-windows-rdp-桌面)
-  - [RHEL9 安装 ToDesk](#rhel9-安装-todesk)
-- [dnf 下载软件包及其依赖](#dnf-下载软件包及其依赖)
-- [dnf 实现软件包安全检测与更新](#dnf-实现软件包安全检测与更新)
-- [RedHat 订阅服务使用](#redhat-订阅服务使用)
+- [1. 常用公共服务器](#1-常用公共服务器)
+  - [1.1 镜像站点](#11-镜像站点)
+  - [1.2 NTP 时间同步服务器](#12-ntp-时间同步服务器)
+  - [1.3 DNS 名称服务器](#13-dns-名称服务器)
+  - [1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别](#14-utc-时间gmt-时间est-时间cst-时间的区别)
+- [2. 常用 DOS 命令](#2-常用-dos-命令)
+- [3. Shell 脚本补充](#3-shell-脚本补充)
+- [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
+- [5. grep 常用命令示例](#5-grep-常用命令示例)
+- [6. Markdown 语法配置](#6-markdown-语法配置)
+  - [6.1 设置字体颜色](#61-设置字体颜色)
+  - [6.2 标题选项](#62-标题选项)
+  - [6.3 加粗文本](#63-加粗文本)
+  - [6.4 删除文本（添加中横线）](#64-删除文本添加中横线)
+- [7. VSCode 常用 Settings 参数](#7-vscode-常用-settings-参数)
+- [8. Chrome 扩展安装与使用](#8-chrome-扩展安装与使用)
+  - [8.1 更改 GitHub 页面 logo](#81-更改-github-页面-logo)
+  - [8.2 更改 GitHub 默认的代码字体](#82-更改-github-默认的代码字体)
+- [9. Tabby 自定义 CSS](#9-tabby-自定义-css)
+- [10. Linux 实用命令示例](#10-linux-实用命令示例)
+- [11. 安装与设置外部软件](#11-安装与设置外部软件)
+  - [11.1 安装 qpdf 并解密 PDF 文件](#111-安装-qpdf-并解密-pdf-文件)
+  - [11.2 RHEL 7/8 安装 exfat 驱动](#112-rhel-78-安装-exfat-驱动)
+  - [11.3 安装 xfce4-terminal 软件包](#113-安装-xfce4-terminal-软件包)
+  - [11.4 RHEL8/9 安装 openvpn-gnome 客户端](#114-rhel89-安装-openvpn-gnome-客户端)
+  - [11.5 RHEL8 安装 Google Chrome](#115-rhel8-安装-google-chrome)
+  - [11.6 RHEL9 安装 Google Chrome](#116-rhel9-安装-google-chrome)
+  - [11.7 RHEL8 安装 VScode](#117-rhel8-安装-vscode)
+  - [11.8 RHEL9 安装 VScode](#118-rhel9-安装-vscode)
+  - [11.9 RHEL9 安装 EPEL9 软件源](#119-rhel9-安装-epel9-软件源)
+  - [11.10 安装 Chinese lang pack](#1110-安装-chinese-lang-pack)
+  - [11.11 安装 rdesktop 软件包连接 Windows RDP 桌面](#1111-安装-rdesktop-软件包连接-windows-rdp-桌面)
+  - [11.12 RHEL9 安装 ToDesk](#1112-rhel9-安装-todesk)
+  - [11.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1113-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
+    - [11.13.1 安装与设置 x11vnc 虚拟桌面](#11131-安装与设置-x11vnc-虚拟桌面)
+    - [11.13.2 MobaXterm 的连接访问](#11132-mobaxterm-的连接访问)
+- [12. dnf 下载软件包及其依赖](#12-dnf-下载软件包及其依赖)
+- [13. dnf 实现软件包安全检测与更新](#13-dnf-实现软件包安全检测与更新)
+- [14. RedHat 订阅服务使用](#14-redhat-订阅服务使用)
 
 -----
 
-## 常用公共服务器
+## 1. 常用公共服务器
 
-### 镜像站点
+### 1.1 镜像站点
 
 ```bash
 https://developer.aliyun.com/mirror/  阿里云
 ```
 
-### NTP 时间同步服务器
+### 1.2 NTP 时间同步服务器
 
 ```bash
 www.pool.ntp.org/zone/cn  最常见、熟知
@@ -80,7 +83,7 @@ s2k.time.edu.cn     CERNET桂林主节点
 s2m.time.edu.cn     北京大学
 ```
 
-### DNS 名称服务器
+### 1.3 DNS 名称服务器
 
 ```bash
 223.5.5.5              阿里云
@@ -88,7 +91,7 @@ s2m.time.edu.cn     北京大学
 http://www.alidns.com  阿里云
 ```
 
-### UTC 时间、GMT 时间、EST 时间、CST 时间的区别
+### 1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别
 
 - **UTC**：协调世界时（Coordinated Universal Time）是最主要的世界时间标准，其以原子时秒长为基础，在时刻上尽量接近于格林尼治标准时间。UTC 是一个标准，而不是一个时区。
 - **GMT**：Greenwich Mean Time 的缩写，指的是皇家格林威治天文台的标准时间，称作格林威治时间，因为本初子午线通过此地区，因此也称为世界标准时间。然而地球的自转不是完全规律的，而且正逐渐减慢，因此自 1924 年开始，格林威治时间（GMT）已经不再被视为标准时间，取而代之的是 "世界协调时间"（UTC: Coordinated Universal Time）。
@@ -97,7 +100,7 @@ http://www.alidns.com  阿里云
 
 -----
 
-## 常用 DOS 命令
+## 2. 常用 DOS 命令
 
 ```powershell
 dos> cls
@@ -126,7 +129,7 @@ dos> route print
 
 -----
 
-## Shell 脚本补充
+## 3. Shell 脚本补充
 
 - 用户登录时加载 bash 配置文件的过程：
   - 登录式 shell（login shell）加载配置文件过程：
@@ -190,7 +193,7 @@ dos> route print
 
 -----
 
-## oh-my-bash 终端字体（fonts）的安装
+## 4. oh-my-bash 终端字体（fonts）的安装
 
 > 同理，oh-my-zsh 可使用类似的方法完成安装。
 
@@ -204,12 +207,12 @@ dos> route print
   $ bash -c "$(wget https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh -O -)"
   ```
 
-  ![oh-my-bash-install](images/oh-my-bash-install.jpg)
+  <center><img src="images/oh-my-bash-install.jpg" style="width:80%"></center>
 
   下载安装该项目源码后，更改 `$HOME/.bashrc` 中的 `OSH_THEME` 值为对应的 `fonts theme` 即可（位于 `$HOME/.oh-my-bash/themes/`），最后 source 该文件生效。
   此处使用的 theme 为 `powerline`，在 `$HOME/.oh-my-bash/themes/powerline/powerline.base.sh` 的第 165 行可自定义更改 PS1 环境变量。
 
-  ![rhel8-oh-my-bash-powerline-ps1](images/rhel8-oh-my-bash-powerline-ps1.jpg)
+  <center><img src="images/rhel8-oh-my-bash-powerline-ps1.jpg" style="width:80%"></center>
   
 - Ubuntu 20.04.3 LTS 中安装：安装方式为 deb 软件包安装
 
@@ -230,11 +233,11 @@ dos> route print
   $ source $HOME/.bashrc
   ```
 
-  ![ubuntu-powerline-ps1](images/ubuntu-powerline-ps1.jpg)
+  <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:80%"></center>
 
 -----
 
-## grep 常用命令示例
+## 5. grep 常用命令示例
   
 ```bash
 $ grep -n "pattern" /path/to/file
@@ -279,9 +282,9 @@ $ grep "pattern" /path/to/file | xargs command
 
 -----
 
-## Markdown 语法配置
+## 6. Markdown 语法配置
 
-### 设置字体颜色
+### 6.1 设置字体颜色
 
 - 方法 1：
 
@@ -301,22 +304,22 @@ $\color{#FF00FF}{紫}$
 <font face="楷体" size=13 color=Blue>你好</font>
 ```
 
-### 标题选项
+### 6.2 标题选项
 
 - `[ ] 计划`
 - `[x] 计划`
 
-### 加粗文本
+### 6.3 加粗文本
 
 - `**文本内容**`
 
-### 删除文本（添加中横线）
+### 6.4 删除文本（添加中横线）
 
 - `~~文本内容~~`
 
 -----
 
-## VSCode 常用 Settings 参数
+## 7. VSCode 常用 Settings 参数
 
 ```bash
 Render Line Highlight: none
@@ -331,16 +334,16 @@ Cursor Style: block
 
 -----
 
-## Chrome 扩展安装与使用
+## 8. Chrome 扩展安装与使用
 
-### 更改 GitHub 页面 logo
+### 8.1 更改 GitHub 页面 logo
 
 - 安装 Chrome 扩展 `Stylus`
 - 打开该扩展，并将 `GitHub PH logo design` CSS 样式导入其中，如下所示：
 
-  ![css-1](images/stylus-GitHub%20PH%20logo%20design-css-1.jpg)
+  <center><img src="images/stylus-GitHub%20PH%20logo%20design-css-1.jpg" style="width:80%"></center>
 
-  ![css-2](images/stylus-GitHub%20PH%20logo%20design-css-2.jpg)
+  <center><img src="images/stylus-GitHub%20PH%20logo%20design-css-2.jpg" style="width:80%"></center>
 
   ```css
   .Header-item.Header-item--full.flex-justify-center.d-md-none.position-relative a svg,
@@ -362,17 +365,17 @@ Cursor Style: block
 - 以上 CSS 样式可参考 [该链接](https://userstyles.org/styles/204545/github-ph-logo-design)。
 - 配置完成后重新打开 GitHub 页面即可显示效果。
 
-### 更改 GitHub 默认的代码字体
+### 8.2 更改 GitHub 默认的代码字体
 
 - 安装 Chrome 扩展 `Github Code Font Changer`
 
-  ![github-code-font-changer-2.0](images/github-code-font-changer-2.0.jpg)
+  <center><img src="images/github-code-font-changer-2.0.jpg" style="width:80%"></center>
   
 - 安装完成后即可使用该扩展选择对应的字体，打开 GitHub 页面即可显示效果。
 
 -----
 
-## Tabby 自定义 CSS
+## 9. Tabby 自定义 CSS
 
 ```css
 .content.tabs-on-top {
@@ -384,7 +387,7 @@ Cursor Style: block
 
 -----
 
-## Linux 实用命令示例
+## 10. Linux 实用命令示例
 
 ```bash
 $ echo "<password>" | sudo -S <username>
@@ -422,9 +425,9 @@ $ sudo cat /etc/securetty
 # 包括：本地控制台（console）、本地终端（ttyX）、远程虚拟终端（pts/X）
 ```
 
-## 安装额外软件包
+## 11. 安装与设置外部软件
 
-### 安装 qpdf 并解密 PDF 文件
+### 11.1 安装 qpdf 并解密 PDF 文件
 
 ```bash
 $ sudo yum install -y qpdf
@@ -433,7 +436,7 @@ $ sudo qpdf --password=<password> \
 # 指定加密的 PDF 文件的密码解密 PDF 文件
 ```
 
-### RHEL 7/8 安装 exfat 驱动
+### 11.2 RHEL 7/8 安装 exfat 驱动
 
 ```bash
 $ sudo yum install -y epel-release
@@ -450,14 +453,14 @@ $ sudo mount.exfat /dev/sdX <mountpoint>
 #      $ sudo yum --enablerepo=nux-desktop install -y <package>
 ```
 
-### 安装 xfce4-terminal 软件包
+### 11.3 安装 xfce4-terminal 软件包
 
 ```bash
 $ sudo dnf install -y xfce4-terminal
 # 该软件包可设置终端背景图片及透明度
 ```
 
-### RHEL8/9 安装 openvpn-gnome 客户端
+### 11.4 RHEL8/9 安装 openvpn-gnome 客户端
 
 ```bash
 $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
@@ -468,7 +471,7 @@ $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
   redhat-internal-NetworkManager-openvpn-profiles-0.1-61.el7.noarch.rpm
 ```
 
-### RHEL8 安装 Google Chrome
+### 11.5 RHEL8 安装 Google Chrome
 
 ```bash
 $ sudo vim /etc/yum.repos.d/google-chrome.repo
@@ -482,13 +485,13 @@ gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 $ sudo dnf install -y google-chrome-stable
 ```
 
-### RHEL9 安装 Google Chrome
+### 11.6 RHEL9 安装 Google Chrome
 
 ```bash
 $ sudo dnf install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 ```
 
-### RHEL8 安装 VScode
+### 11.7 RHEL8 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -504,7 +507,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### RHEL9 安装 VScode
+### 11.8 RHEL9 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -520,7 +523,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### RHEL9 安装 EPEL9 软件源
+### 11.9 RHEL9 安装 EPEL9 软件源
 
 ```bash
 $ sudo dnf config-manager \
@@ -534,13 +537,13 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 # 安装 epel9 软件包
 ```
 
-### 安装 Chinese lang pack
+### 11.10 安装 Chinese lang pack
 
 ```bash
 $ sudo dnf install -y langpacks-zh_CN.noarch
 ```
 
-### 安装 rdesktop 软件包连接 Windows RDP 桌面
+### 11.11 安装 rdesktop 软件包连接 Windows RDP 桌面
 
 ```bash
 $ sudo dnf install -y rdesktop
@@ -549,7 +552,7 @@ $ rdesktop -u hwuser88 -d bestvdc -p Ansible2024! redhat.bestvdc.com:23353
 # 登录 Cloudshell bestvdc desktop
 ```
 
-### RHEL9 安装 ToDesk
+### 11.12 RHEL9 安装 ToDesk
 
 ```bash
 $ wget https://rh-course-materials.oss-cn-hangzhou.aliyuncs.com/todesk-v4.7.2.0-x86_64.rpm
@@ -560,9 +563,57 @@ $ sudo systemctl enable --now todeskd.service
 # 启动并设置开机自启服务
 ```
 
+### 11.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
+
+#### 11.13.1 安装与设置 x11vnc 虚拟桌面
+
+```bash
+### 打开一个终端执行 ###
+$ sudo dnf install -y crudini
+# 安装 crudini 用于编辑 ini 格式文件
+$ sudo crudini --set /etc/gdm/custom.conf WaylandEnable false
+# 禁用 Wayland Server，防止与 x11vnc 启动冲突。
+$ sudo systemctl restart gdm.service
+# 重启 gdm 服务使配置生效
+$ sudo dnf install -y x11vnc
+# 安装 x11vnc 软件包
+$ x11vnc -storepasswd
+Enter VNC password: 
+Verify password:    
+Write password to /home/kiosk/.vnc/passwd?  [y]/n y
+Password written to: /home/kiosk/.vnc/passwd
+# 设置当前用户的 x11vnc 登录用密码
+$ x11vnc -display :1 -forever -usepw -noxdamage
+# 前台启动 x11vnc，可通过外部 MobaXterm 的 VNC 连接登录。
+
+### 打开另一个终端执行 ###
+$ sudo netstat -tunlp | grep x11vnc
+tcp        0      0 0.0.0.0:5900            0.0.0.0:*               LISTEN      4396/x11vnc
+tcp6       0      0 :::5900                 :::*                    LISTEN      4396/x11vnc
+# 确认 x11vnc 监听的端口，用于外部连接的端口确认
+```
+
+#### 11.13.2 MobaXterm 的连接访问
+
+1️⃣ 打开 MobaXterm，点击 Session 创建新会话：
+
+<center><img src="images/x11vnc-connect-1.jpg" style="width:80%"></center>
+
+2️⃣ 点击 VNC 创建新连接：
+
+<center><img src="images/x11vnc-connect-2.jpg" style="width:80%"></center>
+
+3️⃣ 输入 VNC 服务端的地址与监听端口，点击 OK 即弹出密码输入框，输入设置的 VNC 登录用户密码即可完成登录：
+
+<center><img src="images/x11vnc-connect-3.jpg" style="width:80%"></center>
+
+4️⃣ 可在 VNC 虚拟桌面中操作：
+
+<center><img src="images/x11vnc-connect-4.jpg" style="width:80%"></center>
+
 -----
 
-## dnf 下载软件包及其依赖
+## 12. dnf 下载软件包及其依赖
 
 ```bash
 $ sudo dnf install --downloadonly \
@@ -577,7 +628,7 @@ $ sudo dnf install --downloadonly \
 
 -----
 
-## dnf 实现软件包安全检测与更新
+## 13. dnf 实现软件包安全检测与更新
 
 ```bash
 $ sudo dnf --security updateinfo
@@ -604,7 +655,7 @@ $ sudo dnf update --cve CVE-xxxx-xxxx
 
 -----
 
-## RedHat 订阅服务使用
+## 14. RedHat 订阅服务使用
 
 ```bash
 $ sudo subscription-manager register [--username=<username>] [--password=<password>]
