@@ -89,11 +89,11 @@
   | 主机名 | 主机别名 | IPv4 | vCPU | 内存 | 节点角色 |
   | ----- | ----- | ----- | ----- | ----- | ----- |
   | foundation0.ilt.example.com | NA | 172.25.254.250 | 8 | 48 | 虚拟机宿主机 & 应用部署 |
-  | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 6 | GitLab CE 容器 |
+  | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 8 | GitLab CE 容器 |
   | servera.lab.example.com | jenkins-master.lab.example.com | 172.25.250.10 | 4 | 4 | Jenkins Master 节点 |
   | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent 节点 |
   | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent 节点 |
-  | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 4 | 6 | Nexus3 容器 & PostgreSQL 数据库 |
+  | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 6 | 6 | Nexus3 容器 & PostgreSQL 数据库 |
 
   > 💥 注意：servera，serverb，serverc，serverd 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。workstation 节点需根据 2.3 添加新磁盘以满足存储需求。
 
@@ -107,7 +107,7 @@
 ### 2.2 配置 classroom 可实现外网连接
 
 ```bash
-[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/00-set_classroom_extnet
+[kiosk@foundation0 ~]$ wget http://content.example.com/jenkins-ci-plt/set_classroom_extnet
 [kiosk@foundation0 ~]$ ./set_classroom_extnet
 ```
 

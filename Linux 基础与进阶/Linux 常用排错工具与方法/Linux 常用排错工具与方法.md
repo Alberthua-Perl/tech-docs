@@ -1382,6 +1382,6 @@ $ ltrace -t -f -p <pid>
 
 ## 参考链接
 
-- [Red Hat Customer Portal - Access to 24x7 support and knowledge](https://access.redhat.com/knowledgebase/)
-- [Labs - Red Hat Customer Portal](https://access.redhat.com/labs)
+- [Access to 24x7 support and knowledge | Red Hat Customer Portal](https://access.redhat.com/knowledgebase/)
+- [Labs | Red Hat Customer Portal](https://access.redhat.com/labs)
 - [What is early kdump support and how do I configure it?](https://access.redhat.com/solutions/3700611#masthead)

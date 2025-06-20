@@ -1,6 +1,4 @@
-# 🛠 Linux 常用工具与资源
-
------
+# 🛠 Linux 系统工具与资源
 
 ## 文档目录
 
@@ -14,10 +12,6 @@
 - [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
 - [5. grep 常用命令示例](#5-grep-常用命令示例)
 - [6. Markdown 语法配置](#6-markdown-语法配置)
-  - [6.1 设置字体颜色](#61-设置字体颜色)
-  - [6.2 标题选项](#62-标题选项)
-  - [6.3 加粗文本](#63-加粗文本)
-  - [6.4 删除文本（添加中横线）](#64-删除文本添加中横线)
 - [7. VSCode 常用 Settings 参数](#7-vscode-常用-settings-参数)
 - [8. Chrome 扩展安装与使用](#8-chrome-扩展安装与使用)
   - [8.1 更改 GitHub 页面 logo](#81-更改-github-页面-logo)
@@ -34,7 +28,7 @@
   - [11.7 RHEL8 安装 VScode](#117-rhel8-安装-vscode)
   - [11.8 RHEL9 安装 VScode](#118-rhel9-安装-vscode)
   - [11.9 RHEL9 安装 EPEL9 软件源](#119-rhel9-安装-epel9-软件源)
-  - [11.10 安装 Chinese lang pack](#1110-安装-chinese-lang-pack)
+  - [11.10 RHEL 安装中文输入法支持](#1110-rhel-安装中文输入法支持)
   - [11.11 安装 rdesktop 软件包连接 Windows RDP 桌面](#1111-安装-rdesktop-软件包连接-windows-rdp-桌面)
   - [11.12 RHEL9 安装 ToDesk](#1112-rhel9-安装-todesk)
   - [11.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1113-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
@@ -43,8 +37,6 @@
 - [12. dnf 下载软件包及其依赖](#12-dnf-下载软件包及其依赖)
 - [13. dnf 实现软件包安全检测与更新](#13-dnf-实现软件包安全检测与更新)
 - [14. RedHat 订阅服务使用](#14-redhat-订阅服务使用)
-
------
 
 ## 1. 常用公共服务器
 
@@ -98,8 +90,6 @@ http://www.alidns.com  阿里云
 - **EST**：东部标准时间（Eastern Standard Time）= UTC-05:00（晚5小时），美国东部时间（EST）。
 - **CST**：北京时间（China Standard Time，中国标准时间）是中国的标准时间。在时区划分上，属东八区，比协调世界时早8小时，记为 UTC+8。CST 比 EST 早 13 个小时。
 
------
-
 ## 2. 常用 DOS 命令
 
 ```powershell
@@ -126,8 +116,6 @@ dos> netsh advfirewall firewall show rule name=accepted_ssh
 dos> route print
 # 查看 Windows 的路由表信息
 ```
-
------
 
 ## 3. Shell 脚本补充
 
@@ -191,8 +179,6 @@ dos> route print
   # 关闭上述功能
   ```
 
------
-
 ## 4. oh-my-bash 终端字体（fonts）的安装
 
 > 同理，oh-my-zsh 可使用类似的方法完成安装。
@@ -234,8 +220,6 @@ dos> route print
   ```
 
   <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:80%"></center>
-
------
 
 ## 5. grep 常用命令示例
   
@@ -280,44 +264,16 @@ $ grep "pattern" /path/to/file | xargs command
 # grep 结合 xargs：将 grep 结果作为参数传递给另一个命令
 ```
 
------
-
 ## 6. Markdown 语法配置
 
-### 6.1 设置字体颜色
-
-- 方法 1：
-
-```markdown
-$\color{#FF0000}{红}$
-$\color{#FF7D00}{橙}$
-$\color{#FFFF00}{黄}$
-$\color{#00FF00}{绿}$
-$\color{#0000FF}{蓝}$
-$\color{#00FFFF}{靛}$
-$\color{#FF00FF}{紫}$
-```
-
-- 方法 2：
-
-```markdown
-<font face="楷体" size=13 color=Blue>你好</font>
-```
-
-### 6.2 标题选项
-
-- `[ ] 计划`
-- `[x] 计划`
-
-### 6.3 加粗文本
-
-- `**文本内容**`
-
-### 6.4 删除文本（添加中横线）
-
-- `~~文本内容~~`
-
------
+| 功能 | 语法 | 效果 |
+| ----- | ----- | ----- |
+| 设置字体颜色 | `$\color{#FF0000}{红}$` <br> `$\color{#FF7D00}{橙}$` <br> `$\color{#FFFF00}{黄}$` <br> `$\color{#00FF00}{绿}$` <br> `$\color{#0000FF}{蓝}$` <br> `$\color{#00FFFF}{靛}$` <br> `$\color{#FF00FF}{紫}$` | $\color{#FF0000}{红}$ <br> $\color{#FF7D00}{橙}$ <br> $\color{#FFFF00}{黄}$ <br> $\color{#00FF00}{绿}$ <br> $\color{#0000FF}{蓝}$ <br> $\color{#00FFFF}{靛}$ <br> $\color{#FF00FF}{紫}$ |
+| 设置字体颜色 | `<font face="楷体" size=13 color=Blue>你好</font>` | <font face="楷体" size=13 color=Blue>你好</font> |
+| 标题选项 | `[ ] 计划` <br> `[x] 计划` | [ ] 计划 <br> [x] 计划 |
+| 加粗文本 | `**文本内容**` | **文本内容** |
+| 删除文本（添加中横线）| `~~文本内容~~` | ~~文本内容~~ |
+| 图片居中显示 | `<center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center>` | <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center> |
 
 ## 7. VSCode 常用 Settings 参数
 
@@ -331,8 +287,6 @@ Match Brackets: never
 Cursor Style: block
 # 设置光标的输入形式为 block
 ```
-
------
 
 ## 8. Chrome 扩展安装与使用
 
@@ -373,8 +327,6 @@ Cursor Style: block
   
 - 安装完成后即可使用该扩展选择对应的字体，打开 GitHub 页面即可显示效果。
 
------
-
 ## 9. Tabby 自定义 CSS
 
 ```css
@@ -384,8 +336,6 @@ Cursor Style: block
     background-size: cover;  /* 如果需要全屏背景，取消注释这行 */
 }
 ```
-
------
 
 ## 10. Linux 实用命令示例
 
@@ -537,11 +487,26 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 # 安装 epel9 软件包
 ```
 
-### 11.10 安装 Chinese lang pack
+### 11.10 RHEL 安装中文输入法支持
+
+以下输入法引擎（IME）可以从 RHEL 中列出的软件包中获得：
+
+| 语言 | 脚本 | IME 名称 | 软件包 |
+| ----- | ----- | ----- | ----- |
+| 中文 | 简体中文 | Intelligent Pinyin | ibus-libpinyin |
+| 中文 | 繁体中文 | New Zhuyin | ibus-libzhuyin |
+| 日语 | Kanji, Hiragana, Katakana | Anthy |ibus-anthy |
+| 韩语 | Hangul | Hangul | ibus-hangul |
+| 其他 | 各种各样的 | M17N | ibus-m17n |
 
 ```bash
-$ sudo dnf install -y langpacks-zh_CN.noarch
+$ sudo dnf install -y langpacks-zh_CN.noarch ibus-libpinyin
+# GNOME3 中安装中文输入法支持，并且可在 Keyboard 中设置调整
 ```
+
+<center><img src="images/rhel-supported-chinese-input.png" style="width:60%"></center>
+
+如上图所示，在 Settings > Keyboard > Input Sources 中添加 `Chinese (Intelligent Pinyin)` 即可完成设置。
 
 ### 11.11 安装 rdesktop 软件包连接 Windows RDP 桌面
 
@@ -611,8 +576,6 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 
 <center><img src="images/x11vnc-connect-4.jpg" style="width:80%"></center>
 
------
-
 ## 12. dnf 下载软件包及其依赖
 
 ```bash
@@ -625,8 +588,6 @@ $ sudo dnf install --downloadonly \
   podman
 # 下载 podman 及其依赖的软件包至目标目录（仅下载不安装）
 ```
-
------
 
 ## 13. dnf 实现软件包安全检测与更新
 
@@ -653,8 +614,6 @@ $ sudo dnf update --cve CVE-xxxx-xxxx
 # 更新依赖指定 CVE 编号的软件包
 ```
 
------
-
 ## 14. RedHat 订阅服务使用
 
 ```bash
@@ -673,3 +632,8 @@ $ sudo subscription-manager repos --enable="*"
 $ sudo subscription-manager repos --list-enabled
 # 列举当前系统可用的订阅仓库
 ```
+
+## 15. 参考链接
+
+- [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
+- [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
