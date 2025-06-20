@@ -33,9 +33,9 @@ Jenkins 的 Master 和 Agent 均可安装在虚拟机或容器中，且组合形
 
 - 单 Master 安装 Jenkins，直接进行任务管理和业务构建发布。
 
-  <center><img src="images/jenkins-cluster-alone-master.png" style="width:80%"></center>
+<center><img src="images/jenkins-cluster-alone-master.png" style="width:80%"></center>
 
-  <center>图 2.1-1 Jenkins 单 Master 节点架构示意</center>
+<center>图 2.1-1 Jenkins 单 Master 节点架构示意</center>
 
 - 对于某些特定场景，单节点不足以满足需求：
   - 如果所有执行程序（executor）都忙于处理构建作业，则作业（job）必须等待。
