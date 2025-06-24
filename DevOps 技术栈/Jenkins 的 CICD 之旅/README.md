@@ -57,7 +57,15 @@
     - [10.2.3 创建与运行作业](#1023-创建与运行作业)
   - [10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像](#103-java-应用--构建测试-spring-boot-应用及容器镜像)
     - [10.3.1 推送 openjdk-17 构建用容器镜像](#1031-推送-openjdk-17-构建用容器镜像)
-    - [10.3.2 创建与运行作业](#1032-创建与运行作业)  
+    - [10.3.2 创建与运行作业](#1032-创建与运行作业)
+- [11. 设置 Jenkins 分布式构建环境](#11-设置-jenkins-分布式构建环境)
+  - [11.1 Master 节点与 Agent 节点连接方式对比](#111-master-节点与-agent-节点连接方式对比)
+  - [11.2 JNLP 连接方式](#112-jnlp-连接方式)
+    - [11.2.1 调整 Master 节点支持 JNLP 的 Agent 节点](#1121-调整-master-节点支持-jnlp-的-agent-节点)
+    - [11.2.2 添加支持 JNLP 的 Agent 节点](#1122-添加支持-jnlp-的-agent-节点)
+    - [11.2.3 使用流水线风格作业测试 Agent 节点功能](#1123-使用流水线风格作业测试-agent-节点功能)
+  - [11.3 SSH 连接方式](#113-ssh-连接方式)
+    - [11.3.1 调整 Master 节点支持 SSH 连接 Agent 节点](#1131-调整-master-节点支持-ssh-连接-agent-节点)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -91,8 +99,8 @@
   | foundation0.ilt.example.com | NA | 172.25.254.250 | 8 | 48 | 虚拟机宿主机 & 应用部署 |
   | workstation.lab.example.com | gitlab-ce.lab.example.com | 172.25.250.9 | 8 | 8 | GitLab CE 容器 |
   | servera.lab.example.com | jenkins-master.lab.example.com | 172.25.250.10 | 4 | 4 | Jenkins Master 节点 |
-  | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent 节点 |
-  | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent 节点 |
+  | serverb.lab.example.com | jenkins-agent0.lab.example.com | 172.25.250.11 | 4 | 4 | Jenkins Agent 节点（JNLP 连接方式）|
+  | serverc.lab.example.com | jenkins-agent1.lab.example.com | 172.25.250.12 | 4 | 4 | Jenkins Agent 节点（SSH 连接方式）|
   | serverd.lab.example.com | nexus3.lab.example.com | 172.25.250.13 | 6 | 6 | Nexus3 容器 & PostgreSQL 数据库 |
 
   > 💥 注意：servera，serverb，serverc，serverd 节点的 qcow2 磁盘镜像由于存储容量的限制在 Jenkins CI 流程中无法满足需求，因此，在本实验环境中进行了重新构建。workstation 节点需根据 2.3 添加新磁盘以满足存储需求。
@@ -868,7 +876,7 @@ logout
 ## 9. 部署 Jenkins Master 服务
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/jkn-cluster.yml --tag master_config
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/jkn-cluster.yml
 # 部署 Jenkins Master 节点服务
 ```
 
@@ -1270,19 +1278,180 @@ fi
 
 如上图所示，spring boot 应用构建测试完成，并将构建的应用镜像已推送至 Nexus3 中。
 
-## 11. 构建 Jenkins 分布式构建环境
+## 11. 设置 Jenkins 分布式构建环境
 
-### 11.1 连接 Master 与 Agent —— 配置 jnlp Agent
+关于 Jenkins 分布式构建环境的说明，可参考此[文档](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Jenkins%20%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%84%E5%BB%BA%E7%8E%AF%E5%A2%83/Jenkins%20%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%84%E5%BB%BA%E7%8E%AF%E5%A2%83.md)。
 
-#### 11.1.1
+### 11.1 Master 节点与 Agent 节点连接方式对比
 
-#### 11.1.2
+| 项目 | JNLP（Java 网络启动协议） | SSH |
+| ----- | ----- | ----- |
+| 连接方式 | Agent 主动连接 Master，Agent 接收并执行 Master 传递的作业，然后将结果反馈给 Master。| Master 主动连接 Agent，通过 SSH 协议连接到远程机器并启动代理进程。|
+| 适用平台 | 适用于各种操作系统，只要网络可以正常通信，且目标机器安装了 Java 环境即可。| 通常适用于 Linux 或 macOS 系统。|
+| 安全性 | 需要在  Master 上开启 Inbound agents 端口（默认为 50000/tcp），可能存在一定的安全风险。| 使用 SSH 协议进行加密通信，安全性较高。|
+| 配置复杂度 | 配置相对复杂，需要在 Master 上配置节点，并生成 JNLP 连接文件，然后在 Agent 机器上运行该文件。| 配置相对简单，只需在 Master 上配置节点，提供目标机器的 SSH 连接信息即可。|
+| 自动恢复能力 | 如果 Agent 掉线，需要手动重新启动 Agent。| 如果 Agent 掉线，Master 可以自动重新连接。|
 
-### 11.2 连接 Master 与 Agent —— 配置 SSH Agent
+### 11.2 JNLP 连接方式
 
-#### 11.2.1
+#### 11.2.1 调整 Master 节点支持 JNLP 的 Agent 节点
 
-#### 11.2.2
+1️⃣ 登录 Jenkins UI，点击 Dashboard > Manage Jenkins > Security，修改 TCP port for inbound agents 参数，此参数用于 Master 节点与 Agent 节点之间的 JNLP 连接，默认为 Disable（不启用）。此处设置参数 Fixed 为 `50000` 端口监听 Agent 节点：
+
+> 注意：以上端口只要 Master 节点上未被占用可自定义端口号。
+
+<center><img src="images/jenkins-agent-config-1.jpg" style="width:80%"></center>
+
+2️⃣ 设置完 Master 节点的监听端口后，点击 Dashboard > Manage Jenkins > Nodes，进行 Agent 节点的添加与管理：
+
+<center><img src="images/jenkins-agent-config-2.jpg" style="width:80%"></center>
+
+3️⃣ 点击 New Node 添加新节点：
+
+<center><img src="images/jenkins-agent-config-3.jpg" style="width:80%"></center>
+
+4️⃣ 指定新节点的名称与类型，点击 Create 创建节点：
+
+> 💥 注意：此处的创建仅仅在 Master 上的节点列表中创建，仍需单独配置 Agent 节点才能连接 Master。
+
+<center><img src="images/jenkins-agent-config-4.jpg" style="width:80%"></center>
+
+5️⃣ 在每个 Node 中定义执行器（Executor）的数量（并发构建的最大数量），一个执行器可以被理解为一个单独的进程（事实上是线程）。在一个节点上可以运行多个执行器。如果执行器均在执行相应的作业，那么此节点上无法运行额外的作业，需等待作业完成后才能执行。Remote root directory 参数指定远程 Agent 节点上的 Jenkins 根目录。
+
+> 注意：此目录在 Agent 节点上需提前创建，否则将 Agent 节点连接 Master 节点时将报错失败！如下所示：
+>
+> <center><img src="images/jenkins-agent-config-9.jpg" style="width:80%"></center>
+
+<center><img src="images/jenkins-agent-config-5.jpg" style="width:80%"></center>
+
+6️⃣ 如下图的重要参数说明：
+
+- Labels 参数：指定 Agent 节点的标签，多个标签之间使用空格间隔。
+- Usage 参数：指定仅仅使用标签匹配的节点执行构建作业。
+- Launch method 参数有两种：
+  - Launch agent by connecting it to the controller：通过 Java Web 启动代理（JNLP）。此方法可跨平台，但是必须提前在固定 Agent 节点上安装配置 JRE 环境，最常用的一种方式。
+  - Launch agent via SSH：Master 节点通过 SSH 连接到固定 Agent 节点。此方式比较简单，但是不能跨平台。
+- 其余参数保持默认即可。
+
+<center><img src="images/jenkins-agent-config-6.jpg" style="width:80%"></center>
+
+> 说明：
+>
+> Master 节点与 Agent 节点的连接方式
+
+#### 11.2.2 添加支持 JNLP 的 Agent 节点
+
+1️⃣ 在 Dashboard > Manage Jenkins > Nodes 中可见，新添加的 Agent 节点处于离线状态，原因在于此节点上尚未连接至 Master 节点。
+
+<center><img src="images/jenkins-agent-config-7.jpg" style="width:80%"></center>
+
+2️⃣ 点击此节点，使用给定的命令在对应的 Agent 节点上运行。此处使用固定 Agent 类型，因此使用第一种方式添加。
+
+<center><img src="images/jenkins-agent-config-8.jpg" style="width:80%"></center>
+
+3️⃣ Agent 节点上执行以下命令，可参考：
+
+```bash
+### 此节点使用 JNLP 连接 Master 节点 ###
+[root@serverb ~]# curl -sO http://jenkins-master.lab.example.com:8080/jnlpJars/agent.jar
+[root@serverb ~]# mkdir /opt/jenkins-agent0/  #创建 Jenkins 根目录
+[root@serverb ~]# java -jar agent.jar -url http://jenkins-master.lab.example.com:8080/ -secret f240790575bfd564d2ebda8142f8c074d6f1a4bac66b426bec9849340fd764ff -name "jenkins-agent0" -webSocket -workDir "/opt/jenkins-agent0"
+Jun 24, 2025 6:32:45 AM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using /opt/jenkins-agent0/remoting as a remoting work directory
+Jun 24, 2025 6:32:45 AM org.jenkinsci.remoting.engine.WorkDirManager setupLogging
+INFO: Both error and output logs will be printed to /opt/jenkins-agent0/remoting
+Jun 24, 2025 6:32:45 AM hudson.remoting.Launcher createEngine
+INFO: Setting up agent: jenkins-agent0
+Jun 24, 2025 6:32:45 AM hudson.remoting.Engine startEngine
+INFO: Using Remoting version: 3261.v9c670a_4748a_9
+Jun 24, 2025 6:32:45 AM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using /opt/jenkins-agent0/remoting as a remoting work directory
+Jun 24, 2025 6:32:45 AM hudson.remoting.Launcher$CuiListener status
+INFO: WebSocket connection open
+Jun 24, 2025 6:32:45 AM hudson.remoting.Launcher$CuiListener status
+INFO: Connected
+
+# 以上进程保持前台运行（JDK 环境在 `9. 部署 Jenkins Master 服务` 中已部署完成）
+```
+
+4️⃣ Master 节点上验证 Agent 节点是否加入成功：
+
+<center><img src="images/jenkins-agent-config-10.png" style="width:80%"></center>
+
+如上图所示，Agent 节点已成功与 Master 节点连接，可用于后续的作业执行。
+
+#### 11.2.3 使用流水线风格作业测试 Agent 节点功能
+
+根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent 节点。
+
+<center><img src="images/jenkins-agent-pipeline-test-1.png" style="width:80%"></center>
+
+```groovy
+pipeline {
+  agent {
+    label 'node && maven && flask'  //使用对应 label 标签的 Agent 节点执行作业
+  }
+ 
+  stages {
+    stage('Print Agent Hostname') {  //返回执行作业的 Agent 节点主机名，验证连接是否成功。
+      steps {
+        script {
+          def hostname = sh(script: 'hostname', returnStdout: true).trim()
+          echo "Running on agent with hostname: ${hostname}"
+        }
+      }
+    }
+
+    stage('Non-Paralles Stage') {
+      steps {
+        echo "This stage will be executed first."
+      }
+    }
+ 
+    stage('Parallel Stage') {
+      failFast true
+      parallel {  //3个并行化阶段
+        stage('Parallel One') {
+          steps {
+            echo "Parallel One"
+          }
+        }
+        
+        stage('Parallel Two') {
+          steps {
+            echo "Parallel Two"
+          }
+        }
+        
+        stage('Parallel Three') {  //stage 中嵌套 stages
+          stages {
+            stage('Nested 1') {
+              steps {
+                echo "In stage Nested 1 within Branch C"
+              }
+            }
+            stage('Nested 2') {
+              steps {
+                echo "In stage Nested 2 within Branch C"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+以上 Jenkinsfile 可参考 [jenkins-ci-plt/jenkins/pipeline-test-labeld-agent/Jenkinsfile](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/pipeline-test-labeld-agent/Jenkinsfile)。
+
+执行此作业，可在 Blue Ocean 中返回如下测试结果，即为测试成功。
+
+<center><img src="images/jenkins-agent-pipeline-test-2.png" style="width:80%"></center>
+
+### 11.3 SSH 连接方式
+
+#### 11.3.1 调整 Master 节点支持 SSH 连接 Agent 节点
 
 ## 附录A. PostgreSQL 常用命令
 
