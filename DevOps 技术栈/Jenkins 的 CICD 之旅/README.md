@@ -1283,7 +1283,7 @@ fi
 
 ### 11.1 JNLP 连接方式
 
-#### 11.1.1 调整 Master 支持 JNLP 的 Agent
+#### 11.1.1 配置 Master 支持 JNLP Agent
 
 1️⃣ 登录 Jenkins UI，点击 Dashboard > Manage Jenkins > Security，修改 TCP port for inbound agents 参数，此参数用于 Master与 Agent之间的 JNLP 连接，默认为 Disable（不启用）。此处设置参数 Fixed 为 `50000` 端口监听 Agent：
 
@@ -1305,7 +1305,18 @@ fi
 
 <center><img src="images/jenkins-agent-config-4.jpg" style="width:80%"></center>
 
-5️⃣ 在每个 Node 中定义执行器（Executor）的数量（并发构建的最大数量），一个执行器可以被理解为一个单独的进程（事实上是线程）。在一个节点上可以运行多个执行器。如果执行器均在执行相应的作业，那么此节点上无法运行额外的作业，需等待作业完成后才能执行。Remote root directory 参数指定远程 Agent上的 Jenkins 根目录。
+5️⃣ 如下图的重要参数说明：
+
+- Number of executors 参数：
+  - 在每个 Node 中定义执行器（Executor）的数量，即并发构建任务的最大数量。
+  - 通常应该与 Agent 的 CPU 核心数相同。
+  - 一个执行器可以被理解为一个单独的进程（事实上是线程）。
+  - 在一个节点上可以运行多个执行器。如果执行器均在执行相应的作业，那么此节点上无法运行额外的作业，需等待作业完成后才能执行。
+- Remote root directory 参数：
+  - 指定远程 Agent 上的 Jenkins 根目录
+  - 授权 Master 运行构建任务时使用的工作空间
+  - Agent 不会存储关键数据，作业配置、构建日志和制品等都会存储在 Master 上。
+  - 一般应该使用绝对路径
 
 > 注意：此目录在 Agent上需提前创建，否则将 Agent连接 Master时将报错失败！如下所示：
 >
@@ -1315,16 +1326,33 @@ fi
 
 6️⃣ 如下图的重要参数说明：
 
-- Labels 参数：指定 Agent的标签，多个标签之间使用空格间隔。
-- Usage 参数：指定仅仅使用标签匹配的节点执行构建作业。
-- Launch method 参数有两种：
-  - Launch agent by connecting it to the controller：通过 Java Web 启动代理（JNLP）。此方法可跨平台，但是必须提前在固定 Agent上安装配置 JRE 环境，最常用的一种方式。
-  - Launch agent via SSH：Master通过 SSH 连接到固定 Agent。此方式比较简单，但是不能跨平台。
-- 其余参数保持默认即可。
+- Labels 参数：
+  - 指定 Agent 的标签
+  - 用于对节点进行逻辑分组
+  - 多个标签之间使用空格分隔
+- Usage 参数：
+  - 控制 Jenkins 如何在此 Agent 上安排构建任务
+  - 两种方式：
+    - Use this node as much as possible：尽可能地使用此节点
+    - Only build jobs with label expressions matching this node：仅仅使用标签表达式匹配的节点构建作业
+- Launch method 参数：
+  - Master 识别此 Agent 主机并与其建立双向连接的方式
+  - 两种方式：
+    - Launch agent by connecting it to the controller：通过 Java Web 启动代理（JNLP）。此方法可跨平台，但是必须提前在固定 Agent上安装配置 JRE 环境，最常用的一种方式。
+    - Launch agent via SSH：Master通过 SSH 连接到固定 Agent。此方式比较简单，但是不能跨平台。
+- Availability 参数：
+  - Master 与 Agent 间的连接保持机制
+  - 三种方式：
+    - Keep this agent online as much as possible：尽量保持代理在线
+    - Bring this agent online according to a schedule：根据调度使代理上线
+    - Bring this agent online when in demand, and take offline when idle：有需要时保持代理在线，空闲时使代理下线。
+- Node properties 参数：
+  - Environment variables：配置 Agent 使用的环境变量
+  - Tools Location：配置 Agent 的构建工具与安装位置
 
 <center><img src="images/jenkins-agent-config-6.jpg" style="width:80%"></center>
 
-#### 11.1.2 添加支持 JNLP 的 Agent
+#### 11.1.2 添加支持 JNLP Agent
 
 1️⃣ 在 Dashboard > Manage Jenkins > Nodes 中可见，新添加的 Agent处于离线状态，原因在于此节点上尚未连接至 Master。
 
@@ -1340,7 +1368,13 @@ fi
 ### 此节点使用 JNLP 连接 Master ###
 [root@serverb ~]# curl -sO http://jenkins-master.lab.example.com:8080/jnlpJars/agent.jar
 [root@serverb ~]# mkdir /opt/jenkins-agent0/  #创建 Jenkins 根目录
-[root@serverb ~]# java -jar agent.jar -url http://jenkins-master.lab.example.com:8080/ -secret f240790575bfd564d2ebda8142f8c074d6f1a4bac66b426bec9849340fd764ff -name "jenkins-agent0" -webSocket -workDir "/opt/jenkins-agent0"
+[root@serverb ~]# nohup java -jar agent.jar -url http://jenkins-master.lab.example.com:8080/ -secret f240790575bfd564d2ebda8142f8c074d6f1a4bac66b426bec9849340fd764ff -name "jenkins-agent0" -webSocket -workDir "/opt/jenkins-agent0" &
+# 使用 nohup 将进程以后台运行（JDK 环境在 `9. 部署 Jenkins Master 服务` 中已部署完成）
+```
+
+如果不使用 nohup 命令运行而是前台直接运行，那么将返回以下输出：
+
+```plaintext
 Jun 24, 2025 6:32:45 AM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
 INFO: Using /opt/jenkins-agent0/remoting as a remoting work directory
 Jun 24, 2025 6:32:45 AM org.jenkinsci.remoting.engine.WorkDirManager setupLogging
@@ -1355,8 +1389,7 @@ Jun 24, 2025 6:32:45 AM hudson.remoting.Launcher$CuiListener status
 INFO: WebSocket connection open
 Jun 24, 2025 6:32:45 AM hudson.remoting.Launcher$CuiListener status
 INFO: Connected
-
-# 以上进程保持前台运行（JDK 环境在 `9. 部署 Jenkins Master 服务` 中已部署完成）
+...
 ```
 
 4️⃣ Master上验证 Agent是否加入成功：
@@ -1365,7 +1398,7 @@ INFO: Connected
 
 如上图所示，Agent已成功与 Master连接，可用于后续的作业执行。
 
-#### 11.1.3 使用流水线风格作业测试 Agent 功能
+#### 11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业
 
 根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
 

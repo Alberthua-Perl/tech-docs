@@ -6,11 +6,16 @@
 - [2. Jenkins 部署架构详解](#2-jenkins-部署架构详解)
   - [2.1 单 Master 架构](#21-单-master-架构)
   - [2.2 分布式架构（Master + Agent）](#22-分布式架构master--agent)
-    - [2.2.1 固定 Agent 类型](#221-固定-agent-类型)
-    - [2.2.2 动态 Agent 类型](#222-动态-agent-类型)
+    - [2.2.1 Agent 的常见形式](#221-agent-的常见形式)
+      - [2.2.1.1 按照 Agent 的运行形式分类](#2211-按照-agent-的运行形式分类)
+      - [2.2.1.2 按照 Agent 的持久化分类](#2212-按照-agent-的持久化分类)
+    - [2.2.2 节点标签（label）](#222-节点标签label)
+    - [2.2.3 Master 与 Agent 间的连接方式](#223-master-与-agent-间的连接方式)
+    - [2.2.4 配置与使用 JNLP Agent](#224-配置与使用-jnlp-agent)
+    - [2.2.5 配置与使用 SSH Agent](#225-配置与使用-ssh-agent)
 - [参考链接](#参考链接)
 
-## 1. Jenkins 部署架构概况
+## 1. Jenkins 部署架构概述
 
 Jenkins 部署分为以下两种模式：
 
@@ -127,15 +132,6 @@ Jenkins 的 Master 和 Agent 均可安装在虚拟机或容器中，且组合形
 #### 2.2.3 Master 与 Agent 间的连接方式
 
 - 为了能让 Master 将一个主机识别为 Agent，需要事先在各 Agent 上运行特定的代理程序以使得其能够与 Master 之间建立双向通信。
-
-| 项目 | JNLP-HTTP 连接器（Launch agent by connecting it to the controller）| SSH 连接器（Launch agent via SSH）|
-| ----- | ----- | ----- |
-| 连接方式 | Agent 主动连接 Master，Agent 接收并执行 Master 传递的作业，然后将结果反馈给 Master。| Master 主动连接 Agent，通过 SSH 协议连接到远程机器并启动代理进程。|
-| 适用平台 | 适用于各种操作系统，只要网络可以正常通信，且目标机器安装了 Java 环境即可。| 通常适用于 Linux 或 macOS 系统。|
-| 安全性 | 需要在  Master 上开启 Inbound agents 端口（默认为 50000/tcp），可能存在一定的安全风险。| 1️⃣ 首选且最稳定的双向连接机制，它依赖于 Jenkins 内置的 SSH 客户端，要求各 Agent 要部署并启动 SSH 服务。<br> 2️⃣ 支持基于密钥及口令的两种认证方式，但认证信息要保存为 Master之上的凭证。<br> 3️⃣ 基于密钥认证时，Master 主机上私钥凭证对应的公钥要正确配置到各 Agent主机之上。|
-| 配置复杂度 | 1️⃣ 配置相对复杂，需要在 Master 上配置节点，并生成 JNLP 连接文件，然后在 Agent 机器上运行该文件。<br> 2️⃣ 在 Agent 上以手动或系统服务的方式经由 JNLP 协议触发双向连接的建立。| 配置相对简单，只需在 Master 上配置节点，提供目标机器的 SSH 连接信息即可。|
-| 自动恢复能力 | 如果 Agent 掉线，需要手动重新启动 Agent。| 如果 Agent 掉线，Master 可以自动重新连接。|
-
 - Jenkins 使用 JNLP 协议启动 Agent 原理：
   - 概述：Java 网络启动协议（JNLP）是一种允许客户端启动托管在远程 Web 服务器上的应用程序的协议，用于在 Java 应用程序之间建立安全、高效的通信。
   - JNLP 协议只是技术方式，其核心是：
@@ -163,22 +159,60 @@ Jenkins 的 Master 和 Agent 均可安装在虚拟机或容器中，且组合形
     - Master 调度构建任务，从节点根据标签接收构建任务，并按照 Master 的指示执行构建作业，并将构建结果和日志发送回 Master。
     - Master 将构建结果和日志发布到 Jenkins Dashboard 上，供用户查看和监控。
 
+- 💪 连接方式汇总如下：
+
+  | 项目 | JNLP-HTTP 连接器（Launch agent by connecting it to the controller）| SSH 连接器（Launch agent via SSH）|
+  | ----- | ----- | ----- |
+  | 连接方式 | Agent 主动连接 Master，Agent 接收并执行 Master 传递的作业，然后将结果反馈给 Master。| Master 主动连接 Agent，通过 SSH 协议连接到远程机器并启动代理进程。|
+  | 适用平台 | 适用于各种操作系统，只要网络可以正常通信，且目标机器安装了 Java 环境即可。| 通常适用于 Linux 或 macOS 系统。|
+  | 安全性 | 需要在  Master 上开启 Inbound agents 端口（默认为 50000/tcp），可能存在一定的安全风险。| 1️⃣ 首选且最稳定的双向连接机制，它依赖于 Jenkins 内置的 SSH 客户端，要求各 Agent 要部署并启动 SSH 服务。<br> 2️⃣ 支持基于密钥及口令的两种认证方式，但认证信息要保存为 Master之上的凭证。<br> 3️⃣ 基于密钥认证时，Master 主机上私钥凭证对应的公钥要正确配置到各 Agent主机之上。|
+  | 配置复杂度 | 1️⃣ 配置相对复杂，需要在 Master 上配置节点，并生成 JNLP 连接文件，然后在 Agent 机器上运行该文件。<br> 2️⃣ 在 Agent 上以手动或系统服务的方式经由 JNLP 协议触发双向连接的建立。| 配置相对简单，只需在 Master 上配置节点，提供目标机器的 SSH 连接信息即可。|
+  | 自动恢复能力 | 如果 Agent 掉线，需要手动重新启动 Agent。| 如果 Agent 掉线，Master 可以自动重新连接。|
+
 #### 2.2.4 配置与使用 JNLP Agent
 
 - Jenkins 基于一个 TCP 端口通过 JNLP 代理节点进行通信：
-  - 由系统随机选择使用的端口能有效避免冲突，但是这种不固定又可能会给防火墙设置等带来困扰。
+  - 💥 由系统随机选择使用的端口能有效避免冲突，但是这种不固定又可能会给防火墙设置等带来困扰。
   - 未使用 JNLP 代理的情况下，建议关闭 Jenkins 上的此端口。
   - Jenkins 默认为 JNLP 使用的固定端口是 `50000/TCP`。
 - 配置各种类型的 Agent 的关键之处在于启动 Agent 的方式：
   - JNLP Agent 对应着 `Launch agent by connecting it to the controller`（早先版本为 `通过 Java Web 启动代理` 方式）
   - Master 与 Agent 之间建立一个基于 HTTP/HTTPS 协议的 Web 连接
   - Agent 首次接入 Master 时，需要提供用于认证的 Secret 以完成 Bootstrap。
-- 配置 JNLP Agent 创建分布式构建环境的简要步骤：
-  - 准备 Agent 节点，Master 节点上部署好 Jenkins。
+- 🧪 配置 JNLP Agent 创建分布式构建环境的步骤：
+  - Master 节点上部署好 Jenkins，准备 Agent 节点。
   - 在 Master 节点上，添加 Agent 节点的定义。
   - 在 Master 节点上，获取将 Agent 节点连接至 Master 节点时需要执行的命令。
   - 在 Agent 节点上，打开命令终端，运行 Master 节点提示的命令。
   - 在 Master 节点上验证添加的结果。
+
+  > 💪 说明：以上步骤可参考 [11.1 JNLP 连接方式](https://github.com/Alberthua-Perl/tech-docs/tree/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85#111-jnlp-%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F)
+
+- 如何调用 JNLP Agent 执行任务构建？
+  - 1️⃣ 由 Master（Controller）自行按调度逻辑动态分配
+  - 2️⃣ 在作业中指定要使用的节点
+    - 一般情况下，仅某些特定的任务必须要在特定类型的 Agent（如特定操作系统，或安装有特定的工具）上构建时，才需要手动指定。
+    - 可以基于节点标签筛选目标节点
+- 标签表达式（label expressions）操作符：
+  - `!expression`：表达式条件取反
+  - `a && b`：表达式间 “与” 联结
+  - `a || b` ：表达式间 “或” 联结
+  - `a -> b`：等同于 `!a || b`，意味着如果满足 a 表达式，则同时必须满足 b表达式。如，`linux -> x64`，意味着，如果操作系统为 linux，则它也必须是 x64 的系统环境。
+  - `a <-> b`：表示两个条件要么同时满足，要么同时都不满足，即等同 `a && b || !a && !b`
+  - `(expression)`：表达式分组，常在需要改变操作符间的优先级顺序时使用
+
+#### 2.2.5 配置与使用 SSH Agent
+
+- 静态运行 SSH Agent 的方式有两种：
+  - 在常规的 Jenkins 节点上，将运行 jenkins 进程的用户账号（如 jenkins）设定为可通过 sshd 远程连接和访问。
+  - 基于 *jenkins/ssh-agent* Image 运行 Docker 容器
+- Jenkins Master（Controller）连接 SSH Agent 的方式：
+  - 对于运行有 sshd 服务的常规 Jenkins 节点，可选择使用口令认证或密钥认证的方式：
+    - 将认证信息保存为 Jenkins 上的凭据
+    - 启动方式：Lanch agent via SSH
+  - 对于容器化运行的 SSH Agent，通常只能使用密钥认证的方式：
+    - 使用 ssh-keygen 生成一对密钥，并将公钥通过环境变量传递给 ssh-agent 容器。
+    - 将私钥保存为 Jenkins 上的凭据
 
 ## 参考链接
 
