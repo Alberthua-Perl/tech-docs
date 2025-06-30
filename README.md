@@ -2,12 +2,19 @@
 
 > 以下文档中的内容将根据实际情况进行更新补充！
 
-## 🧠 机器学习 & 深度学习
+## 🧠 机器学习 & 深度学习系列
 
-- **机器学习**
+- **数学概念 & 推导**
   - [LaTeX 数学公式编辑常用命令](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/LaTeX%20%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4.md)
-- **深度学习**
-  - [基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb)
+  - [法向量 & 超平面](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B3%95%E5%90%91%E9%87%8F%20%26%20%E8%B6%85%E5%B9%B3%E9%9D%A2.ipynb)
+  - [梯度 & 散度](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%A2%AF%E5%BA%A6%20%26%20%E6%95%A3%E5%BA%A6.ipynb)
+- **理论概念 & 模型示例**
+  - [深入浅出人工智能：机器学习、深度学习、强化学习概览与对比](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%EF%BC%9A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E3%80%81%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E3%80%81%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%A7%88%E4%B8%8E%E5%AF%B9%E6%AF%94.md)
+  - [深度学习的历史，现状与发展](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8E%86%E5%8F%B2%EF%BC%8C%E7%8E%B0%E7%8A%B6%E4%B8%8E%E5%8F%91%E5%B1%95.md)
+  - [全面认识感知机（perceptron）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E5%85%A8%E9%9D%A2%E8%AE%A4%E8%AF%86%E6%84%9F%E7%9F%A5%E6%9C%BA.ipynb)
+  - [基于 Red Hat OpenShift AI 运行 MLOps](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/AI267v2.x-course-demo/%E5%9F%BA%E4%BA%8E%20Red%20Hat%20OpenShift%20AI%20%E8%BF%90%E8%A1%8C%20MLOps.ipynb)
+  - [【Lab】基于 TensorFlow 实现 CNN 手写数字识别](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/%E5%9F%BA%E4%BA%8E%20TensorFlow%20%E5%AE%9E%E7%8E%B0%20CNN%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB.ipynb)
+  - [深入浅出理解生成对抗网络 (GAN)](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN)/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN).ipynb)
 
 ## 🐧 **Linux 进阶之路**
 

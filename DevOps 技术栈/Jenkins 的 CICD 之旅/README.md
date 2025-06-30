@@ -60,11 +60,15 @@
     - [10.3.2 创建与运行作业](#1032-创建与运行作业)
 - [11. 设置 Jenkins 分布式构建环境](#11-设置-jenkins-分布式构建环境)
   - [11.1 JNLP 连接方式](#111-jnlp-连接方式)
-    - [11.1.1 调整 Master 支持 JNLP 的 Agent](#1111-调整-master-支持-jnlp-的-agent)
-    - [11.1.2 添加支持 JNLP 的 Agent](#1112-添加支持-jnlp-的-agent)
-    - [11.1.3 使用流水线风格作业测试 Agent 功能](#1113-使用流水线风格作业测试-agent-功能)
+    - [11.1.1 配置 Master 支持 JNLP Agent](#1111-配置-master-支持-jnlp-agent)
+    - [11.1.2 添加支持 JNLP Agent](#1112-添加支持-jnlp-agent)
+    - [11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业](#1113-调用-jnlp-agent-进行构建--使用流水线风格作业)
   - [11.2 SSH 连接方式](#112-ssh-连接方式)
-    - [11.2.1 调整 Master 支持 SSH 连接 Agent](#1121-调整-master-支持-ssh-连接-agent)
+    - [11.2.1 Master 创建用于登录 SSH Agent 的公私钥](#1121-master-创建用于登录-ssh-agent-的公私钥)
+    - [11.2.2 创建登录 SSH Agent 的凭据](#1122-创建登录-ssh-agent-的凭据)
+    - [11.2.3 调整 Master 支持 SSH 连接 Agent](#1123-调整-master-支持-ssh-连接-agent)
+    - [11.2.4 安装 SSH Agent Plugin 插件](#1124-安装-ssh-agent-plugin-插件)
+    - [11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业](#1125-调用-ssh-agent-进行构建--使用流水线风格作业)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -875,7 +879,7 @@ logout
 ## 9. 部署 Jenkins Master 服务
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/jkn-cluster.yml
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tag master_config
 # 部署 Jenkins Master服务
 ```
 
@@ -1400,7 +1404,7 @@ INFO: Connected
 
 #### 11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业
 
-根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
+1️⃣ 测试一：根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
 
 <center><img src="images/jenkins-agent-pipeline-test-1.png" style="width:80%"></center>
 
@@ -1467,9 +1471,86 @@ pipeline {
 
 <center><img src="images/jenkins-agent-pipeline-test-2.png" style="width:80%"></center>
 
+2️⃣ 测试二：
+
 ### 11.2 SSH 连接方式
 
-#### 11.2.1 调整 Master 支持 SSH 连接 Agent
+#### 11.2.1 Master 创建用于登录 SSH Agent 的公私钥
+
+在 SSH Agent 节点上需存在 jenkins 用户以及对应的 `$HOME/.ssh/` 目录，用于存储 Master 节点 SSH 使用密钥登录的公钥。如下所示：
+
+```bash
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tag agent_config
+# SSH Agent 节点上创建 jenkins 用户，并设置 SSH 相关目录及权限。
+```
+
+在 Jenkins Master 节点上，切换至 jenkins 用户创建 SSH 公私钥用于 Master 节点登录 SSH Agent 节点。
+
+```bash
+[devops@servera ~]$ sudo su - -s /bin/bash jenkins  #切换至 jenkins 用户
+[jenkins@servera ~]$ cd ~/.ssh/
+[jenkins@servera .ssh]$ ssh-keygen  #生成用于 SSH 登录 Agent 节点的公私钥
+Generating public/private rsa key pair.
+Enter file in which to save the key (/var/lib/jenkins/.ssh/id_rsa): agent-login_rsa  #自定义公私钥名称
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in agent-login_rsa
+Your public key has been saved in agent-login_rsa.pub
+The key fingerprint is:
+SHA256:Vrf5EJZyeWKywGRSUX1WRONgD3XFhYAPuXXf8xsFviE jenkins@servera.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|      ..=o.+.=.OX|
+|       =  + +o@ +|
+|        o +=X=.=.|
+|         o.OE*o.+|
+|        S . +. o+|
+|       .     o...|
+|              . o|
+|               . |
+|                 |
++----[SHA256]-----+
+
+[jenkins@servera .ssh]$ ssh-copy-id -i ~/.ssh/agent-login_rsa jenkins@jenkins-agent1.lab.example.com
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/var/lib/jenkins/.ssh/agent-login_rsa.pub"
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+jenkins@jenkins-agent1.lab.example.com's password: 
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'jenkins@jenkins-agent1.lab.example.com'"
+and check to make sure that only the key(s) you wanted were added.
+# 拷贝 SSH 公钥至 SSH Agent 节点
+```
+
+#### 11.2.2 创建登录 SSH Agent 的凭据
+
+点击 Dashboard > Manage Jenkins > Credentials 创建 global 范围的凭据，方法与 *10.1.1* 类似，如下所示：
+
+<center><img src="images/jenkins-agent-new-credential-1.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-agent-new-credential-2.png" style="width:80%"></center>
+
+#### 11.2.3 调整 Master 支持 SSH 连接 Agent
+
+在 Dashboard > Manage Jenkins > Nodes 中，点击 `+ New Node` 用以添加新节点的定义，如下所示：
+
+<center><img src="images/jenkins-ssh-agent-config-1.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-ssh-agent-config-2.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-ssh-agent-config-3.png" style="width:80%"></center>
+
+#### 11.2.4 安装 SSH Agent Plugin 插件
+
+点击 Dashboard > Manage Jenkins > Plugins，在 Available plugins 中搜索 `SSH Agent Plugin` 插件并安装此插件，它可实现 Master 与 Agent 之间的 SSH 连接。一旦安装成功，并且前面步骤不存在错误的情况下，Master 与 Agent 之间可正常连接，如下所示：
+
+<center><img src="images/jenkins-all-kind-of-agents.png" style="width:80%"></center>
+
+#### 11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业
+
+以 spring-boot 应用为例，使用流水线风格作业测试 SSH Agent。
 
 ## 附录A. PostgreSQL 常用命令
 
