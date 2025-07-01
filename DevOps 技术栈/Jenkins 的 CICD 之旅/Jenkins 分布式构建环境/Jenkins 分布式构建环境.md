@@ -217,3 +217,4 @@ Jenkins 的 Master 和 Agent 均可安装在虚拟机或容器中，且组合形
 ## 参考链接
 
 - [在 CCE 中安装部署 Jenkins 方案概述 | 华为云](https://support.huaweicloud.com/bestpractice-cce/cce_bestpractice_0066.html)
+- [11. 设置 Jenkins 分布式构建环境](https://github.com/Alberthua-Perl/tech-docs/tree/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85#11-%E8%AE%BE%E7%BD%AE-jenkins-%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%84%E5%BB%BA%E7%8E%AF%E5%A2%83)

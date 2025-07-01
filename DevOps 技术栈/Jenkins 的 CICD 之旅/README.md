@@ -1404,7 +1404,9 @@ INFO: Connected
 
 #### 11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业
 
-1️⃣ 测试一：根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
+根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
+
+> 说明：以下方法仅做 Jenkinsfile 的 pipeline 脚本语法测试以及 JNLP Agent 节点调度测试，在以下 SSH Agent 中将使用 spring-boot 应用测试 Agent 节点调度。
 
 <center><img src="images/jenkins-agent-pipeline-test-1.png" style="width:80%"></center>
 
@@ -1470,8 +1472,6 @@ pipeline {
 执行此作业，可在 Blue Ocean 中返回如下测试结果，即为测试成功。
 
 <center><img src="images/jenkins-agent-pipeline-test-2.png" style="width:80%"></center>
-
-2️⃣ 测试二：
 
 ### 11.2 SSH 连接方式
 
@@ -1550,7 +1550,28 @@ and check to make sure that only the key(s) you wanted were added.
 
 #### 11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业
 
-以 spring-boot 应用为例，使用流水线风格作业测试 SSH Agent。
+以 spring-boot 应用为例，使用流水线风格作业测试 SSH Agent。serverc 节点作为 SSH Agent 节点，运行构建任务需从远程代码仓库中拉取代码，但是使用 SSH 方式登录仓库的话要进行远程代码仓库节点的主机验证与用户认证，如果未执行这些步骤，那么构建过程的报错如下：
+
+<center><img src="images/jenkins-ssh-agent-pipeline-error.png" style="width:80%"></center>
+
+解决方法如下所示：
+
+```bash
+[devops@servera ~]$ sudo su - -s /bin/bash jenkins
+[jenkins@servera ~]$ scp /var/lib/jenkins/.ssh/known_hosts jenkins@jenkins-agent1.lab.example.com:~/.ssh/
+[jenkins@servera ~]$ scp /var/lib/jenkins/.ssh/config jenkins@jenkins-agent1.lab.example.com:~/.ssh/
+# 同步 SSH Agent 节点上的配置
+```
+
+创建流水线风格作业：
+
+<center><img src="images/jenkins-ssh-agent-pipeline-spring-test-1.png" style="width:80%"></center>
+
+<center><img src="images/jenkins-ssh-agent-pipeline-spring-test-2.png" style="width:80%"></center>
+
+执行构建作业并追踪过程：
+
+<center><img src="images/jenkins-ssh-agent-pipeline-spring-test-3.png" style="width:80%"></center>
 
 ## 附录A. PostgreSQL 常用命令
 
