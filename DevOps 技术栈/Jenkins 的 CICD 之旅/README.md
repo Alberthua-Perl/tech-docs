@@ -1,4 +1,4 @@
-# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布容器化 Node.js、Python、Java 应用
+# 🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布容器化 Node.js、Python 与 Java 应用
 
 ## 文档说明
 
@@ -69,6 +69,8 @@
     - [11.2.3 调整 Master 支持 SSH 连接 Agent](#1123-调整-master-支持-ssh-连接-agent)
     - [11.2.4 安装 SSH Agent Plugin 插件](#1124-安装-ssh-agent-plugin-插件)
     - [11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业](#1125-调用-ssh-agent-进行构建--使用流水线风格作业)
+      - [11.2.5.1 spring-boot 应用测试流水线作业](#11251-spring-boot-应用测试流水线作业)
+      - [11.2.5.2 CNN 模型应用测试流水线作业](#11252-cnn-模型应用测试流水线作业)
 - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
   - [A.1 登录数据库](#a1-登录数据库)
   - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
@@ -1406,7 +1408,7 @@ INFO: Connected
 
 根据前文介绍的创建流水线风格作业的方法，此处创建名为 pipeline-test-labeld-agent 的作业测试 Agent。
 
-> 说明：以下方法仅做 Jenkinsfile 的 pipeline 脚本语法测试以及 JNLP Agent 节点调度测试，在以下 SSH Agent 中将使用 spring-boot 应用测试 Agent 节点调度。
+> 说明：以下方法仅做 Jenkinsfile 的 pipeline 脚本语法测试以及 JNLP Agent 节点调度测试，在以下 SSH Agent 中将使用 spring-boot 应用与 CNN 模型应用测试 Agent 节点调度。
 
 <center><img src="images/jenkins-agent-pipeline-test-1.png" style="width:80%"></center>
 
@@ -1550,6 +1552,10 @@ and check to make sure that only the key(s) you wanted were added.
 
 #### 11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业
 
+##### 11.2.5.1 spring-boot 应用测试流水线作业
+
+> 🎯 说明：此作业中 Jenkinsfile 来自于应用源代码中的定义，即 `Pipeline script from SCM`，因此，Jenkinsfile 中无需指定远程源代码仓库与凭据。
+
 以 spring-boot 应用为例，使用流水线风格作业测试 SSH Agent。serverc 节点作为 SSH Agent 节点，运行构建任务需从远程代码仓库中拉取代码，但是使用 SSH 方式登录仓库的话要进行远程代码仓库节点的主机验证与用户认证，如果未执行这些步骤，那么构建过程的报错如下：
 
 <center><img src="images/jenkins-ssh-agent-pipeline-error.png" style="width:80%"></center>
@@ -1569,9 +1575,169 @@ and check to make sure that only the key(s) you wanted were added.
 
 <center><img src="images/jenkins-ssh-agent-pipeline-spring-test-2.png" style="width:80%"></center>
 
+以上流水线风格的作业 Jenkinsfile 可参考 [jenkins-ci-plt/jenkins/pipeline-spring-boot/Jenkinsfile_ssh_agent](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/pipeline-spring-boot/Jenkinsfile_ssh_agent)
+
 执行构建作业并追踪过程：
 
 <center><img src="images/jenkins-ssh-agent-pipeline-spring-test-3.png" style="width:80%"></center>
+
+##### 11.2.5.2 CNN 模型应用测试流水线作业
+
+> 🎯 说明：此作业中 Jenkinsfile 直接来自于 `Pipeline script`，因此，Jenkinsfile 中需指定远程源代码仓库与凭据。
+
+以 CNN 模型应用为例，使用流水线风格作业测试 SSH Agent。此模型的训练与镜像的构建在 Jenkinsfile 中指定 serverc 节点上运行，但此节点上还未部署 TensorFlow 运行环境，需执行以下步骤：
+
+```bash
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-tf-runtime.yml
+#serverc 节点在 jenkins 用户环境中部署 TensorFlow 运行环境
+#根据 `11.2.1 Master 创建用于登录 SSH Agent 的公私钥`，serverc 节点作为 SSH Agent 已在此节点上创建 jenkins 用户。
+```
+
+创建流水线风格作业：
+
+<center><img src="images/pipeline-agent-cnn_mnist_train-1.png" style="width:80%"></center>
+
+<center><img src="images/pipeline-agent-cnn_mnist_train-2.png" style="width:80%"></center>
+
+上图中填入的 Script Jenkinsfile 如下所示：
+
+```groovy
+// Use this Jenkinsfile directly in pipeline-cnn-mnist-train
+// project. Not define git repository and credential, rather than
+// type following content into `Pipeline -> Definition -> Pipeline script`
+// and build the job.
+
+pipeline {
+    //agent any
+    agent {
+        label "spring"
+    }
+
+    environment {
+        GIT_CREDENTIALS_ID = 'gitlab-ce-devuser0'
+    }
+
+    stages {
+        stage('Print agent node hostname') {
+            steps {
+                script {
+                    def hostname = sh(script: 'hostname', returnStdout: true).trim()
+                    echo "Running job on agent hostname: ${hostname}"
+                }
+            }
+        }
+
+        stage('Checkout source code') {
+            steps {
+                script {
+                    echo '---> Checkout source code from Git repository...'
+                    checkout([$class: 'GitSCM', userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: 'git@workstation.lab.example.com:devuser0/cnn_mnist_train.git']], branches: [[name: 'main']]])
+                }
+            }
+        }
+
+        stage('Create build env') {
+            steps {
+                echo '---> Create build env...'
+                sh '''
+                mkdir build/
+                shopt -s extglob
+                mv !(build) build/ && mv .[a-zA-Z]* build/
+                '''
+            }
+        }
+
+        stage('Train MNIST and generate module') {
+            steps {
+                dir('build') {
+                    echo '---> Train MNIST and generate module...'
+                    sh '''
+                    python ./train_mnist_model_tf.py
+                    tree .
+                    '''
+                }
+            }
+        }
+
+        stage('Generate Containerfile') {
+            steps {
+                dir('./') {
+                    echo '---> Generate Containerfile...'
+                    script {
+                        def currentDir = sh(script: 'pwd', returnStdout: true).trim()
+                        echo "Current directory: ${currentDir}"
+                        def fileContent = """
+                        FROM nexus3.lab.example.com:8882/tf-flask:2.18.0
+
+                        ADD build/ /app
+                        WORKDIR /app
+
+                        EXPOSE 5000
+
+                        ENTRYPOINT ["python", "app.py"]
+                        """
+                        writeFile file: 'Containerfile', text: fileContent
+                    }
+                }
+            }
+        }
+
+        stage('Login and pull tf-flask image') {
+            steps {
+                echo '---> Login and pull tf-flask image...'
+                sh '''
+                podman login --tls-verify=false --username devuser0 --password 1qazZSE\$ nexus3.lab.example.com:8882
+                podman pull --tls-verify=false nexus3.lab.example.com:8882/tf-flask:2.18.0
+                '''
+            }
+        }
+
+        stage('Build app-tf-flask app image') {
+            steps {
+                echo '---> Build app-tf-flask app image...'
+                sh 'podman build -t app-tf-flask:v1.0 --format=docker .'
+                script {
+                    def buildResult = sh(script: 'echo $?', returnStdout: true).trim()
+                    if (buildResult != '0') {
+                        error('---> [ERROR] Build failure...')
+                    }
+                }
+            }
+        }
+
+        stage('Tag and push app-tf-flask app image') {
+            steps {
+                echo '---> Tag and push app-tf-flask app image...'
+                sh '''
+                podman tag localhost/app-tf-flask:v1.0 nexus3.lab.example.com:8882/app-tf-flask:v1.0
+                podman push --tls-verify=false nexus3.lab.example.com:8882/app-tf-flask:v1.0
+                '''
+            }
+        }
+
+        stage('Remove local builded image') {
+            steps {
+                echo '---> Remove local builded image...'
+                sh 'podman rmi localhost/app-tf-flask:v1.0 nexus3.lab.example.com:8882/app-tf-flask:v1.0'
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo '---> [ERROR] Build failure...'
+        }
+    }
+}
+```
+
+以上流水线风格的作业 Jenkinsfile 可参考 [jenkins-ci-plt/jenkins/pipeline-cnn-mnist-train/Jenkinsfile](https://github.com/Alberthua-Perl/ansible-demo/blob/master/jenkins-ci-plt/jenkins/pipeline-cnn-mnist-train/Jenkinsfile)
+
+执行构建作业并追踪过程：
+
+<center><img src="images/pipeline-agent-cnn_mnist_train-3.png" style="width:80%"></center>
+
+作业可根据 Agent 节点标签调度至 SSH Agent 节点上执行，并成功完成流水线。
 
 ## 附录A. PostgreSQL 常用命令
 
