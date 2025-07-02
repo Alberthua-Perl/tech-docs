@@ -1,4 +1,4 @@
-## 🤘 Ansible Tower 自动化实践（6）- 使用 Ansible 与 API 通信
+## 🤘 Ansible Tower 自动化实践 (6) —— 使用 Ansible 与 API 通信
 
 ### 文档目录：
 
@@ -117,9 +117,9 @@
   
   - 如下所示，使用 `Firefox web` 浏览器访问相同的 API：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/tower-apiv2-demo-1.jpg)
+    ![](images/tower-apiv2-demo-1.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/tower-apiv2-demo-2.jpg)
+    ![](images/tower-apiv2-demo-2.jpg)
     
     也可通过在图形界⾯中提供 `JSON` 格式文本或文件，在特定的 API ⻚⾯上使⽤ PUT 或 POST 方法。
 
@@ -219,7 +219,7 @@
       > 1. 也可以使⽤内部 `ID` 号而不是其名称来启动作业模板。
       > 2. 在较早版本的红帽 Ansible Tower 中，使用版本 1 API 时，必须仅使用 ID 号启动作业模板。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/apiv2-post-method-survey-variable.jpg)
+      ![](images/apiv2-post-method-survey-variable.jpg)
 
 - 使用 Ansible Playbook 中的 API 启动作业：
   
@@ -291,9 +291,9 @@
     > 1. 在 Ansible 的最新版本中，可使用不同的 Ansible Vault 密码加密不同的文件。
     > 2. Ansible Tower 可以在同一作业模板中使用多个 Vault 凭据，以确保它可以解密项目中使用 Ansible Vault 加密的所有文件。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/vault-credential-demo.jpg)
+    ![](images/vault-credential-demo.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/job-template-vault-credential.jpg)
+    ![](images/job-template-vault-credential.jpg)
     
     > 📌 以上示例配置流程：
     > 
@@ -303,7 +303,7 @@
     > 
     > 3. 如下所示：
     >    
-    >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/tower-apiv2-job-template-triggle-another-job.jpg)
+    >    ![](images/tower-apiv2-job-template-triggle-another-job.jpg)
 
 - 基于令牌（token）的身份验证：
   
@@ -371,7 +371,7 @@
     > 
     > 3. 运行该作业模板时，由于该作业可触发已配置 survey 的 playbook，因此需定义额外的变量，否则运行将报错，如下所示：
     >    
-    >    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/job-template-not-extra-var-error.jpg)
+    >    ![](images/job-template-not-extra-var-error.jpg)
 
 ### 使用 Ansible Playbook 与 API 交互
 
@@ -401,7 +401,7 @@
       
       - `PATCH`：用于对资源应用部分修改。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/primary-http-method.jpg)
+      ![](images/primary-http-method.jpg)
       
       👉 关于 HTTP 方法的说明请参考 [该链接](https://www.restapitutorial.com/lessons/httpmethods.html)。
     
@@ -518,7 +518,7 @@
     
     > 该示例中 token 已提前创建，出于测试的目的，将其明文显示在 playbook 中。
     > 
-    > ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/create-personal-access-token-demo.jpg)
+    > ![](images/create-personal-access-token-demo.jpg)
     
     - API 调用返回的 `JSON` 是字典的列表（a list of dictionaries），其中每一字典都包含关于一个用户的信息，username 键包含用户的用户名。
     
@@ -557,7 +557,7 @@
             loop: "{{ gitlab_api_result.json }}"
       ```
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/gitlab-api-v4-connect-demo.jpg)
+      ![](images/gitlab-api-v4-connect-demo.jpg)
 
 - HTTP 安全性设置：
   
@@ -596,6 +596,6 @@
                 "http://example.com?name={{ entity_name }}"
       ```
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/ansible-api-test/http-restful-api-filter-1.jpg)
+      ![](images/http-restful-api-filter-1.jpg)
   
   - 其他有用的模块与过滤器：`xml` 模块、`to_json` 过滤器、`from_json` 过滤器

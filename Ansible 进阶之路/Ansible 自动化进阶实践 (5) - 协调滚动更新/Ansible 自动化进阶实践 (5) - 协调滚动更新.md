@@ -1,4 +1,4 @@
-## Ansible 自动化进阶实践（5）- 协调滚动更新
+## Ansible 自动化进阶实践 (5) —— 协调滚动更新
 
 ### 文档目录：
 
@@ -54,7 +54,7 @@
     
     该 playbook 执行结果如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/delegate-rolling-update/delegate_to-demo.png)
+    <center><img src="images/delegate_to-demo.png" style="width:80%"></center>
   
   - ✅ 示例 2：
     
@@ -211,7 +211,7 @@
     
     - 若向下舍入后的值为 `0`，Ansible 会将批处理大小更改为 `1` 个主机。
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/ansible-advanced-practice/delegate-rolling-update/serial-percent-demo.png)
+      <center><img src="images/serial-percent-demo.png" style="width:80%"></center>
   
   - 🚀 设置要更改的批处理大小：
     
