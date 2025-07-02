@@ -20,15 +20,15 @@
 
 ## 文档目录
 
-- 安装 Python 3.11 环境
-- 切换 Python 多版本环境
-- 部署用户的 Python venv 虚拟环境
-- 安装 ansible-navigator
-- 选择与拉取 EE 容器镜像
-- 验证测试 ansible-navigator 与 EE 容器镜像
-- 安装 community-general collection
-- 测试已安装的 collection
-- 参考链接
+- [安装 Python 3.11 环境](#安装-python-311-环境)
+- [切换 Python 多版本环境](#切换-python-多版本环境)
+- [部署用户的 Python venv 虚拟环境](#部署用户的-python-venv-虚拟环境)
+- [安装 ansible-navigator](#安装-ansible-navigator)
+- [选择与拉取 EE 容器镜像](#选择与拉取-ee-镜像)
+- [验证测试 ansible-navigator 与 EE 容器镜像](#验证测试-ansible-navigator-与-ee-容器镜像)
+- [安装 community-general collection](#安装-community-general-collection)
+- [测试已安装的 collection](#测试已安装的-collection)
+- [参考链接](#参考链接)
 
 ## 安装 Python 3.11 环境
 
