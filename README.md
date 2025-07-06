@@ -20,7 +20,7 @@
 
 - **命令行与工具**
   - [【精华】Linux 基础命令快速入门](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8.md)
-  - [Linux 常用工具与资源](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E4%B8%8E%E8%B5%84%E6%BA%90/Linux%20%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E4%B8%8E%E8%B5%84%E6%BA%90.md)
+  - [Linux 系统工具与资源](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7%E4%B8%8E%E8%B5%84%E6%BA%90/Linux%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7%E4%B8%8E%E8%B5%84%E6%BA%90.md)
   - [RHEL9.3 与 SLE15SP6 系统使用对比](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94/RHEL9.3%20%E4%B8%8E%20SLE15SP6%20%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94.md)
   - [find 与 locate 命令常用示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/find%20%E4%B8%8E%20locate%20%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E7%A4%BA%E4%BE%8B.md)
   - [Vim 常用方法汇总](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Vim%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/Vim%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB.md)
