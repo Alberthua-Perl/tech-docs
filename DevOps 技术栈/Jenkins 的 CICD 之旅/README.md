@@ -913,6 +913,10 @@ Jenkins Master 服务部署完成后需登录 Web UI 继续设置，可参考 [J
 
 <center><img src="images/blue-ocean-plugin-install-2.jpg" style="width:80%"></center>
 
+> 注意：
+>
+> Blue Ocean 插件提供新一代的作业构建面板，但 Jenkins 依然兼容以方块形式体现流水线作业过程的插件，即 `Pipeline: Stage View`。
+
 #### 10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置
 
 配置自由风格作业的过程中，如需连接远程代码库，那么要指定连接远程代码库的凭据，此处使用基于 SSH 私钥的凭据。本次采用容器化部署的 gitlab-ce 远程代码库，其对外暴露的 SSH 监听端口不再是默认的 22/tcp 端口，而是映射至宿主机的 8882/tcp 端口，因此，Jenkins Master使用 SSH 连接时需执行以下步骤：
