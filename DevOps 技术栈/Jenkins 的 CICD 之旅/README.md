@@ -4,6 +4,10 @@
 
 - ✍ 本文档使用 Ansible Navigator 自动化部署 Jenkins 分布式构建平台（Master+Agent），并发布 Java、Node.js、Flask 与 Golang 应用。
 - 📚 文档项目源代码：[jenkins-ci-plt | GitHub](https://github.com/Alberthua-Perl/ansible-demo/tree/master/jenkins-ci-plt)
+- 本文档中涉及的额外安装插件：
+  - Blue Ocean
+  - AnsiColor
+  - SSH Agent Plugin
 
 ## 文档目录
 
