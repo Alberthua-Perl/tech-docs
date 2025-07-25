@@ -11,76 +11,83 @@
 
 ## 文档目录
 
-- [0. Lab 环境架构与实现](#0-lab-环境架构与实现)
-- [1. Lab 相关用户名与登录密码](#1-lab-相关用户名与登录密码)
-- [2. Foundation 中设置节点资源](#2-foundation-中设置节点资源)
-  - [2.1 调整虚拟机计算资源](#21-调整虚拟机计算资源)
-  - [2.2 配置 classroom 可实现外网连接](#22-配置-classroom-可实现外网连接)
-  - [2.3 创建与附加 raw 磁盘镜像](#23-创建与附加-raw-磁盘镜像)
-- [3. 注意 Ansible 清单文件中的 ansible 变量 ansible_host](#3-注意-ansible-清单文件中的-ansible-变量-ansible_host)
-- [4. 生成 devops 用户 SSH 公私钥并实现各节点免密登录](#4-生成-devops-用户-ssh-公私钥并实现各节点免密登录)
-- [5. 部署与设置 GitLab-CE 容器](#5-部署与设置-gitlab-ce-容器)
-  - [5.1 安装 Ansible 内容集合（collection）](#51-安装-ansible-内容集合collection)
-  - [5.2 部署 GitLab-CE 容器](#52-部署-gitlab-ce-容器)
-  - [5.3 重置 GitLab-CE 的 root 密码](#53-重置-gitlab-ce-的-root-密码)
-  - [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](#54-创建与批准-gitlab-ce-的-devuser0-开发者用户)
-  - [5.5 Node.js 应用导入](#55-nodejs-应用导入)
-    - [5.5.1 创建新项目 etherpad-lite-postgres](#551-创建新项目-etherpad-lite-postgres)
-    - [5.5.2 导入 etherpad-lite-postgres 外部代码库](#552-导入-etherpad-lite-postgres-外部代码库)
-  - [5.6 Python 应用导入](#56-python-应用导入)
-    - [5.6.1 创建新项目 cnn_mnist_train](#561-创建新项目-cnn_mnist_train)
-    - [5.6.2 导入 cnn_mnist_train 外部代码库](#562-导入-cnn_mnist_train-外部代码库)
-  - [5.7 Java 应用导入](#57-java-应用导入)
-    - [5.7.1 创建新项目 spring-boot-helloworld](#571-创建新项目-spring-boot-helloworld)
-    - [5.7.2 导入 spring-boot-helloworld 外部代码库](#572-导入-spring-boot-helloworld-外部代码库)
-- [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
-  - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
-  - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
-  - [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](#63-创建-nexus3-的容器镜像仓库hosted-类型)
-  - [6.4 创建 Nexus3 的 npm 构件仓库（proxy 类型）](#64-创建-nexus3-的-npm-构件仓库proxy-类型)
-  - [6.5 创建 Nexus3 的 maven 构件仓库](#65-创建-nexus3-的-maven-构件仓库)
-- [7. 部署应用运行及构建环境](#7-部署应用运行及构建环境)
-  - [7.1 Node.js 运行环境](#71-nodejs-运行环境)
-  - [7.2 Maven 构建环境](#72-maven-构建环境)
-  - [7.3 使用 spring-boot 应用测试 maven (group) 类型构件库](#73-使用-spring-boot-应用测试-maven-group-类型构件库)
-- [8. 部署与设置 PostgreSQL 数据库](#8-部署与设置-postgresql-数据库)
-  - [8.1 安装部署 PostgreSQL 数据库](#81-安装部署-postgresql-数据库)
-  - [8.2 数据库服务器中创建 etherpad-lite 应用相关用户与数据库](#82-数据库服务器中创建-etherpad-lite-应用相关用户与数据库)
-- [9. 部署 Jenkins Master 服务](#9-部署-jenkins-master-服务)
-- [10. 运行自由风格的作业（Free Style Project）](#10-运行自由风格的作业free-style-project)
-  - [10.1 Node.js 应用 —— 构建测试 etherpad-lite 应用及容器镜像](#101-nodejs-应用--构建测试-etherpad-lite-应用及容器镜像)
-    - [10.1.1 创建基于 SSH 私钥的凭据连接 GitLab-CE](#1011-创建基于-ssh-私钥的凭据连接-gitlab-ce)
-    - [10.1.2 安装 Jenkins 的 Blue Ocean 插件](#1012-安装-jenkins-的-blue-ocean-插件)
-    - [10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置](#1013-jenkins-用户的-ssh-连接代码库的主机密钥校验与配置)
-    - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
-    - [10.1.5 构建与推送 node-pnpm 容器镜像](#1015-构建与推送-node-pnpm-容器镜像)
-    - [10.1.6 创建与运行作业](#1016-创建与运行作业)
-  - [10.2 Python 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像](#102-python-应用--训练-cnn-模型构建-app-tf-flask-应用及推理容器镜像)
-    - [10.2.1 推送 tf-flask 构建用容器镜像](#1021-推送-tf-flask-构建用容器镜像)
-    - [10.2.2 安装 AnsiColor 插件](#1022-安装-ansicolor-插件)
-    - [10.2.3 创建与运行作业](#1023-创建与运行作业)
-  - [10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像](#103-java-应用--构建测试-spring-boot-应用及容器镜像)
-    - [10.3.1 推送 openjdk-17 构建用容器镜像](#1031-推送-openjdk-17-构建用容器镜像)
-    - [10.3.2 创建与运行作业](#1032-创建与运行作业)
-- [11. 设置 Jenkins 分布式构建环境](#11-设置-jenkins-分布式构建环境)
-  - [11.1 JNLP 连接方式](#111-jnlp-连接方式)
-    - [11.1.1 配置 Master 支持 JNLP Agent](#1111-配置-master-支持-jnlp-agent)
-    - [11.1.2 添加支持 JNLP Agent](#1112-添加支持-jnlp-agent)
-    - [11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业](#1113-调用-jnlp-agent-进行构建--使用流水线风格作业)
-  - [11.2 SSH 连接方式](#112-ssh-连接方式)
-    - [11.2.1 Master 创建用于登录 SSH Agent 的公私钥](#1121-master-创建用于登录-ssh-agent-的公私钥)
-    - [11.2.2 创建登录 SSH Agent 的凭据](#1122-创建登录-ssh-agent-的凭据)
-    - [11.2.3 调整 Master 支持 SSH 连接 Agent](#1123-调整-master-支持-ssh-连接-agent)
-    - [11.2.4 安装 SSH Agent Plugin 插件](#1124-安装-ssh-agent-plugin-插件)
-    - [11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业](#1125-调用-ssh-agent-进行构建--使用流水线风格作业)
-      - [11.2.5.1 spring-boot 应用测试流水线作业](#11251-spring-boot-应用测试流水线作业)
-      - [11.2.5.2 CNN 模型应用测试流水线作业](#11252-cnn-模型应用测试流水线作业)
-- [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
-  - [A.1 登录数据库](#a1-登录数据库)
-  - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
-  - [A.3 用户（角色）与数据库操作](#a3-用户角色与数据库操作)
-  - [A.4 psql 常用的元命令](#a4-psql-常用的元命令)
-- [参考链接](#参考链接)
+- [🧪 基于 Ansible Navigator 部署管理分布式 Jenkins CI/CD 平台 —— 构建发布容器化 Node.js、Python 与 Java 应用](#-基于-ansible-navigator-部署管理分布式-jenkins-cicd-平台--构建发布容器化-nodejspython-与-java-应用)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [0. Lab 环境架构与实现](#0-lab-环境架构与实现)
+  - [1. Lab 相关用户名与登录密码](#1-lab-相关用户名与登录密码)
+  - [2. Foundation 中设置节点资源](#2-foundation-中设置节点资源)
+    - [2.1 调整虚拟机计算资源](#21-调整虚拟机计算资源)
+    - [2.2 配置 classroom 可实现外网连接](#22-配置-classroom-可实现外网连接)
+    - [2.3 创建与附加 raw 磁盘镜像](#23-创建与附加-raw-磁盘镜像)
+  - [3. 注意 Ansible 清单文件中的 ansible 变量 ansible\_host](#3-注意-ansible-清单文件中的-ansible-变量-ansible_host)
+  - [4. 生成 devops 用户 SSH 公私钥并实现各节点免密登录](#4-生成-devops-用户-ssh-公私钥并实现各节点免密登录)
+  - [5. 部署与设置 GitLab-CE 容器](#5-部署与设置-gitlab-ce-容器)
+    - [5.1 安装 Ansible 内容集合（collection）](#51-安装-ansible-内容集合collection)
+    - [5.2 部署 GitLab-CE 容器](#52-部署-gitlab-ce-容器)
+    - [5.3 重置 GitLab-CE 的 root 密码](#53-重置-gitlab-ce-的-root-密码)
+    - [5.4 创建与批准 GitLab-CE 的 devuser0 开发者用户](#54-创建与批准-gitlab-ce-的-devuser0-开发者用户)
+    - [5.5 Node.js 应用导入](#55-nodejs-应用导入)
+      - [5.5.1 创建新项目 etherpad-lite-postgres](#551-创建新项目-etherpad-lite-postgres)
+      - [5.5.2 导入 etherpad-lite-postgres 外部代码库](#552-导入-etherpad-lite-postgres-外部代码库)
+    - [5.6 Python 应用导入](#56-python-应用导入)
+      - [5.6.1 创建新项目 cnn\_mnist\_train](#561-创建新项目-cnn_mnist_train)
+      - [5.6.2 导入 cnn\_mnist\_train 外部代码库](#562-导入-cnn_mnist_train-外部代码库)
+    - [5.7 Java 应用导入](#57-java-应用导入)
+      - [5.7.1 创建新项目 spring-boot-helloworld](#571-创建新项目-spring-boot-helloworld)
+      - [5.7.2 导入 spring-boot-helloworld 外部代码库](#572-导入-spring-boot-helloworld-外部代码库)
+  - [6. 部署与设置 Nexus3 容器](#6-部署与设置-nexus3-容器)
+    - [6.1 部署 Nexus3 容器](#61-部署-nexus3-容器)
+    - [6.2 创建 Nexus3 的 devuser0 用户](#62-创建-nexus3-的-devuser0-用户)
+    - [6.3 创建 Nexus3 的容器镜像仓库（hosted 类型）](#63-创建-nexus3-的容器镜像仓库hosted-类型)
+    - [6.4 创建 Nexus3 的 npm 构件仓库（proxy 类型）](#64-创建-nexus3-的-npm-构件仓库proxy-类型)
+    - [6.5 创建 Nexus3 的 maven 构件仓库](#65-创建-nexus3-的-maven-构件仓库)
+  - [7. 部署应用运行及构建环境](#7-部署应用运行及构建环境)
+    - [7.1 Node.js 运行环境](#71-nodejs-运行环境)
+    - [7.2 TensorFlow 框架运行环境](#72-tensorflow-框架运行环境)
+    - [7.3 Maven 构建环境](#73-maven-构建环境)
+    - [7.4 使用 spring-boot 应用测试 maven (group) 类型构件库](#74-使用-spring-boot-应用测试-maven-group-类型构件库)
+  - [8. 部署与设置 PostgreSQL 数据库](#8-部署与设置-postgresql-数据库)
+    - [8.1 安装部署 PostgreSQL 数据库](#81-安装部署-postgresql-数据库)
+    - [8.2 数据库服务器中创建 etherpad-lite 应用相关用户与数据库](#82-数据库服务器中创建-etherpad-lite-应用相关用户与数据库)
+  - [9. 部署 Jenkins Master 服务](#9-部署-jenkins-master-服务)
+  - [10. 运行自由风格的作业（Free Style Project）](#10-运行自由风格的作业free-style-project)
+    - [10.1 Node.js 应用 —— 构建测试 etherpad-lite 应用及容器镜像](#101-nodejs-应用--构建测试-etherpad-lite-应用及容器镜像)
+      - [10.1.1 创建基于 SSH 私钥的凭据连接 GitLab-CE](#1011-创建基于-ssh-私钥的凭据连接-gitlab-ce)
+      - [10.1.2 安装 Jenkins 的 Blue Ocean 插件](#1012-安装-jenkins-的-blue-ocean-插件)
+      - [10.1.3 jenkins 用户的 SSH 连接代码库的主机密钥校验与配置](#1013-jenkins-用户的-ssh-连接代码库的主机密钥校验与配置)
+      - [10.1.4 设置 jenkins 用户的 subuid/subgid 以满足 podman 的 rootless 构建环境](#1014-设置-jenkins-用户的-subuidsubgid-以满足-podman-的-rootless-构建环境)
+      - [10.1.5 构建与推送 node-pnpm 容器镜像](#1015-构建与推送-node-pnpm-容器镜像)
+      - [10.1.6 创建与运行作业](#1016-创建与运行作业)
+      - [10.1.7 部署测试应用](#1017-部署测试应用)
+    - [10.2 Python 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像](#102-python-应用--训练-cnn-模型构建-app-tf-flask-应用及推理容器镜像)
+      - [10.2.1 推送 tf-flask 构建用容器镜像](#1021-推送-tf-flask-构建用容器镜像)
+      - [10.2.2 安装 AnsiColor 插件](#1022-安装-ansicolor-插件)
+      - [10.2.3 创建与运行作业](#1023-创建与运行作业)
+      - [10.2.4 部署测试应用](#1024-部署测试应用)
+    - [10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像](#103-java-应用--构建测试-spring-boot-应用及容器镜像)
+      - [10.3.1 推送 openjdk-17 构建用容器镜像](#1031-推送-openjdk-17-构建用容器镜像)
+      - [10.3.2 创建与运行作业](#1032-创建与运行作业)
+      - [10.3.3 部署测试应用](#1033-部署测试应用)
+  - [11. 设置 Jenkins 分布式构建环境](#11-设置-jenkins-分布式构建环境)
+    - [11.1 JNLP 连接方式](#111-jnlp-连接方式)
+      - [11.1.1 配置 Master 支持 JNLP Agent](#1111-配置-master-支持-jnlp-agent)
+      - [11.1.2 添加支持 JNLP Agent](#1112-添加支持-jnlp-agent)
+      - [11.1.3 调用 JNLP Agent 进行构建 —— 使用流水线风格作业](#1113-调用-jnlp-agent-进行构建--使用流水线风格作业)
+    - [11.2 SSH 连接方式](#112-ssh-连接方式)
+      - [11.2.1 Master 创建用于登录 SSH Agent 的公私钥](#1121-master-创建用于登录-ssh-agent-的公私钥)
+      - [11.2.2 创建登录 SSH Agent 的凭据](#1122-创建登录-ssh-agent-的凭据)
+      - [11.2.3 调整 Master 支持 SSH 连接 Agent](#1123-调整-master-支持-ssh-连接-agent)
+      - [11.2.4 安装 SSH Agent Plugin 插件](#1124-安装-ssh-agent-plugin-插件)
+      - [11.2.5 调用 SSH Agent 进行构建 —— 使用流水线风格作业](#1125-调用-ssh-agent-进行构建--使用流水线风格作业)
+        - [11.2.5.1 spring-boot 应用测试流水线作业](#11251-spring-boot-应用测试流水线作业)
+        - [11.2.5.2 CNN 模型应用测试流水线作业](#11252-cnn-模型应用测试流水线作业)
+  - [附录A. PostgreSQL 常用命令](#附录a-postgresql-常用命令)
+    - [A.1 登录数据库](#a1-登录数据库)
+    - [A.2 更新数据库管理员 postgres 密码](#a2-更新数据库管理员-postgres-密码)
+    - [A.3 用户（角色）与数据库操作](#a3-用户角色与数据库操作)
+    - [A.4 psql 常用的元命令](#a4-psql-常用的元命令)
+  - [参考链接](#参考链接)
 
 ## 0. Lab 环境架构与实现
 
@@ -235,12 +242,12 @@ total 8.0K
 ### 5.2 部署 GitLab-CE 容器
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ sh scm-artifact/deploy-prep.sh
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run scm-artifact/deploy-prep.yml
 # 部署容器前准备
 ## 可选命令：$ ansible-playbook --list-tags <playbook_name>.yml  #列举 playbook 中的 tag
 [devops@workstation jenkins-ci-plt]$ podman login utility.lab.example.com  #login: admin/redhat
 [devops@workstation jenkins-ci-plt]$ podman pull utility.lab.example.com/ansible-automation-platform-22/ee-supported-rhel8:latest
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run scm-artifact/prep-scm-nexus3.yml --tag gitlab-ce
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run scm-artifact/prep-scm-nexus3.yml --tags gitlab-ce
 # 部署 gitlab-ce 容器（容器启动需 7~8 分钟），容器状态将从 starting -> unhealthy -> healthy。
 ```
 
@@ -263,7 +270,7 @@ total 8.0K
 
 <center><img src="images/gitlab-create-new-project-3.png" style="width:80%"></center>
 
-💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+💥 注意：忽略上图中对 README.md 文件的勾选，此处不选择创建此文件。
 
 #### 5.5.2 导入 etherpad-lite-postgres 外部代码库
 
@@ -358,7 +365,7 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 Branch 'develop' set up to track remote branch 'develop' from 'origin'.
 Branch 'master' set up to track remote branch 'master' from 'origin'.
 
-[devops@workstation etherpad-lite-postgres]$ git push origin --tags  #推送本地 tag 至远程代码库
+[devops@workstation etherpad-lite-postgres]$ git push origin --tagss  #推送本地 tag 至远程代码库
 Enumerating objects: 60, done.
 Counting objects: 100% (60/60), done.
 Delta compression using up to 8 threads
@@ -399,7 +406,7 @@ To gitlab-ce.lab.example.com:devuser0/etherpad-lite-postgres.git
 
 <center><img src="images/gitlab-create-cnn-demo-3.png" style="width:80%"></center>
 
-💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+💥 注意：忽略上图中对 README.md 文件的勾选，此处不选择创建此文件。
 
 #### 5.6.2 导入 cnn_mnist_train 外部代码库
 
@@ -465,7 +472,7 @@ To gitlab-ce.lab.example.com:devuser0/cnn_mnist_train.git
 
 <center><img src="images/gitlab-create-java-demo-3.png" style="width:80%"></center>
 
-💥 上图中，如果源代码目录中已有 README 文件，可不选择创建此文件。
+💥 注意：忽略上图中对 README.md 文件的勾选，此处不选择创建此文件。
 
 #### 5.7.2 导入 spring-boot-helloworld 外部代码库
 
@@ -490,7 +497,7 @@ remote: Resolving deltas: 100% (55/55), done.
 To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
  * [new branch]      main -> main
 Branch 'main' set up to track remote branch 'main' from 'origin'.
-[devops@workstation spring-boot-helloworld]$ git push origin --tags  #推送本地 tag 至远程代码库
+[devops@workstation spring-boot-helloworld]$ git push origin --tagss  #推送本地 tag 至远程代码库
 Enumerating objects: 1, done.
 Counting objects: 100% (1/1), done.
 Writing objects: 100% (1/1), 155 bytes | 155.00 KiB/s, done.
@@ -555,7 +562,9 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
         </distributionManagement>                
         <!-- edited by hualongfeiyyy@163.com -->
 
-[devops@workstation spring-boot-helloworld]$ git .
+### 💥 注意：以上修改的 pom.xml 文件可参考 `jenkins-ci-plt/files` 目录中的 pom.xml.bak，此文件即为修改后的文件备份。
+
+[devops@workstation spring-boot-helloworld]$ git add .
 [devops@workstation spring-boot-helloworld]$ git commit -m "Update nexus3 group repo info"
 [main 86758fa] Update nexus3 group repo info
  2 files changed, 90 insertions(+), 5 deletions(-)
@@ -582,7 +591,7 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
 ### 6.1 部署 Nexus3 容器
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run scm-artifact/prep-scm-nexus3.yml --tag nexus3
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run scm-artifact/prep-scm-nexus3.yml --tags nexus3
 # 部署 nexus3 容器（容器启动需 2~3 分钟）
 ```
 
@@ -601,21 +610,30 @@ To gitlab-ce.lab.example.com:devuser0/spring-boot-helloworld.git
 
 ### 7.1 Node.js 运行环境
 
-Jenkins Master与 Agent使用 Node.js 管理工具构建与管理模块与应用，因此，各节点需安装 node 运行环境、npm 与 pnpm 工具，可参考以下步骤：
+Jenkins Master 与 Agent 使用 Node.js 管理工具构建与管理模块与应用，因此，各节点需安装 node 运行环境、npm 与 pnpm 工具，可参考以下步骤：
 
 ```bash
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-nodejs-env.yml
 ```
 
-### 7.2 Maven 构建环境
+### 7.2 TensorFlow 框架运行环境
 
-Jenkins Master与 Agent使用 Maven 构建与管理 Java 项目，因此，各节点需安装 maven。此处不使用 Jenkins Dashboard 中 "全局工具" 提供的 maven 安装方式，而是直接使用以下 playbook 安装与设置 maven，以及同步 maven 的 settings.xml 配置文件，以满足 maven-proxy 私服的认证连接，此私服可缓存来自外部仓库的各个 jar 包，方便后续应用构建使用。
+Jenkins Master 或 Agent（jenkins-agent1 节点，即 serverc 节点）完成 CNN 模型的训练，因此，需要在这些节点上部署 TensorFlow 环境，可参考如下方式：
 
 ```bash
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-tf-runtime.yml
+```
+
+### 7.3 Maven 构建环境
+
+Jenkins Master 与 Agent 使用 Maven 构建与管理 Java 项目，因此，各节点需安装 maven。此处不使用 Jenkins Dashboard 中 "全局工具" 提供的 maven 安装方式，而是直接使用以下 playbook 安装与设置 maven，以及同步 maven 的 settings.xml 配置文件，以满足 maven-proxy 私服的认证连接，此私服可缓存来自外部仓库的各个 jar 包，方便后续应用构建使用。
+
+```bash
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tags base_config  #部署 Maven 依赖的 JDK 环境
 [devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/prep-maven-env.yml
 ```
 
-### 7.3 使用 spring-boot 应用测试 maven (group) 类型构件库
+### 7.4 使用 spring-boot 应用测试 maven (group) 类型构件库
 
 可选择一个 Jenkins Agent（serverb 节点为例）克隆应用代码并使用 maven 测试，如下所示：
 
@@ -844,7 +862,7 @@ hello word
 
 
 ### 打开其他节点访问测试
-[devops@workstation ~]$ curl http://serverc.lab.example.com:8080
+[devops@workstation ~]$ curl http://serverb.lab.example.com:8080; echo
 Hello Spring Boot 2.0!
 ```
 
@@ -864,7 +882,7 @@ ALTER ROLE
 [postgres@serverd ~]$ exit
 logout
 
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tag allow_local
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tags allow_local
 # 数据库服务器 postgres 管理员密码设置完成后，配置以密码认证方式本地连接数据库。
 ```
 
@@ -873,19 +891,19 @@ logout
 构建的 etherpad-lite 应用可通过源代码中的 settings.json 文件定义的数据库服务器对接。因此，此处创建相关用户与数据库，如下所示：
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tag create_user_db
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-user.yml --tags create_user_db
 ```
 
 如果用户创建或数据库创建失败或报错，可执行以下命令回退：
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-db.yml --tag revoke_user_db
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run build-env/setup-postgres-user.yml --tags revoke_user_db
 ```
 
 ## 9. 部署 Jenkins Master 服务
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tag master_config
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tags master_config
 # 部署 Jenkins Master服务
 ```
 
@@ -986,7 +1004,7 @@ devops@gitlab-ce.lab.example.com: Permission denied (publickey).
 
 ```bash
 [devops@servera ~]$ sudo su -
-[root@servera ~]# loginctl enable-linger 977  #jenkins 的 UID
+[root@servera ~]# loginctl enable-linger $(id -u jenkins)  #jenkins 的 UID
 [root@servera ~]# vim /etc/subuid
 devops:100000:65536
 jenkins:165536:65536
@@ -1109,6 +1127,16 @@ fi
 
 <center><img src="images/jenkins-create-freestyle-job-nodejs-8.png" style="width:80%"></center>
 
+#### 10.1.7 部署测试应用
+
+```bash
+[kiosk@foundation0 ~]$ podman pull nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+[kiosk@foundation0 ~]$ podman run -d --name=etherpad-lite-postgres -p 9001:9001 nexus3.lab.example.com:8882/etherpad-lite-postgres:v1.0
+[kiosk@foundation0 ~]$ podman ps  #查看容器是否正确运行
+```
+
+在 foundation0 节点上打开 Chrome 浏览器，访问 `http://172.25.254.250:9001` 地址，确认是否可访问 Etherpad-Lite 应用。
+
 ### 10.2 Python 应用 —— 训练 CNN 模型、构建 app-tf-flask 应用及推理容器镜像
 
 > ✍ 容器镜像说明：tf-flask 为构建用镜像（包含 TensorFlow 等深度学习框架）、app-tf-flask 为推理容器镜像（包含 TensorFlow、Flask 等框架）
@@ -1125,6 +1153,8 @@ fi
 ```
 
 #### 10.2.2 安装 AnsiColor 插件
+
+> 注意：此步骤为可选步骤，未必一定要安装此插件。
 
 在后续的 CNN 模型训练过程中，Blue Ocean 界面无法以 ANSI 形式进度条的方式显示，因此先预安装 `AnsiColor` 插件支持此功能。安装方法可参考 `10.1.2` 的方式。
 
@@ -1197,6 +1227,16 @@ fi
 
 如上图所示，Nexus3 中已存储推送的 app-tf-flask 容器镜像。
 
+#### 10.2.4 部署测试应用
+
+```bash
+[kiosk@foundation0 ~]$ podman pull nexus3.lab.example.com:8882/app-tf-flask:v1.0
+[kiosk@foundation0 ~]$ podman run -d --name=app-tf-flask -p 5000:5000 nexus3.lab.example.com:8882/app-tf-flask:v1.0
+[kiosk@foundation0 ~]$ podman ps  #查看容器是否正确运行
+```
+
+在 foundation0 节点上打开 Chrome 浏览器，访问 `http://172.25.254.250:5000` 地址，确认是否可访问 CNN 应用，可在 Web 手写板中写入任意 0~9 数字测试模型推理能力。
+
 ### 10.3 Java 应用 —— 构建测试 spring-boot 应用及容器镜像
 
 #### 10.3.1 推送 openjdk-17 构建用容器镜像
@@ -1257,7 +1297,7 @@ WORKDIR /app
 
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "/opt/openjdk-17/bin/java -jar spring-boot-helloworld-0.9.6-SNAPSHOT.jar --server.port=80]
+ENTRYPOINT ["sh", "-c", "/opt/openjdk-17/bin/java -jar spring-boot-helloworld-0.9.6-SNAPSHOT.jar --server.port=80"]
 EOF
 
 echo -e "\n---> Login and pull base image..."
@@ -1290,6 +1330,16 @@ fi
 <center><img src="images/jenkins-create-freestyle-job-spring-boot-8.png" style="width:80%"></center>
 
 如上图所示，spring boot 应用构建测试完成，并将构建的应用镜像已推送至 Nexus3 中。
+
+#### 10.3.3 部署测试应用
+
+```bash
+[kiosk@foundation0 ~]$ podman pull nexus3.lab.example.com:8882/spring-boot-app:v1.0
+[kiosk@foundation0 ~]$ podman run -d --name=spring-boot-app -p 8080:80 nexus3.lab.example.com:8882/spring-boot-app:v1.0
+[kiosk@foundation0 ~]$ podman ps  #查看容器是否正确运行
+```
+
+在 foundation0 节点上打开 Chrome 浏览器，访问 `http://172.25.254.250:8080` 地址，确认是否可访问应用。
 
 ## 11. 设置 Jenkins 分布式构建环境
 
@@ -1490,7 +1540,7 @@ pipeline {
 在 SSH Agent 节点上需存在 jenkins 用户以及对应的 `$HOME/.ssh/` 目录，用于存储 Master 节点 SSH 使用密钥登录的公钥。如下所示：
 
 ```bash
-[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tag agent_config
+[devops@workstation jenkins-ci-plt]$ ansible-navigator run jenkins/setup-jkn-arch.yml --tags agent_config
 # SSH Agent 节点上创建 jenkins 用户，并设置 SSH 相关目录及权限。
 ```
 
