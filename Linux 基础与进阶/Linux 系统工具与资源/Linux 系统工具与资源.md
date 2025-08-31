@@ -1,8 +1,8 @@
-# 🛠 Linux 系统工具与资源
+# 🛠 Linux 与 Windows 系统工具与资源
 
 ## 文档目录
 
-- [🛠 Linux 系统工具与资源](#-linux-系统工具与资源)
+- [🛠 Linux 与 Windows 系统工具与资源](#-linux-与-windows-系统工具与资源)
   - [文档目录](#文档目录)
   - [1. 常用公共服务器](#1-常用公共服务器)
     - [1.1 镜像站点](#11-镜像站点)
@@ -11,80 +11,86 @@
     - [1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别](#14-utc-时间gmt-时间est-时间cst-时间的区别)
   - [2. 常用 DOS 命令](#2-常用-dos-命令)
   - [3. Shell 脚本补充](#3-shell-脚本补充)
+  - [3.1 用户登录时加载 bash 配置文件的过程](#31-用户登录时加载-bash-配置文件的过程)
+  - [3.2 关于重定向说明](#32-关于重定向说明)
+  - [3.3 Shell 内部字段分隔符（Internal Field Separator）](#33-shell-内部字段分隔符internal-field-separator)
+  - [3.4 Shell 脚本多行注释](#34-shell-脚本多行注释)
+  - [3.5 设置自定义 `PS1` 交互式命令提示符](#35-设置自定义-ps1-交互式命令提示符)
+  - [3.6 Bash 常用命令汇总](#36-bash-常用命令汇总)
   - [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
   - [5. grep 常用命令示例](#5-grep-常用命令示例)
   - [6. Markdown 语法配置](#6-markdown-语法配置)
-  - [7. VSCode 常用 Settings 参数](#7-vscode-常用-settings-参数)
+  - [7. VSCode 常用 Settings 参数与插件](#7-vscode-常用-settings-参数与插件)
   - [8. Chrome 扩展安装与使用](#8-chrome-扩展安装与使用)
     - [8.1 更改 GitHub 页面 logo](#81-更改-github-页面-logo)
     - [8.2 更改 GitHub 默认的代码字体](#82-更改-github-默认的代码字体)
   - [9. Tabby 自定义 CSS](#9-tabby-自定义-css)
-  - [10. Linux 实用命令示例](#10-linux-实用命令示例)
-  - [11. 安装与设置外部软件](#11-安装与设置外部软件)
-    - [11.1 安装 qpdf 并解密 PDF 文件](#111-安装-qpdf-并解密-pdf-文件)
-    - [11.2 RHEL 7/8 安装 exfat 驱动](#112-rhel-78-安装-exfat-驱动)
-    - [11.3 安装 xfce4-terminal 软件包](#113-安装-xfce4-terminal-软件包)
-    - [11.4 RHEL8/9 安装 openvpn-gnome 客户端](#114-rhel89-安装-openvpn-gnome-客户端)
-    - [11.5 RHEL8 安装 Google Chrome](#115-rhel8-安装-google-chrome)
-    - [11.6 RHEL9 安装 Google Chrome](#116-rhel9-安装-google-chrome)
-    - [11.7 RHEL8 安装 VScode](#117-rhel8-安装-vscode)
-    - [11.8 RHEL9 安装 VScode](#118-rhel9-安装-vscode)
-    - [11.9 RHEL9 安装 EPEL9 软件源](#119-rhel9-安装-epel9-软件源)
-    - [11.10 RHEL 安装中文输入法支持](#1110-rhel-安装中文输入法支持)
-    - [11.11 安装 rdesktop 软件包连接 Windows RDP 桌面](#1111-安装-rdesktop-软件包连接-windows-rdp-桌面)
-    - [11.12 RHEL9 安装 ToDesk](#1112-rhel9-安装-todesk)
-    - [11.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1113-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
-      - [11.13.1 安装与设置 x11vnc 虚拟桌面](#11131-安装与设置-x11vnc-虚拟桌面)
-      - [11.13.2 MobaXterm 的连接访问](#11132-mobaxterm-的连接访问)
-  - [12. dnf 下载软件包及其依赖](#12-dnf-下载软件包及其依赖)
-  - [13. dnf 实现软件包安全检测与更新](#13-dnf-实现软件包安全检测与更新)
-  - [14. RedHat 订阅服务使用](#14-redhat-订阅服务使用)
+  - [10. 安装与设置外部软件](#10-安装与设置外部软件)
+    - [10.1 安装 qpdf 并解密 PDF 文件](#101-安装-qpdf-并解密-pdf-文件)
+    - [10.2 RHEL 7/8 安装 exfat 驱动](#102-rhel-78-安装-exfat-驱动)
+    - [10.3 安装 xfce4-terminal 软件包](#103-安装-xfce4-terminal-软件包)
+    - [10.4 RHEL8/9 安装 openvpn-gnome 客户端](#104-rhel89-安装-openvpn-gnome-客户端)
+    - [10.5 RHEL8 安装 Google Chrome](#105-rhel8-安装-google-chrome)
+    - [10.6 RHEL9 安装 Google Chrome](#106-rhel9-安装-google-chrome)
+    - [10.7 RHEL8 安装 VScode](#107-rhel8-安装-vscode)
+    - [10.8 RHEL9 安装 VScode](#108-rhel9-安装-vscode)
+    - [10.9 RHEL9 安装 EPEL9 软件源](#109-rhel9-安装-epel9-软件源)
+    - [10.10 RHEL 安装中文输入法支持](#1010-rhel-安装中文输入法支持)
+    - [10.11 安装 rdesktop 软件包连接 Windows RDP 桌面](#1011-安装-rdesktop-软件包连接-windows-rdp-桌面)
+    - [10.12 RHEL9 安装 ToDesk](#1012-rhel9-安装-todesk)
+    - [10.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1013-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
+      - [10.13.1 安装与设置 x11vnc 虚拟桌面](#10131-安装与设置-x11vnc-虚拟桌面)
+      - [10.13.2 MobaXterm 的连接访问](#10132-mobaxterm-的连接访问)
+  - [11. dnf 下载软件包及其依赖](#11-dnf-下载软件包及其依赖)
+  - [12. dnf 实现软件包安全检测与更新](#12-dnf-实现软件包安全检测与更新)
+  - [13. RedHat 订阅服务使用](#13-redhat-订阅服务使用)
+  - [14. 如何在 Windows 11 家庭版中禁用 Hyper-V？](#14-如何在-windows-11-家庭版中禁用-hyper-v)
   - [15. 参考链接](#15-参考链接)
 
 ## 1. 常用公共服务器
 
 ### 1.1 镜像站点
 
-```bash
-https://developer.aliyun.com/mirror/  阿里云
-```
+| 站点 | 描述 |
+| ----- | ----- |
+| https://developer.aliyun.com/mirror/ | 阿里云 |
 
 ### 1.2 NTP 时间同步服务器
 
-```bash
-www.pool.ntp.org/zone/cn  最常见、熟知
-cn.pool.ntp.org           最常用的国内 NTP 时间服务器
-cn.ntp.org.cn             中国
-edu.ntp.org.cn            中国教育网
-ntp1.aliyun.com           阿里云
+| 站点 | 描述 |
+| ----- | ----- |
+| www.pool.ntp.org/zone/cn | 最常见、熟知 |
+| cn.pool.ntp.org | 最常用的国内 NTP 时间服务器 |
+| cn.ntp.org.cn | 中国 |
+| edu.ntp.org.cn | 中国教育网 |
+| ntp1.aliyun.com | 阿里云 |
+| time1-7.aliyun.com | 阿里云 NTP 服务器 |
+| ntp.sjtu.edu.cn | 202.120.2.101（上海交通大学网络中心 NTP 服务器地址）|
+| s1a.time.edu.cn | 北京邮电大学 |
+| s1b.time.edu.cn | 清华大学 |
+| s1c.time.edu.cn | 北京大学 |
+| s2m.time.edu.cn | 北京大学 |
+| s1d.time.edu.cn | 东南大学 |
+| s1e.time.edu.cn | 清华大学 |
+| s2a.time.edu.cn | 清华大学 |
+| s2b.time.edu.cn | 清华大学 |
+| s2c.time.edu.cn | 北京邮电大学 |
+| s2d.time.edu.cn | 西南地区网络中心 |
+| s2e.time.edu.cn | 西北地区网络中心 |
+| s2f.time.edu.cn | 东北地区网络中心 |
+| s2g.time.edu.cn | 华东南地区网络中心 |
+| s2h.time.edu.cn | 四川大学网络管理中心 | 
+| s2j.time.edu.cn | 大连理工大学网络中心 |
+| s2k.time.edu.cn | CERNET 桂林主节点 |
 
-time1-7.aliyun.com  阿里云 NTP 服务器
-ntp.sjtu.edu.cn     202.120.2.101（上海交通大学网络中心 NTP 服务器地址）
-s1a.time.edu.cn     北京邮电大学
-s1b.time.edu.cn     清华大学
-s1c.time.edu.cn     北京大学
-s1d.time.edu.cn     东南大学
-s1e.time.edu.cn     清华大学
-s2a.time.edu.cn     清华大学
-s2b.time.edu.cn     清华大学
-s2c.time.edu.cn     北京邮电大学
-s2d.time.edu.cn     西南地区网络中心
-s2e.time.edu.cn     西北地区网络中心
-s2f.time.edu.cn     东北地区网络中心
-s2g.time.edu.cn     华东南地区网络中心
-s2h.time.edu.cn     四川大学网络管理中心
-s2j.time.edu.cn     大连理工大学网络中心
-s2k.time.edu.cn     CERNET桂林主节点
-s2m.time.edu.cn     北京大学
-```
 
 ### 1.3 DNS 名称服务器
 
-```bash
-223.5.5.5              阿里云
-223.6.6.6              阿里云
-http://www.alidns.com  阿里云
-```
+| 站点 | 描述 |
+| ----- | ----- |
+| 223.5.5.5 | 阿里云 |
+| 223.6.6.6 | 阿里云 |
+| http://www.alidns.com | 阿里云 |
 
 ### 1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别
 
@@ -96,91 +102,150 @@ http://www.alidns.com  阿里云
 ## 2. 常用 DOS 命令
 
 ```powershell
-dos> cls
+> cls
 # 清除终端信息
 
-dos> winver
+> winver
 # 查看 Windows 详细版本信息
 
-dos> systeminfo
+> systeminfo
 # 查看系统详细信息
 
-dos> chcp 437
+> chcp 437
 # 更改终端字符集为 437 编码模式
 
-dos> mv <filename> <directory>
+> mv <filename> <directory>
 # dos 命令行中的文件名可使用通配符与中文字符
 # dos 命令行中显示乱码依然为中文（编码模式不同而导致）
 
-dos> netsh advfirewall firewall show rule name=accepted_icmpv4
-dos> netsh advfirewall firewall show rule name=accepted_ssh
+> netsh advfirewall firewall show rule name=accepted_icmpv4
+> netsh advfirewall firewall show rule name=accepted_ssh
 # 查看 Windows 的 ICMPv4 与 SSH 协议规则
 
-dos> route print
+> route print
 # 查看 Windows 的路由表信息
 ```
 
 ## 3. Shell 脚本补充
 
-- 用户登录时加载 bash 配置文件的过程：
-  - 登录式 shell（login shell）加载配置文件过程：
+## 3.1 用户登录时加载 bash 配置文件的过程
 
-    ```plaintext
-    /etc/profile --> /etc/profile.d/*.sh --> ~/.bash_profile --> ~/.bashrc --> /etc/bashrc
-    ```
+- 登录式 shell（login shell）加载配置文件过程：
 
-  - 非登录式 shell（non-login shell）加载配置文件过程：
+  ```mermaid
+  graph LR
+    A(["/etc/profile"]) --> B(["/etc/profile.d/*.sh"])
+    B --> C(["~/.bash_profile"])
+    C --> D(["~/.bashrc"])
+    D --> E(["/etc/bashrc"])
+  ```
 
-    ```plaintext
-    ~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh
-    ```
+- 非登录式 shell（non-login shell）加载配置文件过程：
 
-- 关于重定向说明：
-  - `<`：输出重定向（将原来需要由键盘输入的数据，改由文件内容来取代）
+  ```mermaid
+  graph LR
+    A(["~/.bashrc"]) --> B(["/etc/bashrc"])
+    B --> C(["/etc/profile.d/*.sh"])
+  ```
+
+## 3.2 关于重定向说明
+
+- `<`：输出重定向（将原来需要由键盘输入的数据，改由文件内容来取代）
 
   ```bash
   tr 'a-z' 'A-Z' < /path/to/file
   ```
 
-  - `<<`：代表结束的输入字符
+- `<<`：代表结束的输入字符
 
   ```bash
-  cat << END
-  cat > /path/to/file << EOF
+  cat <<END
+  cat > /path/to/file <<EOF
+  cat <<EOF > /path/to/file
   ```
 
-- Shell 内部字段分隔符（Internal Field Separator）：`IFS`
-  - IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
-  - 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
-  - ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`。
-- Shell 脚本多行注释：
-  使用 `:<<!` 或 `:<<EOF` 与 `!` 或 `EOF` 注释代码块
-- 设置自定义 `PS1` 交互式命令提示符：
-  
-  ```bash
-  $ vim ~/.bashrc
-    export COURSE_ID=$(grep COURSE /etc/rht | awk -F'=' '{print $2}' | tr '[a-z]' '[A-Z]')
-    export PS1="(${COURSE_ID})\033[1;36m[\u@\h\033[0m \033[1;33m\W\033[0m\033[1;36m]$ \033[0m"
-  ```
+## 3.3 Shell 内部字段分隔符（Internal Field Separator）
 
-- bash 常用命令汇总：
-  
-  ```bash
-  $ sh -x /path/to/<shell_script>
-  # 跟踪 shell 脚本执行过程      
-  
-  $ sh -n /path/to/<shell_script>
-  # 检查 shell 语法
+- 字段分隔符为 `IFS`
+- IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
+- 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
+- ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`。
 
-  $ set -C
-  # 禁止对已经存在文件使用覆盖重定向（>）；强制覆盖重定向，则使用 >|。
-  $ echo "Hello world!" > ./testfile
-  # 设置以上命令后，执行覆盖重定向操作将返回 "cannot overwrite existing file" 报错。
-  $ echo "Hello world!" >| ./testfile
-  # 强制重定向覆盖
-  $ set +C
-  # 关闭上述功能
-  ```
+## 3.4 Shell 脚本多行注释
+
+使用 `:<<!` 或 `:<<EOF` 与 `!` 或 `EOF` 注释代码块
+
+## 3.5 设置自定义 `PS1` 交互式命令提示符
+  
+```bash
+$ vim ~/.bashrc
+  export COURSE_ID=$(grep COURSE /etc/rht | awk -F'=' '{print $2}' | tr '[a-z]' '[A-Z]')
+  export PS1="(${COURSE_ID})\033[1;36m[\u@\h\033[0m \033[1;33m\W\033[0m\033[1;36m]$ \033[0m"
+```
+
+## 3.6 Bash 常用命令汇总
+  
+```bash
+$ echo "<password>" | sudo -S <username>
+# 命令行明文传递密码，sudo 直接为指定用户提权。
+
+### 重要的配置文件使用 ###
+$ sudo vim /etc/profile
+  echo "##### Welcome to login workstation.lab.example.com! #####"
+  export HISTSIZE=500
+  # 配置历史命令最多显示条数
+  export HISTTIMEFORMAT="%F %T "
+  # 配置历史命令时间的显示格式
+  export TMOUT=1800
+  # 配置所有用户登陆超时时间。若用户无任何操作，在配置的时间后将自动登出系统，单位为秒（s）。
+  # 该超时时间也用于 SSH 远程登陆，若远程连接没有任何操作，在配置的时间后将自动登出。
+
+$ echo "export TMOUT=1800" >> $HOME/.bash_profile
+# 配置相关用户登陆系统的超时时间
+# 避免自动登出系统的解决方法：
+#   $ unset TMOUT  # 取消登陆超时时间
+#   $ read         # read 命令搭配 TMOUT 一起使用，使 read 等待无限长时间。
+
+$ sudo vim /etc/nologin.txt    
+# 使用 /sbin/nologin 作为登陆 shell 而无法登陆系统
+# 若使用该用户登陆时，系统显示的自定义说明文件。
+
+$ sudo vim /etc/nologin
+# pam_nologin.so 的配置文件
+# 该配置文件内的用户将被拒绝登录系统（本地或远程登录），每个用户占一行。
+
+$ sudo cat /etc/securetty
+# pam_securetty.so 的配置文件
+# telnet 远程登录时，限制 root 的登录终端类型。
+# 包括：本地控制台（console）、本地终端（ttyX）、远程虚拟终端（pts/X）
+
+### bash 的行为 ###
+$ sh -x /path/to/<shell_script>
+# 跟踪 shell 脚本执行过程      
+  
+$ sh -n /path/to/<shell_script>
+# 检查 shell 语法
+
+$ set -C
+# 禁止对已经存在文件使用覆盖重定向（>）；强制覆盖重定向，则使用 >|。
+$ echo "Hello world!" > ./testfile
+# 设置以上命令后，执行覆盖重定向操作将返回 "cannot overwrite existing file" 报错。
+$ echo "Hello world!" >| ./testfile
+# 强制重定向覆盖
+$ set +C
+# 关闭上述功能
+
+### systemctl 命令选项 ###
+$ sudo systemctl status -l --no-pager <unit_name>.service
+# -l, --full 选项：完全显示单元文件的所有内容
+# --no-pager 选项：不截断输出，在整页中显示结果。
+# 注意：相关的 systemd 环境变量如下所示，
+#   $SYSTEMD_PAGER
+#          Pager to use when --no-pager is not given; overrides $PAGER. If neither $SYSTEMD_PAGER nor $PAGER are set,
+#          a set of well-known pager implementations are tried in turn, including less(1) and more(1), until one is
+#          found. If no pager implementation is discovered no pager is invoked. Setting this environment variable to
+#          an empty string or the value "cat" is equivalent to passing --no-pager.
+```
 
 ## 4. oh-my-bash 终端字体（fonts）的安装
 
@@ -278,7 +343,9 @@ $ grep "pattern" /path/to/file | xargs command
 | 删除文本（添加中横线）| `~~文本内容~~` | ~~文本内容~~ |
 | 图片居中显示 | `<center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center>` | <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center> |
 
-## 7. VSCode 常用 Settings 参数
+## 7. VSCode 常用 Settings 参数与插件
+
+- 常用参数：
 
 ```bash
 Render Line Highlight: none
@@ -290,6 +357,15 @@ Match Brackets: never
 Cursor Style: block
 # 设置光标的输入形式为 block
 ```
+
+- 常用插件：
+  - Dracula Theme Official：Dracula 配色方案
+  - Markdown Preview Mermaid Support：支持 UML 时序图预览
+  - Markdown All in One：支持 Markdown 语法格式
+    - `ctrl + shift + p`：自动生成 markdown 文件目录结构 
+  - markdownlint：Markdown 语法检查
+  - vscode-pdf：支持 PDF 文件预览
+  - YAML：支持 yaml 格式语法
 
 ## 8. Chrome 扩展安装与使用
 
@@ -340,47 +416,9 @@ Cursor Style: block
 }
 ```
 
-## 10. Linux 实用命令示例
+## 10. 安装与设置外部软件
 
-```bash
-$ echo "<password>" | sudo -S <username>
-# 命令行明文传递密码，sudo 直接为指定用户提权。
-
-$ sudo vim /etc/profile
-  echo "##### Welcome to login workstation.lab.example.com! #####"
-  export HISTSIZE=500
-  # 配置历史命令最多显示条数
-  export HISTTIMEFORMAT="%F %T "
-  # 配置历史命令时间的显示格式
-  export TMOUT=1800
-  # 配置所有用户登陆超时时间。若用户无任何操作，在配置的时间后将自动登出系统，单位为秒（s）。
-  # 该超时时间也用于 SSH 远程登陆，若远程连接没有任何操作，在配置的时间后将自动登出。
-$ sudo source /etc/profile
-# 直接写入 /etc/profile 中，并 source，即可实现自定义。
-
-$ echo "export TMOUT=1800" >> $HOME/.bash_profile
-# 配置相关用户登陆系统的超时时间
-# 避免自动登出系统的解决方法：
-#   $ unset TMOUT  # 取消登陆超时时间
-#   $ read         # read 命令搭配 TMOUT 一起使用，使 read 等待无限长时间。
-
-$ sudo vim /etc/nologin.txt    
-# 使用 /sbin/nologin 作为登陆 shell 而无法登陆系统
-# 若使用该用户登陆时，系统显示的自定义说明文件。
-
-$ sudo vim /etc/nologin
-# pam_nologin.so 的配置文件
-# 该配置文件内的用户将被拒绝登录系统（本地或远程登录），每个用户占一行。
-
-$ sudo cat /etc/securetty        
-# pam_securetty.so 的配置文件
-# telnet 远程登录时，限制 root 的登录终端类型。
-# 包括：本地控制台（console）、本地终端（ttyX）、远程虚拟终端（pts/X）
-```
-
-## 11. 安装与设置外部软件
-
-### 11.1 安装 qpdf 并解密 PDF 文件
+### 10.1 安装 qpdf 并解密 PDF 文件
 
 ```bash
 $ sudo yum install -y qpdf
@@ -389,7 +427,7 @@ $ sudo qpdf --password=<password> \
 # 指定加密的 PDF 文件的密码解密 PDF 文件
 ```
 
-### 11.2 RHEL 7/8 安装 exfat 驱动
+### 10.2 RHEL 7/8 安装 exfat 驱动
 
 ```bash
 $ sudo yum install -y epel-release
@@ -406,14 +444,14 @@ $ sudo mount.exfat /dev/sdX <mountpoint>
 #      $ sudo yum --enablerepo=nux-desktop install -y <package>
 ```
 
-### 11.3 安装 xfce4-terminal 软件包
+### 10.3 安装 xfce4-terminal 软件包
 
 ```bash
 $ sudo dnf install -y xfce4-terminal
 # 该软件包可设置终端背景图片及透明度
 ```
 
-### 11.4 RHEL8/9 安装 openvpn-gnome 客户端
+### 10.4 RHEL8/9 安装 openvpn-gnome 客户端
 
 ```bash
 $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
@@ -424,7 +462,7 @@ $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
   redhat-internal-NetworkManager-openvpn-profiles-0.1-61.el7.noarch.rpm
 ```
 
-### 11.5 RHEL8 安装 Google Chrome
+### 10.5 RHEL8 安装 Google Chrome
 
 ```bash
 $ sudo vim /etc/yum.repos.d/google-chrome.repo
@@ -438,13 +476,13 @@ gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 $ sudo dnf install -y google-chrome-stable
 ```
 
-### 11.6 RHEL9 安装 Google Chrome
+### 10.6 RHEL9 安装 Google Chrome
 
 ```bash
 $ sudo dnf install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 ```
 
-### 11.7 RHEL8 安装 VScode
+### 10.7 RHEL8 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -460,7 +498,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### 11.8 RHEL9 安装 VScode
+### 10.8 RHEL9 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -476,7 +514,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### 11.9 RHEL9 安装 EPEL9 软件源
+### 10.9 RHEL9 安装 EPEL9 软件源
 
 ```bash
 $ sudo dnf config-manager \
@@ -490,7 +528,7 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 # 安装 epel9 软件包
 ```
 
-### 11.10 RHEL 安装中文输入法支持
+### 10.10 RHEL 安装中文输入法支持
 
 以下输入法引擎（IME）可以从 RHEL 中列出的软件包中获得：
 
@@ -511,7 +549,7 @@ $ sudo dnf install -y langpacks-zh_CN.noarch ibus-libpinyin
 
 如上图所示，在 Settings > Keyboard > Input Sources 中添加 `Chinese (Intelligent Pinyin)` 即可完成设置。
 
-### 11.11 安装 rdesktop 软件包连接 Windows RDP 桌面
+### 10.11 安装 rdesktop 软件包连接 Windows RDP 桌面
 
 ```bash
 $ sudo dnf install -y rdesktop
@@ -520,7 +558,7 @@ $ rdesktop -u hwuser88 -d bestvdc -p Ansible2024! redhat.bestvdc.com:23353
 # 登录 Cloudshell bestvdc desktop
 ```
 
-### 11.12 RHEL9 安装 ToDesk
+### 10.12 RHEL9 安装 ToDesk
 
 ```bash
 $ wget https://rh-course-materials.oss-cn-hangzhou.aliyuncs.com/todesk-v4.7.2.0-x86_64.rpm
@@ -531,9 +569,9 @@ $ sudo systemctl enable --now todeskd.service
 # 启动并设置开机自启服务
 ```
 
-### 11.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
+### 10.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
 
-#### 11.13.1 安装与设置 x11vnc 虚拟桌面
+#### 10.13.1 安装与设置 x11vnc 虚拟桌面
 
 ```bash
 ### 打开一个终端执行 ###
@@ -561,7 +599,7 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 # 确认 x11vnc 监听的端口，用于外部连接的端口确认
 ```
 
-#### 11.13.2 MobaXterm 的连接访问
+#### 10.13.2 MobaXterm 的连接访问
 
 1️⃣ 打开 MobaXterm，点击 Session 创建新会话：
 
@@ -579,7 +617,7 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 
 <center><img src="images/x11vnc-connect-4.jpg" style="width:80%"></center>
 
-## 12. dnf 下载软件包及其依赖
+## 11. dnf 下载软件包及其依赖
 
 ```bash
 $ sudo dnf install --downloadonly \
@@ -592,7 +630,7 @@ $ sudo dnf install --downloadonly \
 # 下载 podman 及其依赖的软件包至目标目录（仅下载不安装）
 ```
 
-## 13. dnf 实现软件包安全检测与更新
+## 12. dnf 实现软件包安全检测与更新
 
 ```bash
 $ sudo dnf --security updateinfo
@@ -617,7 +655,7 @@ $ sudo dnf update --cve CVE-xxxx-xxxx
 # 更新依赖指定 CVE 编号的软件包
 ```
 
-## 14. RedHat 订阅服务使用
+## 13. RedHat 订阅服务使用
 
 ```bash
 $ sudo subscription-manager register [--username=<username>] [--password=<password>]
@@ -635,6 +673,37 @@ $ sudo subscription-manager repos --enable="*"
 $ sudo subscription-manager repos --list-enabled
 # 列举当前系统可用的订阅仓库
 ```
+
+## 14. 如何在 Windows 11 家庭版中禁用 Hyper-V？
+
+- ❓问题：此次需要在 `DELL Precision 3591` 上的 Windows 11 家庭版中运行 VMware 虚拟机，但在启动虚拟机过程中直接返回类似报错 "虚拟机不支持 VT-x 模式"。
+- ✔️ 解决：
+  - 在硬件 BIOS 中已经启用 `VT-x` 虚拟化，宿主机可运行虚拟机，但出现问题中的报错，可判断为宿主机中可能运行着 Hyper-V 组件，需将其禁用才能运行 VMware 拟机（Hyper-V 与 VMware 运行冲突导致）。
+
+  <center><img src="images/win11-default-installed-hyper-v.png" style="width:60%"></center>
+  
+  <center><img src="images/dell-precision-3591-vt.jpg" style="width:60%"></center>
+
+  - `Win + R` 输入 `optionalfeatures` 查看 **启动或关闭 Windows 功能**，此列表中未显示 Hyper-V 相关的功能，需要通过其他方式将其彻底关闭（Windows 11 家庭版中不会显式列出 Hyper-V 组件）。
+  - 以管理员身份运行 PowerShell 关闭虚拟化调度器，执行以下命令：
+  
+    ```powershell
+    > bcdedit /set hypervisorlaunchtype off  #关闭 Hyper-V 功能
+    > bcdedit  #查看是否关闭 Hyper-V
+    Windows 启动加载器
+    -------------------
+    ...
+    hypervisorlaunchtype    Off
+    ```
+
+  - `Win + R` 输入 `windowsdefender:` 查看 **Windows 安全中心**，点击 **设备安全性-转到设置**，在 **内核隔离** 中关闭 **内存完整性**（基于虚拟化的安全性 VBS）。
+
+  <center><img src="images/win11-kernel-isolate.png" style="width:80%"></center>
+
+  - 重启系统使配置生效
+  - 系统重启后，`Win + R` 输入 `msinfo32` 查看，是否与如下信息一致，若一致表示彻底关闭 Hyper-V，可运行 VMware 虚拟机。
+  
+  <center><img src="images/win11-disable-hyperv.png" style="width:50%"></center>
 
 ## 15. 参考链接
 

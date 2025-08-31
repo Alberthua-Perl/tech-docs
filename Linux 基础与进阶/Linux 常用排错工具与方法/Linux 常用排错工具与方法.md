@@ -1,40 +1,45 @@
-# Linux 常用排错工具与方法
+# Linux 常用排错工具与实践方法
 
 ## 文档说明
 
 - 以下示例均在 `RHEL 7/8` 中验证实现，在 RHEL 8 中已更改的内容将特别指出。若针对其他 Linux 发行版请自行测试。
 - 该文档中涉及的命令与参考链接可提供排错思路或依据。
-- 若更深层次的分析与追踪故障原因需配合业务应用代码或 kernel 源码等进一步分析。
+- 若更深层次的分析与追踪故障原因需配合业务应用代码、内核或驱动源码等进一步分析。
 - 该文档将根据所使用的命令持续更新与使用案例。
 
 ## 文档目录
 
-- journalctl 命令使用
-- sosreport 命令使用
-- Performance Co-Pilot (PCP) 组件使用
-- 🔥 MBR 与 GPT 分区中的 GRUB2 再认识
-- systemd 单元文件的依赖性
-- CPU 的个数、核心数、超线程的关系
-- CPU 信息查看
-- dmidecode 命令使用
-- 管理与测试硬件设备
-- 常见物理服务器及硬件示例
-- 管理内核模块与 KVM 虚拟化
-- 🔥 Linux 存储栈故障修复
-- rpm 命令使用
-- yum 或 dnf 命令使用
-- 🔥 基础网络问题调试
-- 内存泄漏与内存溢出
-- 共享库相关命令
-- 🔥 系统调用与库调用
-- strace 与 ltrace 命令使用
+- [Linux 常用排错工具与实践方法](#linux-常用排错工具与实践方法)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [journalctl 命令示例](#journalctl-命令示例)
+  - [sosreport 命令使用](#sosreport-命令使用)
+  - [Performance Co-Pilot (PCP) 组件使用](#performance-co-pilot-pcp-组件使用)
+  - [🔥 MBR 与 GPT 分区中的 GRUB2 再认识](#-mbr-与-gpt-分区中的-grub2-再认识)
+  - [systemd 单元文件的依赖性](#systemd-单元文件的依赖性)
+  - [CPU 的个数、核心数、超线程的关系](#cpu-的个数核心数超线程的关系)
+  - [CPU 信息查看](#cpu-信息查看)
+  - [dmidecode 命令使用](#dmidecode-命令使用)
+  - [管理与测试硬件设备](#管理与测试硬件设备)
+  - [常见物理服务器及硬件示例](#常见物理服务器及硬件示例)
+  - [管理内核模块与 KVM 虚拟化](#管理内核模块与-kvm-虚拟化)
+  - [🔥 Linux 存储栈故障修复](#-linux-存储栈故障修复)
+  - [rpm 命令使用](#rpm-命令使用)
+  - [yum 或 dnf 命令使用](#yum-或-dnf-命令使用)
+  - [🔥 基础网络问题调试](#-基础网络问题调试)
+  - [内存泄漏与内存溢出](#内存泄漏与内存溢出)
+  - [共享库相关命令](#共享库相关命令)
+  - [🔥 系统调用与库调用](#-系统调用与库调用)
+  - [strace 与 ltrace 命令使用](#strace-与-ltrace-命令使用)
+  - [参考链接](#参考链接)
 
-## journalctl 命令使用
+## journalctl 命令示例
 
 ```bash
 $ man 7 systemd.journal-filelds
 # 获取关于 journalctl 命令更加详细的搜索字段
 
+### 系统引导日志 ###
 $ journalctl --list-boots
 # 查看系统重启的次数与信息
 $ journalctl -b <number>
@@ -43,6 +48,7 @@ $ journalctl -b _TRANSPORT=kernel
 $ journalctl -k
 # 以上两个命令均返回上一次系统启动过程中的内核信息，相当于 dmesg 命令输出。
 
+### 内核、设备与服务日志 ###
 $ journalctl [/dev/sdX|/dev/vdX]
 # 查看指定 scsi 磁盘设备或 virtio 磁盘设备的日志信息
 
@@ -51,15 +57,20 @@ $ journalctl -b _SYSTEMD_UNIT=<service_name>.service _PID=<service_pid>
 $ journalctl -u <unit_file_name>
 # 查看 systemd 单元的日志信息
 
-$ journalctl -n <number>
-# 默认显示最后 10 条日志，也可以指定条目数量。
-$ journalctl -ef
-# 实时刷新最新的日志
+$ journalctl [--system|--user]
+# --system 选项：显示来自于系统服务与内核的日志
+# --user 选项：显示当前用户的服务日志
 
+### 日志等级过滤 ###
 $ journalctl -p <priority>
 # 显示 debug、info、notice、warning、err、crit、alert 和 emerg 该级别及其之上的日志。
 $ journalctl -p emerg..err
 # 查看 emerg 到 err 级别的日志信息
+
+$ journalctl -n <number>
+# 默认显示最后 10 条日志，也可以指定条目数量。
+$ journalctl -ef
+# 实时刷新最新的日志
 
 $ journalctl --since today
 # 查看当天的所有日志信息
@@ -74,23 +85,29 @@ $ journalctl -o verbose
 # 显示更加详细的日志信息
 ```
 
-- 参考链接：
+参考链接：
   
-  - [Chapter 10. Troubleshooting problems using log files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_troubleshooting-problems-using-log-files_configuring-basic-system-settings#masthead) 
-  - [Chapter 5. Troubleshooting problems related to SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/troubleshooting-problems-related-to-selinux_using-selinux)
+- [Chapter 10. Troubleshooting problems using log files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_troubleshooting-problems-using-log-files_configuring-basic-system-settings#masthead) 
+- [Chapter 5. Troubleshooting problems related to SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/troubleshooting-problems-related-to-selinux_using-selinux)
 
 ## sosreport 命令使用
 
 ```bash
 $ sosreport -l
 # 列出 SOS 支持的插件与可用的选项
+
 $ sosreport -e <plugin_name>
 # 启用当前禁用的插件
 $ sosreport -n <plugin_name>
 # 禁用当前已启用的插件
+
 $ sosreport -k <plugin_option>
 $ sosreport -k xfs.logprint
-# 使用 xfs.logprint 选项以收集 XFS 文件系统的相关信息 
+# 使用 xfs.logprint 选项以收集 XFS 文件系统的相关信息
+
+###注意：sosreport 命令在新版本中已被 deprecated，而采用 sos report 替换。
+$ sos report --label <label_name> -n <plugin_name> -k <plugin_option>
+# 使用
 ```
 
 ## Performance Co-Pilot (PCP) 组件使用
@@ -141,6 +158,64 @@ $ pmatop
   - 📊 [Chapter 10. Setting up graphical representation of PCP metrics](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-up-graphical-representation-of-pcp-metrics_monitoring-and-managing-system-status-and-performance#doc-wrapper)
   - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 1)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-1)
   - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 2)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-2)
+
+- 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
+  - 1️⃣ 问题1：
+    - pmlogger 启动后只在 `/var/lib/pcp/config/pmlogger/config.default`（pmlogger 自动生成）中预先定义的一组 “默认指标”，并非采集 `pminfo` 命令返回的所有性能指标。
+    - 自定义修改性能指标：
+      - 方式1：
+      
+      ```bash
+      $ sudo egrep '^\s+[a-z]' /var/lib/pcp/config/pmlogger/config.default | sed 's/^\t//'
+      # 过滤 PCP 默认收集的性能指标
+      # 注意：此配置文件可由 pmlogconf 命令更新并覆盖其中的配置，若通过手动方式更新其中自定义的性能指标，那么需注意备份此文件，防止 pmlogconf 命令的配置覆盖。
+
+      $ sudo vim /var/lib/pcp/config/pmlogger/config.default
+      ...
+      log advisory on default {
+        ...
+      }
+      # 在对应组（group）中添加自定义的性能指标
+
+      $ sudo systemctl restart pmlogger.service
+      # 重启 pmlogger 服务
+      ```
+
+      - 👍 方式2（推荐）：
+  
+      ```bash
+      $ sudo vim /var/lib/pcp/config/pmlogger/customized_metrics
+      log advisory on default {
+        mem.numa.util.dirty
+        mem.numa.alloc.hit
+      }
+      # 创建自定义性能指标文件，文件名可自行指定，pmlogger 将只采集此文件中的性能指标。
+
+      $ sudo vim /etc/pcp/pmlogger/control.d/local
+      ...
+      #LOCALHOSTNAME  y   n   PCP_LOG_DIR/pmlogger/LOCALHOSTNAME      -r -T24h10m -c config.default -v 100Mb
+      LOCALHOSTNAME   y   n   PCP_LOG_DIR/pmlogger/LOCALHOSTNAME      -r -T24h10m -c customized_metrics -v 100Mb
+      # 将 -c 选项指定的文件 config.default 修改为自定义文件 customized_metrics
+
+      $ sudo systemctl restart pmlogger.service
+      # 重启 pmlogger 服务
+      ```
+
+    - 交互式修改性能指标：
+
+    ```bash
+    $ sudo pmlogconf -r /var/lib/pcp/config/pmlogger/config.default
+
+    Group: utilization per CPU
+    Log this group? [n] n
+
+    Group: utilization (usr, sys, idle, ...) over all CPUs
+    Log this group? [y] y
+    ...
+    # 交互式指定所需的性能指标组
+    ```
+
+  - 2️⃣ 调整采样的时间间隔依然可在 `/etc/pcp/pmlogger/control.d/local` 文件中调整
 
 ## 🔥 MBR 与 GPT 分区中的 GRUB2 再认识
 

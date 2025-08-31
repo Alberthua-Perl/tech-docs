@@ -1,269 +1,155 @@
-## Apache HTTP Server 原理与常用配置实现
+# Apache HTTP Server 原理与常用配置实现
 
-### 文档说明：
+## 文档说明
 
 - OS 版本：CentOS Linux release 7.7.1908 (Core)
-
 - Apache HTTPD 服务相关软件包：httpd-2.4.6-90.el7.centos.x86_64
-
 - 👉 其中 httpd 的虚拟主机配置文件最终参考见该 [链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/http-vhost-ssl.conf)，`.htaccess` 的最终参考见该 [链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/.htaccess)。
 
-### 文档目录：
+## 文档目录
 
 - Apache HTTP Server 概述
-
 - Apache HTTP Server 特点
-
 - Apache HTTP Server 架构与层次结构
-
 - Apache HTTP Server 的工作模式
-
 - Apache HTTP Server 安装与配置信息
-
 - Apache HTTP Server 虚拟主机配置
-
 - Apache HTTP Server 访问控制
-
 - Apache HTTP Server 用户认证授权
-
 - Apache HTTP Server 的 SSL 安全连接
-
 - Apache HTTP Server 与 CGI 脚本
-
 - Apache HTTP Server 实现反向代理
-
 - Apache HTTP Server 优化思路
-
 - Apache Web 页面异常示例
-
 - 参考链接
 
-### Apache HTTP Server 概述：
+## Apache HTTP Server 概述
 
 - 20 世纪 90 年代初，由美国国家超级计算机应用中心 NCSA 开发。
-
 - 1995 年开源社区发布 Apache（A Patchy Server）。
-
 - Apache 与 Nginx 是世界上使用率极高的 Web 服务器软件。
-
 - Apache 可以运行在几乎所有广泛使用的计算机平台上，由于其跨平台和安全性被广泛使用，是最流行的 Web 服务器端软件之一。
-
 - 它快速、可靠并且可通过简单的 API 扩充，将 Perl、Python 等解释器编译到服务器中。
-
 - 后来逐步扩充到各种 Unix 系统中，尤其对 Linux 的支持相当完美。
-
 - Apache 有多种产品，可以支持 SSL 技术，支持多个虚拟主机等。
-
 - Apache 是以进程为基础的架构，进程要比线程消耗更多的系统开支，不太适合于多处理器环境。
-
 - 因此，在 Apache Web 站点扩容时，通常是增加服务器或扩充群集节点而不是增加处理器。
-
 - 世界上很多著名的网站如 Amazon、Yahoo!、W3 Consortium、Financial Times 等都是 Apache 的产物，它的成功之处主要在于它的源代码开放、有一支开放的开发队伍、支持跨平台的应用（可以运行在几乎所有的 Unix、Windows、Linux 系统平台上）以及它的可移植性等方面。
-
 - 但随着 Nginx 的功能逐渐成熟完善，新的功能特性不断涌现，并以其高性能的并发处理能力，对 Apache 具有后来居上，赶超之势。
-
 - ✨ 截止 2020 年 2月，Nginx 的市场占有率首次超过 Apache！
-
 - 2021 年 1 月的 Web 服务器市场占有率调查统计：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/web-server-types.png)
+  ![web-server-types.png](images/web-server-types.png)
 
 > 名词说明：
-> 
+>
 > 1. `ASF`（Apache Software Foundation）：Apache 软件基金会
-> 
+>
 > 2. `FSF`（Free Software Foundation）：自由软件基金会
 
-### Apache HTTP Server 特点：
+## Apache HTTP Server 特点
 
 - 支持多计算机平台
-
 - Apache 支持 `HTTP/1.1` 协议，并与 `HTTP/1.0` 协议向后兼容，并为新协议做好准备。
-
 - 配置文件简单，易操作。
-
 - 支持多种方式的 HTTP 认证
-
 - 支持特定的 Web 目录修改
-
 - 支持 `CGI` 脚本，如 `Perl`、`PHP` 等。
-
 - 支持 `FastCGI`
-
 - 支持安全 Socket 层（`SSL`）
-
 - 支持服务器端包含指令（`SSI`）
-
 - 支持反向代理
-
 - 支持虚拟主机：
-  
   - 通过在一台服务器上使用不同的域名来提供多个 HTTP 服务
-  
   - 👉 Apache 支持基于 IP、域名和端口号三种类型的虚拟主机服务
-
 - 支持实时监视服务器状态和定制服务器日志
-
-- 跟踪用户会话：
-  
-  当用户浏览基于 Apache 的 Web 站点时，可通过 `mod_usertrack` 模块对其进行跟踪。
-
-- 支持动态共享对象（dynamic shared object，`DSO`）：
-  
-  Apache 的模块可在运行时动态加载，即这些模块可以被载入服务器进程空间，从而减少系统的内存开销。
-
-- 支持多进程：
-  
-  当负载增加时，服务器会快速生成子进程来处理，从而提高系统的响应能力。
-
+- 跟踪用户会话：当用户浏览基于 Apache 的 Web 站点时，可通过 `mod_usertrack` 模块对其进行跟踪。
+- 支持动态共享对象（dynamic shared object，`DSO`）：Apache 的模块可在运行时动态加载，即这些模块可以被载入服务器进程空间，从而减少系统的内存开销。
+- 支持多进程：当负载增加时，服务器会快速生成子进程来处理，从而提高系统的响应能力。
 - 🚀 支持多线程和多进程混合模型的 `MPM`（multiprocess model）
-
 - 高度模块化架构
+- 支持第三方软件开发商提供的功能模块：如 Apache 加载 `mod_jserv` 模块后可以支持 `Java Servlet`，这样就可运行 Java 程序。
 
-- 支持第三方软件开发商提供的功能模块：
-  
-  如 Apache 加载 `mod_jserv` 模块后可以支持 `Java Servlet`，这样就可运行 Java 程序。
-
-### Apache HTTP Server 架构与层次结构：
+## Apache HTTP Server 架构与层次结构
 
 - 操作系统层：
-  
   - Apache 归根结底是建立在操作系统的普通应用程序，因此必须使用操作系统本身提供的底层功能，如进程和线程、进程和线程间的通信、网络套接字通信、文件系统等。
-  
   - 目前 Apache 可支持的操作系统：Linux、Unix、Windows、MacOS、NetWare、OS/2
-
 - 可移植运行库层：
-  
   - 早期的 Apache 只用于 Unix 系统，后来为了能够跨平台使用，不同的操作系统提供的底层 API 不同，甚至存在很大差异，需要隐藏不同操作系统的 API 细节问题，对所有的操作系统，提供一个完全相同的函数接口。
-  
   - 🚀 从 Apache 2.0 开始将专门封装不同操作系统 API 的任务独立出来形成新的项目，称为 `APR`（Apache Portable Runtime libraries）。
-  
   - 该项目主要为上层的应用程序提供一个可跨多操作系统平台使用的底层支持接口库。
-
 - Apache 核心功能层：
-  
   - 该层为 Apache 的核心部分，用来实现 Apache 的基本功能以及对其他模块的支持调用等。
-  
   - 该层包括两个部分：Apache 核心程序、Apache 核心模块
-  
   - 1️⃣ Apache 核心程序：主要实现 Apache 作为 HTTP 服务器的基本功能
-    
     - 启动、停止和重启 Apache
-    
     - 处理配置文件，如 httpd.conf 等所有的配置文件。
-    
     - 接受和处理 HTTP 连接
-    
     - 读取 HTTP 请求并对请求进行处理
-    
     - 处理 HTTP 协议
-  
   - 2️⃣ Apache 核心模块：
-    
     - Apache 只是一个 HTTP 服务器，本身只有很简单的上述基本功能，为了完成其他功能则需要开发相应的模块。
-    
     - 为了最大程度的将核心功能与模块解耦，Apache 采用了对模块进行载入的方式，若需要启用某些模块，则只需要编辑相应的配置文件将该模块载入。
-    
     - Apache 在启动时读取配置文件进行处理，读取到配置指令 `LoadModule`，然后执行 `mod_so` 模块中的该指令对应的指令处理函数，将模块载入进来即可。
-    
     - Apache 的核心模块则提供了这些扩展功能。
-
-- Apache 可选功能层：
+- Apache 可选功能层：可选功能层指所有的非核心模块的其他 Apache 模块，实际上对于服务器端开发通常指的就是这个层，开发者开发自己相应的模块。
+- 第三方支持库：Apache 的模块开发中使用到了第三方的开发库，如 `mod_ssl` 模块使用了 `OpenSSL`，`mod_perl` 模块使用了 `Perl` 开发库等。
   
-  可选功能层指所有的非核心模块的其他 Apache 模块，实际上对于服务器端开发通常指的就是这个层，开发者开发自己相应的模块。
-
-- 第三方支持库：
+  ![apache-http-server-arch-1.png](images/apache-http-server-arch-1.png)
   
-  Apache 的模块开发中使用到了第三方的开发库，如 `mod_ssl` 模块使用了 `OpenSSL`，`mod_perl` 模块使用了 `Perl` 开发库等。
-  
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-http-server-arch-1.png)
-  
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-http-server-arch-2.png)
+  ![apache-http-server-arch-2.png](images/apache-http-server-arch-2.png)
 
 > 💥 注意：
-> 
+>
 > 1. Apache 核心模块与可选模块的接口完全相同，对于 Apache 核心而言完全相同。
-> 
+>
 > 2. 核心模块和非核心模块的唯一区别在于加载的时间不同，核心模块通常必须静态加载，而非核心模块既可以静态加载，也可以动态加载。
 
-### Apache HTTP Server 的工作模式：
+## Apache HTTP Server 的工作模式
 
 - Apache HTTP Server（httpd-2.4.x）支持多种 `MPM`，包括 prefork、worker、event。
-
 - 1️⃣ `prefork MPM`：
-  
   - 预派生模式：由主控制进程生成多个子进程，使用 `select` 模型，最大并发 1024 个进程。
-  
   - 这样做是为了减少频繁创建和销毁进程的开销。
-  
   - 每个子进程只有一个线程，在一个时间点内，只能处理一个请求。
-  
   - 可以设置最大和最小进程数，是最古老的一种模式，也是最稳定的模式，适用于访问量不是很大的场景。
-  
   - 优点：
-    
     - 成熟稳定，兼容所有新老模块。
-    
     - 同时，不需要担心线程安全的问题。
-  
   - 缺点：
-    
     - 运行慢
-    
     - 占用更多内存
-    
     - 不适用于高并发场景
-  
   - 工作原理：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-prefork-mpm.png)
+
+    ![apache-prefork-mpm.png](images/apache-prefork-mpm.png)
 
 - 2️⃣ `worker MPM`：
-  
   - 多进程和多线程混合的模型
-  
   - 由一个控制进程启动多个子进程，每个子进程中包含固定的线程，使用线程来处理请求。
-  
   - 当线程不够使用时会再启动一个新的子进程，然后在进程中再启动线程处理请求，由于其使用了线程处理请求，因此可以承受更高的并发。
-  
   - 优点：
-    
     - 相比 prefork 占用的内存较少，可以同时处理更多的请求。
-  
   - 缺点：
-    
     - 使用 `keep-alive` 的长连接方式，某个线程会一直被占据，即使没有传输数据，也需要一直等待到超时才会被释放。
-    
     - 若过多的线程被这样占据，也会导致在高并发场景下的无服务线程可用，该问题在 prefork 模式下同样会发生。
-  
   - 工作原理：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/apache-worker-mpm.png)
+
+    ![apache-worker-mpm.png](images/apache-worker-mpm.png)
 
 - 3️⃣ `event MPM`：
-  
   - 🚀 Apache 中最新的模式，属于事件驱动模型（`epoll`）。
-  
   - 每个进程中的多个线程分别响应多个请求，在当前版本中已是稳定可用的模式（GA）。
-  
   - 它和 worker 模式很像，最大的区别在于，解决了 keep-alive 场景下，长期被占用的线程资源浪费问题。如，某些线程由于处于 keep-alive 状态，空挂着等待，中间几乎没有请求过来，甚至等到超时。
-  
   - event MPM 中有一个专门的线程来管理这些 keep-alive 类型的线程，当有真实请求过来时，将请求传递给工作线程，执行完毕后，又允许它释放，这样增强了高并发场景下的请求处理能力。
-  
   - event MPM 只在有数据发送的时候才开始建立连接，连接请求才会触发工作线程，即使用了 TCP 延迟接受连接选项 `TCP_DEFER_ACCEPT`，加了该选项后，若客户端只进行 TCP 连接，不发送请求，则不会触发 `Accept` 操作，也就不会触发工作线程去干活，进行了简单的防攻击（TCP 连接）。
-  
   - 优点：
-    
     - 单线程响应多请求，占据更少的内存，高并发下表现更优秀。
-    
     - event MPM 会有一个专门的线程管理 keep-alive 类型的线程，当有真实请求过来的时候，将请求传递给工作线程，执行完毕后，又允许它释放。
-  
   - 缺点：
-    
     - 没有线程安全控制
-    
     - 不能在 `HTTPS` 下工作
-
 - httpd 状态检查：
   
   ```bash
@@ -271,7 +157,7 @@
   # 查看 Apache HTTP 服务的编译配置
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-status.png)
+  ![httpd-status.png](images/httpd-status.png)
   
   ```bash
   $ sudo httpd -t
@@ -282,24 +168,19 @@
   # 可注释相应 MPM 模块，再重启 httpd 服务即可切换工作模式。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-mpm-config.png)
+  ![httpd-mpm-config.png](images/httpd-mpm-config.png)
 
-### Apache HTTP Server 安装与配置信息：
+## Apache HTTP Server 安装与配置信息
 
 - Apache HTTP Server 的安装方式：yum 源 rpm 软件包安装、源码编译安装
-
 - 此次使用 rpm 软件包方式安装
-
 - Apache HTTP Server 的服务名称为 httpd，其中 Apache 的核心功能与扩展功能均通过模块（module）来实现，若使用源码编译安装，需特别注意模块的加载。
-
 - 实验节点环境说明：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/lab-env.png)
+  ![lab-env.png](images/lab-env.png)
   
   - 除 Apache 反向代理功能外，servera 具有 Apache HTTP Server 的其他功能。
-  
   - serverb 作为 Apache 反向代理服务器，servera 与 base-server 作为后端服务端运行 nginx-ssl 容器。
-
 - 安装相关命令：
   
   ```bash
@@ -313,84 +194,55 @@
   ```
 
 - httpd 服务默认目录与文件：
-  
   - 服务单元文件（unit file）：`/usr/lib/systemd/system/httpd.service`
-  
   - 服务环境文件：`/etc/sysconfig/httpd`
-  
   - 服务目录：`/etc/httpd/`
-  
   - 主配置文件：
-    
     - `/etc/httpd/conf/httpd.conf`
-    
     - `/etc/httpd/conf.d/*.conf`
-  
   - 站点网页根目录：`/var/www/html/`
-  
   - 模块目录：
-    
     - `/etc/httpd/modules/`
-    
     - `/usr/lib64/httpd/modules/`
-  
   - 主程序文件：`/usr/sbin/httpd`
-  
   - 访问日志与错误日志：
-    
     - `/var/log/httpd/access_log`
-    
     - `/var/log/httpd/error_log`
-  
   - 常用离线参考文档：`/usr/share/doc/httpd-2.4.6/*`
   
   > 该目录中的文档定义了 httpd 服务支持的默认配置、MPM、语言、模块等信息。
 
 - httpd 服务主配置文件中的信息：
-  
   - 注释行信息：使用 `#` 号开头进行注释
-  
   - 全局配置：
-    
     - 全局性的配置参数，可作用于对所有的子站点，既保证了子站点的正常访问，也有效减少频繁写入重复参数的工作量。
-    
     - 主配置文件中的常用全局配置参数：
-      
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-conf-golable-paraments.png)
+
+      ![httpd-conf-golable-paraments.png](images/httpd-conf-golable-paraments.png)
   
   - 区域配置：单独针对于每个独立的子站点进行设置
 
-### Apache HTTP Server 虚拟主机配置：
+## Apache HTTP Server 虚拟主机配置
 
 - 若每台运行 Linux 系统的服务器上只能运行一个网站，那么将承担高昂的服务器租赁费用，这显然也会造成硬件资源的浪费。
-
 - 在虚拟专用服务器（Virtual Private Server，`VPS`）与云计算技术诞生以前，IDC 服务供应商为了能够更充分地利用服务器资源，同时也为了降低购买门槛，于是纷纷启用了虚拟主机功能。
-
 - 利用虚拟主机功能，可以把一台处于运行状态的物理服务器分割成多个 "虚拟的服务器"。
-
 - 但是，该技术无法实现目前云主机技术的硬件资源隔离，让这些虚拟的服务器共同使用物理服务器的硬件资源，供应商只能限制硬盘的使用空间大小。
-
 - 出于各种考虑的因素（主要是价格低廉），目前依然有很多企业或个人站长在使用虚拟主机的形式来部署网站。
-
 - Apache 的虚拟主机功能是服务器基于用户请求的不同 IP 地址、主机域名或端口号，实现提供多个网站同时为外部提供访问服务的技术。
-
 - 用户请求的资源不同，最终获取到的网页内容也各不相同。
-
 - 1️⃣ **基于 IP 地址的虚拟主机**：
-  
   - 若一台服务器有多个 IP 地址，而且每个 IP 地址与服务器上部署的每个网站一一对应，这样当用户请求访问不同的 IP 地址时，会访问到不同网站的页面资源。
-  
   - 这种方式提供虚拟网站主机功能最常见。
-  
   - 配置方法如下所示：
-    
+
     ```bash
     $ sudo ip address ahow
     # 查看 Apache HTTP Server 的 IP 地址
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-1.png)
-    
+
+    ![httpd-ip-based-vhost-1.png](images/httpd-ip-based-vhost-1.png)
+
     ```bash
     $ sudo mkdir -p /webapp/data/site-{221,225,226}
     $ sudo echo "Site IP address: 10.197.11.221" > \
@@ -404,13 +256,13 @@
     $ sudo vim /etc/httpd/conf.d/vhost-ip-based.conf
     # 创建基于 IP 地址的虚拟主机配置文件
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-2.png)
-    
+
+    ![httpd-ip-based-vhost-2.png](images/httpd-ip-based-vhost-2.png)
+
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-ip-based.conf)。
-    
+
     🏷 基于 IP 地址的虚拟主机可省略 `ServerName` 参数，不影响外部访问。
-    
+
     ```bash
     $ sudo systemctl restart httpd.service
     $ sudo semanage fcontext -a -t httpd_sys_content_t '/webapp/data(/.*)?'
@@ -424,19 +276,16 @@
     $ sudo firewall-cmd --reload
     # 重载 firewalld 服务，使配置生效。
     ```
-    
+
     可在其他节点访问以上站点进行测试：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ip-based-vhost-3.png)
+
+    ![httpd-ip-based-vhost-3.png](images/httpd-ip-based-vhost-3.png)
 
 - 2️⃣ **基于域名（名称）的虚拟主机：**
-  
   - 当服务器无法为每个站点都分配一个独立 IP 地址的时候，可以尝试让 Apache 自动识别用户请求的域名，从而根据不同的域名请求来传输不同的内容。
-  
   - 在这种情况下的配置更加简单，只需要保证位于生产环境中的服务器上有一个可用的 IP 地址（以 10.197.11.221 为例）。
-  
   - 配置方法如下所示：
-    
+
     ```bash
     $ sudo mkdir /webapp/data/{www,cloud,bbs}
     $ sudo echo "Domain name: www.lab.example.com" > \
@@ -450,36 +299,30 @@
     $ sudo vim /etc/httpd/conf.d/vhost-domainname-based.conf
     # 创建基于域名的虚拟主机配置文件
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-domainname-based-vhost-1.png)
-    
+
+    ![httpd-domainname-based-vhost-1.png](images/httpd-domainname-based-vhost-1.png)
+
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-domainname-based.conf)。
-    
+
     🏷 基于域名（名称）的虚拟主机可能使用所在服务器上的相同 IP 地址与端口，必须使用 `ServerName` 参数将其区分，否则访问流量将随机定向至其中任意一个虚拟主机！
-    
+
     ```bash
     $ sudo systemctl restart httpd.service
     # 重启 httpd 服务使配置生效
     ```
-    
+
     可在其他节点访问以上站点进行测试：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-domainname-based-vhost-2.png)
+
+    ![httpd-domainname-based-vhost-2.png](images/httpd-domainname-based-vhost-2.png)
 
 - 3️⃣ **基于端口的虚拟主机：**
-  
   - 基于端口的虚拟主机功能可以让用户通过指定的端口来访问服务器上的网站资源。
-  
   - 在使用 Apache 配置虚拟主机功能时，最复杂的是基于端口的配置方式。
-  
   - 需考虑 httpd 服务的配置，还需要考虑 SELinux 对新开设端口的监控。
-  
   - 一般来说，使用 80、443、8080 等端口来提供网站访问服务比较合理。
-  
   - 💥 若使用其他端口则会受到 SELinux 的限制。
-  
   - 配置方法如下所示：
-    
+
     ```bash
     $ sudo mkdir /webapp/data/port-{8880,8882}
     $ sudo echo "Port: 8880" > /webapp/data/port-8880/index.html
@@ -489,20 +332,20 @@
     $ sudo vim /etc/httpd/conf.d/vhost-port-based.conf
     # 创建基于端口的虚拟主机配置文件
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-1.png)
-    
+
+    ![httpd-port-based-vhost-1.png](images/httpd-port-based-vhost-1.png)
+
     👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/vhost-port-based.conf)。
-    
+
     🏷 基于端口的虚拟主机根据端口区分使用相同 IP 的虚拟主机，ServerName 参数可省略。
-    
+
     ```bash
     $ sudo systemctl restart httpd.service
     # 重启 httpd 服务使配置生效，但由于端口被 SELinux 限制而重启报错。
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-2.png)
-    
+
+    ![httpd-port-based-vhost-2.png](images/httpd-port-based-vhost-2.png)
+
     ```bash
     $ sudo semanage port -a -t http_port_t -p tcp 8880
     $ sudo semanage port -a -t http_port_t -p tcp 8882
@@ -513,8 +356,8 @@
     $ sudo firewall-cmd --reload
     # 重载 firewalld 服务，使配置生效。可在其他节点访问以上站点进行测试：
     ```
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-port-based-vhost-3.png)
+
+    ![httpd-port-based-vhost-3.png](images/httpd-port-based-vhost-3.png)
 
 ### Apache HTTP Server 访问控制：
 
@@ -540,7 +383,7 @@
 
 - 相关模块：`mod_authz_core`、`mod_authz_host`
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-1.png)
+  ![](images/httpd-access-control-1.png)
 
 - 配置方法如下所示：
   
@@ -550,17 +393,17 @@
     $ sudo vim /etc/httpd/conf.d/http-vhost.conf
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-2.png)
+    ![](images/httpd-access-control-2.png)
     
     使用不同客户端测试：
     
     Chrome 与 Firefox 客户端均可访问资源，而 curl 命令行客户端被拒绝访问。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-3.png)
+    ![](images/httpd-access-control-3.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-4.png)
+    ![](images/httpd-access-control-4.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-5.png)
+    ![](images/httpd-access-control-5.png)
   
   - 基于源 IP 地址：
     
@@ -568,7 +411,7 @@
     $ sudo vim /etc/httpd/conf.d/http-vhost.conf
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-6.png)
+    ![](images/httpd-access-control-6.png)
     
     🏷 可允许放行具体的 IP 地址、网段、域名等。
     
@@ -576,9 +419,9 @@
     
     10.197.11.222 可访问资源，而10.197.11.204 拒绝访问。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-7.png)
+    ![](images/httpd-access-control-7.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-access-control-8.png)
+    ![](images/httpd-access-control-8.png)
   
   > 💥 注意：
   > 
@@ -630,7 +473,7 @@
     
     - 相关模块：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-1.png)
+      ![](images/httpd-user-auth-1.png)
 
 - **基于密码文件的 Basic 认证实现：**
   
@@ -644,14 +487,14 @@
     # 文件中的参数可覆盖其中的配置。
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-2.png)
+    ![](images/httpd-user-auth-2.png)
     
     ```bash
     $ sudo vim /webapp/data/learnpath/.htaccess
     # 创建 .htaccess 文件使其覆盖虚拟机配置文件的参数
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-3.png)
+    ![](images/httpd-user-auth-3.png)
     
     ```bash
     $ sudo htpasswd -b -c /webapp/data/learnpath/.auth_basic foo redhat
@@ -660,7 +503,7 @@
     # 创建 Basic 认证密码文件后无需再次指定，可直接创建 bar 用户。
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-4.png)
+    ![](images/httpd-user-auth-4.png)
     
     🏷 htpasswd 命令默认使用MD5对明文密码加密！
     
@@ -680,11 +523,11 @@
     # 指定 Basic 认证的用户名与密码，即可完成认证返回结果。
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-5.png)
+    ![](images/httpd-user-auth-5.png)
 
     也打开浏览器输入指定URL后即可弹出用户认证窗口。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-6.png)
+    ![](images/httpd-user-auth-6.png)
   
   - Wireshark 抓包验证：
     
@@ -696,9 +539,9 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-wireshark-1.png)
+      ![](images/httpd-user-auth-wireshark-1.png)
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-user-auth-wireshark-2.png)
+      ![](images/httpd-user-auth-wireshark-2.png)
 
 - **基于 SDBM 文件型数据库的 Basic 认证实现：**
   
@@ -710,7 +553,7 @@
     $ sudo vim /webapp/data/learnpath/.htaccess
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/htaccess-1.png)
+    ![](images/htaccess-1.png)
     
     ```bash
     $ sudo htdbm -c /webapp/data/learnpath/.auth_dbm albert
@@ -724,7 +567,7 @@
     
     打开浏览器输入指定 URL 后即可弹出用户认证窗口
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-basic-auth-sdbm-1.png)
+    ![](images/httpd-basic-auth-sdbm-1.png)
   
   - Wireshark 抓包验证：
     
@@ -736,7 +579,7 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-basic-auth-sdbm-2.png)
+      ![](images/httpd-basic-auth-sdbm-2.png)
 
 - **Digest 认证实现：**
   
@@ -746,7 +589,7 @@
     $ sudo vim /webapp/data/learnpath/.htaccess
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-1.png)
+    ![](images/httpd-digest-auth-1.png)
     
     ```bash
     $ sudo htdigest -c /webapp/data/learnpath/.auth_digest \
@@ -762,7 +605,7 @@
     
     打开浏览器输入指定 URL 后即可弹出用户认证窗口
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-2.png)
+    ![](images/httpd-digest-auth-2.png)
   
   - Wireshark 抓包验证：
     
@@ -774,7 +617,7 @@
     
     - 使用 Wireshark 查看数据包状态：
       
-      ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-digest-auth-3.png)
+      ![](images/httpd-digest-auth-3.png)
 
 - 🚀 用户认证授权注意要点：
   
@@ -792,7 +635,7 @@
     
     - `Satisfy all` 指令：只有两种都满足要求才能访问相应资源
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-auth-htaccess.png)
+    ![](images/httpd-auth-htaccess.png)
 
 ### Apache HTTP Server 的 SSL 安全连接：
 
@@ -811,7 +654,7 @@
   # 安装 mod_ssl 模块实现 Apache 与 OpenSSL 间调用
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-1.png)
+  ![](images/httpd-ssl-conf-1.png)
   
   ```bash
   $ sudo vim create-ssl-certs.sh
@@ -854,7 +697,7 @@
   # 配置虚拟主机 SSL 安全连接
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-2.png)
+  ![](images/httpd-ssl-conf-2.png)
   
   ```bash
   $ sudo vim /webapp/data/learnpath/.htaccess
@@ -862,7 +705,7 @@
   # 将其与虚拟主机配置文件解耦，AuthOverride AuthConfig 指令将引用该文件。
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-3.png)
+  ![](images/httpd-ssl-conf-3.png)
   
   💥 注意：
   
@@ -876,11 +719,11 @@
   
   - 从 IP 地址为 10.197.11.220 客户端的浏览器访问网站，先执行 HTTPS 认证，再进入访问控制，由于 `.htaccess` 文件中拒绝该 IP，因此无法访问。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-4.png)
+    ![](images/httpd-ssl-conf-4.png)
   
   - 服务端错误日志 `/etc/httpd/logs/*-error_ssl_log` 中显示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-5.png)
+    ![](images/httpd-ssl-conf-5.png)
   
   - 从 IP 地址为 10.197.11.222 客户端使用 `curl` 命令行访问网站，提供 Digest 认证需要的用户名与密码，该 IP 地址允许访问网站。
     
@@ -890,13 +733,13 @@
     # 只查看通过 Digest 认证的用户的响应包头部信息
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-6.png)
+    ![](images/httpd-ssl-conf-6.png)
     
     根据 `.htaccess` 文件中禁用的 IP 地址，使用其他 IP 地址进行访问测试。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-7.png)
+    ![](images/httpd-ssl-conf-7.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-ssl-conf-8.png)
+    ![](images/httpd-ssl-conf-8.png)
 
 ### Apache HTTP Server 与 CGI 脚本：
 
@@ -910,11 +753,11 @@
 
 - CGI 脚本与 HTTP 服务器关系示意：发送 HTTP 请求前必须先创建 TCP 连接，完成 TCP 三次握手。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-1.png)
+  ![](images/httpd-cgi-1.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-2.png)
+  ![](images/httpd-cgi-2.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-3.png)
+  ![](images/httpd-cgi-3.png)
 
 - CGI 脚本在 Apache HTTP Server 中具有多种实现方式，包括 Shell、Perl、Python、PHP 脚本等，以下使用 Shell 与 Perl 脚本为例加以说明。
 
@@ -927,14 +770,14 @@
   # 查看 CGI 模块是否加载
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-4.png)
+  ![](images/httpd-cgi-4.png)
   
   ```bash
   $ sudo vim /etc/httpd/conf.d/http-vhost.conf
   # 配置虚拟主机 CGI 相关参数
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-5.png)
+  ![](images/httpd-cgi-5.png)
   
   ```bash
   $ sudo mkdir /webapp/data/learnpath/cgi-bin/
@@ -945,11 +788,11 @@
   
   💥 注意：该目录中的所有脚本都必须赋予可执行权限 `chmod a+x *`，否则访问时报错！
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-6.png)
+  ![](images/httpd-cgi-6.png)
   
   在 /etc/httpd/logs/*-error_log 中的报错日志，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-cgi-7.png)
+  ![](images/httpd-cgi-7.png)
 
 - Shell CGI 脚本示例：
   
@@ -1109,7 +952,7 @@
   
   - 正向代理示意如下：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-proxy.png)
+    ![](images/httpd-proxy.png)
     
     - 正向代理服务器可位于数据中心或公司防火墙内部，将内部流量转发至外部网络。
     
@@ -1127,11 +970,11 @@
   
   - 反向代理示意如下：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-1.png)
+    ![](images/httpd-reverse-proxy-1.png)
 
 - 正向代理与反向代理比较：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-2.png)
+  ![](images/httpd-reverse-proxy-2.png)
   
   - 正向代理即客户端代理，代理客户端，实际发起请求的客户端对服务端透明。
   
@@ -1139,7 +982,7 @@
 
 - 相关模块：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-3.png)
+  ![](images/httpd-reverse-proxy-3.png)
 
 - Apache 反向代理配置方式：
   
@@ -1151,7 +994,7 @@
   # 配置 Apache 反向代理与负载均衡配置文件
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-4.png)
+  ![](images/httpd-reverse-proxy-4.png)
   
   👉 以上文件可参考该 [GitHub 链接](https://github.com/Alberthua-Perl/sc-col/blob/master/httpd-auth-ssl-proxy/apache-httpd/http-proxy.conf)。
   
@@ -1162,7 +1005,7 @@
   # 查看 Apache reverse proxy 相关的模块
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-5.png)
+  ![](images/httpd-reverse-proxy-5.png)
   
   ```bash
   $ sudo apachectl restart
@@ -1171,23 +1014,23 @@
   
   💥 注意：该 Apache reverse proxy 的后端 Web 服务器为基于 SSL 的 Nginx podman 容器，分别运行于 base-server 与 servera 节点上。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-6.png)
+  ![](images/httpd-reverse-proxy-6.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-7.png)
+  ![](images/httpd-reverse-proxy-7.png)
 
 - 使用客户端浏览器测试：
   
   刷新 `https://10.197.11.222` 页面，确认负载均衡是否实现。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-8.png)
+  ![](images/httpd-reverse-proxy-8.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-9.png)
+  ![](images/httpd-reverse-proxy-9.png)
 
 - Apache 反向代理配置报错：
   
   `ProxyPass` 与 `ProxyPassReverse` 指令中的 `balancer` 末尾必须跟上 `/`，否则反向代理服务无法实现，error_log 中报错如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-10.png)
+  ![](images/httpd-reverse-proxy-10.png)
 
 - 🚀 客户端、Apache reverse proxy 与后端 Web 服务器间报文分析：
   
@@ -1205,7 +1048,7 @@
     
     - IP 地址：**`ip.src == <ip_address> [or|and] ip.dst == <ip_address>`**
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-reverse-proxy-11.png)
+    ![](images/httpd-reverse-proxy-11.png)
 
 ### Apache HTTP Server 优化思路：
 
@@ -1237,9 +1080,9 @@
   
   - 可查找相应无法显示的图片，根据 Apache 支持的文件扩展名文件 `/etc/mime.types` 更改图片的扩展名，更改后再更新 html 中引用的图片链接即可正常显示。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-web-pic-error-display-1.png)
+    ![](images/httpd-web-pic-error-display-1.png)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/apache-http-server-conf/httpd-web-pic-error-display-2.png)
+    ![](images/httpd-web-pic-error-display-2.png)
 
 ### 参考链接：
 
