@@ -245,6 +245,29 @@ $ sudo systemctl status -l --no-pager <unit_name>.service
 #          a set of well-known pager implementations are tried in turn, including less(1) and more(1), until one is
 #          found. If no pager implementation is discovered no pager is invoked. Setting this environment variable to
 #          an empty string or the value "cat" is equivalent to passing --no-pager.
+
+### 文件编码与加密 ###
+$ base64 /path/to/file > /path/to/base64_file
+$ base64 -d /path/to/base64_file > /path/to/file
+
+$ tar -zcvf - /path/to/file_or_dir | \
+  openssl des3 -salt -pbkdf2 -iter 10000 -k "<password>" -out /path/to/file_or_dir.tar.gz
+# 使用 3DES 对称加密算法、PBKDF2 标准以及 10000 次迭代生成密钥进行 tar.gz 压缩包加密
+# 说明：
+#   des3：对称加密算法，Triple-DES（3DES），密钥长度 168-bit。
+#   -salt：在加密前随机生成 8-byte 的 salt，用于抵抗字典/彩虹表攻击。
+#   -pbkdf2：使用 PBKDF2 算法从口令派生密钥，而不是旧的 EVP_BytesToKey 算法。
+#            PBKDF2 是 “基于密码的密钥派生函数2”（Password-Based Key Derivation Function 2）的算法，
+#            用于安全地从用户提供的密码中派生出加密密钥，而不是直接存储明文密码。
+#            它通过对密码进行多次迭代哈希运算（使用随机 salt 来增强安全性），以生成固定长度的密钥，
+#            从而大大增加了暴力破解的难度，确保了密码的安全性。
+#            PBKDF2 是一个被广泛推荐的标准，常用于存储和验证用户密码。
+#   -iter 10000：PBKDF2 的迭代次数设为 10000，提高暴力破解成本（可再调高）。
+$ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir.tar.gz | \
+  tar -zxvf -
+# 使用 3DES 对称加密算法对 tar.gz 压缩包解密
+# -d 选项：解密文件
+# -k 选项：指定解密的明文密码
 ```
 
 ## 4. oh-my-bash 终端字体（fonts）的安装

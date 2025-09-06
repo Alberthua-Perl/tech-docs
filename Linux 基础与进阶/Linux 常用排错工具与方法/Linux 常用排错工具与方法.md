@@ -5,21 +5,32 @@
 - 以下示例均在 `RHEL 7/8` 中验证实现，在 RHEL 8 中已更改的内容将特别指出。若针对其他 Linux 发行版请自行测试。
 - 该文档中涉及的命令与参考链接可提供排错思路或依据。
 - 若更深层次的分析与追踪故障原因需配合业务应用代码、内核或驱动源码等进一步分析。
-- 该文档将根据所使用的命令持续更新与使用案例。
+- 此文档将根据所使用的命令持续更新与使用案例。
 
 ## 文档目录
 
 - [Linux 常用排错工具与实践方法](#linux-常用排错工具与实践方法)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [journalctl 命令示例](#journalctl-命令示例)
-  - [sosreport 命令使用](#sosreport-命令使用)
-  - [Performance Co-Pilot (PCP) 组件使用](#performance-co-pilot-pcp-组件使用)
-  - [🔥 MBR 与 GPT 分区中的 GRUB2 再认识](#-mbr-与-gpt-分区中的-grub2-再认识)
-  - [systemd 单元文件的依赖性](#systemd-单元文件的依赖性)
-  - [CPU 的个数、核心数、超线程的关系](#cpu-的个数核心数超线程的关系)
-  - [CPU 信息查看](#cpu-信息查看)
-  - [dmidecode 命令使用](#dmidecode-命令使用)
+  - [1. journalctl 命令](#1-journalctl-命令)
+    - [1.1 命令示例](#11-命令示例)
+    - [1.2 参考链接](#12-参考链接)
+  - [2. sosreport 命令示例](#2-sosreport-命令示例)
+  - [🔥 3. MBR 与 GPT 分区中的 GRUB2 再认识](#-3-mbr-与-gpt-分区中的-grub2-再认识)
+    - [3.1 GRUB2 在 MBR 分区中的分布](#31-grub2-在-mbr-分区中的分布)
+    - [3.2 GRUB2 在 GPT 分区中的分布](#32-grub2-在-gpt-分区中的分布)
+    - [3.3 MBR 分区与 GPT 分区系统引导的过程与差异](#33-mbr-分区与-gpt-分区系统引导的过程与差异)
+    - [3.4 管理 boot loader 配置文件与引导菜单](#34-管理-boot-loader-配置文件与引导菜单)
+      - [3.4.1 1️⃣ 示例：管理多个 UEFI 启动目标（boot target）](#341-1️⃣-示例管理多个-uefi-启动目标boot-target)
+      - [3.4.2 2️⃣ 示例：使用 GRUB2 命令行引导 UEFI 方式启动的系统](#342-2️⃣-示例使用-grub2-命令行引导-uefi-方式启动的系统)
+    - [3.5 参考链接](#35-参考链接)
+  - [4. systemd 单元文件的依赖性](#4-systemd-单元文件的依赖性)
+  - [5. CPU 的个数、核心数、超线程的关系](#5-cpu-的个数核心数超线程的关系)
+  - [6. CPU 信息查看](#6-cpu-信息查看)
+  - [7. dmidecode 命令](#7-dmidecode-命令)
+    - [7.1 SMBIOS/DMI 说明](#71-smbiosdmi-说明)
+    - [7.2 命令示例](#72-命令示例)
+    - [7.3 其他硬件相关命令](#73-其他硬件相关命令)
   - [管理与测试硬件设备](#管理与测试硬件设备)
   - [常见物理服务器及硬件示例](#常见物理服务器及硬件示例)
   - [管理内核模块与 KVM 虚拟化](#管理内核模块与-kvm-虚拟化)
@@ -33,343 +44,247 @@
   - [strace 与 ltrace 命令使用](#strace-与-ltrace-命令使用)
   - [参考链接](#参考链接)
 
-## journalctl 命令示例
+## 1. journalctl 命令
+
+### 1.1 命令示例
 
 ```bash
 $ man 7 systemd.journal-filelds
 # 获取关于 journalctl 命令更加详细的搜索字段
 
 ### 系统引导日志 ###
-$ journalctl --list-boots
+$ sudo journalctl --list-boots
 # 查看系统重启的次数与信息
-$ journalctl -b <number>
+$ sudo journalctl -b <number>
 # 查看指定重启的详细信息
-$ journalctl -b _TRANSPORT=kernel
-$ journalctl -k
+$ sudo journalctl -b _TRANSPORT=kernel
+$ sudo journalctl -k
 # 以上两个命令均返回上一次系统启动过程中的内核信息，相当于 dmesg 命令输出。
 
 ### 内核、设备与服务日志 ###
-$ journalctl [/dev/sdX|/dev/vdX]
+$ sudo journalctl [/dev/sdX|/dev/vdX]
 # 查看指定 scsi 磁盘设备或 virtio 磁盘设备的日志信息
 
-$ journalctl -b _SYSTEMD_UNIT=<service_name>.service _PID=<service_pid>
+$ sudo journalctl -b _SYSTEMD_UNIT=<service_name>.service _PID=<service_pid>
 # 查看指定服务中特定进程的日志信息
-$ journalctl -u <unit_file_name>
+$ sudo journalctl -u <unit_file_name>
 # 查看 systemd 单元的日志信息
 
-$ journalctl [--system|--user]
+$ sudo journalctl [--system|--user]
 # --system 选项：显示来自于系统服务与内核的日志
 # --user 选项：显示当前用户的服务日志
 
 ### 日志等级过滤 ###
-$ journalctl -p <priority>
+$ sudo journalctl -p <priority>
 # 显示 debug、info、notice、warning、err、crit、alert 和 emerg 该级别及其之上的日志。
-$ journalctl -p emerg..err
+$ sudo journalctl -p emerg..err
 # 查看 emerg 到 err 级别的日志信息
 
-$ journalctl -n <number>
+$ sudo journalctl -n <number>
 # 默认显示最后 10 条日志，也可以指定条目数量。
-$ journalctl -ef
+$ sudo journalctl -ef
 # 实时刷新最新的日志
 
-$ journalctl --since today
+$ sudo journalctl --since today
 # 查看当天的所有日志信息
-$ journalctl --since "-1 hour"
+$ sudo journalctl --since "-1 hour"
 # 查看前 1 小时的所有日志信息
-$ journalctl --since "YYYY-MM-DD hh:mm:ss" --until "YYYY-MM-DD hh:mm:ss"
+$ sudo journalctl --since "YYYY-MM-DD hh:mm:ss" --until "YYYY-MM-DD hh:mm:ss"
 # 显示指定时间范围内的日志，必须使用双引号。
 # 如果省略日期，则命令会假定日期为当天；如果省略时间，则命令假定为自 00:00:00 起的整天。
 # yesterday、today 与 tomorrow 可以指定日志时间段，可参考 systemd.time(7) man 帮助。
 
-$ journalctl -o verbose
+$ sudo journalctl -o verbose
 # 显示更加详细的日志信息
 ```
 
-参考链接：
+### 1.2 参考链接
   
 - [Chapter 10. Troubleshooting problems using log files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_troubleshooting-problems-using-log-files_configuring-basic-system-settings#masthead) 
 - [Chapter 5. Troubleshooting problems related to SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/troubleshooting-problems-related-to-selinux_using-selinux)
 
-## sosreport 命令使用
+## 2. sosreport 命令示例
 
 ```bash
-$ sosreport -l
+$ sudo sosreport -l
 # 列出 SOS 支持的插件与可用的选项
 
-$ sosreport -e <plugin_name>
+$ sudo sosreport -e <plugin_name>
 # 启用当前禁用的插件
-$ sosreport -n <plugin_name>
+$ sudo sosreport -n <plugin_name>
 # 禁用当前已启用的插件
 
-$ sosreport -k <plugin_option>
-$ sosreport -k xfs.logprint
+$ sudo sosreport -k <plugin_option>
+$ sudo sosreport -k xfs.logprint
 # 使用 xfs.logprint 选项以收集 XFS 文件系统的相关信息
 
-###注意：sosreport 命令在新版本中已被 deprecated，而采用 sos report 替换。
-$ sos report --label <label_name> -n <plugin_name> -k <plugin_option>
-# 使用
+$ sudo sos report --label <label_name> -n <plugin_name> -k <plugin_option>
+# 指定标签名称、插件名称与插件选项采集相关信息
+# 默认只采集指定插件的信息，可显式指定不采集的插件。
+# 注意：sosreport 命令在新版本中已被 deprecated，而采用 sos report 替换。
 ```
 
-## Performance Co-Pilot (PCP) 组件使用
-
-```bash
-$ yum install -y pcp pcp-gui pcp-system-tools
-# 安装 PCP、PCP 图形化软件包与 PCP 系统工具包
-$ systemctl enable --now pmcd.service pmlogger.service
-# 启动并开机自启 pmcd 与 pmlogger 守护进程
-# pmlogger 服务将指标日志存储于 /var/log/pcp/pmlogger/<hostname>/ 目录中
-
-$ pminfo
-# 查看 Co-Pilot 数据库中的性能指标的类型，可通过 pmval 命令列出数据库中的数据。
-$ pminfo -dt <metrics_type>
-# 查看指定指标类型的说明
-$ pminfo -dt kernel.percpu.cpu.idle
-
-$ pmval -s 5 -t 2 proc.nprocs
-  metric:    proc.nprocs
-  host:      servera.lab.example.com
-  semantics: instantaneous value
-  units:     none
-  samples:   5
-  interval:  2.00 sec
-          111
-          111
-          111
-          111
-          111
-# 实时刷新时间间隔 2 秒，共统计 5 次的瞬时进程数。
-$ pmval -a /var/log/pcp/pmlogger/workstation.lab.example.com/20210609.14.52.0 <metrics_type>
-# 查看默认指标数据归档文件中指定的指标类型日志
-# -a 选项指定性能指标的归档日志
-
-$ pmstat -s <sample_number> -t <number>[seconds|minutes] 
-# 高层次的系统性能查看工具，在指定的时间间隔内（默认 5 秒刷新一次），共统计指定次数（类似于 vmstat 命令）。
-$ pmatop
-# 实时刷新系统资源使用信息（类似于 top 命令）
-```
-
-- PCP 软件包除提供命令行模式的性能指标输出外，还提供 `GUI` 图形化界面及 Web 图形化界面，并可与 `Grafana` 集成显示。
-  该软件包提供强大而丰富的系统性能监控指标与参数，关于 PCP 软件包及相关命令的使用方法，可参考如下 `Red Hat Access` 链接获取更为详细的技术指导：
-  - [RHEL 7 性能监控之 PCP](http://www.361way.com/rhel7-pcp/5149.html)  
-  - [How do I install Performance Co-Pilot (PCP) on my RHEL server to capture performance logs](https://access.redhat.com/solutions/1137023) 
-  - 💪 [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953) 
-  - [Interactive web interface for Performance Co-Pilot](https://access.redhat.com/articles/1378113) 
-  - [Introduction to storage performance analysis with PCP](https://access.redhat.com/articles/2450251)
-  - 📊 [Chapter 10. Setting up graphical representation of PCP metrics](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-up-graphical-representation-of-pcp-metrics_monitoring-and-managing-system-status-and-performance#doc-wrapper)
-  - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 1)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-1)
-  - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 2)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-2)
-
-- 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
-  - 1️⃣ 问题1：
-    - pmlogger 启动后只在 `/var/lib/pcp/config/pmlogger/config.default`（pmlogger 自动生成）中预先定义的一组 “默认指标”，并非采集 `pminfo` 命令返回的所有性能指标。
-    - 自定义修改性能指标：
-      - 方式1：
-      
-      ```bash
-      $ sudo egrep '^\s+[a-z]' /var/lib/pcp/config/pmlogger/config.default | sed 's/^\t//'
-      # 过滤 PCP 默认收集的性能指标
-      # 注意：此配置文件可由 pmlogconf 命令更新并覆盖其中的配置，若通过手动方式更新其中自定义的性能指标，那么需注意备份此文件，防止 pmlogconf 命令的配置覆盖。
-
-      $ sudo vim /var/lib/pcp/config/pmlogger/config.default
-      ...
-      log advisory on default {
-        ...
-      }
-      # 在对应组（group）中添加自定义的性能指标
-
-      $ sudo systemctl restart pmlogger.service
-      # 重启 pmlogger 服务
-      ```
-
-      - 👍 方式2（推荐）：
-  
-      ```bash
-      $ sudo vim /var/lib/pcp/config/pmlogger/customized_metrics
-      log advisory on default {
-        mem.numa.util.dirty
-        mem.numa.alloc.hit
-      }
-      # 创建自定义性能指标文件，文件名可自行指定，pmlogger 将只采集此文件中的性能指标。
-
-      $ sudo vim /etc/pcp/pmlogger/control.d/local
-      ...
-      #LOCALHOSTNAME  y   n   PCP_LOG_DIR/pmlogger/LOCALHOSTNAME      -r -T24h10m -c config.default -v 100Mb
-      LOCALHOSTNAME   y   n   PCP_LOG_DIR/pmlogger/LOCALHOSTNAME      -r -T24h10m -c customized_metrics -v 100Mb
-      # 将 -c 选项指定的文件 config.default 修改为自定义文件 customized_metrics
-
-      $ sudo systemctl restart pmlogger.service
-      # 重启 pmlogger 服务
-      ```
-
-    - 交互式修改性能指标：
-
-    ```bash
-    $ sudo pmlogconf -r /var/lib/pcp/config/pmlogger/config.default
-
-    Group: utilization per CPU
-    Log this group? [n] n
-
-    Group: utilization (usr, sys, idle, ...) over all CPUs
-    Log this group? [y] y
-    ...
-    # 交互式指定所需的性能指标组
-    ```
-
-  - 2️⃣ 调整采样的时间间隔依然可在 `/etc/pcp/pmlogger/control.d/local` 文件中调整
-
-## 🔥 MBR 与 GPT 分区中的 GRUB2 再认识
+## 🔥 3. MBR 与 GPT 分区中的 GRUB2 再认识
 
 - 传统 `GRUB` 与 `GRUB2` 在系统引导过程中存在明显的差异，因此对 GRUB2 引导系统各阶段的理解将帮助我们更好地实现引导过程的故障排除。
 - GRUB2 不再使用传统 GRUB 的 `stage1`、`stage1.5` 与 `stage2` 阶段，而采用 `boot.img`、`core.img` 与各类 `*.mod` 等实现系统的引导启动，并且根据 MBR 与 GPT 分区的方式不同，GRUB2 在两者间的分布存在显著的区别。
-- GRUB2 在 MBR 分区中的分布：
-  
-  ![gnu-grub-on-mbr-partitioned-hard-disk-drives](images/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
-  
-  ![grub2-mbr-scheme](images/grub2-mbr-scheme.png)
-  
-  如上图，GRUB2 使用 boot.img 作为 `boot loader` 负责系统引导过程的第一阶段（对应 GRUB 方式的 `stage1`），由于该镜像本身的容量大小限制无法识别 `/boot/grub2/` 所在文件系统类型，因此使用可以识别文件系统类型的 core.img，而 boot.img 由 GRUB2 硬编码 core.img 的磁盘位置定位该镜像。boot.img 位于 `/usr/lib/grub/i386-pc/` 中，grub2-install 程序将其转换为合适的 boot loader 程序写入第一个扇区。
-  core.img 镜像是由位于 `/usr/lib/grub/i386-pc/` 中的 `diskboot.img`、`lzma_decompress.img`、`kernel.img` 与各类 `*.mod` 模块通过 `grub2-mkimage` 程序动态生成，该镜像安装的位置可在第二个扇区起始的称为 `MBR gap` 的区域（此区域至少 31 KiB）或任意文件系统的第一个扇区。
-  
-  ![grub2-structure-on-disk](images/grub2-structure-on-disk.jpg)
-  
-  由于 core.img 中可能包含更多的功能用以识别不同的文件系统类型与结构，如 Btrfs、ZFS、RAID 与 LVM 等，因此 MBR gap 需要更多空间。现代的很多磁盘管理与分区工具已预留至少 1 MiB 来满足该需求，如 fdisk、gdisk 与 parted 工具等。一旦 boot.img 引导定位至 core.img，其使用文件系统驱动识别 /boot/grub2 所在的文件系统（对应 GRUB 方式的 `stage1.5`）。
-  
-  ![core-img-structure](images/core-img-structure.png)
-  
-  GRUB2 通过读取 /boot/grub2 中的相关配置定位系统的 `vmlinuz (kernel)`、`initramfs (ramdisk)`，继而将系统的控制权由 GRUB2 转交给内存中的 kernel（对应 GRUB 方式的 `stage2`）。
 
-- GRUB2 在 GPT 分区中的分布：
+### 3.1 GRUB2 在 MBR 分区中的分布
   
-  ![gnu-grub-on-gpt-partitioned](images/gnu-grub-on-gpt-partitioned.jpg)
+![gnu-grub-on-mbr-partitioned-hard-disk-drives](images/gnu-grub-on-mbr-partitioned-hard-disk-drives.jpg)
   
-  `GPT`（GUID partition table，全局唯一标识符分区表）分区的结构与 MBR 分区相似，但存在自身的独特分区。在 GPT 中使用 `LBA`（logical block address，逻辑区块地址）来代替常用扇区的概念，虽然当前可使用以 `4 KiB` 的存储单位，但在 LBA 中默认依然采用 `512 bytes` 作为一个 LBA 的存储单位（可将 LBA 作为扇区理解）。  
-  GPT 具体分区如上图所示：  
-  - `LBA 0`：第一个扇区，称为保护性 MBR（MBR 兼容区块），可安装 446 bytes 的 boot loader 程序与 GPT 分区格式标识符。 
-  - `LBA 1`：主要 GPT 表头记录，该部分记录了分区表自身的位置和大小，同时也记录了备用 GPT 分区所在位置（最后 34 个 LBA），还放置了分区表的校验码（CRC32），校验码的作用是让系统判断 GPT 的正确与否，倘若发现错误则可以从备份的 GPT 中恢复正常运行。 
-  - `LBA 2~33`：32 个 LBA 共存储 128 个 GPT 分区表信息（entry），其中每个 LBA 存储 4 个分区信息，每个分区信息占 128 bytes。 
-  - `LBA 34~2048`：类似于 MBR gap 区域，存储系统引导所需要的 core.img。 
-  - `LBA -34 ~ -1`：备用 GPT 分区信息
+![grub2-mbr-scheme](images/grub2-mbr-scheme.png)
+  
+如上图，GRUB2 使用 boot.img 作为 `boot loader` 负责系统引导过程的第一阶段（对应 GRUB 方式的 `stage1`），由于该镜像本身的容量大小限制无法识别 `/boot/grub2/` 所在文件系统类型，因此使用可以识别文件系统类型的 core.img，而 boot.img 由 GRUB2 硬编码 core.img 的磁盘位置定位该镜像。boot.img 位于 `/usr/lib/grub/i386-pc/` 中，grub2-install 程序将其转换为合适的 boot loader 程序写入第一个扇区。
 
-- MBR 分区与 GPT 分区系统引导的过程与差异：
+core.img 镜像是由位于 `/usr/lib/grub/i386-pc/` 中的 `diskboot.img`、`lzma_decompress.img`、`kernel.img` 与各类 `*.mod` 模块通过 `grub2-mkimage` 程序动态生成，该镜像安装的位置可在第二个扇区起始的称为 `MBR gap` 的区域（此区域至少 31 KiB）或任意文件系统的第一个扇区。
   
-  ![](images/boot-process-for-bios-and-uefi-systems.jpg)
+![grub2-structure-on-disk](images/grub2-structure-on-disk.jpg)
   
-  虽然 BIOS 和 UEFI 启动过程的大多数配置语法与工具都相同，但存在一些差异。
-  - linux16 和 /initrd16  更改为 `linuxefi` 和 `initrdefi`：
-    用于加载内核和初始 ramdisk 的配置命令将 linux16 和 initrd16（用于 BIOS）切换为 linuxefi 和 initrdefi（用于 UEFI）。此更改是必要的，因为 UEFI 系统上的内核必须与 BIOS 系统上的加载方式不同。grub2-mkconfig 命令可自动识别 UEFI 系统并使用正确的命令。 
-  - /boot/grub2 更改为 `/boot/efi/EFI/redhat`：
-    用于存放 UEFI GRUB2 配置文件和对象的目录为 /boot/efi/EFI/redhat。此目录位于 `ESP`（EFI system partition）分区上，用于访问 UEFI 固件。
-  - grub2-install：
-    不要直接使用 grub2-install 命令安装 UEFI boot loader。RHEL 8 提供预构建的 `/boot/efi/EFI/redhat/grubx64.efi` 文件，其中包含安全启动系统所需的身份认证签名。直接在 UEFI 系统上执行 grub2-install 会生成一个没有这些必要签名的新 grubx64.efi 文件。可以从 `grub2-efi` 软件包恢复正确的 grubx64.efi 文件。使用 grub2-install 会直接在 UEFI 固件中注册可启动目标，以使用该新的 grubx64.efi，而不是所需的 `shim.efi`。
-  - /boot/grub2/grub.cfg 更改为 `/boot/efi/EFI/redhat/grub.cfg`：
-    GRUB2 配置文件从 BIOS 的 /boot/grub2 目录移至 UEFI ESP 分区上的 /boot/efi/EFI/redhat/ 目录。软链接 /etc/grub.cfg 已移至 `/etc/grub2-efi.cfg`。
+由于 core.img 中可能包含更多的功能用以识别不同的文件系统类型与结构，如 Btrfs、ZFS、RAID 与 LVM 等，因此 MBR gap 需要更多空间。现代的很多磁盘管理与分区工具已预留至少 1 MiB 来满足该需求，如 fdisk、gdisk 与 parted 工具等。一旦 boot.img 引导定位至 core.img，其使用文件系统驱动识别 /boot/grub2 所在的文件系统（对应 GRUB 方式的 `stage1.5`）。
+  
+![core-img-structure](images/core-img-structure.png)
+  
+GRUB2 通过读取 /boot/grub2 中的相关配置定位系统的 `vmlinuz (kernel)`、`initramfs (ramdisk)`，继而将系统的控制权由 GRUB2 转交给内存中的 kernel（对应 GRUB 方式的 `stage2`）。
 
-- 管理 boot loader 配置文件与引导菜单：
-  💥 MBR 分区与 GPT 分区对 boot loader 配置文件及引导菜单的管理方式相似，主要区别在于配置文件路径的变化。
+### 3.2 GRUB2 在 GPT 分区中的分布
   
-  ```bash
-  $ sudo vim /etc/default/grub
-    GRUB_ENABLE_BLSCFG=true
-  $ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-  # MBR 分区方式：更新 GRUB2 配置文件
-  $ sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
-  # GPT 分区方式：更新 GRUB2 配置文件
-  $ sudo kernel-install add $(uname -r) /lib/modules/$(uname -r)/vmlinuz
-  # 生成 /boot/loader/entries 条目
+![gnu-grub-on-gpt-partitioned](images/gnu-grub-on-gpt-partitioned.jpg)
   
-  $ sudo grubby --default-kernel
-  # grubby 程序查看当前系统引导使用的默认内核
-  $ sudo grubby --default-index
-  # 查看当前系统引导使用的默认索引
-  $ sudo grubby --set-default /boot/vmlinuz-4.18.0-305.el8.x86_64
-  # 持久化设置默认的系统引导使用的内核
-  $ sudo grubby --info=ALL
-  # 查看所有内核的目录条目
-  $ sudo grubby --info /boot/vmlinuz-4.18.0-305.el8.x86_64
-  # 查看指定内核的 GRUB2 目录条目
-  ```
+`GPT`（GUID partition table，全局唯一标识符分区表）分区的结构与 MBR 分区相似，但存在自身的独特分区。在 GPT 中使用 `LBA`（logical block address，逻辑区块地址）来代替常用扇区的概念，虽然当前可使用以 `4 KiB` 的存储单位，但在 LBA 中默认依然采用 `512 bytes` 作为一个 LBA 的存储单位（可将 LBA 作为扇区理解）。  
 
-- 1️⃣ 示例：管理多个 UEFI 启动目标（boot target）
-  UEFI 固件（firmware）引导系统可使用 `efibootmgr` 命令管理启动目标（启动设备）。该命令可对启动目标实现更改、删除、添加等操作，其中删除某项启动目标后，可通过手动添加的方式进行恢复。
-  
-  ```bash
-  $ sudo efibootmgr -v
-  # 查看系统当前所有可引导设备的信息
-  $ sudo efibootmgr -b <target_num> -B
-  # 删除指定的启动目标
-  ```
-  
-  ![efibootmgr-rm-targets](images/efibootmgr-rm-targets.png)
-  
-  ✨ 若系统具有多个可用的内核版本时，使用 efibootmgr 命令依然可管理启动目标（默认通常位于 `/boot/efi/EFI/redhat/*.efi` 中），再使用 grubby 命令设置当前可用的默认内核版本，即当 UEFI 方式中 GRUB2 引导至内核选择时，默认选取的内核，如下所示：
-  
-  ![uefi-efibootmgr-grubby](images/uefi-efibootmgr-grubby.png)
-  
-  如下所示，通过添加额外的 UEFI 启动目标并指定该启动目标以引导系统：
-  
-  ```bash
-  $ sudo efibootmgr -c -d /path/to/device -p <esp_number> \
-    -L "EFI for RedHat Enterprise Linux 8" \
-    -l "\EFI\redhat\grubx64.efi"
-  # 添加新的 UEFI 启动目标
-  # 选项说明：
-  #   -c  创建新的引导序号并添加至引导顺序中
-  #   -d  使用的引导磁盘设备
-  #   -p  ESP 分区的分区号
-  #   -L  该命令显示的引导标签
-  #   -l  指定的 UEFI 启动目标，默认为 "\EFI\redhat\grub.efi"。
-  $ sudo efibootmgr -n <target_number>
-  # 指定可用的启动目标覆盖当前的启动目标
-  ```
-  
-  ![efibootmgr-add-new-boot-target](images/efibootmgr-add-new-boot-target.png)
-  
-  ![uefi-boot-manager](images/uefi-boot-manager.png)
-  
-  efibootmgr 添加额外启动目标后，当系统重启进入 BIOS 引导界面（VMware 虚拟化环境）中可见新增的启动目标。
+GPT 具体分区如上图所示：  
 
-- 2️⃣ 示例：使用 GRUB2 命令行引导 UEFI 方式启动的系统
-  
-  ![rhel85-efi-partition](images/rhel85-efi-partition.png)
-  
-  该系统分区中 `/dev/sda1` 挂载于 `/boot/efi` 为 UEFI 的 `ESP` 分区，`/dev/sda2` 挂载于 `/boot`，根分区以 `/dev/rootvg/lv0` 逻辑卷的方式挂载。现尝试使用 GRUB2 命令行方式重新引导系统：
-  
-  ![grub2-boot-cmd](images/grub2-boot-cmd.png)
-  
-  若 `root=` 根分区指定错误将无法成功引导，报错如下：
-  
-  ![grub2-cmd-boot-error](images/grub2-cmd-boot-error.png)
+- `LBA 0`：第一个扇区，称为保护性 MBR（MBR 兼容区块），可安装 446 bytes 的 boot loader 程序与 GPT 分区格式标识符。 
+- `LBA 1`：主要 GPT 表头记录，该部分记录了分区表自身的位置和大小，同时也记录了备用 GPT 分区所在位置（最后 34 个 LBA），还放置了分区表的校验码（CRC32），校验码的作用是让系统判断 GPT 的正确与否，倘若发现错误则可以从备份的 GPT 中恢复正常运行。 
+- `LBA 2~33`：32 个 LBA 共存储 128 个 GPT 分区表信息（entry），其中每个 LBA 存储 4 个分区信息，每个分区信息占 128 bytes。 
+- `LBA 34~2048`：类似于 MBR gap 区域，存储系统引导所需要的 core.img。 
+- `LBA -34 ~ -1`：备用 GPT 分区信息
 
-- 参考链接：
-  - 📚 [GNU GRUB manual v2.06](https://www.gnu.org/software/grub/manual/grub/)  
-  - 📚 [Chapter 26. Working with GRUB 2](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-working_with_the_grub_2_boot_loader#doc-wrapper)  
-  - ✨ [Managing, monitoring, and updating the kernel](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/managing_monitoring_and_updating_the_kernel/index#doc-wrapper)  
-  - 💪 [grub2 详解 (翻译和整理官方手册) - 骏马金龙](https://www.cnblogs.com/f-ck-need-u/p/7094693.html) 
-  - 💪 [GRUB2 配置文件 grub.cfg 详解 (GRUB2 实战手册) - 金步国](http://www.jinbuguo.com/linux/grub.cfg.html)
-  - 💪 [grub 安装过程](https://www.wxtechblog.com/grub/grub-install)  
-  - [Step by Step Linux boot process with GRUB2 and systemd in RHEL 7 / CentOS 7](https://www.golinuxhub.com/2017/12/step-by-step-linux-boot-process-with/)  
-  - [Linux Boot Process Explained Step by Step in Detail](https://www.golinuxcloud.com/linux-boot-process-explained-step-detail/) 
-  - [第14章 Linux开机详细流程 - 骏马金龙](https://www.cnblogs.com/f-ck-need-u/p/7100336.html#auto_id_6)  
-  - [GPT 分区数据格式分析](https://blog.csdn.net/chongyang198999/article/details/43408249)  
-  - [GUID 磁碟分割表 - Wikiwand](https://www.wikiwand.com/zh/GUID%E7%A3%81%E7%A2%9F%E5%88%86%E5%89%B2%E8%A1%A8)  
-  - ✨ [Linux 无法启动的修复方法](https://note.lishouzhong.com/article/wiki/linux/Linux%20%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%B3%95.html) 
-  - [How to generate BLS configuration files under /boot/loader/entries in Red Hat Enterprise Linux?](https://access.redhat.com/solutions/5847011) 
-  - [How to reinstall GRUB and GRUB2 on UEFI-based machines?](https://access.redhat.com/solutions/3486741)
-  - [How to unpack/uncompress and repack/re-compress an initial ramdisk (initrd/initramfs) boot image file on RHEL 5,6 ?](https://access.redhat.com/solutions/24029)
+### 3.3 MBR 分区与 GPT 分区系统引导的过程与差异
+  
+![boot-process-for-bios-and-uefi-systems.jpg](images/boot-process-for-bios-and-uefi-systems.jpg)
+  
+虽然 BIOS 和 UEFI 启动过程的大多数配置语法与工具都相同，但存在一些差异。
 
-## systemd 单元文件的依赖性
+- linux16 和 /initrd16  更改为 `linuxefi` 和 `initrdefi`：
+  用于加载内核和初始 ramdisk 的配置命令将 linux16 和 initrd16（用于 BIOS）切换为 linuxefi 和 initrdefi（用于 UEFI）。此更改是必要的，因为 UEFI 系统上的内核必须与 BIOS 系统上的加载方式不同。grub2-mkconfig 命令可自动识别 UEFI 系统并使用正确的命令。 
+- /boot/grub2 更改为 `/boot/efi/EFI/redhat`：
+  用于存放 UEFI GRUB2 配置文件和对象的目录为 /boot/efi/EFI/redhat。此目录位于 `ESP`（EFI system partition）分区上，用于访问 UEFI 固件。
+- grub2-install：
+  不要直接使用 grub2-install 命令安装 UEFI boot loader。RHEL 8 提供预构建的 `/boot/efi/EFI/redhat/grubx64.efi` 文件，其中包含安全启动系统所需的身份认证签名。直接在 UEFI 系统上执行 grub2-install 会生成一个没有这些必要签名的新 grubx64.efi 文件。可以从 `grub2-efi` 软件包恢复正确的 grubx64.efi 文件。使用 grub2-install 会直接在 UEFI 固件中注册可启动目标，以使用该新的 grubx64.efi，而不是所需的 `shim.efi`。
+- /boot/grub2/grub.cfg 更改为 `/boot/efi/EFI/redhat/grub.cfg`：
+  GRUB2 配置文件从 BIOS 的 /boot/grub2 目录移至 UEFI ESP 分区上的 /boot/efi/EFI/redhat/ 目录。软链接 /etc/grub.cfg 已移至 `/etc/grub2-efi.cfg`。
+
+### 3.4 管理 boot loader 配置文件与引导菜单
+
+💥 MBR 分区与 GPT 分区对 boot loader 配置文件及引导菜单的管理方式相似，主要区别在于配置文件路径的变化。
+  
+```bash
+$ sudo vim /etc/default/grub
+  GRUB_ENABLE_BLSCFG=true
+$ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+# MBR 分区方式：更新 GRUB2 配置文件
+$ sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+# GPT 分区方式：更新 GRUB2 配置文件
+$ sudo kernel-install add $(uname -r) /lib/modules/$(uname -r)/vmlinuz
+# 生成 /boot/loader/entries 条目
+  
+$ sudo grubby --default-kernel
+# grubby 程序查看当前系统引导使用的默认内核
+$ sudo grubby --default-index
+# 查看当前系统引导使用的默认索引
+$ sudo grubby --set-default /boot/vmlinuz-4.18.0-305.el8.x86_64
+# 持久化设置默认的系统引导使用的内核
+$ sudo grubby --info=ALL
+# 查看所有内核的目录条目
+$ sudo grubby --info /boot/vmlinuz-4.18.0-305.el8.x86_64
+# 查看指定内核的 GRUB2 目录条目
+```
+
+#### 3.4.1 1️⃣ 示例：管理多个 UEFI 启动目标（boot target）
+
+UEFI 固件（firmware）引导系统可使用 `efibootmgr` 命令管理启动目标（启动设备）。该命令可对启动目标实现更改、删除、添加等操作，其中删除某项启动目标后，可通过手动添加的方式进行恢复。
+  
+```bash
+$ sudo efibootmgr -v
+# 查看系统当前所有可引导设备的信息
+$ sudo efibootmgr -b <target_num> -B
+# 删除指定的启动目标
+```
+  
+![efibootmgr-rm-targets](images/efibootmgr-rm-targets.png)
+  
+✨ 若系统具有多个可用的内核版本时，使用 efibootmgr 命令依然可管理启动目标（默认通常位于 `/boot/efi/EFI/redhat/*.efi` 中），再使用 grubby 命令设置当前可用的默认内核版本，即当 UEFI 方式中 GRUB2 引导至内核选择时，默认选取的内核，如下所示：
+  
+![uefi-efibootmgr-grubby](images/uefi-efibootmgr-grubby.png)
+  
+如下所示，通过添加额外的 UEFI 启动目标并指定该启动目标以引导系统：
+  
+```bash
+$ sudo efibootmgr -c -d /path/to/device -p <esp_number> \
+  -L "EFI for RedHat Enterprise Linux 8" \
+  -l "\EFI\redhat\grubx64.efi"
+# 添加新的 UEFI 启动目标
+# 选项说明：
+#   -c  创建新的引导序号并添加至引导顺序中
+#   -d  使用的引导磁盘设备
+#   -p  ESP 分区的分区号
+#   -L  该命令显示的引导标签
+#   -l  指定的 UEFI 启动目标，默认为 "\EFI\redhat\grub.efi"。
+$ sudo efibootmgr -n <target_number>
+# 指定可用的启动目标覆盖当前的启动目标
+```
+  
+![efibootmgr-add-new-boot-target](images/efibootmgr-add-new-boot-target.png)
+  
+![uefi-boot-manager](images/uefi-boot-manager.png)
+  
+efibootmgr 添加额外启动目标后，当系统重启进入 BIOS 引导界面（VMware 虚拟化环境）中可见新增的启动目标。
+
+#### 3.4.2 2️⃣ 示例：使用 GRUB2 命令行引导 UEFI 方式启动的系统
+  
+![rhel85-efi-partition](images/rhel85-efi-partition.png)
+  
+该系统分区中 `/dev/sda1` 挂载于 `/boot/efi` 为 UEFI 的 `ESP` 分区，`/dev/sda2` 挂载于 `/boot`，根分区以 `/dev/rootvg/lv0` 逻辑卷的方式挂载。现尝试使用 GRUB2 命令行方式重新引导系统：
+  
+![grub2-boot-cmd](images/grub2-boot-cmd.png)
+  
+若 `root=` 根分区指定错误将无法成功引导，报错如下：
+  
+![grub2-cmd-boot-error](images/grub2-cmd-boot-error.png)
+
+### 3.5 参考链接
+
+- 📚 [GNU GRUB manual v2.06](https://www.gnu.org/software/grub/manual/grub/)  
+- 📚 [Chapter 26. Working with GRUB 2](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-working_with_the_grub_2_boot_loader#doc-wrapper)  
+- ✨ [Managing, monitoring, and updating the kernel](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/managing_monitoring_and_updating_the_kernel/index#doc-wrapper)  
+- 💪 [grub2 详解 (翻译和整理官方手册) - 骏马金龙](https://www.cnblogs.com/f-ck-need-u/p/7094693.html) 
+- 💪 [GRUB2 配置文件 grub.cfg 详解 (GRUB2 实战手册) - 金步国](http://www.jinbuguo.com/linux/grub.cfg.html)
+- 💪 [grub 安装过程](https://www.wxtechblog.com/grub/grub-install)  
+- [Step by Step Linux boot process with GRUB2 and systemd in RHEL 7 / CentOS 7](https://www.golinuxhub.com/2017/12/step-by-step-linux-boot-process-with/)  
+- [Linux Boot Process Explained Step by Step in Detail](https://www.golinuxcloud.com/linux-boot-process-explained-step-detail/) 
+- [第14章 Linux开机详细流程 - 骏马金龙](https://www.cnblogs.com/f-ck-need-u/p/7100336.html#auto_id_6)  
+- [GPT 分区数据格式分析](https://blog.csdn.net/chongyang198999/article/details/43408249)  
+- [GUID 磁碟分割表 - Wikiwand](https://www.wikiwand.com/zh/GUID%E7%A3%81%E7%A2%9F%E5%88%86%E5%89%B2%E8%A1%A8)  
+- ✨ [Linux 无法启动的修复方法](https://note.lishouzhong.com/article/wiki/linux/Linux%20%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%B3%95.html) 
+- [How to generate BLS configuration files under /boot/loader/entries in Red Hat Enterprise Linux?](https://access.redhat.com/solutions/5847011) 
+- [How to reinstall GRUB and GRUB2 on UEFI-based machines?](https://access.redhat.com/solutions/3486741)
+- [How to unpack/uncompress and repack/re-compress an initial ramdisk (initrd/initramfs) boot image file on RHEL 5,6 ?](https://access.redhat.com/solutions/24029)
+
+## 4. systemd 单元文件的依赖性
 
 ```bash
-$ systemctl list-dependencies <unit_name>
+$ sudo systemctl list-dependencies <unit_name>
 # 列出指定单元文件依赖的其他单元文件，绿色点表示处于 active 状态，红色点表示 inactive 状态。
-$ yum install -y graphviz
+$ sudo yum install -y graphviz
 # 安装单元文件依赖的图形化处理工具
-$ systemd-analyze dot <unit_name> | dot -Tsvg > <filename>.svg
+$ sudo systemd-analyze dot <unit_name> | dot -Tsvg > <filename>.svg
 # 生成指定单元文件的依赖性关系图
 $ man 5 systemd.unit
 # systemd 单元文件的详细说明文档
 
-$ systemctl enable debug-shell.service
+$ sudo systemctl enable debug-shell.service
 # 启用 debug-shell 服务
 # 注意：
 #   1. 在 sysinit.target 早期启动期间，该服务将在 /dev/tty9 上启动带有已登录
@@ -380,7 +295,7 @@ $ systemctl enable debug-shell.service
 - 可在系统 GRUB2 引导时进行中断，使用 `systemd.unit=emergency.target` 参数进入紧急模式，该模式中 **`/`** 为 `ro`（只读状态），而使用 `systemd.unit=rescue.target` 参数进入救援模式，该模式中 **`/`** 为 `rw`（读写）状态。
 - 关于 systemd 更为详尽的指导可参考[此链接](https://access.redhat.com/articles/754933)。
 
-## CPU 的个数、核心数、超线程的关系
+## 5. CPU 的个数、核心数、超线程的关系
 
 - 使用多处理器架构（SMP）或多核心 CPU 中 Linux 内核会将多核 CPU 当做多个单核 CPU 来识别，如 Linux 会将 2 个 4 核的 CPU 当做 8 个单核 CPU 来识别，但两者的性能并不等价。
 - 物理 CPU 个数（physical id）：
@@ -390,7 +305,7 @@ $ systemctl enable debug-shell.service
 - 逻辑 CPU 个数（processor）：
   物理 CPU 个数（physical id）x 每颗 CPU 的核心数（core id）x 每个核心的超线程数（CPU 支持的话）
 
-## CPU 信息查看
+## 6. CPU 信息查看
 
 ```bash
 $ grep 'model name' /proc/cpuinfo | cut -d ':' -f 2 | uniq -c
@@ -417,26 +332,33 @@ $ grep 'flags' /proc/cpuinfo | grep 'lm' | wc -l
 # lm 指 long mode，支持 lm 则支持 64-bit。
 ```
 
-## dmidecode 命令使用
+## 7. dmidecode 命令
+
+### 7.1 SMBIOS/DMI 说明
+
+- `dmidecode` 允许在 Linux 系统下获取有关硬件方面的信息，其遵循 `SMBIOS`（System Management BIOS）/ `DMI`（Desktop Management Interface） 标准，该标准由 DMTF（Desktop Management Task Force）开发，其输出的信息包括 BIOS、系统、主板、处理器、内存、缓存等等。
+- `DMI` 充当了管理工具和系统层之间接口的角色。它建立了标准的可管理系统更加方便了计算机厂商和用户对系统的了解。DMI 的主要组成部分是 Management Information Format（MIF）数据库。这个数据库包括了所有有关计算机系统和配件的信息。通过 DMI，用户可以获取序列号、计算机厂商、串口信息以及其它系统配件信息。
+
+### 7.2 命令示例
 
 ```bash
 $ man dmidecode
 # 查看 dmidecode 命令的详细使用方法
 # 可搜索 TYPES 关键字查询该命令支持的 DMI 类型，也可搜索 -s 查看该命令支持的类型关键字。
 
-$ dmidecode | grep 'Product Name'
+$ sudo dmidecode | grep 'Product Name'
 # 查看服务器型号
-$ dmidecode | grep 'Serial Number' | grep -Ev "Not|None"
+$ sudo dmidecode | grep 'Serial Number' | grep -Ev "Not|None"
 # 查看服务器主板序列号
-$ dmidecode -s system-serial-number
+$ sudo dmidecode -s system-serial-number
 # 查看服务器系统序列号
 
-$ dmidecode -t Memory | grep -P -A5 "Memory\s+Device" | grep Size | sed -s 's/^[ \t]*//g'
+$ sudo dmidecode -t Memory | grep -P -A5 "Memory\s+Device" | grep Size | sed -s 's/^[ \t]*//g'
 # 查看系统当前已安装的内存大小与内存槽位数
 # -P 选项为 grep 命令支持 Perl 正则表达式
-$ dmidecode -t Memory | grep -P -A16 "Memory\s+Device" | grep Speed
+$ sudo dmidecode -t Memory | grep -P -A16 "Memory\s+Device" | grep Speed
 # 查看已安装的内存速率，未安装内存的槽位其速率为 Unknown。
-$ dmidecode -t 16
+$ sudo dmidecode -t 16
   # dmidecode 3.2
   Getting SMBIOS data from sysfs.
   SMBIOS 2.7 present.
@@ -453,22 +375,21 @@ $ dmidecode -t 16
           # 系统支持的内存插槽数，单根内存条最大支持容量为 "Maximum Capacity/Number Of Devices"。
 # 16 代表 Physical Memory Array
 # 注意： 需考虑内存槽位是否被占满，以及是否可被扩展到最大内存。
-$ dmidecode -t 16 | grep "Maximum Capacity" | sed -s 's/^[ \t]*//g'
+$ sudo dmidecode -t 16 | grep "Maximum Capacity" | sed -s 's/^[ \t]*//g'
 # 查看系统可支持的最大内存数
 
-$ dmidecode -t 0,1
+$ sudo dmidecode -t 0,1
 # 同时查看两种 DMI 类型的信息（BIOS 与 processor）
 ```
 
-- `dmidecode` 允许在 Linux 系统下获取有关硬件方面的信息，其遵循 `SMBIOS`（System Management BIOS）/ `DMI`（Desktop Management Interface） 标准，该标准由 DMTF（Desktop Management Task Force）开发，其输出的信息包括 BIOS、系统、主板、处理器、内存、缓存等等。
-- `DMI`（Desktop Management Interface）充当了管理工具和系统层之间接口的角色。它建立了标准的可管理系统更加方便了计算机厂商和用户对系统的了解。DMI 的主要组成部分是 Management Information Format（MIF）数据库。这个数据库包括了所有有关计算机系统和配件的信息。通过 DMI，用户可以获取序列号、计算机厂商、串口信息以及其它系统配件信息。
-- 查看硬件相关的命令与文件：
-  - `dmesg` 命令：
-    在 Linux 上 syslogd 或 klogd 启动前用来记录内核消息（启动阶段的消息）。
-    它通过读取内核的环形缓冲区（ring buffer）来获取数据，在排查问题或只是尝试获取系统硬件信息时，该命令非常有用。
+### 7.3 其他硬件相关命令
+
+- `dmesg` 命令：
+  - 在 Linux 上 syslogd 或 klogd 启动前用来记录内核消息（启动阶段的消息）。
+  - 它通过读取内核的环形缓冲区（ring buffer）来获取数据，在排查问题或只是尝试获取系统硬件信息时，该命令非常有用。
 
     ```bash
-    $ dmesg -T
+    $ sudo dmesg -H -T --color=auto 
     # 转换 dmesg 命令输出的时间戳以查看启动过程
     ```
   
