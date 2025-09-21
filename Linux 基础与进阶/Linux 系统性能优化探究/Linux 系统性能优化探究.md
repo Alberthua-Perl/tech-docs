@@ -826,20 +826,28 @@ $ sudo ls -lhd /sys/devices/system/node/node*
 
 ## 8. x86_64 架构的常用寄存器示例
 
-- x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本不同的寄存器，以下列举了 x86_64 架构中常用寄存器的全称和简称： 
-  - 通用寄存器 (General-Purpose Registers)：
-    - RAX (Accumulator Register)
-    - RBX (Base Register)
-    - RCX (Counter Register)
-    - RDX (Data Register)
-    - RSI (Source Index Register)
-    - RDI (Destination Index Register)
-    - RBP (Base Pointer Register)
-    - RSP (Stack Pointer Register)
-    - R8-R15：新增 8 个通用寄存器，即 R8、R9、R10、R11、R12、R13、R14、R15。
-  - 程序计数器 (Program Counter Registers, PC)：
-    - RIP (Instruction Pointer Register)：
-      存储 CPU 正在执行的指令的地址。  
+x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本不同的寄存器，以下列举了 x86_64 架构中常用寄存器的全称和简称：
+
+- 通用寄存器 (General-Purpose Registers)：
+  
+  | 名称                                  | 功能                                             |
+  | ------------------------------------ | ------------------------------------------------ |
+  | **rax** (Accumulator Register)       | 累加器寄存器。常用于算术运算、函数返回值等。在乘法/除法等指令中，rax 还常作为隐含操作数。|
+  | **rbx** (Base Register)              | 基址寄存器。传统上用作内存访问的基址，现代也常作为通用寄存器使用。|
+  | **rcx** (Counter Register)           | 计数寄存器。常用于循环计数（如 `loop` 指令）、字符串操作（如 `rep` 前缀指令）等。|
+  | **rdx** (Data Register)              | 数据寄存器。常用于算术运算、I/O 操作、乘法/除法中的高 32 位等。|
+  | **rsi** (Source Index Register)      | 源变址寄存器。在字符串操作指令（如 `movs`, `lods` 等）中作为源地址指针。|
+  | **rdi** (Destination Index Register) | 目的变址寄存器。在字符串操作指令（如 `movs`, `stos` 等）中作为目的地址指针。|
+  | **rbp** (Base Pointer Register)      | 基址指针寄存器。常用于栈帧（stack frame）的基址，帮助访问函数参数和局部变量。|
+  | **rsp** (Stack Pointer Register)     | 栈指针寄存器。始终指向当前栈顶，用于函数调用、参数传递、局部变量分配等。|
+  | **r8–r15**                           | 新增的 8 个通用寄存器。没有特殊用途，主要用于存放通用数据，减少寄存器压力，提高性能。|
+
+- 程序计数器 (Program Counter Registers, PC)：
+
+  | 名称 | 功能 |
+  | ----- | ----- |
+  | rip (Instruction Pointer Register) | 存储 CPU 正在执行的指令的地址 |
+
   - 标志寄存器 (Flags Registers)：
     - RFlags (Flags Register)：
       存储 CPU 状态的二进制标志，包含了 x86_32 架构中的 EFlags 寄存器。  

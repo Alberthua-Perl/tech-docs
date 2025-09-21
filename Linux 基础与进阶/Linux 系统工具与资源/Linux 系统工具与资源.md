@@ -385,7 +385,7 @@ Cursor Style: block
   - Dracula Theme Official：Dracula 配色方案
   - Markdown Preview Mermaid Support：支持 UML 时序图预览
   - Markdown All in One：支持 Markdown 语法格式
-    - `ctrl + shift + p`：自动生成 markdown 文件目录结构 
+    - `ctrl + shift + p`：`Markdown: Create Table of Contents`（自动生成 markdown 文件目录结构）
   - markdownlint：Markdown 语法检查
   - vscode-pdf：支持 PDF 文件预览
   - YAML：支持 yaml 格式语法
