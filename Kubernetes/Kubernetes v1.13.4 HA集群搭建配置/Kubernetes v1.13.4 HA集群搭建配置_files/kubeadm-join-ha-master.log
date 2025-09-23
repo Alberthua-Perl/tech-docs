@@ -1,0 +1,62 @@
+--- Install other HA master nodes of Kubernetes 1.13.4 by kubeadm ---
+
+[root@kube-master1 ~]# kubeadm join master.lab.example.com:16443 --token s3fqh8.ghoheuyezbrnpmx6 --discovery-token-ca-cert-hash sha256:1a7fffc93d38484a3336415a1ad17f5df32fc25d6fba728ca9954b6d29e23b3d --experimental-control-plane
+[preflight] Running pre-flight checks
+[discovery] Trying to connect to API Server "master.lab.example.com:16443"
+[discovery] Created cluster-info discovery client, requesting info from "https://master.lab.example.com:16443"
+[discovery] Requesting info from "https://master.lab.example.com:16443" again to validate TLS against the pinned public key
+[discovery] Cluster info signature and contents are valid and TLS certificate validates against pinned roots, will use API Server "master.lab.example.com:16443"
+[discovery] Successfully established connection with API Server "master.lab.example.com:16443"
+[join] Reading configuration from the cluster...
+[join] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[join] Running pre-flight checks before initializing the new control plane instance
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [kube-master1.lab.example.com localhost] and IPs [192.168.5.82 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [kube-master1.lab.example.com localhost] and IPs [192.168.5.82 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [kube-master1.lab.example.com kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local master.lab.example.com kube-master0 kube-master1 kube-master2 master.lab.example.com] and IPs [10.10.0.1 192.168.5.82 192.168.5.86 192.168.5.81 192.168.5.82 192.168.5.83 127.0.0.1]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] valid certificates and keys now exist in "/etc/kubernetes/pki"
+[certs] Using the existing "sa" key
+[endpoint] WARNING: port specified in controlPlaneEndpoint overrides bindPort in the controlplane address
+[kubeconfig] Using existing up-to-date kubeconfig file: "/etc/kubernetes/admin.conf"
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[etcd] Checking etcd cluster health
+[kubelet] Downloading configuration for the kubelet from the "kubelet-config-1.13" ConfigMap in the kube-system namespace
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Activating the kubelet service
+[tlsbootstrap] Waiting for the kubelet to perform the TLS Bootstrap...
+[patchnode] Uploading the CRI Socket information "/var/run/dockershim.sock" to the Node API object "kube-master1.lab.example.com" as an annotation
+[etcd] Announced new etcd member joining to the existing etcd cluster
+[etcd] Wrote Static Pod manifest for a local etcd member to "/etc/kubernetes/manifests/etcd.yaml"
+[etcd] Waiting for the new etcd member to join the cluster. This can take up to 40s
+[util/etcd] Waiting 0s for initial delay
+[util/etcd] Attempt timed out
+[util/etcd] Waiting 5s until next retry
+[uploadconfig] storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[mark-control-plane] Marking the node kube-master1.lab.example.com as control-plane by adding the label "node-role.kubernetes.io/master=''"
+[mark-control-plane] Marking the node kube-master1.lab.example.com as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]
+
+This node has joined the cluster and a new control plane instance was created:
+
+* Certificate signing request was sent to apiserver and approval was received.
+* The Kubelet was informed of the new secure connection details.
+* Master label and taint were applied to the new node.
+* The Kubernetes control plane instances scaled up.
+* A new etcd member was added to the local/stacked etcd cluster.
+
+To start administering your cluster from this node, you need to run the following as a regular user:
+
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Run 'kubectl get nodes' to see this node join the cluster.
+
+[root@kube-master1 ~]# 
