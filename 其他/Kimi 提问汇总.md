@@ -10,7 +10,6 @@
   - “自顶向下” 的顺序：从 NUMA 节点 → 内存域（Zone）→ 页帧（Page Frame）→ 每 CPU/伙伴/Slab 三级缓存
   - Linux 把物理 RAM 先切成 NUMA 节点，节点内再切成 Zone，Zone 里用 **伙伴系统** 管理 2^n 页块，每页对应一个 `struct page`；小对象再由 **slab** 切分，形成 “节点-域-页-对象” 四级物理内存版图。
 - 🔥 Linux 内核自身运行所在的内存与用户空间程序运行所在的内存有何区别？
-  
   - Linux 内核永远跑在 **高地址、特权级、固定映射** 的那一段内存里；所有用户态进程只能呆在 **低地址、非特权、按需映射** 的另一半。两边用页表+特权级完全隔离，互不干扰。
   
   | 维度 | 内核空间 (Kernel Space) | 用户空间 (User Space) |
@@ -29,8 +28,7 @@
     - 用户空间 = 低地址 + Ring 3 + 按需映射
     - 内核空间 = 高地址 + Ring 0 + 永远映射
     - 两边地址空间重叠但权限隔离，用户态永远触碰不到内核那半张页表。
-
-- 🔥 Linux 内核如何为自己分配内存? 如何为用户空间进程分配内存？
+- 🔥 Linux 内核如何为自己分配内存？ 如何为用户空间进程分配内存？
   - 把 Linux 内核的内存分配机制拆成两条主线：
     - “内核给自己用” —— 内核地址空间
     - “内核给用户进程用” —— 用户地址空间
@@ -44,18 +42,43 @@
     | **per-CPU 变量** | `alloc_percpu(type)` | 每 CPU 一段 | 每 CPU 固定线性映射 | `free_percpu()` |
     | **bootmem/memblock** 早期 | `memblock_alloc()` | 启动早期预留 | 静态映射 | 启动完成后转交伙伴系统 |
 
-
 - 请详细描述从 CR3 寄存器开始的线性地址到物理地址的寻址过程？
-- 上述 CR3 寄存器是什么结构?
+- 上述 CR3 寄存器是什么结构？
 - Linux 内核是如何操作 MMU 和 TLB，请详述过程？
 - 详解 /proc/meminfo 文件中的各项参数？
 
 在 Linux 运行的 x86-64 模式下：
-硬件把段基址强制设为 0，限长视为无限 →
-逻辑地址 = 线性地址（恒等映射，段部件不做任何算术）。
+硬件把段基址强制设为 0，限长视为无限 → 逻辑地址 = 线性地址（恒等映射，段部件不做任何算术）。
 因此用户代码里看到的地址就是线性地址，Linux 只通过四级/五级页表把它映射到物理页；分段机制既不参与分配，也不提供隔离。
-结论：
-“分段”在 64-bit Linux 中名存实亡，所有虚拟地址↔物理地址的转换完全由分页机制完成。
+结论：“分段” 在 64-bit Linux 中名存实亡，所有虚拟地址 ↔ 物理地址的转换完全由分页机制完成。
+
+- 以下 Linux 内核 call trace 代表的含义是？每个符号与后面的十六进制分别代表是？
+  
+```plaintext
+[Sat Jun  7 16:54:14 2025] Call Trace:
+[Sat Jun  7 16:54:14 2025]  <TASK>
+[Sat Jun  7 16:54:14 2025]  dump_stack_lvl+0x34/0x48
+[Sat Jun  7 16:54:14 2025]  dump_header+0x4a/0x201
+[Sat Jun  7 16:54:14 2025]  oom_kill_process.cold+0xb/0x10
+[Sat Jun  7 16:54:14 2025]  out_of_memory+0xed/0x2e0
+[Sat Jun  7 16:54:14 2025]  __alloc_pages_slowpath.constprop.0+0x6e8/0x960
+[Sat Jun  7 16:54:14 2025]  __alloc_pages+0x21d/0x250
+[Sat Jun  7 16:54:14 2025]  __folio_alloc+0x17/0x50
+[Sat Jun  7 16:54:14 2025]  ? policy_node+0x4f/0x70
+[Sat Jun  7 16:54:14 2025]  vma_alloc_folio+0xa3/0x390
+[Sat Jun  7 16:54:14 2025]  do_anonymous_page+0x63/0x520
+[Sat Jun  7 16:54:14 2025]  __handle_mm_fault+0x32b/0x670
+[Sat Jun  7 16:54:14 2025]  ? nohz_balancer_kick+0x31/0x250
+[Sat Jun  7 16:54:14 2025]  handle_mm_fault+0xcd/0x290
+[Sat Jun  7 16:54:14 2025]  do_user_addr_fault+0x1b4/0x6a0
+[Sat Jun  7 16:54:14 2025]  ? sched_clock_cpu+0x9/0xc0
+[Sat Jun  7 16:54:14 2025]  exc_page_fault+0x62/0x150
+[Sat Jun  7 16:54:14 2025]  asm_exc_page_fault+0x22/0x30
+```
+
+- 以 Linux 内核 call trace 中的 do_anonymous_page+0x63/0x520 为例，请给出 addr2line 定位源代码行号的示例？
+- 那么上述函数的长度在定位源码行数的过程中没有实际作用吗？
+- 以上示例中，什么是函数入口地址、相对地址与绝对地址？
 
 ## Linux 系统编程
 
@@ -63,8 +86,12 @@
 - 请编写多个 C 语言程序示例，并使用 makefile 完成编译。
 - 为什么 C 程序中函数传参都使用了字符串指针而不是直接使用字符串，这样有何好处？
 - char *s 这里的 s 是字符串数组，而 *s 是指向 s 的指针？
+- 什么是函数声明与定义中的形参与实参？
 - intel 8086 CPU 与内存间的地址总线数量是多少？
 - intel x86_64 CPU 与内存间的地址总线数量是多少？
+- 编写 C 程序，用于拷贝文件数据。如果文件过大，效率会降低，是否可将原数据文件进行拆分，再做拷贝，应该如何实现？如何利用多线程或者异步 I/O 优化上述程序？
+- 给出一个示例，使用 linux io_uring 来实现大文件的拷贝？
+- io_uring 相比传统的读写操作有哪些优势？
 
 ## Linux 性能优化
 
@@ -190,6 +217,7 @@ net.ipv4.conf.all.arp_announce = 2
 
 ## 容器 & Kubernetes
 
+- 如何理解 overlayfs 文件系统，并用示例说明？
 - flatpak 与 Podman 容器在实现上的异同点是什么？
 
   flatpak 与 Podman 虽然都属于 “容器化” 技术，但它们的设计目标、隔离模型和底层实现差异很大，可类比为“桌面沙盒”与“系统级容器”的区别。下面从实现机制角度给出异同点对比。
@@ -285,15 +313,16 @@ net.ipv4.conf.all.arp_announce = 2
 
 - 如何使用 ostree 命令读取 flatpak 仓库？
 - 什么是 bubblewrap？
-- flatpak 如何利用 bwrap 实现容器化? 如何利用 ostree 实现应用的升级与回滚？
+- flatpak 如何利用 bwrap 实现容器化？ 如何利用 ostree 实现应用的升级与回滚？
 - 如何查看 flatpak 应用的当前版本和历史版本？
-- 请给出一个 Kubernetes Operator 的实现的具体示例
+- 请给出一个 Kubernetes Operator 与 CRD 的具体实现示例？
 - Kubernetes 从哪个版本开始支持 Tekton 与 ArgoCD？
 - Kubernetes api `managedFileds`（v1.18新增）：server-side apply（服务端应用）说明
 - OpenShift v4.6 OAuth2 server 认证的原理？
 - OpenShift v4.10 集群中的证书工作机制？集群内部使用的证书由集群内部自身管理，不可使用用户自定义的证书，该功能直至 v4.11 版本依然未被解决，而 `router pod` 与 `web console pod` 的证书可替换为用户自定义的证书。
 - OpenShift v4.10 etcd 数据库的备份与恢复？
 - 如何理解 OpenShift v4.10 中的 `extension APIs` 与 `Operator` 概念？
+- 🌐 KServe 与 Knative 之间的联系？它们的架构如何实现？
 
 ### K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系
 
@@ -334,30 +363,60 @@ $ ip addr add 10.244.0.1/24 dev cni0
 
 ## 机器学习
 
-- 函数 y=1/(1+e^(-x)) 求导？
-- 超平面与法向量详细介绍？
-- 如何求直线方程与平面方程的法向量？
-- 点到超平面距离公式如何推导？超平面表达式如何推导？
-- 向量内积的柯西·施瓦茨不等式？
-- [十大回归算法与代码示例](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzkwNjY5NDU2OQ==&scene=1&album_id=3510733534568808456&count=3#wechat_redirect)
+- 数学基础：
+  - 函数 $y = \frac{1}{1 + e^{-x}}$ 求导过程？
+  - 如何求直线方程与平面方程的法向量？
+  - 超平面与法向量的定义？
+  - 如何推导超平面表达式？如何推导点到超平面距离公式？
+  - 向量内积的 **柯西·施瓦茨不等式**？
+  - 如何理解与推导最小二乘法？
+  - 举例说明最小二乘法的具体步骤？
+  - 均方根误差是不是通过最小二乘法推导而来的？
+
+- 概率 & 统计：
+  - 均值、方差、协方差、标准差、偏差的数学定义？
+
+- Python 基础：
+  - 请给出 Python 面向对象的说明与示例？
+  - 什么是 Python 面向对象的封装、继承与多态？
+  - 如何使用 Python 绘制曲面与平面相切及其切点？
+
+- 📊 给出 NumPy 与 Pandas 在实际数据清洗过程中的完整示例？
+- 评估数据相关性的有哪些指标？
 - 详细描述线性回归的训练过程？
-- 最小二乘法的理解及推导过程？
-- 举例说明最小二乘法的具体步骤？
-- 均方根误差是不是通过最小二乘法推导而来的？
-- 如何使用 python 绘制曲面与平面相切及其切点？
-- 机器学习中的 AC、SN、MCC、MSE、RMSE？
-- NumPy 数组表示的矩阵维度，请给出具体示例？
-- 如何修改 ipynb 的字体以及安装 Git 扩展？
-- 误差反向传播算法 (BP) 的详细数学推导？
+- 🎉 什么是 XGBoost？它是否既可以做预测分析，也可以做多分类呢？
+- 🧩 什么是 LightGBM？此算法的数学推导与应用场景是什么？
+
+- 📝 案例：
+  - 如何获取 Ames House Prices 数据集，该数据集是以何种方式存储的？如何理解 Ames House Prices 数据集结构？
+  - 如何对 Ames House Prices 数据集进行特征工程？
+  - ANN 实现 Ames 房价预测的代码示例？
+  - 什么是 Bootstrap 采样和有放回采样？
+  - 如何计算模型的方差和偏差，并利用这两个值判断欠拟合或过拟合？
 
 ## 深度学习
 
 - tensorflow.keras.datasets 下载的数据存放路径是什么？
-- 下采样操作是什么？
+- 什么是数据标准化？它的功能是什么？
+- 什么是正则化？它的功能是什么？
+- 数据预处理中 OneHotEncoder 是什么？它的功能是什么？
+- ANN 中为何要构建数据加载器 DataLoader？
+- CNN 中的下采样操作是什么？
+
+- 梯度下降算法的公式是如何基于泰勒公式推导出来的？
+- 以一元函数的泰勒公式为例，详细演示如何推导出梯度下降算法公式？
+- 以多元函数的泰勒公式为例，详细演示如何推导出梯度下降算法公式？
+- 🔎 神经网络中的计算图（graph）是什么？误差反向传播算法 (BP) 的详细数学推导？
+- 🧬 PyTorch 框架中 autograd 机制实现反向传播过程，loss.backward() 逐一更新整个所有梯度，再由 optimizer.step() 更新权重与偏置项，请以鸢尾花数据集为例，采用真实的数据手动计算这一过程？
 - CNN 训练过程中反向传播在哪些阶段实现？
 - CNN 中每个卷积层中的不同卷积核的值是如何确定的？
 - 为什么激活函数可以有效解决梯度消失问题？
 - 深度学习中为什么会出现梯度消失与梯度爆炸，请详细说明原因？
+- Scikit-learn, PyTorch, TensorFlow 保存的模型格式，这些格式的具体结构是如何组织的？
+
+- 📝 案例：
+  - 如何查看 MNIST 或 CIFAR-10 数据集中的图片，并将其以 png 格式保存在指定目录中？
+  - CIFAR-10 数据集：使用 CNN 实现图片中物体识别的代码示例？
 
 ## 大模型
 
@@ -366,4 +425,5 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - tokenizer 不属于 Transformer 的一部分，而是每个模型实现的一部分，是吗？
 - 为什么每个 Transformer 模型都需要一个特定的 tokenizer？
 - BPE 是什么？
-  
+- 如何部署与微调蒸馏的 Qwen3？如何使用此模型部署 RAG 与 AI agent？
+- ❓如何在 Kubernetes 集群中进行分布式模型训练（图像识别或大语言模型）？数据集是如何拆分至不同 GPU 中的？训练过程中模型的参数是如何协同更新的？

@@ -1,9 +1,10 @@
-# GCC 常用方法与技巧：
+# 🐂 GCC 常用方法与调试技巧
 
 ## 文档目录
 
 - Linux 中查看支持的 C 语言标准
 - 指定 C 语言标准编译
+- 参考链接
 
 ## Linux 中查看与指定支持的 C 语言标准
 
@@ -39,3 +40,5 @@ $ gcc -E -dM - < /dev/null | grep "STDC_VERSION"
 ```
 
 在 Linux 系统中，默认情况下如果不指明 `-std` 选项，GCC 会使用 `-std=gnu11` 作为默认支持的 C 语言版本，也就是 C11 标准加上 `GCC extension` 的组合。
+
+## 参考链接
