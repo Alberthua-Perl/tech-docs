@@ -315,6 +315,7 @@ net.ipv4.conf.all.arp_announce = 2
 - 什么是 bubblewrap？
 - flatpak 如何利用 bwrap 实现容器化？ 如何利用 ostree 实现应用的升级与回滚？
 - 如何查看 flatpak 应用的当前版本和历史版本？
+- 🔎 如何在 Kubernetes 集群当中安装一个指定的 operator？
 - 请给出一个 Kubernetes Operator 与 CRD 的具体实现示例？
 - Kubernetes 从哪个版本开始支持 Tekton 与 ArgoCD？
 - Kubernetes api `managedFileds`（v1.18新增）：server-side apply（服务端应用）说明
@@ -322,6 +323,7 @@ net.ipv4.conf.all.arp_announce = 2
 - OpenShift v4.10 集群中的证书工作机制？集群内部使用的证书由集群内部自身管理，不可使用用户自定义的证书，该功能直至 v4.11 版本依然未被解决，而 `router pod` 与 `web console pod` 的证书可替换为用户自定义的证书。
 - OpenShift v4.10 etcd 数据库的备份与恢复？
 - 如何理解 OpenShift v4.10 中的 `extension APIs` 与 `Operator` 概念？
+- 💡 OpenShift 安装 operator 的过程中，subscription 资源对象的作用是什么？
 - 🌐 KServe 与 Knative 之间的联系？它们的架构如何实现？
 
 ### K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系
@@ -364,14 +366,23 @@ $ ip addr add 10.244.0.1/24 dev cni0
 ## 机器学习
 
 - 数学基础：
+  - 什么是雅可比矩阵（Jacobian）？ 
+  - 什么是海森矩阵（Hessian Matrix）？
+    - 海森矩阵（Hessian Matrix）是多元函数二阶偏导数的方阵，用于描述函数的局部曲率、凹凸性以及极值判别。
+    - 在优化、机器学习（牛顿法、XGBoost、深度学习二阶优化）里都是核心工具。
+    - 海森矩阵 = 梯度的一阶导数 = 函数局部的曲率仪表盘
+    - 正定极小，负定极大，不定鞍点；牛顿法靠它一步下山，XGBoost 用它算叶子权重。
+  - 如何理解海森矩阵中每行每列？
   - 函数 $y = \frac{1}{1 + e^{-x}}$ 求导过程？
-  - 如何求直线方程与平面方程的法向量？
-  - 超平面与法向量的定义？
+  - 超平面和法向量详细介绍？
   - 如何推导超平面表达式？如何推导点到超平面距离公式？
+  - 如何求直线方程与平面方程的法向量？
+  - 请更加具体地给出二维直线方程与平面方程的法向量求解方法与过程？
   - 向量内积的 **柯西·施瓦茨不等式**？
   - 如何理解与推导最小二乘法？
   - 举例说明最小二乘法的具体步骤？
   - 均方根误差是不是通过最小二乘法推导而来的？
+  - 分别阐述一阶导数与二阶导数的几何意义（Latex 公式输出）？
 
 - 概率 & 统计：
   - 均值、方差、协方差、标准差、偏差的数学定义？
@@ -384,8 +395,10 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - 📊 给出 NumPy 与 Pandas 在实际数据清洗过程中的完整示例？
 - 评估数据相关性的有哪些指标？
 - 详细描述线性回归的训练过程？
-- 🎉 什么是 XGBoost？它是否既可以做预测分析，也可以做多分类呢？
-- 🧩 什么是 LightGBM？此算法的数学推导与应用场景是什么？
+- 如何绘制数据集的密度散点图？
+- 🎉 什么是 XGBoost（以 LaTex 公式演示）？它是否既可以做预测分析，也可以做多分类呢？它与决策树与随机森林的关系是什么？
+- 🧩 什么是 LightGBM（以 LaTex 公式演示）？此算法的数学推导与应用场景是什么？
+- 🎲 什么是 GaussianNB（以 LaTex 公式演示）？此算法的数学推导与应用场景是什么？(from sklearn.naive_bayes import GaussianNB)
 
 - 📝 案例：
   - 如何获取 Ames House Prices 数据集，该数据集是以何种方式存储的？如何理解 Ames House Prices 数据集结构？
@@ -393,6 +406,7 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - ANN 实现 Ames 房价预测的代码示例？
   - 什么是 Bootstrap 采样和有放回采样？
   - 如何计算模型的方差和偏差，并利用这两个值判断欠拟合或过拟合？
+  - 如何实现偏差-方差权衡？
 
 ## 深度学习
 
@@ -420,10 +434,21 @@ $ ip addr add 10.244.0.1/24 dev cni0
 
 ## 大模型
 
+- 请举例现在流行的大语言模型和对应的蒸馏模型 (如果有的话)？
 - 位置编码与词向量化哪个先执行？
 - LLM 提取 token 的 python 示例 (各大模型的方式存在差异)？
 - tokenizer 不属于 Transformer 的一部分，而是每个模型实现的一部分，是吗？
 - 为什么每个 Transformer 模型都需要一个特定的 tokenizer？
 - BPE 是什么？
-- 如何部署与微调蒸馏的 Qwen3？如何使用此模型部署 RAG 与 AI agent？
+- 如何使用 LangChain + Qwen3 + RAG 实现个人知识库？
+- 如何微调蒸馏的 Qwen3？
 - ❓如何在 Kubernetes 集群中进行分布式模型训练（图像识别或大语言模型）？数据集是如何拆分至不同 GPU 中的？训练过程中模型的参数是如何协同更新的？
+- 什么是 Hugging Face Transformers 格式（config.json + tokenizer.json + .safetensors 分片）格式？
+- 什么是 GGUF（*.gguf）格式？
+- TensorFlow 中的 tf.random.set_seed(10) 与 tf.keras.utils.set_random_seed(10) 功能是什么？
+- 运行 OpenVINO 模型服务器的命令？
+- 运行 ONNX 运行时的命令？
+
+- 📝 案例：
+  - distilbert 模型能在 24 核心 CPU 和 32 GB 内存的平台上运行吗？
+  - distilbert 模型如何转换为 ONNX 格式，并且使用 OpenVINO 部署？  
