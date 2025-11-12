@@ -4,29 +4,29 @@
 
 - [🐱 云原生持续集成之 Tekton](#-云原生持续集成之-tekton)
   - [文档目录](#文档目录)
-  - [CI/CD 快速回顾](#cicd-快速回顾)
-  - [云原生 CI/CD 工具：Jenkins 与 Tekton 的区别？](#云原生-cicd-工具jenkins-与-tekton-的区别)
-  - [云原生 CI/CD 工具：Tekton 与 ArgoCD 的区别？](#云原生-cicd-工具tekton-与-argocd-的区别)
-  - [Tekton 基本组件](#tekton-基本组件)
-    - [基本组件说明](#基本组件说明)
-      - [ClusterTask](#clustertask)
-      - [Task](#task)
-      - [Step](#step)
-      - [Pipeline](#pipeline)
-      - [TaskRun](#taskrun)
-      - [PipelineRun](#pipelinerun)
-      - [Parameter](#parameter)
-      - [Workspace](#workspace)
-      - [Trigger](#trigger)
-    - [基本组件间的关系](#基本组件间的关系)
-      - [Pipeline 与 Task 的关系](#pipeline-与-task-的关系)
-      - [Task 与 Step 的关系](#task-与-step-的关系)
-  - [Tekton 的运行方式](#tekton-的运行方式)
-  - [Tekton 与 Kubernetes 的关系](#tekton-与-kubernetes-的关系)
-  - [Tekton 命令行工具 tkn](#tekton-命令行工具-tkn)
-  - [参考链接](#参考链接)
+  - [1. CI/CD 快速回顾](#1-cicd-快速回顾)
+  - [2. 云原生 CI/CD 工具：Jenkins 与 Tekton 的区别？](#2-云原生-cicd-工具jenkins-与-tekton-的区别)
+  - [3. 云原生 CI/CD 工具：Tekton 与 ArgoCD 的区别？](#3-云原生-cicd-工具tekton-与-argocd-的区别)
+  - [4. Tekton 基本组件](#4-tekton-基本组件)
+    - [4.1 基本组件说明](#41-基本组件说明)
+      - [4.1.1 ClusterTask](#411-clustertask)
+      - [4.1.2 Task](#412-task)
+      - [4.1.3 Step](#413-step)
+      - [4.1.4 Pipeline](#414-pipeline)
+      - [4.1.5 TaskRun](#415-taskrun)
+      - [4.1.6 PipelineRun](#416-pipelinerun)
+      - [4.1.7 Parameter](#417-parameter)
+      - [4.1.8 Workspace](#418-workspace)
+      - [4.1.9 Trigger](#419-trigger)
+    - [4.2 基本组件间的关系](#42-基本组件间的关系)
+      - [4.2.1 Pipeline 与 Task 的关系](#421-pipeline-与-task-的关系)
+      - [4.2.2 Task 与 Step 的关系](#422-task-与-step-的关系)
+  - [5. Tekton 的运行方式](#5-tekton-的运行方式)
+  - [6. Tekton 与 Kubernetes 的关系](#6-tekton-与-kubernetes-的关系)
+  - [7. Tekton 命令行工具 tkn](#7-tekton-命令行工具-tkn)
+  - [8. 参考链接](#8-参考链接)
 
-## CI/CD 快速回顾
+## 1. CI/CD 快速回顾
 
 🤓 一起来看看对 CI/CD 的定义：
 
@@ -90,7 +90,7 @@ CI/CD 是通过自动化流程实现软件频繁可靠交付的实践体系，�
 
 <center>图例： 基于 Jenkins 的 CI/CD 工作流（传统环境/云原生环境）</center>
 
-## 云原生 CI/CD 工具：Jenkins 与 Tekton 的区别？
+## 2. 云原生 CI/CD 工具：Jenkins 与 Tekton 的区别？
 
 Jenkins 虽然在 CI/CD 领域作为自动化服务器多年，但在基于云原生与微服务场景中的持续集成工具，Tekton 相比更加适合。
 
@@ -104,7 +104,7 @@ Jenkins 虽然在 CI/CD 领域作为自动化服务器多年，但在基于云�
 | **Pipeline 实体** | Jenkinsfile 中的 pipeline 对象 | Pipeline 自定义资源 |
 | **运行** | Jenkins UI 构建 | PipelineRun/TaskRun |
 
-## 云原生 CI/CD 工具：Tekton 与 ArgoCD 的区别？
+## 3. 云原生 CI/CD 工具：Tekton 与 ArgoCD 的区别？
 
 - 云原生时代的流水线框架 —— **Tekton**
 - Tekton 负责 CI（持续集成），它的最终产出通常是：
@@ -119,11 +119,11 @@ Jenkins 虽然在 CI/CD 领域作为自动化服务器多年，但在基于云�
 
 <center>图例：Tenton 与 ArgoCD 在云原生 CI/CD 工作流中角色</center>
 
-## Tekton 基本组件
+## 4. Tekton 基本组件
 
-### 基本组件说明
+### 4.1 基本组件说明
 
-#### ClusterTask
+#### 4.1.1 ClusterTask
 
 | 名称 | 功能 |
 | ----- | ----- |
@@ -135,7 +135,7 @@ Jenkins 虽然在 CI/CD 领域作为自动化服务器多年，但在基于云�
 | **apply-manifests** | 向集群 apply 一组 Kubernetes YAML |
 | **update-deployment** | 更新 Deployment 中的镜像版本 |
 
-#### Task
+#### 4.1.2 Task
 
 A task represents an action that runs in a **pod**, usually as part of a pipeline, such as testing, or
 building your application. A task defines a series of **steps** that run **in order**, as containers that
@@ -147,7 +147,7 @@ belong to the task pod.
 - 一个任务定义了一系列按顺序运行的步骤，这些步骤由属于该任务容器组的容器来执行。
 - Task 自定义资源代表了任务
 
-#### Step
+#### 4.1.3 Step
   
 A step is a single operation that runs as part of a task, such as **executing an npm command or**
 **any other script**. Each step is associated with a **container image**, so that the action runs inside
@@ -158,7 +158,7 @@ a specific container.
 - 一个步骤是指作为任务一部分执行的单个操作，例如执行一个 npm 命令或任何其他脚本。
 - 每个步骤都与一个容器镜像相关联，这样操作就会在特定的容器中运行。
 
-#### Pipeline
+#### 4.1.4 Pipeline
 
 A pipeline is a **workflow** that consists of tasks. Pipelines dictate the dependencies between tasks, 
 such as whether one task should run before another, or whether two tasks can run in parallel. Pipelines
@@ -171,7 +171,7 @@ can define Tasks inline or can refer to other Task resources that already exist.
 - 管道可以将任务直接定义出来，也可以引用已存在的其他任务资源。
 - Pipeline 自定义资源代表了管道
 
-#### TaskRun
+#### 4.1.5 TaskRun
 
 A task run is a task in the **execution stage**. A task run represents a single execution of a task,
 and includes a reference to the corresponding task definition, as well as other inputs, such
@@ -182,7 +182,7 @@ as parameter values or storage claims.
 - TaskRun 是一个处于执行阶段的任务。
 - 它代表了任务的一次单独执行过程，包含对相应任务定义的引用，以及诸如参数值或存储声明等其他输入信息。
 
-#### PipelineRun
+#### 4.1.6 PipelineRun
 
 A pipeline run is a pipeline in the **execution stage**. A pipeline run represents a single execution
 of a pipeline, and includes a reference to the corresponding pipeline definition, as well as
@@ -200,7 +200,7 @@ other inputs, such as parameter values or storage claims.
 > 2. 比如说，可通过 OpenShift Web 控制台与 tkn 命令行创建任务与管道。OpenShift 管道创建了所需的 TaskRun 和 PipelineRun 对象。
 > 3. 若需要对某一次构建运行进行排错，可使用 OpenShift Web 控制台与 tkn 命令行查看构建运行日志。
 
-#### Parameter
+#### 4.1.7 Parameter
 
 The Pipeline and Task resources can declare parameters, such as an environment flag or
 a Git branch name. In pipelines and tasks, you can declare parameters by setting properties
@@ -212,7 +212,7 @@ such as the name and type of the parameter.
 - 在管道和任务中，可以通过设置诸如参数的名称和类型等属性来声明参数。
 - 在 PipelineRun 和 TaskRun 资源中，可以传递管道或任务所需的或支持的参数的值。
 
-#### Workspace
+#### 4.1.8 Workspace
 
 A workspace represents **storage**. Workspaces can be useful for sharing state between tasks, or
 as a way to mount or store inputs or outputs.
@@ -231,7 +231,7 @@ claim.
   
 > 注意：同一个 Task 中的 Step 不使用 Workspace 共享资源，因为它们运行的容器都在一个 Pod 中，彼此间共享网络命名空间与存储空间。
 
-#### Trigger
+#### 4.1.9 Trigger
 
 Triggers can run tasks and pipelines based on external events, such as a Git push action. You
 can define triggers by combining the Trigger, TriggerBinding, and TriggerTemplate
@@ -248,14 +248,14 @@ PipelineRun and TaskRun resources.
 - 或者，也可以使用 OpenShift Web 控制台来简化这些资源的创建过程。
 - 当触发器启动管道或任务时，OpenShift Pipelines 也会创建相应的 PipelineRun 和 TaskRun 资源。
 
-### 基本组件间的关系
+### 4.2 基本组件间的关系
 
-#### Pipeline 与 Task 的关系
+#### 4.2.1 Pipeline 与 Task 的关系
 
 - Pipeline 由 Task 组成，两者均为流水线定义 **模板**。
 - PipelineRun 由 TaskRun 组成，两者均为流水线运行的 **实例**。
 
-#### Task 与 Step 的关系
+#### 4.2.2 Task 与 Step 的关系
 
 - 每个 TaskRun 运行对应一个 Pod
 - 每个 Task 中的 Step 对应 Pod 中的各个容器
@@ -347,7 +347,7 @@ $ kubectl logs -f pipelinerun/hello-pipelinerun
 
 <center>图例：Pipeline, PipelineRun, Task, TaskRun, Step 之间在流水线中的关系</center>
 
-## Tekton 的运行方式
+## 5. Tekton 的运行方式
 
 - Tekton 在执行 Pipeline 构建时将生成 “临时 Pod” 来承载每个 Step，这些 Pod 会自动附加 Task/Pipeline 中声明的 PVC（或 EmptyDir/ConfigMap 等 Workspace），构建完成后 Pod 被删除，PVC 保留（除非显式设置 ephemeral: true）。
 - 当 Task 声明 Workspace 时，Tekton 会把对应的 PVC/EmptyDir/ConfigMap 挂载到 /workspace/<name> 路径，Pod 生命周期与 PVC 生命周期解耦。
@@ -357,13 +357,13 @@ $ kubectl logs -f pipelinerun/hello-pipelinerun
 
 <center>图例：OpenShift Pipelines 工作流</center>
 
-## Tekton 与 Kubernetes 的关系
+## 6. Tekton 与 Kubernetes 的关系
 
 - Tekton 以 CRD（CustomResourceDefinition）+ Operator 形式部署在 Kubernetes 上，只要集群版本 ≥ 1.24，即可通过官方 YAML 或 OperatorHub 一键安装。
 - Tekton 从 v0.45 起要求 K8s ≥ 1.24，以 CRD 形式部署。
 - 一条 kubectl apply 即可让 Tekton 部署进入集群。
 
-## Tekton 命令行工具 tkn
+## 7. Tekton 命令行工具 tkn
 
 - tkn 只是 kubectl 的 Tekton 插件，底层通信完全一致。
 - tkn 与 kubectl 的区别：
@@ -378,16 +378,25 @@ $ kubectl logs -f pipelinerun/hello-pipelinerun
 
 ```bash
 $ tkn <type> <command>
+# tkn 命令行格式
 
 $ tkn t list
+# 列出所有状态的任务
 $ tkn t describe <task_name>
+# 查看指定任务的详细信息
 $ tkn t start <task_name>
+# 启动执行指定任务，此命令将创建 TastRun 自定义资源。
 $ tkn tr list
+# 列出所有状态的 TaskRun 自定义资源
 
 $ tkn p list
+# 列出所有状态的流水线
 $ tkn p describe <pipeline_name>
+# 查看指定流水线的详细信息
 $ tkn p start <pipeline_name>
+# 启动执行指定流水线，此命令将创建 PipelineRun 自定义资源。
 $ tkn pr list
+# 列出所有状态的 PipelineRun 自定义资源
 ```
 
 > 说明：关于 Kubernetes 与 OpenShift 中 Operator 的版本信息
@@ -397,7 +406,7 @@ $ tkn pr list
 > 3. 用 oc get csv 即可查看集群里已安装的所有 Operator 及其版本
 > 4. csv = ClusterServiceVersion = Operator 安装包版本
 
-## 参考链接
+## 8. 参考链接
 
 - [Tekton docs | Tekton](https://tekton.dev/docs/)
 - [Tektoncd Operator | operatorhub.io](https://operatorhub.io/operator/tektoncd-operator)
