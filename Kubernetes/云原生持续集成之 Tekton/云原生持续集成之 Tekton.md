@@ -86,6 +86,10 @@ CI/CD 是通过自动化流程实现软件频繁可靠交付的实践体系，�
 - Monitoring & Feedback：
   - 监控与反馈：跟踪系统运行指标（如响应时间、错误率、服务器负载），同时收集用户使用反馈，用于后续版本优化。
 
+<center><img src="images/cicd-workflow-overview-bytebytego.jpg" style="width:80%"></center>
+
+<center>图例： 基于 Jenkins 的 CI/CD 工作流（传统环境/云原生环境）</center>
+
 ## 云原生 CI/CD 工具：Jenkins 与 Tekton 的区别？
 
 Jenkins 虽然在 CI/CD 领域作为自动化服务器多年，但在基于云原生与微服务场景中的持续集成工具，Tekton 相比更加适合。
