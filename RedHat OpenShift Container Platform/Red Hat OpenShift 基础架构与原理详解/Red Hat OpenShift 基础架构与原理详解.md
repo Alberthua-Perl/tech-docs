@@ -1665,7 +1665,7 @@ $ oc rollout restart deployment <deployment_name>
   ```
 
 - 模板（`template`）与 `Web Console` 中已嵌入 route 资源，因此可直接创建。
-- 💥 OCP 3.9 版本中删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见 [Bugfix: route HostAlreadyClaimed](https://bugzilla.redhat.com/show_bug.cgi?id=1660598)。
+- 🪡 OCP 3.9 版本中删除 route 并重建后无法生效，报错 `HostAlreadyClaimed`，Bugfix 请详见 [Bug 1660598 - HostAlreadyClaimed route issue on path based route](https://bugzilla.redhat.com/show_bug.cgi?id=1660598)。
   
   ![ocp3-delete-route-error-1](images/ocp3-delete-route-error-1.jpg)
   

@@ -9,7 +9,9 @@
     - [1.2 NTP 时间同步服务器](#12-ntp-时间同步服务器)
     - [1.3 DNS 名称服务器](#13-dns-名称服务器)
     - [1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别](#14-utc-时间gmt-时间est-时间cst-时间的区别)
-  - [2. 常用 DOS 命令](#2-常用-dos-命令)
+  - [2. Windows 常用 PowerShell 命令](#2-windows-常用-powershell-命令)
+    - [2.1 常规系统信息设置](#21-常规系统信息设置)
+    - [2.2 网络环境设置](#22-网络环境设置)
   - [3. Shell 脚本补充](#3-shell-脚本补充)
   - [3.1 用户登录时加载 bash 配置文件的过程](#31-用户登录时加载-bash-配置文件的过程)
   - [3.2 关于重定向说明](#32-关于重定向说明)
@@ -99,7 +101,9 @@
 - **EST**：东部标准时间（Eastern Standard Time）= UTC-05:00（晚5小时），美国东部时间（EST）。
 - **CST**：北京时间（China Standard Time，中国标准时间）是中国的标准时间。在时区划分上，属东八区，比协调世界时早8小时，记为 UTC+8。CST 比 EST 早 13 个小时。
 
-## 2. 常用 DOS 命令
+## 2. Windows 常用 PowerShell 命令
+
+### 2.1 常规系统信息设置
 
 ```powershell
 > cls
@@ -115,15 +119,63 @@
 # 更改终端字符集为 437 编码模式
 
 > mv <filename> <directory>
-# dos 命令行中的文件名可使用通配符与中文字符
-# dos 命令行中显示乱码依然为中文（编码模式不同而导致）
+# powershell 命令行中的文件名可使用通配符与中文字符
+# powershell 命令行中显示乱码依然为中文（编码模式不同而导致）
+```
 
+### 2.2 网络环境设置
+
+```powershell
+## 兼容传统 COM 方式
+> netsh advfirewall firewall show rule name=all dir=in
+# 查看所有的防火墙入站规则
 > netsh advfirewall firewall show rule name=accepted_icmpv4
 > netsh advfirewall firewall show rule name=accepted_ssh
-# 查看 Windows 的 ICMPv4 与 SSH 协议规则
+# 查看 ICMPv4 与 SSH 入站规则
+> netsh advfirewall firewall show rule name=<rule_name>
+# 查看指定防火墙规则的详细信息
 
 > route print
 # 查看 Windows 的路由表信息
+
+## PowerShell 可编程模式（防火墙规则设置后立即生效）
+> New-NetFirewallRule -Name "Allow-8000-TCP" `
+  -DisplayName "Allow 8000 TCP" `
+  -Direction Inbound -Protocol TCP -LocalPort 8000 `
+  -Action Allow -Profile Any
+> Remove-NetFirewallRule -Name "Allow-8000-TCP"
+# 添加与删除 8000/TCP 端口防火墙规则
+> Get-NetFirewallRule -Name "Allow-8000-TCP"
+
+Name                          : Allow-8000-TCP
+DisplayName                   : Allow 8000 TCP
+Description                   :
+DisplayGroup                  :
+Group                         :
+Enabled                       : True
+Profile                       : Any
+Platform                      : {}
+Direction                     : Inbound
+Action                        : Allow
+EdgeTraversalPolicy           : Block
+LooseSourceMapping            : False
+LocalOnlyMapping              : False
+Owner                         :
+PrimaryStatus                 : OK
+Status                        : 已从存储区成功分析规则。 (65536)
+EnforcementStatus             : NotApplicable
+PolicyStoreSource             : PersistentStore
+PolicyStoreSourceType         : Local
+RemoteDynamicKeywordAddresses : {}
+PolicyAppId                   :
+PackageFamilyName             :
+
+> New-NetFirewallRule -Name "Allow-22-TCP" `
+  -DisplayName "Allow 22 TCP" `
+  -Direction Inbound -Protocol TCP -LocalPort 22 `
+  -Action Allow -Profile Any
+> Remove-NetFirewallRule -Name "Allow-22-TCP"
+# 添加与删除 22/TCP 端口防火墙规则
 ```
 
 ## 3. Shell 脚本补充
