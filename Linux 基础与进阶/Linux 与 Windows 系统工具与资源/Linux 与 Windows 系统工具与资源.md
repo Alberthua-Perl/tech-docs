@@ -780,6 +780,11 @@ $ sudo subscription-manager repos --list-enabled
   
   <center><img src="images/win11-disable-hyperv.png" style="width:50%"></center>
 
+- 💥 WSL2 与 Hyper-V 的切换关系：
+  - WSL2 启用 → Hyper-V 启用：WSL2 子系统的启用需要 Hyper-V 的启用。执行 `bcdedit /set hypervisorlaunchtype auto` 启用 Hyper-V，重启系统使配置生效。
+  - WSL2 禁用 → Hyper-V 禁用：WSL2 子系统的启用会造成原系统中的 VMware 虚拟机无法正常启动（报错不支持 VT-x 模式）。因此，需按照 "控制面板 > 程序 > 启用或关闭 Windows 功能 > 适用于 Linux 的 Windows 子系统（去除勾选）" 以禁用 WSL2 子系统，再执行 `bcdedit /set hypervisorlaunchtype off` 禁用 Hyper-V，重启系统使配置生效。
+  - 如果想再次启用 WSL2，需勾选 "适用于 Linux 的 Windows 子系统"，执行 `bcdedit /set hypervisorlaunchtype auto`，并执行 `wsl --install --no-distribution`，此命令将再次安装 WSL2，本地存在先前运行的 Linux 发行版的话也不会覆盖或丢失。
+
 ## 15. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
