@@ -452,7 +452,6 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - 📝 案例：
   - distilbert 模型能在 24 核心 CPU 和 32 GB 内存的平台上运行吗？
   - distilbert 模型如何转换为 ONNX 格式，并且使用 OpenVINO 部署？
-  - ❓如何在 WSL2 环境中使用 vLLM 模型服务运行时部署 ibm-granit-350M 模型，并完成推理测试？
-  - ❓如何在 WSL2 环境中使用 OpenVINO/model_server 模型服务运行时部署 ibm-granit-350M 模型，并完成推理测试？
-  - 如何在 RHEL10 中封装构建 command-line-assistant 工具来完成在线的 LightSpeed 推理？
-  - 如何在 RHEL9 的环境中（4vCPU+16RAM, 无 GPU）使用 rhel-cla 容器镜像 `api + ibm-granit-350M + rag + pgvector` 实现 LightSpeed 的离线部署？
+  - ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 vLLM 模型服务运行时部署此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
+  - ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 OpenVINO/model_server 模型服务运行时此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
+  - 如何解决 WSL2 中 Linux 主机 8000/tcp 端口不通问题？
