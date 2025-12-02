@@ -1,5 +1,30 @@
 # 📚 Kimi 提问汇总
 
+## 目录
+
+- [📚 Kimi 提问汇总](#-kimi-提问汇总)
+  - [目录](#目录)
+  - [Linux 内核](#linux-内核)
+  - [Linux 系统编程](#linux-系统编程)
+  - [Linux 性能优化](#linux-性能优化)
+  - [Linux 网络](#linux-网络)
+    - [Linux ARP 特性](#linux-arp-特性)
+  - [系统组件](#系统组件)
+  - [硬件监测](#硬件监测)
+  - [系统服务](#系统服务)
+  - [系统安全](#系统安全)
+  - [Shell 脚本](#shell-脚本)
+  - [Ceph](#ceph)
+  - [Jenkins](#jenkins)
+  - [Ansible](#ansible)
+  - [容器 \& Kubernetes](#容器--kubernetes)
+    - [K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系](#k8s-networkpolicy-与-calico-networkpolicy-间的关系)
+  - [CNI 如何玩转 Linux Bridge](#cni-如何玩转-linux-bridge)
+  - [机器学习](#机器学习)
+  - [深度学习](#深度学习)
+  - [大模型](#大模型)
+  - [模型部署 \& 推理](#模型部署--推理)
+
 ## Linux 内核
 
 - **源码分析**：Linux 从加电启动 → start 内核→ 用户空间？
@@ -442,16 +467,30 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - BPE 是什么？
 - 如何使用 LangChain + Qwen3 + RAG 实现个人知识库？
 - 如何微调蒸馏的 Qwen3？
-- ❓如何在 Kubernetes 集群中进行分布式模型训练（图像识别或大语言模型）？数据集是如何拆分至不同 GPU 中的？训练过程中模型的参数是如何协同更新的？
 - 什么是 Hugging Face Transformers 格式（config.json + tokenizer.json + .safetensors 分片）格式？
 - 什么是 GGUF（*.gguf）格式？
 - TensorFlow 中的 tf.random.set_seed(10) 与 tf.keras.utils.set_random_seed(10) 功能是什么？
-- 运行 OpenVINO 模型服务器的命令？
-- 运行 ONNX 运行时的命令？
 
-- 📝 案例：
-  - distilbert 模型能在 24 核心 CPU 和 32 GB 内存的平台上运行吗？
-  - distilbert 模型如何转换为 ONNX 格式，并且使用 OpenVINO 部署？
-  - ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 vLLM 模型服务运行时部署此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
-  - ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 OpenVINO/model_server 模型服务运行时此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
-  - 如何解决 WSL2 中 Linux 主机 8000/tcp 端口不通问题？
+- 如何解决 WSL2 中 Linux 主机 8000/tcp 端口不通问题？
+
+## 模型部署 & 推理
+
+- ❓如何在 Kubernetes 集群中进行分布式模型训练（图像识别或大语言模型）？数据集是如何拆分至不同 GPU 中的？训练过程中模型的参数是如何协同更新的？
+- 运行 OpenVINO 模型服务器的命令（python 原生运行）？如何运行 OpenVINO 容器？
+- 运行 ONNX 运行时的命令（python 原生运行）？如何运行 ONNX 容器？
+- distilbert 模型能在 24 核心 CPU 和 32 GB 内存的平台上运行吗？
+- distilbert 模型如何转换为 ONNX 格式，并且使用 OpenVINO 部署？
+- ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 vLLM 模型服务运行时部署此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
+- ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 OpenVINO/model_server 模型服务运行时此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
+- 如何使用 vLLM 部署指定的模型（每类模型都具有特定的参数）？
+- 如何理解某个大语言模型？
+  - 模型的使用场景
+  - 模型可以在多大的显存上运行
+  - 模型是否量化
+  - 模型量化的方式
+  - 模型的精度
+  - 模型的权重
+  - 模型生成 token 的速度（每秒多少 token）
+  - 模型的并发能多大
+  - 模型实现的原理
+- 多个模型服务运行时对比：llama.cpp、ONNX、OpenVINO、vLLM
