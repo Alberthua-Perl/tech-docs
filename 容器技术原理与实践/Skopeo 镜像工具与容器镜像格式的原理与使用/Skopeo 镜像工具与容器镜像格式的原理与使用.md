@@ -15,6 +15,7 @@
   - [Skopeo 支持的容器镜像存储方式](#skopeo-支持的容器镜像存储方式)
   - [使用 Skopeo 操作容器镜像](#使用-skopeo-操作容器镜像)
   - [🐳 容器镜像格式比较](#-容器镜像格式比较)
+  - [skopeo 命令常见故障](#skopeo-命令常见故障)
   - [参考链接](#参考链接)
 
 ## Skopeo 工具概要
@@ -70,7 +71,7 @@
 - Skopeo 可分别用于操作公共（public）与私有（private）容器镜像，对于私有容器镜像需要对容器镜像仓库进行认证。
 - Skopeo 与 Buildah 可使用 Podman 保存的认证 `token`（位于 `/run/user/<UID>/containers/auth.json`），但是无法执行交互式的登录密码输入，因此，若在 skopeo 命令行中指定明文登录密码可在 history 命令历史记录中查看到，存在一定的安全风险，可使用如下以变量形式传递密码的方法优化：
   
-![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-inspect-creds.jpg)
+![skopeo-inspect-creds](images/skopeo-inspect-creds.jpg)
 
 > 若未使用 Podman 作为容器运行时，而依然使用 Docker 容器运行时的话，其认证 token 依然可被 Skopeo 使用与认证，该认证 token 位于 `$HOME/.docker/config.json`。
 
@@ -131,7 +132,7 @@
     # 分别指定源仓库与目标仓库的认证用户与明文密码，并在仓库间拷贝容器镜像。
     ```
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-dest-creds.jpg)
+    ![skopeo-copy-dest-creds](images/skopeo-copy-dest-creds.jpg)
 
 - `skopeo delete`：删除容器镜像的镜像 tag
   - 该命令可删除容器镜像仓库中指定镜像的 tag
@@ -144,9 +145,9 @@
   
   - 💥 指定镜像 `tag` 时将删除特定 tag，即使将最后一个 tag 删除后也不删除整个镜像仓库，若需要删除整个镜像仓库需登录指定仓库。此处为 Quay.io 为例，在 `Web 控制台` 上删除，如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-delete-1.jpg)
+    ![skopeo-delete-1](images/skopeo-delete-1.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-delete-2.jpg)
+    ![skopeo-delete-2](images/skopeo-delete-2.jpg)
   
   - 💥 该命令也可删除本地容器运行时缓存中的镜像 tag，但需注意，若具有多个不同 tag 的容器镜像（实际为同一容器镜像），只具有同一个 image ID（该值来自于镜像的 manifest 中 `.config.digest`），那么在执行删除时即使指定了镜像的 tag，也会将其他具有相同 image ID 的镜像一并删除，该行为与容器镜像仓库中相区别！
 - `skopeo copy`：dir 模式示例
@@ -159,11 +160,11 @@
     dir:<dir_of_container_image>
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-docker-format-image-dir.jpg)
+  ![skopeo-copy-docker-format-image-dir](images/skopeo-copy-docker-format-image-dir.jpg)
   
   除了使用 docker load 或 podman load 直接将容器镜像的 tar 归档导入本地镜像缓存中，也可使用已经保存至本地的目录以 dir 或 oci 模式存在的容器镜像，如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/podman-load-dir-from-skopeo-copy.jpg)
+  ![podman-load-dir-from-skopeo-copy](images/podman-load-dir-from-skopeo-copy.jpg)
   
   也可以使用 Skopeo 将本地镜像目录拷贝至容器镜像仓库，用以替代 docker push 或 podman push 的功能：
   
@@ -173,7 +174,7 @@
     docker://<uri_for_registry>/<user_or_org>/<repository>:[tag]
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-dir-2.jpg)
+  ![skopeo-copy-dir-2](images/skopeo-copy-dir-2.jpg)
 
 - `skopeo copy`：oci 模式示例
   
@@ -185,11 +186,11 @@
     oci:<dir_of_container_image>
   ```
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-oci-1.jpg)
+  ![skopeo-copy-oci-1](images/skopeo-copy-oci-1.jpg)
   
   其中拷贝至本地的 OCI 格式目录结构如下所示，包含了容器镜像的各层（layer）。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-oci-2.jpg)
+  ![skopeo-copy-oci-2](images/skopeo-copy-oci-2.jpg)
   
   也可使用本地 OCI 格式目录将镜像拷贝至容器镜像仓库中。
 
@@ -206,7 +207,7 @@
   
   > 💥 该模式只能在以 Podman 或 CRI-O 为容器运行时的情况下使用，若使用 Docker 容器运行时将报错！
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-docker-daemon.jpg)
+  ![skopeo-copy-docker-daemon](images/skopeo-copy-docker-daemon.jpg)
   
   ```bash
   $ skopeo copy \
@@ -240,25 +241,25 @@
   - 因此，skopeo copy 命令可同时完成容器镜像的下载与镜像格式的转换。
   - 如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-copy-transform-image-format.jpg)
+    ![skopeo-copy-transform-image-format](images/skopeo-copy-transform-image-format.jpg)
 
 - `skopeo sync`：
   - sync 子命令将容器镜像从 src 源同步至 dest 目的地，功能与 copy 子命令类似。
   - skopeo sync 命令可指定的 src 与 dest 类型如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-help.jpg)
+    ![skopeo-sync-help](images/skopeo-sync-help.jpg)
   
   - 👉 示例 1：
     
     将远程容器镜像仓库中的镜像同步至本地目录，本地存储容器镜像的目录无需创建。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-demo.jpg)
+    ![skopeo-sync-demo](images/skopeo-sync-demo.jpg)
   
   - 👉 示例 2：
     
     skopeo 命令分别使用两个容器镜像仓库的 token 认证文件将容器镜像同步至另一个仓库中，并且目标仓库只需指定仓库 `URI` 即可，将自动生成对应的镜像名称与标签。
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-sync-between-registry.jpg)
+    ![skopeo-sync-between-registry](images/skopeo-sync-between-registry.jpg)
   
   - 也可使用 skopeo sync 命令将本地 dir 模式存储的容器镜像同步至远程容器镜像仓库中。
 
@@ -372,15 +373,15 @@
     
     关于容器镜像目录中 `image manifest` 与其 `digest` 的关系，如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-docker-image-format-digest-1.jpg)
+    ![skopeo-docker-image-format-digest-1](images/skopeo-docker-image-format-digest-1.jpg)
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-docker-image-format-digest-2.jpg)
+    ![skopeo-docker-image-format-digest-2](images/skopeo-docker-image-format-digest-2.jpg)
   
   - 👉 示例 2：OCI 镜像格式的容器镜像目录
     
     关于容器镜像目录中 `image manifest` 与其 `digest` 的关系，如下所示：
     
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/skopeo-container-image-tool/skopeo-oci-image-format-digest.jpg)
+    ![skopeo-oci-image-format-digest](images/skopeo-oci-image-format-digest.jpg)
 
 ## 🐳 容器镜像格式比较
 
@@ -476,6 +477,21 @@
   - 最主要的区别：目录结构不完全相同，配置信息尤其是 `mediaType` 的规范不同。
   - 联系：OCI image 的规范是由 Docker image 的规范修改而来，所以类似它们的 blob 的组织形式大致相同，配置文件中很多的参数也相似。
   - 另外，可以使用 skopeo 工具很方便地将 Docker image 转换为 OCI image。
+
+## skopeo 命令常见故障
+
+- 故障1：`Error: Copying this image would require changing layer representation, which we cannot do "Would invalidate signatures"`
+  
+  skopeo 复制镜像至目标仓库时，发现镜像层在推送到目标仓库时会被重新压缩/转换，导致 digest 变化，而签名（signature）只能对应原 digest，于是拒绝推送，避免 “签名失效”。
+
+  ```bash
+  ##解决方式
+  $ skopeo copy \
+    --remove-siguature \
+    containers-storage:registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:1.0 \
+    docker://hub.lab.example.com/ansible-automation-platform-26/ee-supported-rhel9:1.0
+  # 移除原容器镜像的签名，推送至目标镜像仓库重新签名。
+  ```
 
 ## 参考链接
 
