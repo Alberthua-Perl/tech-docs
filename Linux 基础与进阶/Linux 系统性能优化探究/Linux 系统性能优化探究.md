@@ -456,10 +456,17 @@ $ sudo mpstat -P 1 -N 0 -o JSON 2 5 > mpstat-dump.json
   - -u 选项：报告 CPU 使用率
   - -r 选项：报告页面错误（page faults）与内存使用率
   - -d 选项：报告磁盘统计情况
+  - -w 选项：报告任务切换活动（进程的上下文切换）
 
 ```bash
 $ sudo pidstat -p <pid> -t -u -r <interval> <count>
 # 查看进程的状态统计信息
+
+$ sudo pidstat -p <pid> -w <interval> <count>
+# 查看指定进程的自愿与非自愿上下文切换的状态，指定时间间隔（秒）与采集数量。
+# 重要指标：
+#   1. cswch/s：每秒进程的自愿上下文切换（voluntary context switch）的总数。当一个任务因需要某种不可用的资源而受阻时，就会发生一种自愿的切换操作。
+#   2. nvcswch/s：每秒进程的非自愿上下文切换（involuntary context switch）的总数。当一个任务在其所占用的时间片内完成执行后，却被迫放弃处理器时，就会发生一种非自愿的切换情况。
 ```
   
 #### 2.7.4 sar 命令示例
@@ -566,19 +573,39 @@ $ sudo pidstat -p <pid> -t -u -r <interval> <count>
   - -o 选项：将输出写入指定文件，以二进制数据保存。
   - -f 选项：读取指定数据文件
 
-
-
 ### 2.8 Performance Co-Pilot (PCP) 组件使用
 
 #### 2.8.1 PCP 相关命令示例
 
+安装 PCP 组件：
+
 ```bash
-$ yum install -y pcp pcp-gui pcp-system-tools
+$ sudo dnf install -y pcp pcp-gui pcp-system-tools
 # 安装 PCP、PCP 图形化软件包与 PCP 系统工具包
-$ systemctl enable --now pmcd.service pmlogger.service
+$ sudo systemctl enable --now pmcd.service pmlogger.service
 # 启动并开机自启 pmcd 与 pmlogger 守护进程
 # pmlogger 服务将指标日志存储于 /var/log/pcp/pmlogger/<hostname>/ 目录中
+```
 
+PCP 命令行性能采集工具：pcp-system-tools 软件包安装于 `/usr/libexec/pcp/bin/` 目录中
+
+```bash
+$ export PATH=/usr/libexec/pcp/bin:$PATH
+$ sudo pcp-free -m  #等价于 pcp free -m
+                total        used        free      shared  buff/cache   available
+  Mem:           7741        2621        1949         318        3169        4493
+  Swap            511           0         511
+$ 
+
+$ pmstat -s <sample_number> -t <number>[seconds|minutes] 
+# 高层次的系统性能查看工具，在指定的时间间隔内（默认 5 秒刷新一次），共统计指定次数（类似于 vmstat 命令）。
+$ pmatop
+# 实时刷新系统资源使用信息（类似于 top 命令）
+```
+
+pmval 命令行查询性能指标归档日志：
+
+```bash
 $ pminfo
 # 查看 Co-Pilot 数据库中的性能指标的类型，可通过 pmval 命令列出数据库中的数据。
 $ pminfo -dt <metrics_type>
@@ -601,11 +628,6 @@ $ pmval -s 5 -t 2 proc.nprocs
 $ pmval -a /var/log/pcp/pmlogger/workstation.lab.example.com/20210609.14.52.0 <metrics_type>
 # 查看默认指标数据归档文件中指定的指标类型日志
 # -a 选项指定性能指标的归档日志
-
-$ pmstat -s <sample_number> -t <number>[seconds|minutes] 
-# 高层次的系统性能查看工具，在指定的时间间隔内（默认 5 秒刷新一次），共统计指定次数（类似于 vmstat 命令）。
-$ pmatop
-# 实时刷新系统资源使用信息（类似于 top 命令）
 ```
 
 #### 2.8.2 PCP 参考文档说明

@@ -13,12 +13,12 @@
     - [2.1 常规系统信息设置](#21-常规系统信息设置)
     - [2.2 网络环境设置](#22-网络环境设置)
   - [3. Shell 脚本补充](#3-shell-脚本补充)
-  - [3.1 用户登录时加载 bash 配置文件的过程](#31-用户登录时加载-bash-配置文件的过程)
-  - [3.2 关于重定向说明](#32-关于重定向说明)
-  - [3.3 Shell 内部字段分隔符（Internal Field Separator）](#33-shell-内部字段分隔符internal-field-separator)
-  - [3.4 Shell 脚本多行注释](#34-shell-脚本多行注释)
-  - [3.5 设置自定义 `PS1` 交互式命令提示符](#35-设置自定义-ps1-交互式命令提示符)
-  - [3.6 Bash 常用命令汇总](#36-bash-常用命令汇总)
+    - [3.1 用户登录时加载 bash 配置文件的过程](#31-用户登录时加载-bash-配置文件的过程)
+    - [3.2 关于重定向说明](#32-关于重定向说明)
+    - [3.3 Shell 内部字段分隔符（Internal Field Separator）](#33-shell-内部字段分隔符internal-field-separator)
+    - [3.4 Shell 脚本多行注释](#34-shell-脚本多行注释)
+    - [3.5 设置自定义 `PS1` 交互式命令提示符](#35-设置自定义-ps1-交互式命令提示符)
+    - [3.6 Bash 常用命令汇总](#36-bash-常用命令汇总)
   - [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
   - [5. grep 常用命令示例](#5-grep-常用命令示例)
   - [6. Markdown 语法配置](#6-markdown-语法配置)
@@ -27,7 +27,7 @@
     - [8.1 更改 GitHub 页面 logo](#81-更改-github-页面-logo)
     - [8.2 更改 GitHub 默认的代码字体](#82-更改-github-默认的代码字体)
   - [9. Tabby 自定义 CSS](#9-tabby-自定义-css)
-  - [10. 安装与设置外部软件](#10-安装与设置外部软件)
+  - [10. 安装与配置外部软件](#10-安装与配置外部软件)
     - [10.1 安装 qpdf 并解密 PDF 文件](#101-安装-qpdf-并解密-pdf-文件)
     - [10.2 RHEL 7/8 安装 exfat 驱动](#102-rhel-78-安装-exfat-驱动)
     - [10.3 安装 xfce4-terminal 软件包](#103-安装-xfce4-terminal-软件包)
@@ -47,7 +47,8 @@
   - [12. dnf 实现软件包安全检测与更新](#12-dnf-实现软件包安全检测与更新)
   - [13. RedHat 订阅服务使用](#13-redhat-订阅服务使用)
   - [14. 如何在 Windows 11 家庭版中禁用 Hyper-V？](#14-如何在-windows-11-家庭版中禁用-hyper-v)
-  - [15. 参考链接](#15-参考链接)
+  - [15. RHEL8/9/10 启用 /var/log/dmesg 日志](#15-rhel8910-启用-varlogdmesg-日志)
+  - [16. 参考链接](#16-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -180,7 +181,7 @@ PackageFamilyName             :
 
 ## 3. Shell 脚本补充
 
-## 3.1 用户登录时加载 bash 配置文件的过程
+### 3.1 用户登录时加载 bash 配置文件的过程
 
 - 登录式 shell（login shell）加载配置文件过程：
 
@@ -200,7 +201,7 @@ PackageFamilyName             :
     B --> C(["/etc/profile.d/*.sh"])
   ```
 
-## 3.2 关于重定向说明
+### 3.2 关于重定向说明
 
 - `<`：输出重定向（将原来需要由键盘输入的数据，改由文件内容来取代）
 
@@ -216,18 +217,18 @@ PackageFamilyName             :
   cat <<EOF > /path/to/file
   ```
 
-## 3.3 Shell 内部字段分隔符（Internal Field Separator）
+### 3.3 Shell 内部字段分隔符（Internal Field Separator）
 
 - 字段分隔符为 `IFS`
 - IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
 - 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
 - ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`。
 
-## 3.4 Shell 脚本多行注释
+### 3.4 Shell 脚本多行注释
 
 使用 `:<<!` 或 `:<<EOF` 与 `!` 或 `EOF` 注释代码块
 
-## 3.5 设置自定义 `PS1` 交互式命令提示符
+### 3.5 设置自定义 `PS1` 交互式命令提示符
   
 ```bash
 $ vim ~/.bashrc
@@ -235,7 +236,7 @@ $ vim ~/.bashrc
   export PS1="(${COURSE_ID})\033[1;36m[\u@\h\033[0m \033[1;33m\W\033[0m\033[1;36m]$ \033[0m"
 ```
 
-## 3.6 Bash 常用命令汇总
+### 3.6 Bash 常用命令汇总
   
 ```bash
 $ echo "<password>" | sudo -S <username>
@@ -413,7 +414,7 @@ $ grep "pattern" /path/to/file | xargs command
 | ----- | ----- | ----- |
 | 设置字体颜色 | `$\color{#FF0000}{红}$` <br> `$\color{#FF7D00}{橙}$` <br> `$\color{#FFFF00}{黄}$` <br> `$\color{#00FF00}{绿}$` <br> `$\color{#0000FF}{蓝}$` <br> `$\color{#00FFFF}{靛}$` <br> `$\color{#FF00FF}{紫}$` <br> `<span style="color:red">红色</span>` | $\color{#FF0000}{红}$ <br> $\color{#FF7D00}{橙}$ <br> $\color{#FFFF00}{黄}$ <br> $\color{#00FF00}{绿}$ <br> $\color{#0000FF}{蓝}$ <br> $\color{#00FFFF}{靛}$ <br> $\color{#FF00FF}{紫}$ <br> <span style="color:red">红色</span> |
 | 设置字体颜色 | `<font face="楷体" size=13 color=Blue>你好</font>` | <font face="楷体" size=13 color=Blue>你好</font> |
-| 标题选项 | `[ ] 计划` <br> `[x] 计划` | [ ] 计划 <br> [x] 计划 |
+| 标题选项 | `- [ ] 计划` <br> `- [x] 计划` | - [ ] 计划 <br> - [x] 计划 |
 | 加粗文本 | `**文本内容**` | **文本内容** |
 | 删除文本（添加中横线）| `~~文本内容~~` | ~~文本内容~~ |
 | 图片居中显示 | `<center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center>` | <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center> |
@@ -491,7 +492,7 @@ Cursor Style: block
 }
 ```
 
-## 10. 安装与设置外部软件
+## 10. 安装与配置外部软件
 
 ### 10.1 安装 qpdf 并解密 PDF 文件
 
@@ -785,7 +786,34 @@ $ sudo subscription-manager repos --list-enabled
   - WSL2 禁用 → Hyper-V 禁用：WSL2 子系统的启用会造成原系统中的 VMware 虚拟机无法正常启动（报错不支持 VT-x 模式）。因此，需按照 "控制面板 > 程序 > 启用或关闭 Windows 功能 > 适用于 Linux 的 Windows 子系统（去除勾选）" 以禁用 WSL2 子系统，再执行 `bcdedit /set hypervisorlaunchtype off` 禁用 Hyper-V，重启系统使配置生效。
   - 如果想再次启用 WSL2，需勾选 "适用于 Linux 的 Windows 子系统"，执行 `bcdedit /set hypervisorlaunchtype auto`，并执行 `wsl --install --no-distribution`，此命令将再次安装 WSL2，本地存在先前运行的 Linux 发行版的话也不会覆盖或丢失。
 
-## 15. 参考链接
+## 15. RHEL8/9/10 启用 /var/log/dmesg 日志
+
+默认情况下，在系统引导过程中 RHEL8/9/10 不再自动生成 /var/log/dmesg 日志，因此，查看系统启动早期过程只能通过 `dmesg` 命令与 `journalctl -k` 命令完成。若需自动生成 /var/log/dmesg 日志的话，可执行以下过程完成生成：
+
+```bash
+$ sudo cat > /etc/systemd/system/dmesg.service <<EOF
+[Unit]
+Description=Create /var/log/dmesg on boot
+ConditionPathExists=/var/log/dmesg
+
+[Service]
+ExecStart=/usr/bin/dmesg
+StandardOutput=file:/var/log/dmesg
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+$ sudo touch /var/log/dmesg
+$ sudo restorecon -v /var/log/dmesg
+
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable dmesg.service
+$ sudo systemctl reboot
+```
+
+## 16. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
+- [The /var/log/dmesg file is not created during boot for Red Hat Enterprise Linux](https://access.redhat.com/solutions/3748981)

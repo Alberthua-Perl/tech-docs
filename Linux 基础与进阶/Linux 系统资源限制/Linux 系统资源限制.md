@@ -2,16 +2,19 @@
 
 ## 文档说明
 
-- 该文档中使用的 OS 版本为 `RHEL 6.x/7.x/8.x`，其他 Linux 发行版可自行测试。
+此文档中使用的 OS 版本为 `RHEL 6.x/7.x/8.x`，其他 Linux 发行版可自行测试。
 
 ## 文档目录
 
-- Linux 系统资源限制的级别
-- 使用 limit 针对不同用户限制系统资源
-- 使用 systemd 服务限制系统资源
-- cgroup 层次结构与 systemd 的联系
-- cgroup 实施资源限制示例
-- 参考链接
+- [Linux 系统资源限制](#linux-系统资源限制)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [Linux 系统资源限制的级别](#linux-系统资源限制的级别)
+  - [使用 limit 针对不同用户限制系统资源](#使用-limit-针对不同用户限制系统资源)
+  - [使用 systemd 服务限制系统资源](#使用-systemd-服务限制系统资源)
+  - [🔥 cgroup 层次结构与 systemd 的联系](#-cgroup-层次结构与-systemd-的联系)
+  - [🚧 cgroup 实施资源限制示例](#-cgroup-实施资源限制示例)
+  - [参考链接](#参考链接)
 
 ## Linux 系统资源限制的级别
 
@@ -142,13 +145,32 @@
 
     $ sudo vim /etc/systemd/system/sha1sum.service.d/10-cpulimits.conf
       [Service]
-      LimitCPU=10
-      # sha1sum 进程将持续运行，该参数将限制进程运行 10s 后退出。
+      LimitCPU=30
+      # sha1sum 进程将持续运行，该参数将限制进程运行 30s 后退出。
+
+    $ sudo vim /etc/systemd/system/sha1sum.timer
+      [Unit]
+      Description=Start sha1sum service every 1 minute
+
+      [Timer]
+      OnCalendar=*:00/01
+
+      [Install]
+      WantedBy=sha1sum.service  #启动 sha1sum.service
+      # 由于 sha1sum.service 在 LimitCPU=30 的作用下，在启动后的 30 秒将停止运行。而 timer 计时器将在 30 秒后再次启动此服务。
+      # 即，每分钟启动此服务。
 
     $ sudo systemctl daemon-reload
-    $ sudo systemctl start sha1sum.service
-    # 该守护进程在运行 10s 后收到 SIGTERM 信号后自动终止 
+    $ sudo systemctl enable --now sha1sum.service
+    # 该守护进程在运行 30s 后收到 SIGTERM 信号后自动终止
+    $ sudo systemctl enable --now sha1sum.timer
+    $ watch -cd systemctl status sha1sum.service
     ```
+
+    ![cpu-limit-timer-1](images/cpu-limit-timer-1.png)
+
+    ![cpu-limit-timer-2](images/cpu-limit-timer-2.png)
+
 
     2️⃣ 限制 Nginx 服务终止前的最大 CPU 使用时间
 
