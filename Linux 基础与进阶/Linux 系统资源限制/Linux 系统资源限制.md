@@ -18,10 +18,8 @@
 
 ## Linux 系统资源限制的级别
 
-- 系统级别（kernel level）：
-  Linux 内核参数对系统全局资源的限制，如 `fs.file-max`、`fs.file-nr` 等。
-- 进程级别（process level）：
-  资源限制配置文件与 `ulimit` 命令对用户资源的限制。
+- 系统级别（kernel level）：Linux 内核参数对系统全局资源的限制，如 `fs.file-max`、`fs.file-nr` 等。
+- 进程级别（process level）：资源限制配置文件与 `ulimit` 命令对用户资源的限制。
 
 ## 使用 limit 针对不同用户限制系统资源
 
@@ -33,7 +31,7 @@
 - 配置文件的方式：
   - Linux 资源限制的主配置文件：
 
-    ![rhel-suse-resource-limit-1](images/rhel-suse-resource-limit-1.jpg)
+    <center><img src="images/rhel-suse-resource-limit-1.jpg" style="width:80%"></center>
 
     - RHEL 7.x 中的配置文件：
       - /etc/security/limits.d/20-nproc.conf
@@ -43,7 +41,7 @@
       - /etc/security/limits.conf
   - /etc/security/limits.conf 配置文件中的字段说明：
 
-    ![rhel-suse-resource-limit-3](images/rhel-suse-resource-limit-3.jpg)
+    <center><img src="images/rhel-suse-resource-limit-3.jpg" style="width:80%"></center>
 
     - `domain` ：用户分类
       - 超级用户（root）
@@ -62,8 +60,7 @@
     >
     > 3. 一般情况下，软限制的配置不超过硬限制的配置。
   
-  - `/etc/security/limits.d/[20|90]-nproc.conf`：
-    针对用户 nproc 最大进程数的限制，在 RHEL 5.x 中不存在。
+  - `/etc/security/limits.d/[20|90]-nproc.conf`：针对用户 nproc 最大进程数的限制，在 RHEL 5.x 中不存在。
   - `/etc/security/limits.d/[20|90]-nproc.conf` 优先级大于 `/etc/security/limits.conf`
   - 关于以上两个配置文件的重要说明：
     - 若 [20|90]-nproc.conf 中，root、全局用户、指定用户的 soft 值小于 limits.conf 中相应用户的 hard 值，那么 root、全局用户、指定用户均使用 [20|90]-nproc.conf 中的 soft 值。
@@ -74,38 +71,38 @@
     - 其他限制选项不受 [20|90]-nproc.conf 影响。
     - 示例 1：
 
-      ![rhel-suse-resource-limit-2](images/rhel-suse-resource-limit-2.jpg)
+      <center><img src="images/rhel-suse-resource-limit-2.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-4](images/rhel-suse-resource-limit-4.jpg)
+      <center><img src="images/rhel-suse-resource-limit-4.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-5](images/rhel-suse-resource-limit-5.jpg)
+      <center><img src="images/rhel-suse-resource-limit-5.jpg" style="width:80%"></center>
 
     - 示例 2：
 
-      ![rhel-suse-resource-limit-6](images/rhel-suse-resource-limit-6.jpg)
+      <center><img src="images/rhel-suse-resource-limit-6.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-7](images/rhel-suse-resource-limit-7.jpg)
+      <center><img src="images/rhel-suse-resource-limit-7.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-8](images/rhel-suse-resource-limit-8.jpg)
+      <center><img src="images/rhel-suse-resource-limit-8.jpg" style="width:80%"></center>
 
     - 示例 3：
 
-      ![rhel-suse-resource-limit-9](images/rhel-suse-resource-limit-9.jpg)
+      <center><img src="images/rhel-suse-resource-limit-9.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-10](images/rhel-suse-resource-limit-10.jpg)
+      <center><img src="images/rhel-suse-resource-limit-10.jpg" style="width:80%"></center>
 
     - 示例 4：
 
-      ![rhel-suse-resource-limit-11](images/rhel-suse-resource-limit-11.jpg)
+      <center><img src="images/rhel-suse-resource-limit-11.jpg" style="width:80%"></center>
 
-      ![rhel-suse-resource-limit-12](images/rhel-suse-resource-limit-12.jpg)
+      <center><img src="images/rhel-suse-resource-limit-12.jpg" style="width:80%"></center>
 
 - ulimit 命令行的方式：
   - ulimit 命令能临时使当前登录用户的 shell 环境资源限制立即生效，但仅对当前环境有效，退出重新登陆后将失效。
   - 可将指定用户的 ulimit 命令写入 `$HOME/.bash_profile` 中，实现永久资源限制。
   - ulimit 命令常用选项：
 
-    ![ulimit-options](images/ulimit-options.jpg)
+    <center><img src="images/ulimit-options.jpg" style="width:80%"></center>
 
     ```bash
     # ulimit 命令常用选项：
@@ -167,9 +164,9 @@
     $ watch -cd systemctl status sha1sum.service
     ```
 
-    ![cpu-limit-timer-1](images/cpu-limit-timer-1.png)
+    <center><img src="images/cpu-limit-timer-1.png" style="width:80%"></center>
 
-    ![cpu-limit-timer-2](images/cpu-limit-timer-2.png)
+    <center><img src="images/cpu-limit-timer-2.png" style="width:80%"></center>
 
 
     2️⃣ 限制 Nginx 服务终止前的最大 CPU 使用时间
@@ -220,7 +217,7 @@
     - RHEL 和类似 RHEL 的发行版（从 9 开始）
 - cgroup 的层次结构：
 
-  ![linux-cgroup-hierarchy](images/linux-cgroup-hierarchy.png)
+  <center><img src="images/linux-cgroup-hierarchy.png" style="width:80%"></center>
   
   > 图注：cgroup 对应的目录在创建之初将自动创建各类子系统参数
   
@@ -237,7 +234,7 @@
   - 🏷 若将系统的资源看成一块馅饼，那么所有资源默认会被划分为 3 个等份的 cgroup：`System`、`User` 和 `Machine`。
   - 🏷 每一个 cgroup 都是一个 `slice`，每个 slice 都可以有自己的子 slice：
 
-    ![systemd-slice-type](images/systemd-slice-type.png)
+    <center><img src="images/systemd-slice-type.png" style="width:80%"></center>
 
 - cgroup 版本查看与切换：
 
@@ -329,7 +326,7 @@ $ sudo reboot
   # 可使用 "?" 获取交互式帮助
   ```
   
-  ![systemd-cgtop-demo](images/systemd-cgtop-demo.png)
+  <center><img src="images/systemd-cgtop-demo.png" style="width:80%"></center>
   
   ```bash
   $ sudo systemd-cgls -k
@@ -344,7 +341,7 @@ $ sudo reboot
   $ sudo cat /proc/<pid>/cgroup
   ```
   
-  ![single-process-cgroup-demo](images/single-process-cgroup-demo.png)
+  <center><img src="images/single-process-cgroup-demo.png" style="width:80%"></center>
 
 ## 🚧 cgroup 实施资源限制示例
 
@@ -406,11 +403,11 @@ $ sudo reboot
   
   分别使用 tom 与 jack 用户登录系统，并分别运行 `sha1sum /dev/zero` 命令，查看此时系统的 `top` 命令输出（单核 CPU 的主机）：
   
-  ![systemd-cpushares-demo-1](images/systemd-cpushares-demo-1.png)
+  <center><img src="images/systemd-cpushares-demo-1.png" style="width:80%"></center>
   
   双核 CPU 的主机输出：
   
-  ![systemd-cpushares-demo-2](images/systemd-cpushares-demo-2.png)
+  <center><img src="images/systemd-cpushares-demo-2.png" style="width:80%"></center>
   
   如上所示，system.slice 控制组中的 foo.service 服务与 user.slice 控制组中的 tom、jack 用户运行的进程总共分别具有约 50% CPU 时间，而 tom 与 jack 用户在 user.slice 控制组内受到 CPUShares 权重的影响，jack 的权重是 tom 的 4 倍，因此在 CPU 繁忙的情况下显示上图中的结果，而双核 CPU 主机中只是进程将使用单个核心约 100%，CPUShares 权重对 CPU 时间的影响与单核 CPU 的情况下类似。
   但是，请记住 CPUShares 最多只能使用单核 CPU，无论其至调整的多大，%CPU 也只能最大到 100%！
@@ -422,7 +419,7 @@ $ sudo reboot
   $ sudo systemctl set-property user-1001.slice CPUQuota=5%
   ```
   
-  ![systemd-cpuquota-demo](images/systemd-cpuquota-demo.png)
+  <center><img src="images/systemd-cpuquota-demo.png" style="width:80%"></center>
   
   CPUQuota 参数支持多核 CPU，可设置为 `CPUQuota=200%` 以使用 2 个 CPU 核心，至于是否能完全使用需考虑程序设计问题。
   📚 关于两个强制使用 CPU 的 cgroup 配置参数：

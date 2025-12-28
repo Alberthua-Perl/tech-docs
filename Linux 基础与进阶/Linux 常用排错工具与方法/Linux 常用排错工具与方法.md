@@ -388,26 +388,32 @@ $ sudo dmidecode -t 0,1
   - 在 Linux 上 syslogd 或 klogd 启动前用来记录内核消息（启动阶段的消息）。
   - 它通过读取内核的环形缓冲区（ring buffer）来获取数据，在排查问题或只是尝试获取系统硬件信息时，该命令非常有用。
 
-    ```bash
-    $ sudo dmesg -H -T --color=auto 
-    # 转换 dmesg 命令输出的时间戳以查看启动过程
-    ```
+  ```bash
+  $ sudo dmesg -H -T --color=auto 
+  # 转换 dmesg 命令输出的时间戳以查看启动过程
+  ```
   
-  - `lshw` 命令：
-    通过读取 `/proc` 目录下各种文件的内容和 DMI 表来生成硬件信息。
-  - `hwinfo` 命令：
-    可提供比 lshw、dmidecode、dmesg 命令更为详细的硬件信息。
-    它使用 libhd 库 `libhd.so` 来收集系统上的硬件信息。
-    该工具是为 OpenSuSE 特别设计的，后来其它发行版也将它包含在其官方仓库中（RHEL 中来自 EPEL 源）。
+- `lshw` 命令：
+  - 通过读取 `/proc` 目录下各种文件的内容和 DMI 表来生成硬件信息。
 
-    ```bash
-    $ ldd $(which hwinfo)
-            linux-vdso.so.1 (0x00007ffde40f9000)
-            libhd.so.21 => /lib64/libhd.so.21 (0x00007f70bb4b7000)
-            libc.so.6 => /lib64/libc.so.6 (0x00007f70bb0f5000)
-            libx86emu.so.1 => /lib64/libx86emu.so.1 (0x00007f70baed1000)
-            /lib64/ld-linux-x86-64.so.2 (0x00007f70bbba2000)
-    ```
+  ```bash
+  $ sudo lshw -short
+  # 返回表格形式的硬件信息，包含硬件类型（Class）。
+  ```    
+
+- `hwinfo` 命令：
+  - 可提供比 lshw、dmidecode、dmesg 命令更为详细的硬件信息。
+  - 它使用 libhd 库 `libhd.so` 来收集系统上的硬件信息。
+  - 此工具是为 OpenSuSE 特别设计的，后来其它发行版也将它包含在其官方仓库中（RHEL 中来自 EPEL 源）。
+
+  ```bash
+  $ ldd $(which hwinfo)
+          linux-vdso.so.1 (0x00007ffde40f9000)
+          libhd.so.21 => /lib64/libhd.so.21 (0x00007f70bb4b7000)
+          libc.so.6 => /lib64/libc.so.6 (0x00007f70bb0f5000)
+          libx86emu.so.1 => /lib64/libx86emu.so.1 (0x00007f70baed1000)
+          /lib64/ld-linux-x86-64.so.2 (0x00007f70bbba2000)
+  ```
   
   - `/sys/class/dm/id/`：
     该目录中具有部分 DMI 信息。
@@ -1190,18 +1196,20 @@ $ rpm --setperms <package_name>
   # 获取指定共享库的 SONAME，SONAME 为共享库的软链接。
   ```
 
-- RHEL 7.x 中使用 `/lib64/ld-linux-x86-64.so.2` 作为 `run-time linker`。
-- run-time linker 在应用可执行文件运行时通过两种方式查找对应的共享库（以下两种方式任选其一）：​
-  - run-time linker 可读取 DT_SONAME，再根据环境变量 `LD_LIBRARY_PATH` 定义的存储目录查找共享库。
-  - run-time linker 也可读取 DT_SONAME 及共享库缓存文件 `/etc/ld.so.cache`，再根据该文件查找共享库。
-- run-time linker 最终将共享库映射至应用运行时的内存中。
+- RHEL 7.x 中使用 `/lib64/ld-linux-x86-64.so.2` 作为运行时链接器（run-time linker）。
+- 运行时链接器在应用可执行文件运行时通过两种方式查找对应的共享库（以下两种方式任选其一）：​
+  - 运行时链接器可读取 DT_SONAME，再根据环境变量 `LD_LIBRARY_PATH` 定义的存储目录查找共享库。
+  - 运行时链接器也可读取 DT_SONAME 及共享库缓存文件 `/etc/ld.so.cache`，再根据该文件查找共享库。
+- 运行时链接器最终将共享库映射至应用运行时的内存中。
   
   ```bash
   $ ldconfig -p
   # 查看共享库缓存文件 /etc/ld.so.cache，该文件中包含之前读取的共享库清单列表。
+
   $ strings /etc/ld.so.cache | grep '^/'
   # 查看共享库缓存文件中的共享库列表，文本方式输出。
-  $ ldd <application_name>
+
+  $ ldd /path/to/<programme>
   # 查看可执行文件所需的共享库
   # ldd 命令实质为 Shell 脚本，而非应用程序。
   ```

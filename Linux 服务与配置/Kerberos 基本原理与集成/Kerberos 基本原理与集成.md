@@ -18,25 +18,69 @@
 
 ## 文档目录
 
+- [Kerberos 基本原理与集成](#kerberos-基本原理与集成)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [Kerberos 核心概念](#kerberos-核心概念)
+  - [Kerberos 认证原理](#kerberos-认证原理)
+  - [管理 Kerberos Principals](#管理-kerberos-principals)
+  - [Kerberos Server (KDC) 部署](#kerberos-server-kdc-部署)
+  - [Kerberos 客户端对接 KDC 与 SSO 验证](#kerberos-客户端对接-kdc-与-sso-验证)
+  - [实现访问 Kerberos SSO 认证的 Web 服务方式](#实现访问-kerberos-sso-认证的-web-服务方式)
+  - [Nginx + Apache + Kerberos 实现 SSO 访问](#nginx--apache--kerberos-实现-sso-访问)
+    - [Nginx 反向代理配置](#nginx-反向代理配置)
+    - [安装与配置 mod\_auth\_gssapi 模块](#安装与配置-mod_auth_gssapi-模块)
+    - [安装与配置 GSS-Proxy](#安装与配置-gss-proxy)
+
+
 ## Kerberos 核心概念
+
+- Kerberos Principals（主体）：
+  - Kerberos principals 是 Kerberos 认证系统中用于唯一标识实体（如用户、服务或主机）的名称。它通常采用 `primary[/instance]@REALM` 的格式，其中 ‌primary‌ 表示主体的基本名称（如用户名或 host），‌instance‌ 是可选的实例部分用于进一步区分（例如 admin），‌REALM‌ 是大写的 Kerberos 领域名称，类似于域名。‌
+  - Kerberos 里只有两种 principal 类型，区别完全体现在 **命名格式** 和 **用途**，协议本身没有额外的类型字段。
+
+  | 名称 | 格式 | 作用 | 示例 |
+  | ----- | ----- | ----- | ----- |
+  | **User Principal（UPN）**  | `用户名@REALM` | 代表 **人**（用户、管理员、机器人） | `alice@LAB.EXAMPLE.COM` |
+  | **Service Principal（SPN）** | `服务/主机@REALM` | 代表 **服务实例**（HTTP、LDAP、SSH、CIFS 等） | `HTTP/serverb.example.com@LAB.EXAMPLE.COM` |
+
+  - 常见的 SPN 前缀：
+
+  | 前缀 | 服务 | 典型 SPN |
+  | ----- | ----- | ----- |
+  | `HTTP/` | Web 服务器 | `HTTP/www.lab.example.com@LAB.EXAMPLE.COM` |
+  | `ldap/` | 目录服务器 | `ldap/dc.lab.example.com@LAB.EXAMPLE.COM` |
+  | `host/` | 主机通用 | `host/serverb.lab.example.com@LAB.EXAMPLE.COM` |
+  | `nfs/` | NFS 服务器 | `nfs/nfs.lab.example.com@LAB.EXAMPLE.COM` |
+  | `postgres/` | PostgreSQL | `postgres/db.lab.example.com@LAB.EXAMPLE.COM` |
+
+## Kerberos 认证原理
+
+- Kerberos 认证过程与密钥加密过程：
+  - 图1：客户端请求 TGT、TGS 与服务的过程中密钥加密的变化
+  - 图2：客户端请求 TGT、TGS 与服务的过程中请求与响应
+
+  <center><img src="images/kerberos-authentication-summary.jpg" style="width:90%"></center>
+
+- Kerberos 认证过程中 principal 类型的变化：
 
 ```mermaid
 graph LR
     subgraph User
-        U["用户身份 alice@..."]
-        UPN["用户主体 UPN alice@..."]
-        TGT["用户票据 TGT krbtgt/EXAMPLE.COM@..."]
+        U["用户身份 alice@lab.example.com"]
+        UPN["用户主体 UPN alice@LAB.EXAMPLE.COM：若本地不存在 UPN 的有效 TGT 缓存，那么需要先请求 KDC AS 服务获取 TGT；若本地存在有效 TGT 缓存，那么继续执行。"]
+        TGT["用户票据 TGT krbtgt/LAB.EXAMPLE.COM@LAB.EXAMPLE.COM"]
     end
 
     subgraph KDC Server
-        K["KDC"]
+        K["KDC (TGS 服务)"]
     end
 
     subgraph Service
-        S["服务身份 HTTP/serverb.lab.example.com@..."]
-        SPN["服务主体 SPN HTTP/serverb.lab.example.com@..."]
+        S["服务身份 HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM"]
+        SPN["服务主体 SPN HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM"]
         KEYTAB["keytab"]
-        ST["服务票据 ST HTTP/serverb.lab.example.com@..."]
+        ST["服务票据 ST HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM"]
     end
 
     U -- 认证 --> UPN
@@ -47,7 +91,31 @@ graph LR
     KEYTAB -- 验证 --> S
 ```
 
-## Kerberos 认证原理
+- 💥 注意：为什么通过 kadmin.local 命令行创建 principal 后，依然无法在 Web 页面上显示用户已创建？
+  - FreeIPA/IdM/OpenLDAP 中的用户与 Kerberos principal 强绑定（一一对应），通过创建用户将同时创建对应的 principal。
+  - 而纯命令行 kadmin.local add_principal 只生成 Kerberos principal，不会在 FreeIPA/IdM/OpenLDAP 里创建 posixAccount（即 uid、gid、home 等系统账号属性）。
+  - 因此，即使在客户端使用 kinit demo@LAB.EXAMPLE.COM 此类命令保存了 principal 的 TGT 缓存，但是 SSSD 在枚举用户时根本无法感知这个新建的 principal，自然也不会把它缓存到 /var/lib/sss/db/ 中。
+  - 要让 “裸 principal” 也能被 sssctl 显示并用于 SSH 登录，必须手动补录一条同名的 posixAccount 到 LDAP，让 SSSD 有账可查。
+  - 所以，kadmin.local add_principal 命令新建 principal 不能在 Web 页面查看。
+
+## 管理 Kerberos Principals
+
+创建新的 principal：
+
+```bash
+##Kerberos 认证服务节点/FreeIPA/IdM
+$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw <password> <username>@REALM
+$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw demotest123 demo@LAB.EXAMPLE.COM
+#创建指定名称的 UPN 并设置密码，覆盖默认的严格的 IdM 认证限制。
+```
+
+删除已创建的 principal：
+
+```bash
+##Kerberos 认证服务节点/FreeIPA/IdM
+$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal <username>
+$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal demo
+```
 
 ## Kerberos Server (KDC) 部署
 
