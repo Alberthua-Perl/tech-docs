@@ -10,7 +10,7 @@
 Kubernetes 为集群管理提供了一个强大的 API，包括用于部署应用程序的 Pod、Jobs 和 Deployments。然而，在许多情况下，标准 API 是不够的，还需要额外的抽象级别及增强的功能。通过在 Kubernetes 中定义和管理应用程序和服务作为独立的自定义资源，`Kubernetes Operator` 模式（pattern）解决了这一问题，这也是有助于实现可重用性和降低整体复杂性的技术机制。
 Operator 模式的实现是由特定于域的控制器实现的，这些控制器监控 Custom Resources（自定义资源）的生命周期。这种控制器不断地将当前状态与环境所期望之状态进行比对和同步，以便对 Kubernetes集群进行必要的更改。这一技术概念被称为 `Control Loop`（控制循环）或 `Reconciliation Loop`（调谐循环），为便于有效地叙述，本文使用更为中文化的名称：控制回路。
 
-<center><img src="images/kubernetes-operator-status.jpeg" style="width:80%"></center>
+<center><img src="images/kubernetes-operator-status.jpeg" style="width:60%"></center>
 
 Kubernetes 项目对 "Operator" 的定义很简单：“Operator 是使用自定义资源来管理应用程序及其组件的软件扩展（software extensions）”。换句话说，使用 Operator 使我们能够将应用程序视为单个对象，该对象仅公开对应用程序有意义的调整，而不是一组原语（primitives，例如 Pod、Deployments、Services 或 ConfigMaps）。
 此外，对于运行在 Kubernetes 集群中的软件，Operator 允许自动执行典型的 Day-1 任务（安装、配置等）和 Day-2 任务（重新配置、升级、备份、故障转移、恢复等），并与 Kubernetes 概念和 APIs 进行原生集成。
@@ -31,7 +31,7 @@ Kubernetes 项目对 "Operator" 的定义很简单：“Operator 是使用自定
 
 类似地，隶属于 Kubernetes Operator 的控制器监视（watches）相关的 Custom Resources（自定义资源）类型，并采取特定于应用程序的操作，使工作负载（workload）的当前状态与用户在 Custom Resources 中表达的期望状态相匹配。
 
-<center><img src="images/kubernetes-control-loop.jpeg" style="width:80%"></center>
+<center><img src="images/kubernetes-control-loop.jpeg" style="width:60%"></center>
 
 以上图表说明了 control plane 如何在一个回路中运行各个控制器，其中一些控制器原生内置于 Kubernetes 中，如，deployment controller 和 job controller，而另一些则是属于 Kubernetes Operator 的一部分，如，Custom controller 1 属于 Memcached Operator，而 Custom controller 2 则属于 etcd Operator。
 

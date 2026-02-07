@@ -31,6 +31,7 @@
     - [Nginx 反向代理配置](#nginx-反向代理配置)
     - [安装与配置 mod\_auth\_gssapi 模块](#安装与配置-mod_auth_gssapi-模块)
     - [安装与配置 GSS-Proxy](#安装与配置-gss-proxy)
+  - [参考链接](#参考链接)
 
 
 ## Kerberos 核心概念
@@ -343,3 +344,7 @@ $ sudo vim /etc/gssproxy/80-http.conf
   kernel_nfsd = no
   euid = apache
 ```
+
+## 参考链接
+
+- [Kerberos: An Authentication Service for Computer Networks](https://gost.isi.edu/publications/kerberos-neuman-tso.html)

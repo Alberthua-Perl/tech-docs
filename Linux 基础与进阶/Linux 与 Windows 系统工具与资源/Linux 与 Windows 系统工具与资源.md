@@ -19,6 +19,11 @@
     - [3.4 Shell 脚本多行注释](#34-shell-脚本多行注释)
     - [3.5 设置自定义 `PS1` 交互式命令提示符](#35-设置自定义-ps1-交互式命令提示符)
     - [3.6 Bash 常用命令汇总](#36-bash-常用命令汇总)
+    - [3.7 Shell 列表示例](#37-shell-列表示例)
+    - [3.8 Shell 中的正则匹配使用场景](#38-shell-中的正则匹配使用场景)
+      - [3.8.1](#381)
+      - [3.8.2](#382)
+    - [3.9 浮点数计算](#39-浮点数计算)
   - [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
   - [5. grep 常用命令示例](#5-grep-常用命令示例)
   - [6. Markdown 语法配置](#6-markdown-语法配置)
@@ -36,19 +41,24 @@
     - [10.6 RHEL9 安装 Google Chrome](#106-rhel9-安装-google-chrome)
     - [10.7 RHEL8 安装 VScode](#107-rhel8-安装-vscode)
     - [10.8 RHEL9 安装 VScode](#108-rhel9-安装-vscode)
-    - [10.9 RHEL9 安装 EPEL9 软件源](#109-rhel9-安装-epel9-软件源)
-    - [10.10 RHEL 安装中文输入法支持](#1010-rhel-安装中文输入法支持)
-    - [10.11 安装 rdesktop 软件包连接 Windows RDP 桌面](#1011-安装-rdesktop-软件包连接-windows-rdp-桌面)
-    - [10.12 RHEL9 安装 ToDesk](#1012-rhel9-安装-todesk)
-    - [10.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1013-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
-      - [10.13.1 安装与设置 x11vnc 虚拟桌面](#10131-安装与设置-x11vnc-虚拟桌面)
-      - [10.13.2 MobaXterm 的连接访问](#10132-mobaxterm-的连接访问)
+    - [10.9 RHEL10 安装 VScode](#109-rhel10-安装-vscode)
+    - [10.10 RHEL9 安装 EPEL9 软件源](#1010-rhel9-安装-epel9-软件源)
+    - [10.11 RHEL10 安装 EPEL10 软件源](#1011-rhel10-安装-epel10-软件源)
+    - [10.12 RHEL10 安装 Grafana 软件源](#1012-rhel10-安装-grafana-软件源)
+    - [10.13 RHEL 安装中文输入法支持](#1013-rhel-安装中文输入法支持)
+    - [10.14 安装 rdesktop 软件包连接 Windows RDP 桌面](#1014-安装-rdesktop-软件包连接-windows-rdp-桌面)
+    - [10.15 RHEL9 安装 ToDesk](#1015-rhel9-安装-todesk)
+    - [10.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1016-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
+      - [10.16.1 安装与设置 x11vnc 虚拟桌面](#10161-安装与设置-x11vnc-虚拟桌面)
+      - [10.16.2 MobaXterm 的连接访问](#10162-mobaxterm-的连接访问)
   - [11. dnf 下载软件包及其依赖](#11-dnf-下载软件包及其依赖)
   - [12. dnf 实现软件包安全检测与更新](#12-dnf-实现软件包安全检测与更新)
   - [13. RedHat 订阅服务使用](#13-redhat-订阅服务使用)
   - [14. 如何在 Windows 11 家庭版中禁用 Hyper-V？](#14-如何在-windows-11-家庭版中禁用-hyper-v)
   - [15. RHEL8/9/10 启用 /var/log/dmesg 日志](#15-rhel8910-启用-varlogdmesg-日志)
-  - [16. 参考链接](#16-参考链接)
+  - [16. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#16-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
+  - [17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#17-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
+  - [18. 参考链接](#18-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -98,9 +108,12 @@
 ### 1.4 UTC 时间、GMT 时间、EST 时间、CST 时间的区别
 
 - **UTC**：协调世界时（Coordinated Universal Time）是最主要的世界时间标准，其以原子时秒长为基础，在时刻上尽量接近于格林尼治标准时间。UTC 是一个标准，而不是一个时区。
-- **GMT**：Greenwich Mean Time 的缩写，指的是皇家格林威治天文台的标准时间，称作格林威治时间，因为本初子午线通过此地区，因此也称为世界标准时间。然而地球的自转不是完全规律的，而且正逐渐减慢，因此自 1924 年开始，格林威治时间（GMT）已经不再被视为标准时间，取而代之的是 "世界协调时间"（UTC: Coordinated Universal Time）。
+
+  > **GMT**：Greenwich Mean Time 的缩写，指的是皇家格林威治天文台的标准时间，称作格林威治时间，因为本初子午线通过此地区，因此也称为世界标准时间。然而地球的自转不是完全规律的，而且正逐渐减慢，因此自 1924 年开始，格林威治时间（GMT）已经不再被视为标准时间，取而代之的是 "世界协调时间"（UTC: Coordinated Universal Time）。
+
 - **EST**：东部标准时间（Eastern Standard Time）= UTC-05:00（晚5小时），美国东部时间（EST）。
 - **CST**：北京时间（China Standard Time，中国标准时间）是中国的标准时间。在时区划分上，属东八区，比协调世界时早8小时，记为 UTC+8。CST 比 EST 早 13 个小时。
+- **RTC**：主板电池时间，由主板电池供电，与系统时间无关。
 
 ## 2. Windows 常用 PowerShell 命令
 
@@ -322,6 +335,16 @@ $ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir
 # -d 选项：解密文件
 # -k 选项：指定解密的明文密码
 ```
+
+### 3.7 Shell 列表示例
+
+### 3.8 Shell 中的正则匹配使用场景
+
+#### 3.8.1
+
+#### 3.8.2
+
+### 3.9 浮点数计算
 
 ## 4. oh-my-bash 终端字体（fonts）的安装
 
@@ -590,7 +613,22 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### 10.9 RHEL9 安装 EPEL9 软件源
+### 10.9 RHEL10 安装 VScode
+
+```bash
+$ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+$ sudo tee /etc/yum.repos.d/vscode.repo <<EOF
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+$ sudo dnf install code
+```
+
+### 10.10 RHEL9 安装 EPEL9 软件源
 
 ```bash
 $ sudo dnf config-manager \
@@ -604,7 +642,33 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 # 安装 epel9 软件包
 ```
 
-### 10.10 RHEL 安装中文输入法支持
+### 10.11 RHEL10 安装 EPEL10 软件源
+
+```bash
+$ sudo cat > /etc/yum.repos.d/epel10.repo <<EOF
+[epel10-everything]
+name=EPEL10 Everything
+baseurl=https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/
+enabled=1
+gpgcheck=0
+EOF
+$ sudo dnf repolist
+```
+
+### 10.12 RHEL10 安装 Grafana 软件源
+
+```bash
+$ sudo cat > /etc/yum.repos.d/grafana.repo <<EOF
+[grafana]
+name=grafana
+baseurl=https://mirrors.cloud.tencent.com/grafana/yum/rpm/
+enabled=1
+gpgcheck=0
+EOF
+$ sudo dnf install -y grafana
+```
+
+### 10.13 RHEL 安装中文输入法支持
 
 以下输入法引擎（IME）可以从 RHEL 中列出的软件包中获得：
 
@@ -625,7 +689,7 @@ $ sudo dnf install -y langpacks-zh_CN.noarch ibus-libpinyin
 
 如上图所示，在 Settings > Keyboard > Input Sources 中添加 `Chinese (Intelligent Pinyin)` 即可完成设置。
 
-### 10.11 安装 rdesktop 软件包连接 Windows RDP 桌面
+### 10.14 安装 rdesktop 软件包连接 Windows RDP 桌面
 
 ```bash
 $ sudo dnf install -y rdesktop
@@ -634,7 +698,7 @@ $ rdesktop -u hwuser88 -d bestvdc -p Ansible2024! redhat.bestvdc.com:23353
 # 登录 Cloudshell bestvdc desktop
 ```
 
-### 10.12 RHEL9 安装 ToDesk
+### 10.15 RHEL9 安装 ToDesk
 
 ```bash
 $ wget https://rh-course-materials.oss-cn-hangzhou.aliyuncs.com/todesk-v4.7.2.0-x86_64.rpm
@@ -645,9 +709,9 @@ $ sudo systemctl enable --now todeskd.service
 # 启动并设置开机自启服务
 ```
 
-### 10.13 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
+### 10.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
 
-#### 10.13.1 安装与设置 x11vnc 虚拟桌面
+#### 10.16.1 安装与设置 x11vnc 虚拟桌面
 
 ```bash
 ### 打开一个终端执行 ###
@@ -675,7 +739,7 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 # 确认 x11vnc 监听的端口，用于外部连接的端口确认
 ```
 
-#### 10.13.2 MobaXterm 的连接访问
+#### 10.16.2 MobaXterm 的连接访问
 
 1️⃣ 打开 MobaXterm，点击 Session 创建新会话：
 
@@ -812,7 +876,41 @@ $ sudo systemctl enable dmesg.service
 $ sudo systemctl reboot
 ```
 
-## 16. 参考链接
+## 16. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面
+
+RHEL10 的 Gnome3 已内置支持 RDP 协议连接的远程桌面控制，可使用以下方法设置：
+
+<center><img src="images/gnome3-supported-rdp-1.png" style="width:60%"></center>
+
+<center><img src="images/gnome3-supported-rdp-2.png" style="width:60%"></center>
+
+Windows 客户端使用 `Win+R` 组合键，在运行窗口中输入 `mstsc` 后可连接 Gnome3：
+
+<center><img src="images/gnome3-supported-rdp-3.png" style="width:80%"></center>
+
+## 17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机
+
+```bash
+$ sudo chown qemu:qemu /var/lib/libvirt/images/mysle15sp6-origin.qcow2
+# 更改 qcow2 虚拟磁盘属组
+$ sudo virt-install --name mysle15sp6 \
+  --machine q35 --boot uefi \
+  --vcpus 2 --memory 4096 --disk path=/var/lib/libvirt/images/mysle15sp6-origin.qcow2,format=qcow2,bus=virtio \
+  --network bridge=br-ext,model=virtio \
+  --import \
+  --os-variant sle15sp6 --virt-type kvm
+# 指定虚拟机名称、主板芯片类型、系统引导方式、vCPU、内存、使用的 qcow2 虚拟磁盘路径与驱动类型、
+# 网络类型与驱动类型、系统发行版与虚拟化类型
+# 以上网络类型中的 bridge 需提前创建
+$ sudo virt-viewer --connect qemu:///system mysle15sp6
+# 连接虚拟机终端
+$ sudo virsh destroy mysle15sp6
+# 关闭虚拟机
+$ sudo virsh undefine mysle15sp6
+# 删除虚拟机
+```
+
+## 18. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)

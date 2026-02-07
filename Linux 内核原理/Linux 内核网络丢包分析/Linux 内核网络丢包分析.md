@@ -1,7 +1,7 @@
 
 # Linux 内核网络丢包分析示例
 
-## SETUP IPTABLES TO DROP ICMP PACKETS
+## 设置 iptables 丢弃 ICMP 包（packets）
 
 ```bash
 ### kiosk@foundation0 ###
@@ -12,19 +12,18 @@ num  target     prot opt source               destination
 1    LIBVIRT_INP  all  --  anywhere             anywhere
 2    DROP       icmp --  servera.lab.example.com  anywhere
 ```  
-  
-## IPV4 PING FROM SERVERA
+
+## ping: 从 servera 到 foundation0
 
 ```bash
 ### student@servera ###
 $ ping 172.25.250.250  #NO reponse
 ```
 
-## DEBUG PACKETS DROP FROM FUNCTION STACK
+## 从函数调用栈 debug 网络丢包
 
 ```bash
 ### kiosk@foundation0 ###
-
 $ sudo dnf install -y dropwatch
 $ sudo dropwatch -l kas
   Initalizing kallsyms db
