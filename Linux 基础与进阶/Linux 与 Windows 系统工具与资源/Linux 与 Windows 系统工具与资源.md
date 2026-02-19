@@ -58,7 +58,8 @@
   - [15. RHEL8/9/10 启用 /var/log/dmesg 日志](#15-rhel8910-启用-varlogdmesg-日志)
   - [16. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#16-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
   - [17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#17-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
-  - [18. 参考链接](#18-参考链接)
+  - [18. Ubuntu 24.04.4 LTS 中安装 Clash 工具](#18-ubuntu-24044-lts-中安装-clash-工具)
+  - [19. 参考链接](#19-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -360,12 +361,12 @@ $ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir
   $ bash -c "$(wget https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh -O -)"
   ```
 
-  <center><img src="images/oh-my-bash-install.jpg" style="width:80%"></center>
+  <img src="images/oh-my-bash-install.jpg" style="width:80%">
 
   下载安装该项目源码后，更改 `$HOME/.bashrc` 中的 `OSH_THEME` 值为对应的 `fonts theme` 即可（位于 `$HOME/.oh-my-bash/themes/`），最后 source 该文件生效。
   此处使用的 theme 为 `powerline`，在 `$HOME/.oh-my-bash/themes/powerline/powerline.base.sh` 的第 165 行可自定义更改 PS1 环境变量。
 
-  <center><img src="images/rhel8-oh-my-bash-powerline-ps1.jpg" style="width:80%"></center>
+  <img src="images/rhel8-oh-my-bash-powerline-ps1.jpg" style="width:80%">
   
 - Ubuntu 20.04.3 LTS 中安装：安装方式为 deb 软件包安装
 
@@ -386,7 +387,7 @@ $ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir
   $ source $HOME/.bashrc
   ```
 
-  <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:80%"></center>
+  <img src="images/ubuntu-powerline-ps1.jpg" style="width:80%">
 
 ## 5. grep 常用命令示例
   
@@ -473,9 +474,9 @@ Cursor Style: block
 - 安装 Chrome 扩展 `Stylus`
 - 打开该扩展，并将 `GitHub PH logo design` CSS 样式导入其中，如下所示：
 
-  <center><img src="images/stylus-GitHub%20PH%20logo%20design-css-1.jpg" style="width:80%"></center>
+  <img src="images/stylus-GitHub%20PH%20logo%20design-css-1.jpg" style="width:80%">
 
-  <center><img src="images/stylus-GitHub%20PH%20logo%20design-css-2.jpg" style="width:80%"></center>
+  <img src="images/stylus-GitHub%20PH%20logo%20design-css-2.jpg" style="width:80%">
 
   ```css
   .Header-item.Header-item--full.flex-justify-center.d-md-none.position-relative a svg,
@@ -501,7 +502,7 @@ Cursor Style: block
 
 - 安装 Chrome 扩展 `Github Code Font Changer`
 
-  <center><img src="images/github-code-font-changer-2.0.jpg" style="width:80%"></center>
+  <img src="images/github-code-font-changer-2.0.jpg" style="width:80%">
   
 - 安装完成后即可使用该扩展选择对应的字体，打开 GitHub 页面即可显示效果。
 
@@ -685,7 +686,7 @@ $ sudo dnf install -y langpacks-zh_CN.noarch ibus-libpinyin
 # GNOME3 中安装中文输入法支持，并且可在 Keyboard 中设置调整
 ```
 
-<center><img src="images/rhel-supported-chinese-input.png" style="width:60%"></center>
+<img src="images/rhel-supported-chinese-input.png" style="width:60%">
 
 如上图所示，在 Settings > Keyboard > Input Sources 中添加 `Chinese (Intelligent Pinyin)` 即可完成设置。
 
@@ -743,19 +744,19 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 
 1️⃣ 打开 MobaXterm，点击 Session 创建新会话：
 
-<center><img src="images/x11vnc-connect-1.jpg" style="width:80%"></center>
+<img src="images/x11vnc-connect-1.jpg" style="width:80%">
 
 2️⃣ 点击 VNC 创建新连接：
 
-<center><img src="images/x11vnc-connect-2.jpg" style="width:80%"></center>
+<img src="images/x11vnc-connect-2.jpg" style="width:80%">
 
 3️⃣ 输入 VNC 服务端的地址与监听端口，点击 OK 即弹出密码输入框，输入设置的 VNC 登录用户密码即可完成登录：
 
-<center><img src="images/x11vnc-connect-3.jpg" style="width:80%"></center>
+<img src="images/x11vnc-connect-3.jpg" style="width:80%">
 
 4️⃣ 可在 VNC 虚拟桌面中操作：
 
-<center><img src="images/x11vnc-connect-4.jpg" style="width:80%"></center>
+<img src="images/x11vnc-connect-4.jpg" style="width:80%">
 
 ## 11. dnf 下载软件包及其依赖
 
@@ -820,9 +821,9 @@ $ sudo subscription-manager repos --list-enabled
 - ✔️ 解决：
   - 在硬件 BIOS 中已经启用 `VT-x` 虚拟化，宿主机可运行虚拟机，但出现问题中的报错，可判断为宿主机中可能运行着 Hyper-V 组件，需将其禁用才能运行 VMware 拟机（Hyper-V 与 VMware 运行冲突导致）。
 
-  <center><img src="images/win11-default-installed-hyper-v.png" style="width:60%"></center>
+    <img src="images/win11-default-installed-hyper-v.png" style="width:60%">
   
-  <center><img src="images/dell-precision-3591-vt.jpg" style="width:60%"></center>
+    <img src="images/dell-precision-3591-vt.jpg" style="width:60%">
 
   - `Win + R` 输入 `optionalfeatures` 查看 **启动或关闭 Windows 功能**，此列表中未显示 Hyper-V 相关的功能，需要通过其他方式将其彻底关闭（Windows 11 家庭版中不会显式列出 Hyper-V 组件）。
   - 以管理员身份运行 PowerShell 关闭虚拟化调度器，执行以下命令：
@@ -838,12 +839,12 @@ $ sudo subscription-manager repos --list-enabled
 
   - `Win + R` 输入 `windowsdefender:` 查看 **Windows 安全中心**，点击 **设备安全性-转到设置**，在 **内核隔离** 中关闭 **内存完整性**（基于虚拟化的安全性 VBS）。
 
-  <center><img src="images/win11-kernel-isolate.png" style="width:80%"></center>
+    <img src="images/win11-kernel-isolate.png" style="width:80%">
 
   - 重启系统使配置生效
   - 系统重启后，`Win + R` 输入 `msinfo32` 查看，是否与如下信息一致，若一致表示彻底关闭 Hyper-V，可运行 VMware 虚拟机。
   
-  <center><img src="images/win11-disable-hyperv.png" style="width:50%"></center>
+    <img src="images/win11-disable-hyperv.png" style="width:50%">
 
 - 💥 WSL2 与 Hyper-V 的切换关系：
   - WSL2 启用 → Hyper-V 启用：WSL2 子系统的启用需要 Hyper-V 的启用。执行 `bcdedit /set hypervisorlaunchtype auto` 启用 Hyper-V，重启系统使配置生效。
@@ -880,13 +881,13 @@ $ sudo systemctl reboot
 
 RHEL10 的 Gnome3 已内置支持 RDP 协议连接的远程桌面控制，可使用以下方法设置：
 
-<center><img src="images/gnome3-supported-rdp-1.png" style="width:60%"></center>
+<img src="images/gnome3-supported-rdp-1.png" style="width:60%">
 
-<center><img src="images/gnome3-supported-rdp-2.png" style="width:60%"></center>
+<img src="images/gnome3-supported-rdp-2.png" style="width:60%">
 
 Windows 客户端使用 `Win+R` 组合键，在运行窗口中输入 `mstsc` 后可连接 Gnome3：
 
-<center><img src="images/gnome3-supported-rdp-3.png" style="width:80%"></center>
+<img src="images/gnome3-supported-rdp-3.png" style="width:80%">
 
 ## 17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机
 
@@ -910,7 +911,133 @@ $ sudo virsh undefine mysle15sp6
 # 删除虚拟机
 ```
 
-## 18. 参考链接
+## 18. Ubuntu 24.04.4 LTS 中安装 Clash 工具
+
+此处使用 [nelvko/clash-for-linux-install | GitHub](https://github.com/nelvko/clash-for-linux-install) 仓库安装 Linux 的 Clash 工具。
+
+```bash
+### 安装 Clash ###
+$ wget https://github.com/nelvko/clash-for-linux-install/archive/refs/heads/master.zip
+# 下载 Clash 源代码压缩文件
+$ unzip clash-for-linux-install-master.zip
+$ cd clash-for-linux-install-master
+# 解压缩并进入源代码目录
+$ ./install.sh
+😼 安装内核：mihomo by nohup       # 首次安装会自动下载
+📦 安装路径：/home/godev/clashctl  # clashctl 命令行工具安装路径
+
+╔═══════════════════════════════════════════════╗
+║                😼 Web 控制台                  ║
+║═══════════════════════════════════════════════║
+║                                               ║
+║     🔓 注意放行端口：9090                      ║
+║     🏠 内网：http://192.168.110.115:9090/ui   ║
+║     🌏 公网：http://101.228.51.109:9090/ui    ║
+║     ☁️ 公共：http://board.zash.run.place      ║
+║                                               ║
+╚═══════════════════════════════════════════════╝
+
+😼 当前密钥：Cqblof
+🎉 enjoy 🎉
+    
+Usage: 
+  clashctl COMMAND [OPTIONS]
+
+Commands:
+  on                    开启代理
+  off                   关闭代理
+  proxy                 系统代理
+  status                内核状态
+  ui                    面板地址
+  sub                   订阅管理
+  log                   内核日志
+  tun                   Tun 模式
+  mixin                 Mixin 配置
+  secret                Web 密钥
+  upgrade               升级内核
+
+Global Options:
+  -h, --help            显示帮助信息
+
+For more help on how to use clashctl, head to https://github.com/nelvko/clash-for-linux-install
+✈️  请输入要添加的订阅链接：********************    # 输入订阅地址
+⏳ 正在下载...
+🍃 验证订阅配置...
+🎉 订阅已添加：[1] ********************    # 返回输入的订阅地址
+🔥 订阅已生效
+
+### 管理订阅地址 ###
+$ clashctl sub add <url>
+# 添加新的订阅地址
+$ clashctl sub ls
+# 查看使用的订阅
+use: 1
+# 订阅列表
+profiles:
+  - id: 1
+    path: /home/godev/clashctl/resources/profiles/1.yaml
+    url: ********************
+  - id: 2
+    path: /home/godev/clashctl/resources/profiles/2.yaml
+    url: ********************
+$ clashctl sub use <id>
+# 切换不同的订阅地址
+
+### 管理 Clash 工作模式 ###
+# 注意：此处使用隧道模式实现代理
+$ clashctl tun on
+$ clashctl tun off
+# 启用或关闭 Clash 的隧道模式
+
+$ clashctl proxy on
+$ clashctl proxy off
+# 启用或关闭 Clash 的系统代理模式
+
+### Clash UI 界面访问 ###
+$ clashctl ui  # 使用内网方式访问
+
+╔═══════════════════════════════════════════════╗
+║                😼 Web 控制台                  ║
+║═══════════════════════════════════════════════║
+║                                               ║
+║     🔓 注意放行端口：9090                      ║
+║     🏠 内网：http://192.168.110.115:9090/ui   ║
+║     🌏 公网：http://101.228.51.109:9090/ui    ║
+║     ☁️ 公共：http://board.zash.run.place      ║
+║                                               ║
+╚═══════════════════════════════════════════════╝
+
+$ clashctl secret
+😼 当前密钥：kCJJrh
+# 查看登录 Web 界面所需的密钥
+
+### 启用或关闭 Clash 代理 ###
+$ clashctl on
+$ clashctl off
+```
+
+浏览器中输入前文的内网地址与密钥即可登录设置代理：
+
+<img src="images/login-clash-ui-1.png" style="width:60%">
+
+<img src="images/login-clash-ui-2.png" style="width:60%">
+
+```bash
+$ ping -c3 google.com
+PING google.com (28.0.0.23) 56(84) bytes of data.
+64 bytes from 28.0.0.23: icmp_seq=1 ttl=64 time=0.240 ms
+64 bytes from 28.0.0.23: icmp_seq=2 ttl=64 time=0.063 ms
+64 bytes from 28.0.0.23: icmp_seq=3 ttl=64 time=0.168 ms
+
+--- google.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 6005ms
+rtt min/avg/max/mdev = 0.063/0.157/0.240/0.072 ms
+# 测试 Google 连通性
+```
+
+💥 注意：若调用 OpenAI 的 API，请选择日本或新加坡节点代理，香港节点受地区限制无法调用 API！
+
+## 19. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
