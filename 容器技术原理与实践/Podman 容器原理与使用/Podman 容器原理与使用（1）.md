@@ -1,115 +1,81 @@
-## Podman 容器原理与使用（1）
+# Podman 容器原理与使用（1）
 
-### 文档说明：
+## 文档说明
 
 - 实验用 OS 版本：
-  
   - CentOS 7.9、RHEL 8.0、RHEL 8.2、Ubuntu 20.04.3 LTS
-
 - 实验用 kernel 版本：
-  
   - 3.10.0-1160.41.1.el7.x86_64
-  
   - 4.18.0-193.el8.x86_64
-  
   - 5.14.0-1.el7.elrepo.x86_64
-
 - 实验用 Podman 版本：1.6.4、3.2.3、3.3.1
-
 - 实验用 podman-compose 版本：0.1.8
-
 - 实验用 Docker 版本：20.10.8
-
 - 若未做特殊说明，以下示例均于 `RHEL 8.2`（`4.18.0-193.el8.x86_64`）上执行，Podman 版本为 `3.2.3`。
-
 - 该文档中未涉及 podman 命令的基础使用方法，可参阅 [该文档](https://mp.weixin.qq.com/s/MDi4RB5V60EGl3ii9usD0Q) 加以熟悉。
-
 - 💥 重要提示：Podman 项目正在不断演进与完善中，请以自身使用的版本为准进行测试与使用！ 
 
-### 文档目录：
+## 文档目录
 
-- Podman 的特性概述
+- [Podman 容器原理与使用（1）](#podman-容器原理与使用1)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [Podman 的特性概述](#podman-的特性概述)
+  - [Podman 版本兼容性比较](#podman-版本兼容性比较)
+  - [Podman 的扩展功能](#podman-的扩展功能)
+  - [Podman 在不同 OS 版本中的安装](#podman-在不同-os-版本中的安装)
+  - [🤘 Docker 与 Podman 进程管理方式比较](#-docker-与-podman-进程管理方式比较)
+  - [Podman 的网络实现原理（rootfull 与 rootless）](#podman-的网络实现原理rootfull-与-rootless)
+  - [Podman 的 macvlan 网络实现](#podman-的-macvlan-网络实现)
+  - [Podman rootless 容器用户映射实现方式](#podman-rootless-容器用户映射实现方式)
+  - [参考链接](#参考链接)
 
-- Podman 版本兼容性比较
-
-- Podman 的扩展功能
-
-- Podman 在不同 OS 版本中的安装
-
-- Docker 与 Podman 进程管理方式比较
-
-- Podman 的网络实现原理（rootfull 与 rootless）
-
-- Podman 的 macvlan 网络实现
-
-- Podman rootless 容器用户映射实现方式
-
-- 参考链接
-
-### Podman 的特性概述：
+## Podman 的特性概述
 
 - LXC、`LXD`（Go 语言开发）、`systemd-nspawn` 均可作为 Linux 容器，但缺少容器跨主机运行与应用打包的能力。
-
 - Docker 与 Podman 可使用容器镜像实现应用打包发布，快速且轻量。
-
 - Docker 与 Podman 都使用 `runC`（Go 语言开发）作为底层 `oci-runtime`。
-
 - Docker 与 Podman 都支持 `OCI Image Format`（Go 语言开发），都能使用 DockerHub 上的容器镜像，而 systemd-nspawn 无法使用它们的镜像。
-
 - 👉 Podman 使用 `CNI`（Go 语言开发）作为 rootfull 容器网络底层，实现比 Docker 网络层略微简单但原理相同。 
-
 - 相对于 LXD 与 systemd-nspawn，CNI 可以避免编写大量的网络规则。
-
 - 🚀 为了实现普通用户 rootless 容器网络，Podman 可以使用 `slirp4netns` 程序，避免 `kernel space` 中的大量 `veth pair` 虚拟接口的出现, 并且性能更好。
-
 - Docker 运行容器必须使用守护进程且使用 root 权限，存在系统安全问题，而 Podman 针对此问题使用以下两个特性加以解决，如下所示：
-  
   - Podman 支持无守护进程（`no-daemon`）运行容器。
-  
   - Podman 支持普通用户运行 `rootless` 容器，即，普通用户直接运行容器无需提权具有 root 权限。
-
 - 虽然 Docker 与 Podman 的实现原理不同，但对于使用者而言其 CLI 十分相似，可平滑地从 Docker 过渡至 Podman。
-
 - Podman 的目标不是容器的编排，编排可以使用更加专业的 Kubernetes、Open Shift、Rancher 等，使用 Podman 可以更轻量的运行容器且不受 root 权限的安全问题，即便是 root 用户也无法查看其它普通用户空间下的容器，Podman 通过 `user namespace` 进行隔离。
-
 - 👉 Podman 可使用 `systemd service` 单元文件直接管理容器，实现容器服务随系统启动而启动。
-
 - 👉 Podman 里集成了 `CRIU`，因此 Podman 中的容器可以在单机上热迁移。
-
 - 由于 Kubernetes 将从 `v1.24.x` 版本后放弃使用 `dockershim` 接口层，容器运行时可选择使用 `Containerd` 或者 `CRI-O`，两者虽然均支持 OCI image 规范，但它们不是面向使用者或开发者直接管理容器或镜像的工具，而 Podman 可直接面向使用者或开发者操作容器或镜像。
-
 - Podman 命令的子进程创建 pod 与容器。
 
-### Podman 版本兼容性比较：
+## Podman 版本兼容性比较
 
 - Podman 版本、kernel 版本与 OS 版本的兼容性将直接影响普通用户使用 rootless 容器。
-
 - 如下所示，kernel 不支持 rootless 容器：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/centos79-kernel-not-support-podman-rootless.jpg)
+  ![centos79-kernel-not-support-podman-rootless](images/centos79-kernel-not-support-podman-rootless.jpg)
 
 - 普通用户 rootless 容器兼容性比较：
   
-  | Podman 版本 | OS 版本        | kernel 版本                   | 是否支持 rootless |
-  |:--------- |:------------ |:--------------------------- |:------------- |
-  | 1.6.4     | CentOS 7.9   | 3.10.0-1160.41.1.el7.x86_64 | no            |
-  | 1.6.4     | CentOS 7.9   | 5.14.0-1.el7.elrepo.x86_64  | yes           |
-  | 3.2.3     | RHEL 8.0/8.2 | 4.18.0-193.el8.x86_64       | yes           |
+  | Podman 版本 | OS 版本 | kernel 版本 | 是否支持 rootless |
+  | :----- | :----- | :----- | :----- |
+  | 1.6.4 | CentOS 7.9 | 3.10.0-1160.41.1.el7.x86_64 | no |
+  | 1.6.4 | CentOS 7.9 | 5.14.0-1.el7.elrepo.x86_64 | yes |
+  | 3.2.3 | RHEL 8.0/8.2 | 4.18.0-193.el8.x86_64 | yes |
   
   > 📌**注意：**
-  > 
+  >
   > rootless 容器特性取决于 kernel 的版本，不取决于 OS 与 Podman 的版本。
   
   - 由于 `user namespace` 特性在 kernel `4.9.0` 之后出现，因此升级 kernel 即可解决 rootless 问题。
-  
   - 关于 rootless 特性在 RHEL 8 中的设置，可 [点击此处](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/assembly_starting-with-containers_building-running-and-managing-containers#proc_setting-up-rootless-containers_assembly_starting-with-containers) 参考 Red Hat 的官方配置说明。
 
-### Podman 的扩展功能：
+## Podman 的扩展功能
 
 - `cockpit-podman` 软件包作为 cockpit 插件可集成于 `Web UI` 中，实现 Web UI 管理容器。
-  
   - cockpit-podman 服务安装与启用：
-    
+
     ```bash
     $ sudo yum install -y cockpit-podman
     $ sudo systemctl enable --now cockpit.socket
@@ -120,18 +86,16 @@
     ```
   
   - 在 Web UI 中可查看并管理 podman 容器与镜像：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/cockpit-podman-1.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/cockpit-podman-2.jpg)
+
+    ![cockpit-podman-1](images/cockpit-podman-1.jpg)
+
+    ![cockpit-podman-2](images/cockpit-podman-2.jpg)
 
 - `podman-compose` 旨在使用更轻量的方式实现`单机容器编排`，以用于替换 `docker-compose`，这种方式将不再依赖守护进程与 root 权限，同时可使用 rootless 容器，详细示例见下文。
-
 - podman-compose 使用 `Python` 开发，因此可直接使用 `pip3` 安装该组件，或使用 rpm 软件包方式安装。
-
 - 由于 podman-compose 依然处于 `dev` 阶段，仅作为功能测试使用，暂未受到 GA 环境支持。
 
-### Podman 在不同 OS 版本中的安装：
+## Podman 在不同 OS 版本中的安装
 
 - CentOS 7.x/8.x 或 RHEL 7.x/8.x 中：yum 命令使用 podman `rpm` 软件包安装
   
@@ -172,7 +136,7 @@
   - [Easy to Install Podman on Ubuntu 20.04](https://www.hostnextra.com/kb/easy-to-install-podman-on-ubuntu-20-04/)
   - [podman from devel:kubic:libcontainers:stable project](https://software.opensuse.org//download.html?project=devel%3Akubic%3Alibcontainers%3Astable&package=podman)
 
-### 🤘 Docker 与 Podman 进程管理方式比较：
+## 🤘 Docker 与 Podman 进程管理方式比较
 
 - Docker v20.10.8 使用 `dockerd` 与 `containerd` 守护进程管理容器与镜像的生命周期，运行状态如下所示：
   
@@ -222,20 +186,19 @@
   ```
 
 - Podman 不使用守护进程的方式运行或管理容器，对于 rootfull 容器或 rootless 容器的运行方式存在差异：
-  
   - rootfull 容器的进程：
-    
+
     👉 以交互式方式运行的容器进程状态如下所示：
-    
+
     ```bash
     $ sudo ps -ef | egrep "podman|slirp4netns|conmon"
       root        3879    3476  1 06:31 pts/3    00:00:00 podman run -it --name=mydebian docker.io/library/debian:latest /bin/sh
       root        3945       1  0 06:31 ?        00:00:00 /usr/bin/conmon --api-version 1 -c 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba -u 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba -r /usr/bin/crun -b /var/lib/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata -p /run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/pidfile -n mydebian --exit-dir /run/libpod/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/oci-log -t --conmon-pidfile /run/containers/storage/overlay-containers/29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/lib/containers/storage --exit-command-arg --runroot --exit-command-arg /run/containers/storage --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/libpod --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg cni --exit-command-arg --volumepath --exit-command-arg /var/lib/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --storage-opt --exit-command-arg overlay.mountopt=nodev,metacopy=on --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg 29260258303cef76f1191c8b83f16eb7ba70c5424bb17a729e2d3b051680adba
     # 由于具有交互式命令行运行依然保留 podman 进程
     ```
-    
+
     👉 以 `detach` 方式（后台）运行的容器进程状态如下所示：
-    
+
     ```bash
     $ sudo ps -ef | egrep "podman|slirp4netns|conmon"
       root        3744       1  0 06:25 ?        00:00:00 /usr/bin/conmon --api-version 1 -c b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272 -u b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272 -r /usr/bin/crun -b /var/lib/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata -p /run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/pidfile -n apache-rhce8.2-alpine --exit-dir /run/libpod/exits --full-attach -s -l journald --log-level warning --runtime-arg --log-format=json --runtime-arg --log --runtime-arg=/run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/oci-log --conmon-pidfile /run/containers/storage/overlay-containers/b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272/userdata/conmon.pid --exit-command /usr/bin/podman --exit-command-arg --root --exit-command-arg /var/lib/containers/storage --exit-command-arg --runroot --exit-command-arg /run/containers/storage --exit-command-arg --log-level --exit-command-arg warning --exit-command-arg --cgroup-manager --exit-command-arg systemd --exit-command-arg --tmpdir --exit-command-arg /run/libpod --exit-command-arg --network-config-dir --exit-command-arg  --exit-command-arg --network-backend --exit-command-arg cni --exit-command-arg --volumepath --exit-command-arg /var/lib/containers/storage/volumes --exit-command-arg --runtime --exit-command-arg crun --exit-command-arg --storage-driver --exit-command-arg overlay --exit-command-arg --storage-opt --exit-command-arg overlay.mountopt=nodev,metacopy=on --exit-command-arg --events-backend --exit-command-arg journald --exit-command-arg container --exit-command-arg cleanup --exit-command-arg b8ad3fce848ef26197a1d8bd43be5a2a72c66211e05cd90ccfaa55e1515ed272
@@ -244,9 +207,9 @@
     ```
   
   - rootless 容器的进程：
-    
+
     👉 以交互式方式运行的容器进程状态如下所示：
-    
+
     ```bash
     $ ps -ef | egrep "podman|slirp4netns|conmon"
       core        3418    2762  0 06:17 pts/2    00:00:05 podman run -it --name=mybusybox docker.io/library/busybox:latest /bin/sh
@@ -255,9 +218,9 @@
     # 由于具有交互式命令行运行依然保留 podman 进程，并且由 podman 进程创建 slirp4netns 子进程
     # 用于 rootless 容器的网络命名空间之间的通信。
     ```
-    
+
     👉 以 `detach` 方式（后台）运行的容器进程状态如下所示：
-    
+
     ```bash
     $ ps -ef | egrep "podman|slirp4netns|conmon"
       core        3308       1  0 06:15 pts/2    00:00:00 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable-seccomp --enable-ipv6 -c -e 3 -r 4 --netns-type=path /run/user/1000/netns/netns-f9f6f9dd-bf80-f6ca-6f39-7c9d9cd6beea tap0
@@ -266,18 +229,16 @@
     # 用于 rootless 容器的网络命名空间之间的通信。
     ```
 
-### Podman 的网络实现原理（rootfull 与 rootless）：
+## Podman 的网络实现原理（rootfull 与 rootless）
 
 - Podman 支持的容器网络模式如下所示：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-network-mode.jpg)
+  ![podman-network-mode](images/podman-network-mode.jpg)
 
 - root 用户运行 rootfull 容器网络分析：
-  
   - 默认情况下，rootfull 容器使用 bridge 网络模式，并且在未创建任何容器前系统上不会自动创建 `cni-podman0 `网桥，只有创建容器后自动生成。
-  
   - root 用户使用全局范围内的 CNI 插件，podman 默认使用 `bridge`、`portmap` 插件，其配置文件如下：
-    
+
     ```bash
     $ cat /etc/cni/net.d/87-podman-bridge.conflist
     {
@@ -325,7 +286,7 @@
     ```
   
   - root 用户创建具有端口映射的容器时，iptables filter 表与 nat 表规则将相应增加：
-    
+
     ```bash
     # ----- filter 表中创建新容器后的新增规则 -----
     *filter
@@ -362,32 +323,30 @@
     ```
   
   - 🚀 示例：外部访问容器内 Web 服务时，涉及的宿主机 iptables：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/external-access-container-web-service-iptables.jpg)
-    
+
+    ![external-access-container-web-service-iptables](images/external-access-container-web-service-iptables.jpg)
+
     从外部访问容器内 Web 服务时，流量将通过 PREROUTING 链及自定义链（`CNI-HOSTPORT-DNAT`、`CNI-DN-xxxx`、`DNAT`），经由 FORWARD 链及自定义链（`CNI-FORWARD`）的三层转发与 `cni-podman0` 网桥的二层转发进入容器，容器对外响应的流量将经过 cni-podman0 网桥转发，并经过 CNI-FORWARD 链与 POSTROUTING 链及自定义链（`CNI-HOSTPORT-MASQ`）出容器宿主机。
   
   - 🚀 示例：直接从容器内访问外部时，返回容器的回包将直接使用 conntrack 模块追踪的连接状态，流量通过 `CNI-FORWARD` 链的三层转发与 cni-podman0 的二层转发至容器中，即，回包进入容器宿主机不再通过`CNI-HOSTPORT-DNAT`链。
-    
+
     如下所示，相关的 DNAT 链无流量通过（蓝框），CNI-FORWARD 链均有流量通过（蓝框）。
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/container-access-external-iptables.jpg)
-    
+
+    ![container-access-external-iptables](images/container-access-external-iptables.jpg)
+
     > 📌 **Kubernetes 相关问题提示：**
-    > 
+    >
     > 1. 容器或 pod 通过 cni 网桥桥接的方式在 Kubernetes 或 OpenShift3 中需在计算节点（worker node）上配置 `net.bridge.bridge-nf-call-iptables` 与 `net.bridge.bridge-nf-call-iptables6` 内核参数，使 cni 二层网桥可调用 iptables 的 conntrack 模块，以解决前后端 pod 在同一节点上时，由于 pod 直连 cni 二层网桥，而二层网桥只实现二层转发，无法追踪前后端的连接状态，造成后端 pod 向前端 pod 回包时无法处于同一连接链路的问题，可 [点击此处](https://imroc.cc/k8s/faq/why-enable-bridge-nf-call-iptables/) 获得更多帮助。
     > 2. 使用以上内核参数时，需加载 `br_netfilter` 内核模块方能生效。
   
   - 使用 `iperf3` 工具的容器测试不同 rootfull 容器之间的网络性能，如下所示：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootfull-container-to-container-bandwidth.jpg)
+
+    ![rootfull-container-to-container-bandwidth](images/rootfull-container-to-container-bandwidth.jpg)
 
 - 普通用户运行 rootless 容器网络分析：
-  
   - `slirp4netns` 程序支持 user rootless network namespace，而非通过 `iptables` 与 CNI 实现。
-  
   - 👉 普通用户使用端口映射运行 rootless 容器时，默认情况下只能使用宿主机 1024 以上的端口实现映射，但可使用 `net.ipv4.ip_unprivileged_port_start` 内核参数实现低于 1024 的端口开始映射，如下所示：
-    
+
     ```bash
     ### 方式 1：###
     $ sysctl -w net.ipv4.ip_unprivileged_port_start=80
@@ -401,7 +360,7 @@
     ```
   
   - 普通用户创建的容器网络模式为 `slirp4netns`（slirp4netns 软件包实现）。
-    
+
     ```bash
     $ podman inspect <container_name> | jq .[0].HostConfig.NetworkMode
       "slirp4netns"
@@ -409,31 +368,28 @@
     ```
   
   - 每个普通用户运行 rootless 容器都将生成 slirp4netns 进程用于隔离该用户的 `network namespace`，以下分别使用 godev 与 hualf 用户运行 rootless 容器：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/godev-rootless-container.jpg)
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/hualf-rootless-container.jpg)
+
+    ![godev-rootless-container](images/godev-rootless-container.jpg)
+
+    ![hualf-rootless-container](images/hualf-rootless-container.jpg)
   
   - slirp4netns 实现的网络模式与带宽比较：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-slirp4netns-networking.jpg)
+
+    ![rootless-slirp4netns-networking](images/rootless-slirp4netns-networking.jpg)
   
   - 使用 `iperf3` 工具的容器测试不同 rootless 容器之间的网络性能，如下所示：
-    
-    ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-container-to-container-bandwidth.jpg)
-    
+
+    ![rootless-container-to-container-bandwidth](images/rootless-container-to-container-bandwidth.jpg)
+
     对比 rootfull 容器之间的网络性能来看，slirp4netns 实现的 rootless 容器在不同的网络命名空间内的通信性能损耗较大，而 rootfull 容器之间的网络性能相比前者在此次测试中高出近 5 倍。
   
   - 关于 slirp4netns 更加详细的内容，请参考 [Github 项目](https://github.com/rootless-containers/slirp4netns)。
 
-### Podman 的 macvlan 网络实现:
+## Podman 的 macvlan 网络实现
 
 - `macvlan` 作为 CNI 在 Kubernetes 与 OpenShift v4 中作为 `Multus CNI` 支持的额外插件类型使用愈加广泛，集群中除了常规使用的 Flannel、Calico 等作为 `slow path` 的插件外，要求高性能的业务流量可使用 macvlan 直连 pod 宿主机物理网口实现 `fast path`。
-
 - 为后续熟悉以上场景的实现，因此在 Podman `rootfull` 容器中使用 macvlan 网络模式。
-
 - 关于 macvlan 的基础知识可参考 [Linux 虚拟网卡技术：Macvlan](https://mp.weixin.qq.com/s?__biz=MzU1MzY4NzQ1OA==&mid=2247484064&idx=1&sn=ffd745069b6c4aeac0589de00467b2f2&chksm=fbee426dcc99cb7bdf26f5e6a21bbeaebba7ccd384a02f850d4461ea92331ed140edf98ffaec&mpshare=1&scene=1&srcid=03049MKwF55OVgEZ4OCH39wd&sharer_sharetime=1583337046541&sharer_shareid=8eaca72194dae7b3d51d5c708436eee4#rd) 与 [linux 网络虚拟化：macvlan](https://cizixs.com/2017/02/14/network-virtualization-macvlan/) 
-
 - macvlan 特性由 `Linux kernel` 支持，笔者的实验环境满足 macvlan 的要求，请使用如下命令确定：
   
   ```bash
@@ -460,14 +416,13 @@
 
 - 从与 rootfull 容器在同一广播域的其他节点上 ping 该容器，可正常通信：
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/podman-macvlan-network.png)
+  ![podman-macvlan-network](images/podman-macvlan-network.png)
   
   > 🤔 以上示例的容器中运行 Web 服务（可暴露 443 端口），使用 macvlan 网络模式可打通与同一广播域中外部节点的通信，但无法访问其中的服务，可采取何种方法解决该问题？  
 
-### Podman rootless 容器用户映射实现方式：
+## Podman rootless 容器用户映射实现方式
 
 - Podman rootless 容器的实现核心在于解决 network namespace（NetNS） 与 user namespace（UserNS） 的问题，前文已介绍 NetNS 的实现方式，后文将介绍 UserNS 的实现方式。
-
 - 若要使用 rootless 容器，需确认 OS 是否开启 user namespace 功能：
   
   ```bash
@@ -476,21 +431,15 @@
   ```
 
 - 系统上每创建一个用户就会在 `/etc/subuid` 与 `/etc/subgid` 中生成对应用户在其用户命名空间中的映射规则，以 /etc/subuid 为例，参数以冒号分隔，每个参数含义如下所示：
-  
   - 第一个参数（uid）：用户名称
-  
   - 第二个参数（loweruid）：用户命名空间中起始的映射 uid
-
 - 第三个参数（count）：用户命名空间内部与外部可映射 uid 数量（可理解为所有容器普通用户的 uid 数量和）
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/rootless-user-namespace-mapping.jpg)
+  ![rootless-user-namespace-mapping](images/rootless-user-namespace-mapping.jpg)
 
 - 以上两个文件允许运行进程的 uid 映射范围，在 `/proc/<pid>/uid_map` 中定义。
-
 - 可过滤容器 `conmon` 进程的 pid 确认每个容器中的 uid 映射情况，参见以下示例。
-
 - 关于以上两个文件的具体说明可参考 `newuidmap` 与 `newgidmap` 命令的 man 手册。
-
 - 可参考 Podman 官方推荐的命令创建 uid 的映射，如下所示：
   
   ```bash
@@ -510,28 +459,19 @@
   
   通过容器宿主机上每个普通用户的用户命名空间的 subuid 映射范围，可分配众多 uid 在 rootless 容器中运行应用进程。
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/user-namespace-subuid-mapping-1-edited.png)
+  ![user-namespace-subuid-mapping-1-edited](images/user-namespace-subuid-mapping-1-edited.png)
   
-  ![](https://github.com/Alberthua-Perl/tech-docs/blob/master/images/podman-arch-usage/user-namespace-subuid-mapping-2-edited.png)
+  ![user-namespace-subuid-mapping-2-edited](images/user-namespace-subuid-mapping-2-edited.png)
 
-### 参考链接：
+## 参考链接
 
 - [Reintroduction of Podman](https://projectatomic.io/blog/2018/02/reintroduction-podman/)
-
 - [Using pods with Podman on Fedora](https://fedoramagazine.org/podman-pods-fedora-containers/)
-
 - [Configuring container networking with Podman](https://www.redhat.com/sysadmin/container-networking-podman)
-
 - [RedHat docs - Building, running, and managing Linux containers on Red Hat Enterprise Linux 8](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/index)
-
 - [容器安全拾遗 - Rootless Container初探](https://developer.aliyun.com/article/700923)
-
 - [Documentation for /proc/sys/user/](https://www.kernel.org/doc/html/latest/admin-guide/sysctl/user.html)
-
 - [docker docs - Overview of Docker Compose](https://docs.docker.com/compose/)
-
 - [CNI docs - firewall plugin](https://www.cni.dev/plugins/current/meta/firewall/)
-
 - [CNI docs - Port-mapping plugin](https://www.cni.dev/plugins/current/meta/firewall/)
-
 - https://fossies.org/linux/podman/docs/tutorials/basic_networking.md
