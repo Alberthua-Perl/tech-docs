@@ -1,4 +1,4 @@
-## GPG 公私钥的管理
+# GPG 公私钥的管理
 
 ```bash
 I need you to create a gpg key.
@@ -37,6 +37,4 @@ When you get the email:
     gpg −−send−key <ID>
 
 Email me that the signed key is uploaded. I will verify, and only then can I start your CX training.
-
-
 ```
