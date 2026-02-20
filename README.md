@@ -104,7 +104,7 @@
   - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
   - [【精华】解析 Kubernetes Operator 工作原理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.md)
 - **Golang**
-  - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Go%20%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
+  - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
 
 ## ⭕️ **RedHat OpenShift 云原生平台**
 
