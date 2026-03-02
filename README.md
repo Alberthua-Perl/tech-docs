@@ -13,7 +13,7 @@
   - [深度学习的历史，现状与发展](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8E%86%E5%8F%B2%EF%BC%8C%E7%8E%B0%E7%8A%B6%E4%B8%8E%E5%8F%91%E5%B1%95.md)
   - [一张图搞定：方差、偏差、欠拟合、过拟合](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E4%B8%80%E5%BC%A0%E5%9B%BE%E6%90%9E%E5%AE%9A%EF%BC%9A%E6%96%B9%E5%B7%AE%E3%80%81%E5%81%8F%E5%B7%AE%E3%80%81%E6%AC%A0%E6%8B%9F%E5%90%88%E3%80%81%E8%BF%87%E6%8B%9F%E5%90%88/%E4%B8%80%E5%BC%A0%E5%9B%BE%E6%90%9E%E5%AE%9A%EF%BC%9A%E6%96%B9%E5%B7%AE%E3%80%81%E5%81%8F%E5%B7%AE%E3%80%81%E6%AC%A0%E6%8B%9F%E5%90%88%E3%80%81%E8%BF%87%E6%8B%9F%E5%90%88.md)
   - [全面认识感知机（perceptron）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%85%A8%E9%9D%A2%E8%AE%A4%E8%AF%86%E6%84%9F%E7%9F%A5%E6%9C%BA/%E5%85%A8%E9%9D%A2%E8%AE%A4%E8%AF%86%E6%84%9F%E7%9F%A5%E6%9C%BA.ipynb)
-  - [【Lab】使用 PyTorch 构建 CNN 模型：识别 MNIST 手写数字](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97.ipynb)
+  - [【精华】使用 PyTorch 构建 CNN 模型：识别 MNIST 手写数字](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97.ipynb)
   - [深入浅出理解生成对抗网络 (GAN)](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN)/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN).ipynb)
 - **模型推理**
   - [基于 Fedora42 WSL2 部署测试 vLLM 推理框架](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6.md)
@@ -61,10 +61,11 @@
 - [DHCP 原理与常规配置实现](https://github.com/Alberthua-Perl/sc-col/tree/master/dhcp-server-conf)
 - [【精华】DNS 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E6%9C%8D%E5%8A%A1%E4%B8%8E%E9%85%8D%E7%BD%AE/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0/DNS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
 - [【精华】Apache HTTP Server 原理与常用配置实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E6%9C%8D%E5%8A%A1%E4%B8%8E%E9%85%8D%E7%BD%AE/Apache%20HTTP%20Server%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0/Apache%20HTTP%20Server%20%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0.md)
+- [FreeIPA 基本概念与部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E6%9C%8D%E5%8A%A1%E4%B8%8E%E9%85%8D%E7%BD%AE/FreeIPA%20%E8%BA%AB%E4%BB%BD%E7%AE%A1%E7%90%86%E4%B8%8E%E8%AE%A4%E8%AF%81/FreeIPA%20%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8E%E9%83%A8%E7%BD%B2/FreeIPA%20%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8E%E9%83%A8%E7%BD%B2.md)
 - [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
 - [VMware Workstation 15 虚拟机迁移 ESXi 6.7.0 实施方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/VMware%20Workstation%2015%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%20ESXi%206.7.0%20%E5%AE%9E%E6%96%BD%E6%96%B9%E6%B3%95/VMware%20Workstation%2015%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%20ESXi%206.7.0%20%E5%AE%9E%E6%96%BD%E6%96%B9%E6%B3%95.md)
 - [Red Hat Virtualization 4.1 基础架构与命令汇总](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Red%20Hat%20Virtualization%204.1%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB.pdf)
-- [一键部署二进制 Prometheus+Alertmanager+Granafa 监控平台](https://github.com/Alberthua-Perl/sc-col/tree/master/monitor)
+- [【精华】一键部署二进制 Prometheus+Alertmanager+Granafa 监控平台](https://github.com/Alberthua-Perl/sc-col/tree/master/monitor)
 
 ## 🚀 **Linux 网络虚拟化**
 
@@ -76,6 +77,10 @@
   - [配置 OVN 逻辑交换机](https://github.com/Alberthua-Perl/sc-col/blob/master/ovn-arch/docs/ovn-logical-switch-demo.md)
   - [配置 OVN 逻辑路由器](https://github.com/Alberthua-Perl/sc-col/blob/master/ovn-arch/docs/ovn-logical-router-demo.md)
   - [【精华】OVN 在 OpenStack 中的集成与流表分析](https://github.com/Alberthua-Perl/sc-col/blob/master/ovn-arch/docs/ovn-openstack-openflow-analysis.md)
+
+## 🔮 **Golang**
+
+- [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
 
 ## 🐳 **容器技术原理与实践**
 
@@ -93,7 +98,7 @@
   - [Red Hat Quay v3 registry 原理与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Red%20Hat%20Quay%20v3%20registry%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
   - [【精华】Skopeo 镜像工具与容器镜像格式的原理与使用](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/Skopeo%20%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/Skopeo%20%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8.md)
 
-## ☸ **Kubernetes & Golang**
+## ☸ **Kubernetes**
 
 - **Kubernetes**
   - [minikube 快速上手管理 Kubernetes 集群](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/minukube%20%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E7%AE%A1%E7%90%86%20Kubernetes%20%E9%9B%86%E7%BE%A4/minikube%20%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E7%AE%A1%E7%90%86%20Kubernetes%20%E9%9B%86%E7%BE%A4.md)
@@ -103,8 +108,6 @@
   - [使用 NFS-Client Privisioner 实现 StorageClass 的 PV 动态分配](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/nfs-provisioned-storageclass)
   - [Kubernetes 中部署 Rocket.Chat 与 MongoDB 实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
   - [【精华】解析 Kubernetes Operator 工作原理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.md)
-- **Golang**
-  - [Go 语言开发环境部署](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/Go%20%E8%AF%AD%E8%A8%80%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2.md)
 
 ## ⭕️ **RedHat OpenShift 云原生平台**
 
@@ -124,6 +127,35 @@
 - [【精华】Red Hat Ceph Storage v5.0 常用命令与运维](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BF%90%E7%BB%B4/Red%20Hat%20Ceph%20Storage%20v5.0%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BF%90%E7%BB%B4.md)
 - [【精华】Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
 - [【精华】Ceph 存储配置参数释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20%E5%AD%98%E5%82%A8%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_20250427%E6%9B%B4%E6%96%B0.png)
+
+## **Python 编程基础**
+
+- [Lesson 1. Hello World](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%201.%20Hello%20World.ipynb)
+- [Lesson 2. 数值型对象的创建方法](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%202.%20%E6%95%B0%E5%80%BC%E5%9E%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E6%96%B9%E6%B3%95.ipynb)
+- [Lesson 3. 数值型对象的科学运算](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%203.%20%E6%95%B0%E5%80%BC%E5%9E%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%A7%91%E5%AD%A6%E8%BF%90%E7%AE%97.ipynb)
+- [Lesson 4. 布尔型对象](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%204.%20%E5%B8%83%E5%B0%94%E5%9E%8B%E5%AF%B9%E8%B1%A1.ipynb)
+- [Lesson 5. 字符串型对象的创建](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%205.%20%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%9E%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA.ipynb)
+- [Lesson 6. 字符串索引](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%206.%20%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B4%A2%E5%BC%95.ipynb)
+- [Lesson 7. 字符串的常用方法（一）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%207.%20%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%EF%BC%88%E4%B8%80%EF%BC%89.ipynb)
+- [Lesson 8. 字符串常用方法（二）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%208.%20%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%EF%BC%88%E4%BA%8C%EF%BC%89.ipynb)
+- [Lesson 9. 列表的索引](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%209.%20%E5%88%97%E8%A1%A8%E7%9A%84%E7%B4%A2%E5%BC%95.ipynb)
+- [Lesson 10. 列表的常用方法（一）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2010.%20%E5%88%97%E8%A1%A8%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%EF%BC%88%E4%B8%80%EF%BC%89.ipynb))
+- [Lesson 11. 列表常用方法（二）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2011.%20%E5%88%97%E8%A1%A8%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%EF%BC%88%E4%BA%8C%EF%BC%89.ipynb)
+- [Lesson 12. 元组对象的创建和索引](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2012.%20%E5%85%83%E7%BB%84%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E7%B4%A2%E5%BC%95.ipynb)
+- [Lesson 13. 元组的常用方法](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2013.%20%E5%85%83%E7%BB%84%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.ipynb)
+- [Lesson 14. 字典对象的创建和索引](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2014.%20%E5%AD%97%E5%85%B8%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E7%B4%A2%E5%BC%95.ipynb)
+- [Lesson 15. 字典的常用方法](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2015.%20%E5%AD%97%E5%85%B8%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.ipynb)
+- [Lesson 16. 集合的创建](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2016.%20%E9%9B%86%E5%90%88%E7%9A%84%E5%88%9B%E5%BB%BA.ipynb)
+- [Lesson 17. 集合的常用方法](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2017.%20%E9%9B%86%E5%90%88%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.ipynb)
+- [Lesson 18. 冻集合的创建与使用](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2018.%20%E5%86%BB%E9%9B%86%E5%90%88%E7%9A%84%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BD%BF%E7%94%A8.ipynb)
+- [Lesson 19. 控制语句（一）：判别语句](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2019.%20%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%88%A4%E5%88%AB%E8%AF%AD%E5%8F%A5.ipynb)
+- [Lesson 20. 控制语句（二）：循环语句](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2020.%20%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5.ipynb)
+- [Lesson 21. 控制语句（三）：条件循环](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2021.%20%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E6%9D%A1%E4%BB%B6%E5%BE%AA%E7%8E%AF.ipynb)
+- [Lesson 22. 函数（一）：函数的使用](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2022.%20%E5%87%BD%E6%95%B0%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%BF%E7%94%A8.ipynb)
+- [Lesson 23. 函数（二）：函数的参数](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2023.%20%E5%87%BD%E6%95%B0%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0.ipynb)
+- [Lesson 24. 函数（三）：变量作用域与 lambda 函数](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2024.%20%E5%87%BD%E6%95%B0%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%8F%98%E9%87%8F%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%20lambda%20%E5%87%BD%E6%95%B0.ipynb)
+- [Lesson 25. 类的创建](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2025.%20%E7%B1%BB%E7%9A%84%E5%88%9B%E5%BB%BA.ipynb)
+- [Lesson 26. 类的方法和继承](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%2026.%20%E7%B1%BB%E7%9A%84%E6%96%B9%E6%B3%95%E5%92%8C%E7%BB%A7%E6%89%BF.ipynb)
 
 ## ♾️ **DevOps 技术栈**
 
