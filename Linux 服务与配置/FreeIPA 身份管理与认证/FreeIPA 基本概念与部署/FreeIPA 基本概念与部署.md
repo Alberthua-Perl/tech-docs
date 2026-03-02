@@ -11,6 +11,7 @@
   - ipa-client-4.10.0-6.el9.x86_64
 
 ## 文档目录
+
 - [FreeIPA 基本概念与部署](#freeipa-基本概念与部署)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
@@ -93,7 +94,7 @@
     <img src="images/ipa-prompt-install.png" style="width:60%">
 
   - 2️⃣ `ipa-server-install` 非交互式命令行安装：`--no-forwarder` 选项不使用 forwarder
-      
+
     ```bash
     $ sudo yum install -y ipa-server ipa-server-dns
   
@@ -118,32 +119,32 @@
 ## 查看与调试部署过程中的问题
 
 - 若指定 forwarder，该 forwarder 不可配置有相同域名的 zone 区域数据，否则安装报错失败！
-    
+
   <img src="images/resolv.conf-existed-domain-error.jpg" style="width:60%">
   
 - 若 ipa-server-install 命令安装时卡住或被中断，重新执行该命令时将报错，需先执行卸载操作，再重新安装！
-    
+
   <img src="images/ipa-server-reinstall-failed.jpg" style="width:60%">
 
 - 卸载 ipa-server：
-    
+
   ```bash
   $ sudo ipa-server-install --uninstall
   ```
-    
+
   <img src="images/ipa-server-uninstall.jpg" style="width:60%">
   
 - 查看 DNS 静态与动态解析文件：
-    
+
   ```bash
   $ sudo cat /etc/hosts
   $ sudo cat /etc/resolv.conf
   ```
-    
+
   <img src="images/static-dynamic-dns.jpg" style="width:60%">
   
 ## 部署后命令行验证
-    
+
 ```bash
 $ sudo ipactl status
 Directory Service: RUNNING
@@ -166,9 +167,9 @@ $ sudo kinit admin
 $ sudo ipa user-find admin
 # 查看 admin 域用户的概要信息
 ```
-    
+
 <img src="images/ipa-server-verify.jpg" style="width:60%">
-    
+
 ```bash
 $ sudo firewall-cmd --permanent \
   --add-port={80/tcp,443/tcp,389/tcp,636/tcp,88/tcp,464/tcp,53/tcp,88/udp,464/udp,53/udp,123/udp}
