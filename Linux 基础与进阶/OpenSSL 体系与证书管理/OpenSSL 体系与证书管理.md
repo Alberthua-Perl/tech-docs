@@ -1,7 +1,8 @@
-# OpenSSL 命令使用汇总
+# 🔑 OpenSSL 体系与证书管理
 
 ## 文档目录
-- [OpenSSL 命令使用汇总](#openssl-命令使用汇总)
+
+- [🔑 OpenSSL 体系与证书管理](#-openssl-体系与证书管理)
   - [文档目录](#文档目录)
   - [openssl 命令说明](#openssl-命令说明)
   - [openssl req 命令](#openssl-req-命令)
@@ -301,6 +302,8 @@ $ openssl s_client \
   - 以上表示 5 层证书链深度，如果再增加一层中间层 CA，那么客户端连接是将验证失败，返回报错 `X509_V_ERR_CERT_CHAIN_TOO_LONG`。
 
 ## ✔️ 故障排查示例
+
+> 说明：参考 RH362v9.1 课程 Chapter2 Section3
 
 ### 撤销证书签发异常的证书
 

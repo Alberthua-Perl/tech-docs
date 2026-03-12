@@ -1,8 +1,8 @@
-# 🛠 Linux 与 Windows 系统工具与资源
+# 🛠️ Linux 与 Windows 系统工具与资源
 
 ## 文档目录
 
-- [🛠 Linux 与 Windows 系统工具与资源](#-linux-与-windows-系统工具与资源)
+- [🛠️ Linux 与 Windows 系统工具与资源](#️-linux-与-windows-系统工具与资源)
   - [文档目录](#文档目录)
   - [1. 常用公共服务器](#1-常用公共服务器)
     - [1.1 镜像站点](#11-镜像站点)
@@ -12,54 +12,41 @@
   - [2. Windows 常用 PowerShell 命令](#2-windows-常用-powershell-命令)
     - [2.1 常规系统信息设置](#21-常规系统信息设置)
     - [2.2 网络环境设置](#22-网络环境设置)
-  - [3. Shell 脚本补充](#3-shell-脚本补充)
-    - [3.1 用户登录时加载 bash 配置文件的过程](#31-用户登录时加载-bash-配置文件的过程)
-    - [3.2 关于重定向说明](#32-关于重定向说明)
-    - [3.3 Shell 内部字段分隔符（Internal Field Separator）](#33-shell-内部字段分隔符internal-field-separator)
-    - [3.4 Shell 脚本多行注释](#34-shell-脚本多行注释)
-    - [3.5 设置自定义 `PS1` 交互式命令提示符](#35-设置自定义-ps1-交互式命令提示符)
-    - [3.6 Bash 常用命令汇总](#36-bash-常用命令汇总)
-    - [3.7 Shell 列表示例](#37-shell-列表示例)
-    - [3.8 Shell 中的正则匹配使用场景](#38-shell-中的正则匹配使用场景)
-      - [3.8.1](#381)
-      - [3.8.2](#382)
-    - [3.9 浮点数计算](#39-浮点数计算)
-  - [4. oh-my-bash 终端字体（fonts）的安装](#4-oh-my-bash-终端字体fonts的安装)
-  - [5. grep 常用命令示例](#5-grep-常用命令示例)
-  - [6. Markdown 语法配置](#6-markdown-语法配置)
-  - [7. VSCode 常用 Settings 参数与插件](#7-vscode-常用-settings-参数与插件)
-  - [8. Chrome 扩展安装与使用](#8-chrome-扩展安装与使用)
-    - [8.1 更改 GitHub 页面 logo](#81-更改-github-页面-logo)
-    - [8.2 更改 GitHub 默认的代码字体](#82-更改-github-默认的代码字体)
-  - [9. Tabby 自定义 CSS](#9-tabby-自定义-css)
-  - [10. 安装与配置外部软件](#10-安装与配置外部软件)
-    - [10.1 安装 qpdf 并解密 PDF 文件](#101-安装-qpdf-并解密-pdf-文件)
-    - [10.2 RHEL 7/8 安装 exfat 驱动](#102-rhel-78-安装-exfat-驱动)
-    - [10.3 安装 xfce4-terminal 软件包](#103-安装-xfce4-terminal-软件包)
-    - [10.4 RHEL8/9 安装 openvpn-gnome 客户端](#104-rhel89-安装-openvpn-gnome-客户端)
-    - [10.5 RHEL8 安装 Google Chrome](#105-rhel8-安装-google-chrome)
-    - [10.6 RHEL9 安装 Google Chrome](#106-rhel9-安装-google-chrome)
-    - [10.7 RHEL8 安装 VScode](#107-rhel8-安装-vscode)
-    - [10.8 RHEL9 安装 VScode](#108-rhel9-安装-vscode)
-    - [10.9 RHEL10 安装 VScode](#109-rhel10-安装-vscode)
-    - [10.10 RHEL9 安装 EPEL9 软件源](#1010-rhel9-安装-epel9-软件源)
-    - [10.11 RHEL10 安装 EPEL10 软件源](#1011-rhel10-安装-epel10-软件源)
-    - [10.12 RHEL10 安装 Grafana 软件源](#1012-rhel10-安装-grafana-软件源)
-    - [10.13 RHEL 安装中文输入法支持](#1013-rhel-安装中文输入法支持)
-    - [10.14 安装 rdesktop 软件包连接 Windows RDP 桌面](#1014-安装-rdesktop-软件包连接-windows-rdp-桌面)
-    - [10.15 RHEL9 安装 ToDesk](#1015-rhel9-安装-todesk)
-    - [10.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#1016-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
-      - [10.16.1 安装与设置 x11vnc 虚拟桌面](#10161-安装与设置-x11vnc-虚拟桌面)
-      - [10.16.2 MobaXterm 的连接访问](#10162-mobaxterm-的连接访问)
-  - [11. dnf 下载软件包及其依赖](#11-dnf-下载软件包及其依赖)
-  - [12. dnf 实现软件包安全检测与更新](#12-dnf-实现软件包安全检测与更新)
-  - [13. RedHat 订阅服务使用](#13-redhat-订阅服务使用)
-  - [14. 如何在 Windows 11 家庭版中禁用 Hyper-V？](#14-如何在-windows-11-家庭版中禁用-hyper-v)
-  - [15. RHEL8/9/10 启用 /var/log/dmesg 日志](#15-rhel8910-启用-varlogdmesg-日志)
-  - [16. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#16-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
-  - [17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#17-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
-  - [18. Ubuntu 24.04.4 LTS 中安装 Clash 工具](#18-ubuntu-24044-lts-中安装-clash-工具)
-  - [19. 参考链接](#19-参考链接)
+  - [3. oh-my-bash 终端字体（fonts）的安装](#3-oh-my-bash-终端字体fonts的安装)
+  - [4. Markdown 语法配置](#4-markdown-语法配置)
+  - [5. VSCode 常用 Settings 参数与插件](#5-vscode-常用-settings-参数与插件)
+  - [6. Chrome 扩展安装与使用](#6-chrome-扩展安装与使用)
+    - [6.1 更改 GitHub 页面 logo](#61-更改-github-页面-logo)
+    - [6.2 更改 GitHub 默认的代码字体](#62-更改-github-默认的代码字体)
+  - [7. Tabby 自定义 CSS](#7-tabby-自定义-css)
+  - [8. 安装与配置外部软件](#8-安装与配置外部软件)
+    - [8.1 安装 qpdf 并解密 PDF 文件](#81-安装-qpdf-并解密-pdf-文件)
+    - [8.2 RHEL 7/8 安装 exfat 驱动](#82-rhel-78-安装-exfat-驱动)
+    - [8.3 安装 xfce4-terminal 软件包](#83-安装-xfce4-terminal-软件包)
+    - [8.4 RHEL8/9 安装 openvpn-gnome 客户端](#84-rhel89-安装-openvpn-gnome-客户端)
+    - [8.5 RHEL8 安装 Google Chrome](#85-rhel8-安装-google-chrome)
+    - [8.6 RHEL9 安装 Google Chrome](#86-rhel9-安装-google-chrome)
+    - [8.7 RHEL8 安装 VScode](#87-rhel8-安装-vscode)
+    - [8.8 RHEL9 安装 VScode](#88-rhel9-安装-vscode)
+    - [8.9 RHEL10 安装 VScode](#89-rhel10-安装-vscode)
+    - [8.10 RHEL9 安装 EPEL9 软件源](#810-rhel9-安装-epel9-软件源)
+    - [8.11 RHEL10 安装 EPEL10 软件源](#811-rhel10-安装-epel10-软件源)
+    - [8.12 RHEL10 安装 Grafana 软件源](#812-rhel10-安装-grafana-软件源)
+    - [8.13 RHEL 安装中文输入法支持](#813-rhel-安装中文输入法支持)
+    - [8.14 安装 rdesktop 软件包连接 Windows RDP 桌面](#814-安装-rdesktop-软件包连接-windows-rdp-桌面)
+    - [8.15 RHEL9 安装 ToDesk](#815-rhel9-安装-todesk)
+    - [8.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#816-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
+      - [8.16.1 安装与设置 x11vnc 虚拟桌面](#8161-安装与设置-x11vnc-虚拟桌面)
+      - [8.16.2 MobaXterm 的连接访问](#8162-mobaxterm-的连接访问)
+  - [9. dnf 下载软件包及其依赖](#9-dnf-下载软件包及其依赖)
+  - [10. dnf 实现软件包安全检测与更新](#10-dnf-实现软件包安全检测与更新)
+  - [11. RedHat 订阅服务使用](#11-redhat-订阅服务使用)
+  - [12. 如何在 Windows 11 家庭版中禁用 Hyper-V？](#12-如何在-windows-11-家庭版中禁用-hyper-v)
+  - [13. RHEL8/9/10 启用 /var/log/dmesg 日志](#13-rhel8910-启用-varlogdmesg-日志)
+  - [14. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#14-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
+  - [15. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#15-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
+  - [16. Ubuntu 24.04.4 LTS 中安装 Clash 工具](#16-ubuntu-24044-lts-中安装-clash-工具)
+  - [17. 参考链接](#17-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -96,7 +83,6 @@
 | s2h.time.edu.cn | 四川大学网络管理中心 | 
 | s2j.time.edu.cn | 大连理工大学网络中心 |
 | s2k.time.edu.cn | CERNET 桂林主节点 |
-
 
 ### 1.3 DNS 名称服务器
 
@@ -193,161 +179,7 @@ PackageFamilyName             :
 # 添加与删除 22/TCP 端口防火墙规则
 ```
 
-## 3. Shell 脚本补充
-
-### 3.1 用户登录时加载 bash 配置文件的过程
-
-- 登录式 shell（login shell）加载配置文件过程：
-
-  ```mermaid
-  graph LR
-    A(["/etc/profile"]) --> B(["/etc/profile.d/*.sh"])
-    B --> C(["~/.bash_profile"])
-    C --> D(["~/.bashrc"])
-    D --> E(["/etc/bashrc"])
-  ```
-
-- 非登录式 shell（non-login shell）加载配置文件过程：
-
-  ```mermaid
-  graph LR
-    A(["~/.bashrc"]) --> B(["/etc/bashrc"])
-    B --> C(["/etc/profile.d/*.sh"])
-  ```
-
-### 3.2 关于重定向说明
-
-- `<`：输出重定向（将原来需要由键盘输入的数据，改由文件内容来取代）
-
-  ```bash
-  tr 'a-z' 'A-Z' < /path/to/file
-  ```
-
-- `<<`：代表结束的输入字符
-
-  ```bash
-  cat <<END
-  cat > /path/to/file <<EOF
-  cat <<EOF > /path/to/file
-  ```
-
-### 3.3 Shell 内部字段分隔符（Internal Field Separator）
-
-- 字段分隔符为 `IFS`
-- IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
-- 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
-- ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`。
-
-### 3.4 Shell 脚本多行注释
-
-使用 `:<<!` 或 `:<<EOF` 与 `!` 或 `EOF` 注释代码块
-
-### 3.5 设置自定义 `PS1` 交互式命令提示符
-  
-```bash
-$ vim ~/.bashrc
-  export COURSE_ID=$(grep COURSE /etc/rht | awk -F'=' '{print $2}' | tr '[a-z]' '[A-Z]')
-  export PS1="(${COURSE_ID})\033[1;36m[\u@\h\033[0m \033[1;33m\W\033[0m\033[1;36m]$ \033[0m"
-```
-
-### 3.6 Bash 常用命令汇总
-  
-```bash
-$ echo "<password>" | sudo -S <username>
-# 命令行明文传递密码，sudo 直接为指定用户提权。
-
-### 重要的配置文件使用 ###
-$ sudo vim /etc/profile
-  echo "##### Welcome to login workstation.lab.example.com! #####"
-  export HISTSIZE=500
-  # 配置历史命令最多显示条数
-  export HISTTIMEFORMAT="%F %T "
-  # 配置历史命令时间的显示格式
-  export TMOUT=1800
-  # 配置所有用户登陆超时时间。若用户无任何操作，在配置的时间后将自动登出系统，单位为秒（s）。
-  # 该超时时间也用于 SSH 远程登陆，若远程连接没有任何操作，在配置的时间后将自动登出。
-
-$ echo "export TMOUT=1800" >> $HOME/.bash_profile
-# 配置相关用户登陆系统的超时时间
-# 避免自动登出系统的解决方法：
-#   $ unset TMOUT  # 取消登陆超时时间
-#   $ read         # read 命令搭配 TMOUT 一起使用，使 read 等待无限长时间。
-
-$ sudo vim /etc/nologin.txt    
-# 使用 /sbin/nologin 作为登陆 shell 而无法登陆系统
-# 若使用该用户登陆时，系统显示的自定义说明文件。
-
-$ sudo vim /etc/nologin
-# pam_nologin.so 的配置文件
-# 该配置文件内的用户将被拒绝登录系统（本地或远程登录），每个用户占一行。
-
-$ sudo cat /etc/securetty
-# pam_securetty.so 的配置文件
-# telnet 远程登录时，限制 root 的登录终端类型。
-# 包括：本地控制台（console）、本地终端（ttyX）、远程虚拟终端（pts/X）
-
-### bash 的行为 ###
-$ sh -x /path/to/<shell_script>
-# 跟踪 shell 脚本执行过程      
-  
-$ sh -n /path/to/<shell_script>
-# 检查 shell 语法
-
-$ set -C
-# 禁止对已经存在文件使用覆盖重定向（>）；强制覆盖重定向，则使用 >|。
-$ echo "Hello world!" > ./testfile
-# 设置以上命令后，执行覆盖重定向操作将返回 "cannot overwrite existing file" 报错。
-$ echo "Hello world!" >| ./testfile
-# 强制重定向覆盖
-$ set +C
-# 关闭上述功能
-
-### systemctl 命令选项 ###
-$ sudo systemctl status -l --no-pager <unit_name>.service
-# -l, --full 选项：完全显示单元文件的所有内容
-# --no-pager 选项：不截断输出，在整页中显示结果。
-# 注意：相关的 systemd 环境变量如下所示，
-#   $SYSTEMD_PAGER
-#          Pager to use when --no-pager is not given; overrides $PAGER. If neither $SYSTEMD_PAGER nor $PAGER are set,
-#          a set of well-known pager implementations are tried in turn, including less(1) and more(1), until one is
-#          found. If no pager implementation is discovered no pager is invoked. Setting this environment variable to
-#          an empty string or the value "cat" is equivalent to passing --no-pager.
-
-### 文件编码与加密 ###
-$ base64 /path/to/file > /path/to/base64_file
-$ base64 -d /path/to/base64_file > /path/to/file
-
-$ tar -zcvf - /path/to/file_or_dir | \
-  openssl des3 -salt -pbkdf2 -iter 10000 -k "<password>" -out /path/to/file_or_dir.tar.gz
-# 使用 3DES 对称加密算法、PBKDF2 标准以及 10000 次迭代生成密钥进行 tar.gz 压缩包加密
-# 说明：
-#   des3：对称加密算法，Triple-DES（3DES），密钥长度 168-bit。
-#   -salt：在加密前随机生成 8-byte 的 salt，用于抵抗字典/彩虹表攻击。
-#   -pbkdf2：使用 PBKDF2 算法从口令派生密钥，而不是旧的 EVP_BytesToKey 算法。
-#            PBKDF2 是 “基于密码的密钥派生函数2”（Password-Based Key Derivation Function 2）的算法，
-#            用于安全地从用户提供的密码中派生出加密密钥，而不是直接存储明文密码。
-#            它通过对密码进行多次迭代哈希运算（使用随机 salt 来增强安全性），以生成固定长度的密钥，
-#            从而大大增加了暴力破解的难度，确保了密码的安全性。
-#            PBKDF2 是一个被广泛推荐的标准，常用于存储和验证用户密码。
-#   -iter 10000：PBKDF2 的迭代次数设为 10000，提高暴力破解成本（可再调高）。
-$ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir.tar.gz | \
-  tar -zxvf -
-# 使用 3DES 对称加密算法对 tar.gz 压缩包解密
-# -d 选项：解密文件
-# -k 选项：指定解密的明文密码
-```
-
-### 3.7 Shell 列表示例
-
-### 3.8 Shell 中的正则匹配使用场景
-
-#### 3.8.1
-
-#### 3.8.2
-
-### 3.9 浮点数计算
-
-## 4. oh-my-bash 终端字体（fonts）的安装
+## 3. oh-my-bash 终端字体（fonts）的安装
 
 > 同理，oh-my-zsh 可使用类似的方法完成安装。
 
@@ -389,50 +221,7 @@ $ openssl des3 -salt -pbkdf2 -iter 10000 -d -k "redhat" -in /path/to/file_or_dir
 
   <img src="images/ubuntu-powerline-ps1.jpg" style="width:80%">
 
-## 5. grep 常用命令示例
-  
-```bash
-$ grep -n "pattern" /path/to/file
-# 显示匹配行的行号
-  
-$ grep -r "pattern" /path/to/directory
-# 递归搜索目录中的所有文件
-  
-$ grep -v "pattern" /path/to/file
-# 反向搜索，显示不包含模式的行。
-  
-$ grep -E "regex_pattern" /path/to/file
-# 使用正则表达式搜索
-  
-$ grep "pattern1\|pattern2" /path/to/file
-# 查找多个模式之一
-  
-$ grep -c "pattern" /path/to/file
-# 统计匹配次数
-  
-$ grep -w "pattern" /path/to/file
-# 查找时匹配整个单词而不是部分单词
-  
-$ grep "pattern1.*pattern2" /path/to/file
-# 查找同时包含两个模式的行
-  
-$ find /path/to/search -type f -exec grep -l "pattern" {} \;
-# grep 结合 find：在目录及其子目录中查找包含特定关键词的文件
-  
-$ sed -i 's/pattern/replacement/g' /path/to/file
-# grep 结合 sed：使用正则表达式替换匹配的内容
-  
-$ awk '/pattern/ {print $2}' /path/to/file
-# grep 结合 awk：根据特定字段进行过滤或操作
-  
-$ cut -d',' -f2 /path/to/file.csv | grep "pattern"
-# grep 结合 cut：通过定界符截取特定字段
-  
-$ grep "pattern" /path/to/file | xargs command
-# grep 结合 xargs：将 grep 结果作为参数传递给另一个命令
-```
-
-## 6. Markdown 语法配置
+## 4. Markdown 语法配置
 
 | 功能 | 语法 | 效果 |
 | ----- | ----- | ----- |
@@ -443,7 +232,7 @@ $ grep "pattern" /path/to/file | xargs command
 | 删除文本（添加中横线）| `~~文本内容~~` | ~~文本内容~~ |
 | 图片居中显示 | `<center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center>` | <center><img src="images/ubuntu-powerline-ps1.jpg" style="width:60%"></center> |
 
-## 7. VSCode 常用 Settings 参数与插件
+## 5. VSCode 常用 Settings 参数与插件
 
 - 常用参数：
 
@@ -467,9 +256,9 @@ Cursor Style: block
   - vscode-pdf：支持 PDF 文件预览
   - YAML：支持 yaml 格式语法
 
-## 8. Chrome 扩展安装与使用
+## 6. Chrome 扩展安装与使用
 
-### 8.1 更改 GitHub 页面 logo
+### 6.1 更改 GitHub 页面 logo
 
 - 安装 Chrome 扩展 `Stylus`
 - 打开该扩展，并将 `GitHub PH logo design` CSS 样式导入其中，如下所示：
@@ -498,7 +287,7 @@ Cursor Style: block
 - 以上 CSS 样式可参考 [该链接](https://userstyles.org/styles/204545/github-ph-logo-design)。
 - 配置完成后重新打开 GitHub 页面即可显示效果。
 
-### 8.2 更改 GitHub 默认的代码字体
+### 6.2 更改 GitHub 默认的代码字体
 
 - 安装 Chrome 扩展 `Github Code Font Changer`
 
@@ -506,7 +295,7 @@ Cursor Style: block
   
 - 安装完成后即可使用该扩展选择对应的字体，打开 GitHub 页面即可显示效果。
 
-## 9. Tabby 自定义 CSS
+## 7. Tabby 自定义 CSS
 
 ```css
 .content.tabs-on-top {
@@ -516,9 +305,9 @@ Cursor Style: block
 }
 ```
 
-## 10. 安装与配置外部软件
+## 8. 安装与配置外部软件
 
-### 10.1 安装 qpdf 并解密 PDF 文件
+### 8.1 安装 qpdf 并解密 PDF 文件
 
 ```bash
 $ sudo yum install -y qpdf
@@ -527,7 +316,7 @@ $ sudo qpdf --password=<password> \
 # 指定加密的 PDF 文件的密码解密 PDF 文件
 ```
 
-### 10.2 RHEL 7/8 安装 exfat 驱动
+### 8.2 RHEL 7/8 安装 exfat 驱动
 
 ```bash
 $ sudo yum install -y epel-release
@@ -544,14 +333,14 @@ $ sudo mount.exfat /dev/sdX <mountpoint>
 #      $ sudo yum --enablerepo=nux-desktop install -y <package>
 ```
 
-### 10.3 安装 xfce4-terminal 软件包
+### 8.3 安装 xfce4-terminal 软件包
 
 ```bash
 $ sudo dnf install -y xfce4-terminal
 # 该软件包可设置终端背景图片及透明度
 ```
 
-### 10.4 RHEL8/9 安装 openvpn-gnome 客户端
+### 8.4 RHEL8/9 安装 openvpn-gnome 客户端
 
 ```bash
 $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
@@ -562,7 +351,7 @@ $ sudo dnf install NetworkManager-openvpn-1.8.10-1.el8.1.x86_64.rpm \
   redhat-internal-NetworkManager-openvpn-profiles-0.1-61.el7.noarch.rpm
 ```
 
-### 10.5 RHEL8 安装 Google Chrome
+### 8.5 RHEL8 安装 Google Chrome
 
 ```bash
 $ sudo vim /etc/yum.repos.d/google-chrome.repo
@@ -576,13 +365,13 @@ gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 $ sudo dnf install -y google-chrome-stable
 ```
 
-### 10.6 RHEL9 安装 Google Chrome
+### 8.6 RHEL9 安装 Google Chrome
 
 ```bash
 $ sudo dnf install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 ```
 
-### 10.7 RHEL8 安装 VScode
+### 8.7 RHEL8 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -598,7 +387,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### 10.8 RHEL9 安装 VScode
+### 8.8 RHEL9 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -614,7 +403,7 @@ $ sudo dnf install -y code
 $ code
 ```
 
-### 10.9 RHEL10 安装 VScode
+### 8.9 RHEL10 安装 VScode
 
 ```bash
 $ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -629,7 +418,7 @@ EOF
 $ sudo dnf install code
 ```
 
-### 10.10 RHEL9 安装 EPEL9 软件源
+### 8.10 RHEL9 安装 EPEL9 软件源
 
 ```bash
 $ sudo dnf config-manager \
@@ -643,7 +432,7 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 # 安装 epel9 软件包
 ```
 
-### 10.11 RHEL10 安装 EPEL10 软件源
+### 8.11 RHEL10 安装 EPEL10 软件源
 
 ```bash
 $ sudo cat > /etc/yum.repos.d/epel10.repo <<EOF
@@ -656,7 +445,7 @@ EOF
 $ sudo dnf repolist
 ```
 
-### 10.12 RHEL10 安装 Grafana 软件源
+### 8.12 RHEL10 安装 Grafana 软件源
 
 ```bash
 $ sudo cat > /etc/yum.repos.d/grafana.repo <<EOF
@@ -669,7 +458,7 @@ EOF
 $ sudo dnf install -y grafana
 ```
 
-### 10.13 RHEL 安装中文输入法支持
+### 8.13 RHEL 安装中文输入法支持
 
 以下输入法引擎（IME）可以从 RHEL 中列出的软件包中获得：
 
@@ -690,7 +479,7 @@ $ sudo dnf install -y langpacks-zh_CN.noarch ibus-libpinyin
 
 如上图所示，在 Settings > Keyboard > Input Sources 中添加 `Chinese (Intelligent Pinyin)` 即可完成设置。
 
-### 10.14 安装 rdesktop 软件包连接 Windows RDP 桌面
+### 8.14 安装 rdesktop 软件包连接 Windows RDP 桌面
 
 ```bash
 $ sudo dnf install -y rdesktop
@@ -699,7 +488,7 @@ $ rdesktop -u hwuser88 -d bestvdc -p Ansible2024! redhat.bestvdc.com:23353
 # 登录 Cloudshell bestvdc desktop
 ```
 
-### 10.15 RHEL9 安装 ToDesk
+### 8.15 RHEL9 安装 ToDesk
 
 ```bash
 $ wget https://rh-course-materials.oss-cn-hangzhou.aliyuncs.com/todesk-v4.7.2.0-x86_64.rpm
@@ -710,9 +499,9 @@ $ sudo systemctl enable --now todeskd.service
 # 启动并设置开机自启服务
 ```
 
-### 10.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
+### 8.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问
 
-#### 10.16.1 安装与设置 x11vnc 虚拟桌面
+#### 8.16.1 安装与设置 x11vnc 虚拟桌面
 
 ```bash
 ### 打开一个终端执行 ###
@@ -740,7 +529,7 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 # 确认 x11vnc 监听的端口，用于外部连接的端口确认
 ```
 
-#### 10.16.2 MobaXterm 的连接访问
+#### 8.16.2 MobaXterm 的连接访问
 
 1️⃣ 打开 MobaXterm，点击 Session 创建新会话：
 
@@ -758,7 +547,7 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 
 <img src="images/x11vnc-connect-4.jpg" style="width:80%">
 
-## 11. dnf 下载软件包及其依赖
+## 9. dnf 下载软件包及其依赖
 
 ```bash
 $ sudo dnf install --downloadonly \
@@ -771,7 +560,7 @@ $ sudo dnf install --downloadonly \
 # 下载 podman 及其依赖的软件包至目标目录（仅下载不安装）
 ```
 
-## 12. dnf 实现软件包安全检测与更新
+## 10. dnf 实现软件包安全检测与更新
 
 ```bash
 $ sudo dnf --security updateinfo
@@ -796,7 +585,7 @@ $ sudo dnf update --cve CVE-xxxx-xxxx
 # 更新依赖指定 CVE 编号的软件包
 ```
 
-## 13. RedHat 订阅服务使用
+## 11. RedHat 订阅服务使用
 
 ```bash
 $ sudo subscription-manager register [--username=<username>] [--password=<password>]
@@ -815,7 +604,7 @@ $ sudo subscription-manager repos --list-enabled
 # 列举当前系统可用的订阅仓库
 ```
 
-## 14. 如何在 Windows 11 家庭版中禁用 Hyper-V？
+## 12. 如何在 Windows 11 家庭版中禁用 Hyper-V？
 
 - ❓问题：此次需要在 `DELL Precision 3591` 上的 Windows 11 家庭版中运行 VMware 虚拟机，但在启动虚拟机过程中直接返回类似报错 "虚拟机不支持 VT-x 模式"。
 - ✔️ 解决：
@@ -851,7 +640,7 @@ $ sudo subscription-manager repos --list-enabled
   - WSL2 禁用 → Hyper-V 禁用：WSL2 子系统的启用会造成原系统中的 VMware 虚拟机无法正常启动（报错不支持 VT-x 模式）。因此，需按照 "控制面板 > 程序 > 启用或关闭 Windows 功能 > 适用于 Linux 的 Windows 子系统（去除勾选）" 以禁用 WSL2 子系统，再执行 `bcdedit /set hypervisorlaunchtype off` 禁用 Hyper-V，重启系统使配置生效。
   - 如果想再次启用 WSL2，需勾选 "适用于 Linux 的 Windows 子系统"，执行 `bcdedit /set hypervisorlaunchtype auto`，并执行 `wsl --install --no-distribution`，此命令将再次安装 WSL2，本地存在先前运行的 Linux 发行版的话也不会覆盖或丢失。
 
-## 15. RHEL8/9/10 启用 /var/log/dmesg 日志
+## 13. RHEL8/9/10 启用 /var/log/dmesg 日志
 
 默认情况下，在系统引导过程中 RHEL8/9/10 不再自动生成 /var/log/dmesg 日志，因此，查看系统启动早期过程只能通过 `dmesg` 命令与 `journalctl -k` 命令完成。若需自动生成 /var/log/dmesg 日志的话，可执行以下过程完成生成：
 
@@ -877,7 +666,7 @@ $ sudo systemctl enable dmesg.service
 $ sudo systemctl reboot
 ```
 
-## 16. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面
+## 14. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面
 
 RHEL10 的 Gnome3 已内置支持 RDP 协议连接的远程桌面控制，可使用以下方法设置：
 
@@ -889,7 +678,7 @@ Windows 客户端使用 `Win+R` 组合键，在运行窗口中输入 `mstsc` 后
 
 <img src="images/gnome3-supported-rdp-3.png" style="width:80%">
 
-## 17. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机
+## 15. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机
 
 ```bash
 $ sudo chown qemu:qemu /var/lib/libvirt/images/mysle15sp6-origin.qcow2
@@ -911,7 +700,7 @@ $ sudo virsh undefine mysle15sp6
 # 删除虚拟机
 ```
 
-## 18. Ubuntu 24.04.4 LTS 中安装 Clash 工具
+## 16. Ubuntu 24.04.4 LTS 中安装 Clash 工具
 
 此处使用 [nelvko/clash-for-linux-install | GitHub](https://github.com/nelvko/clash-for-linux-install) 仓库安装 Linux 的 Clash 工具。
 
@@ -1037,7 +826,7 @@ rtt min/avg/max/mdev = 0.063/0.157/0.240/0.072 ms
 
 💥 注意：若调用 OpenAI 的 API，请选择日本或新加坡节点代理，香港节点受地区限制无法调用 API！
 
-## 19. 参考链接
+## 17. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)

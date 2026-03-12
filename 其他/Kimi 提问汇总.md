@@ -19,11 +19,14 @@
   - [Ansible](#ansible)
   - [容器 \& Kubernetes](#容器--kubernetes)
     - [K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系](#k8s-networkpolicy-与-calico-networkpolicy-间的关系)
+  - [OpenShift](#openshift)
   - [CNI 如何玩转 Linux Bridge](#cni-如何玩转-linux-bridge)
+  - [Python](#python)
   - [机器学习](#机器学习)
   - [深度学习](#深度学习)
   - [大模型](#大模型)
   - [模型部署 \& 推理](#模型部署--推理)
+  - [Red Hat Satellite \& Insights](#red-hat-satellite--insights)
 
 ## Linux 内核
 
@@ -121,6 +124,7 @@
 ## Linux 性能优化
 
 - Linux 中 PCP 的 pmlogger 默认是采集所有的性能指标吗？是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
+- 磁盘 IO 请求的合并是由内核调度算法来完成的吗？和磁盘驱动有关系吗？
 
 ## Linux 网络
 
@@ -191,7 +195,7 @@ net.ipv4.conf.all.arp_announce = 2
   # csrow*：内存通道
   # ch*：通道内的第几根内存
   ```
-     
+
 - 什么是 Linux 内核中的 NMI watchdog（不可屏蔽中断看门狗）？
 
 ## 系统服务
@@ -219,10 +223,20 @@ net.ipv4.conf.all.arp_announce = 2
 - 如何使用 `sed` 命令删除指定行、在指定行前后插入新行？
 - `awk` 脚本如何引用 shell 中的变量方法？
 - `shellcheck` 软件包如何检查 shell 语法？
-- shell 截取字符串与统计字符串长度的方法？
+- shell 截取字符串、统计字符串长度？
 - shell 变量中包含多个字符串时匹配空行使用 `[[ var == [[:space:]] ]]`
 - if 条件判断如何结合正则表达式？
 - while 条件判断的无限循环使用？
+
+- 如何定义 shell 空数组？并在数组中添加元素？
+- 如何使用 shell 数组，并且循环迭代？
+- shell 中的 += 如何实现？
+  - 数组追加元素：array+=(新项1 新项2 …)，带括号才是数组。
+  - 字符串拼接：str+=后缀
+  - 数字累加：((num+=增量))
+- shell 中数字累加有浮点数如何处理？
+- shell 中如何转换浮点数为整形数？
+- shell 中 `trap "exit" INT` 的含义是？
 
 ## Ceph
 
@@ -357,6 +371,11 @@ net.ipv4.conf.all.arp_announce = 2
 - 因此，可以使用 `calico` 的 networkpolicy 做功能的扩展。
 - `nerdctl` 的端口不是用户态监听的，而是直接 `iptables nat` 转发的。
 
+## OpenShift
+
+- 如何在本地部署一个单节点的 RHACM？
+- 如何使用 RHACM + ZTP 配合 GitOps 创建部署新的 OpenShift 集群？
+
 ## CNI 如何玩转 Linux Bridge
 
 ```bash
@@ -388,6 +407,18 @@ $ ip route add default via 10.244.0.1 dev eth0
 $ ip addr add 10.244.0.1/24 dev cni0
 ```
 
+## Python
+
+- cookie 与 session 的联系与区别是什么？如何通过 wireshark 抓包的方式获取它们呢？
+- 如何创建一个 python 服务端实现示例完整演示 cookie 和 session 之间的关系？
+- Python 中有多少种错误类型，分别表示的含义是什么？
+- 给出 Python 使用 `__iter__()` 与 `__next__()` 创建迭代器的示例？
+  - 文件分块读取器
+  - 二叉树中序遍历
+- Python 面向对象中的封装与多态？
+- Python 中多线程互斥锁、自旋锁与原子操作的实现？内核底层是如何实现的？
+- 如何使用 Python 获取当前系统中各 CPU 的运行队列？
+
 ## 机器学习
 
 - 数学基础：
@@ -411,11 +442,6 @@ $ ip addr add 10.244.0.1/24 dev cni0
 
 - 概率 & 统计：
   - 均值、方差、协方差、标准差、偏差的数学定义？
-
-- Python 基础：
-  - 请给出 Python 面向对象的说明与示例？
-  - 什么是 Python 面向对象的封装、继承与多态？
-  - 如何使用 Python 绘制曲面与平面相切及其切点？
 
 - 📊 给出 NumPy 与 Pandas 在实际数据清洗过程中的完整示例？
 - 评估数据相关性的有哪些指标？
@@ -494,3 +520,50 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - 模型的并发能多大
   - 模型实现的原理
 - 多个模型服务运行时对比：llama.cpp、ONNX、OpenVINO、vLLM
+- vLLM 部署后第1次的推理请求中并没有 KV cache，那么 vLLM 也会使用 KV cache 吗？
+  - 会。
+  - vLLM 的 KV cache 是“推理过程中在线填充”的，而不是“请求前就已存在”。流程如下：
+    - 第 1 次请求进来时，cache 确实为空。
+    - 在 第 1 个 forward 阶段（prefill），vLLM 把 prompt 各 token 的 Key/Value 向量逐层算出，并 立即写入物理 cache 块（PagedAttention 的 block table）。
+    - 随后的 每个 decode 步 继续把新产生 token 的 KV 追加到同一块表；同一序列后续再发请求，可直接复用这些块，无需重算。
+  - 因此：
+    - “第 1 次”只是 cache 起点，并非不用 KV cache；
+    - 从第 2 次请求起，若命中相同前缀或重用 block，即可享受到缓存加速。
+- 将大模型部署于 vLLM 中，那么 vLLM 是如何处理大模型的请求吗？
+
+  ```plaintext
+  客户端 HTTP 请求
+     ▼
+  API server → 拆成 token 序列
+     ▼
+  Scheduler（Continuous Batching）
+     ├─ Prefill 队列 → 一次性生成 KV → 进块表
+     └─ Decode 队列 → 逐 token 增量更新 KV
+     ▼
+  PagedAttention Kernel（GPU）
+     ▼
+  采样 → 新 token → 异步流式返回
+     ▼
+  KV 块回收 ← 请求完成
+  ```
+
+- 大模型在整个 vllm 推理过程中如何发挥作用？
+  - 可以把 vLLM 的推理流程想象成一条“token 流水线”
+  - 大模型（权重）就是流水线上唯一的那台核心机床；vLLM 只负责把原材料（token）分批、排产、送料、收料，让机床永远处于切削状态， never idle。具体分工如下：
+    - 权重常驻显存
+      - 启动时 vLLM 一次性把完整模型（FP16/BF16/FP8/Int4）加载到 GPU，之后不再移动；后续所有计算都直接引用这片显存，节省重复 IO。
+    - 前向计算 = 机床加工
+      - Prefill 阶段：把整段 prompt 拼成 1 个长矩阵 → 调用 1 次 CUDA kernel 链（Attention + FFN + RMSNorm…）→ 产出首 token  logits。
+      - Decode 阶段：每步只送 1 个新 token 的嵌入向量 → 同样走完整网络，但 KV 复用之前已算好的块，计算量 ≈ prompt 阶段的 1/seq_len。
+    - 模型结构改造 = 机床换夹具
+      - vLLM 在加载时会重写 Attention 算子（ops.paged_attention_v2），把原来“连续缓存”换成“块索引”输入；对模型本身参数、层数、激活函数不做任何改动，因此任何 Transformer 架构的大模型都能直接上线。
+    - 并行策略 = 多机台联动
+      - Tensor Parallel：把一层矩阵按“列-行”切分到多 GPU，单 token 前向一次完成；vLLM 自动插入 NCCL All-Reduce。
+      - Pipeline Parallel：把不同层放在不同卡，vLLM 负责 micro-batch 调度，保证流水线无气泡。大模型权重按策略切好后依旧只干一件事——做矩阵乘法，调度细节对它是透明的。
+    - 采样与输出 = 质检 + 贴标
+      - logits 回传后，vLLM 在 CPU 端做 beam/nucleus/repetition 处理，选出下一个 token；大模型不参与采样，只负责“打分”。
+  → 总结：大模型在 vLLM 里就是一块被“分页 + 批量化”调用的大算子；它只关心“输入矩阵维度对不对”，其余负载均衡、内存碎片、连续批、流式返回等全部由 vLLM 框架代劳。因此同样一张 GPU，vLLM 能让大模型每秒处理的 token 数提升一个数量级，而模型本身一行代码都不用改。
+
+## Red Hat Satellite & Insights
+
+- 如何部署与管理离线版 Red Hat Satellite 并集成 Insights？
