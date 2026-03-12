@@ -55,6 +55,8 @@
   - [使用 AUDIT 记录系统事件](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6.png)
   - [使用 AIDE 监控文件系统更改](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AIDE%20%E7%9B%91%E6%8E%A7%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9B%B4%E6%94%B9.png)
   - [SELinux 整体框架](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SELinux%20%E6%A1%86%E6%9E%B6.png)
+- **Shell 脚本**
+  - [Shell 脚本编程](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B.md)  
 
 ## 🛠 **Linux 服务与配置**
 
@@ -128,7 +130,7 @@
 - [【精华】Ceph CRUSH map 概述与实现](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0/Ceph%20CRUSH%20map%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)
 - [【精华】Ceph 存储配置参数释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/Ceph%20%E5%AD%98%E5%82%A8%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_20250427%E6%9B%B4%E6%96%B0.png)
 
-## **Python 编程基础**
+## 🐍 **Python 编程基础**
 
 - [Lesson 1. Hello World](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%201.%20Hello%20World.ipynb)
 - [Lesson 2. 数值型对象的创建方法](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Python%20%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/Lesson%202.%20%E6%95%B0%E5%80%BC%E5%9E%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E6%96%B9%E6%B3%95.ipynb)
