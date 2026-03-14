@@ -5,10 +5,10 @@
 - [Linux 中使用 AUDIT 记录系统事件](#linux-中使用-audit-记录系统事件)
   - [文档目录](#文档目录)
   - [1. 配置 Audit 以记录系统事件](#1-配置-audit-以记录系统事件)
-    - [Linux Audit 系统](#linux-audit-系统)
-    - [使用 Audit 审计系统](#使用-audit-审计系统)
-    - [配置 auditd](#配置-auditd)
-    - [使用auditd进行远程日志记录](#使用auditd进行远程日志记录)
+    - [1.1 Linux Audit 系统](#11-linux-audit-系统)
+    - [1.2 使用 Audit 审计系统](#12-使用-audit-审计系统)
+    - [1.3 配置 auditd](#13-配置-auditd)
+    - [1.4 使用 auditd 进行远程日志记录](#14-使用-auditd-进行远程日志记录)
   - [检查Audit日志](#检查audit日志)
     - [解读Audit消息](#解读audit消息)
     - [搜索事件（event）](#搜索事件event)
@@ -28,7 +28,7 @@
 
 ## 1. 配置 Audit 以记录系统事件
 
-### Linux Audit 系统
+### 1.1 Linux Audit 系统
 
 - Linux Audit 系统是内核中的一种机制，提供了一种在系统上跟踪与安全相关的事件和信息的方法。
 - 可定义一组加载到内核中的规则，以指定它在审计日志中记录哪些事件。
@@ -44,85 +44,104 @@
   - 对任何受信任数据库的更改，如 /etc/passwd。
   - 尝试在系统中导入或导出信息的行为。
 
-### 使用 Audit 审计系统
+### 1.2 使用 Audit 审计系统
 
 - **auditd 是 Linux 审计子系统的用户空间组件（user-space component）。**
 - 在守护进程启动时，启动 auditd 的 systemd 单元文件，通常会加载所有持久性审计规则。
 - 当 Audit 规则加载至内核后，内核使用规则报告相关的事件。
 - 内核将事件相关的信息发送给 auditd 守护进程。
 - auditd 守护进程的角色：收集由内核报告的审计事件信息，并将其保存至日志文件中。
-- ✅ 审计流程：audit_rules --> kernel --> audit_events --> auditd --> log_file
-- auditd 守护进程运行时，事件信息将被写入 **<span style="color:blue">/var/log/audit/audit.log</span>**，该守护进程不运行时，rsyslog 接收内核的审计信息。
+- ✅ 审计流程：*audit_rules* ⬅ *kernel* ➡ *audit_events* ➡ *auditd* ➡ *log_file*
+- auditd 守护进程运行时，事件信息将被写入 **<span style="color:orange">/var/log/audit/audit.log</span>**，该守护进程不运行时，rsyslog 接收内核的审计信息。
 - 若没有任何额外的配置，仅有限数量的消息通过审计系统，主要是身份认证和授权消息（用户正在登录、正在使用sudo等）和SELinux消息。
 - 使用 auditctl 命令添加控制审计系统的审计规则、监视文件或有关任何系统调用的记录信息。
 
-### 配置 auditd
+### 1.3 配置 auditd
 
 - /etc/audit/auditd.conf：auditd 守护进程主配置文件
 - /etc/audit/audit.rules：auditd 加载的审计规则
-- 不要编辑以上文件，auditd在启动时将从 /etc/audit/audit.d/ 中生成该文件。
+  
+  > 注意：不要编辑以上文件，auditd 在启动时将从 /etc/audit/audit.d/ 中生成该文件！
+
 - /etc/audit/rules.d：手动配置审计规则的目录
-- 该目录中的所有审计规则在 auditd 启动时被合并入 /etc/audit/audit.rules中，并加载至内核中。
+
+  > 注意：该目录中的所有审计规则在 auditd 启动时被合并入 /etc/audit/audit.rules 中，并加载至内核中。
+
 - /etc/audit/rules.d/audit.rules：手动管理的审计规则文件
 
 ```bash
 $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
-# 启动、停止、重启、开机自启动、开机不自启动auditd服务
+# 启动、停止、重启、开机自启动、开机不自启动 auditd 服务
 ```
 
-- auditd启动后，其systemd单元文件自动从/etc/audit/rules.d中重建审计规则集，并将其加载至内核中。
-- 当auditd重新加载时，它会尝试使用augenrules命令重建规则文件并加载新的规则。
+- auditd 启动后，其 systemd 单元文件自动从 /etc/audit/rules.d 中重建审计规则集，并将其加载至内核中。
+- 当 auditd 重新加载时，它会尝试使用 **augenrules** 命令重建规则文件并加载新的规则。
 - ❗若加载了使当前规则不可变的控制规则，可能会失败，需重新引导系统以更改加载的规则集。
-- 调整auditd设置以管理存储：
+- 调整 auditd 设置以管理存储：
   - 根据加载的审计规则，审计日志可能会非常快速地变大。
-  - ✅ 推荐做法：/var/log/audit目录最好是带有自有文件系统的挂载点，这样就不会有其他进程因存储空间和性能调优原因而与审计日志竞争。
+  - ✅ 推荐做法：/var/log/audit 目录最好是带有自有文件系统的挂载点，这样就不会有其他进程因存储空间和性能调优原因而与审计日志竞争。
   - 若审计系统由于缺少存储空间而无法将事件记录到磁盘，则系统必须立即停止或降级到单用户模式，这是为了确保不会在没有记录的情况下发生任何事件。
-  - auditd守护进程具有相关的机制，可以在即将发生这种情况时发出警告，并在存储变低时采取各种操作。
-  - /etc/audit/auditd.conf 配置文件参数（此处有图片）
+  - auditd 护进程具有相关的机制，可以在即将发生这种情况时发出警告，并在存储变低时采取各种操作。
+  - /etc/audit/auditd.conf 配置文件参数：
+
+    | 参数/指令（directive）| 描述（description）|
+    | ----- | ----- |
+    | log_file | 用于存储审计日志文件的位置，默认为 /var/log/audit/audit.log。|
+    | max_log_file | 最大审计日志文件大小（以 MB 为单位）。<br> 当到达此阈值，触发 max_log_file_action 参数设置的操作。|
+    | max_log_file_action | 当审计日志文件大小到达 max_log_file 后执行的操作。<br> 默认设置为 `ROTATE`，这将轮转日志文件，由 num_logs 参数指定保持旧日志文件的数量；如果设置为 `KEEP_FILES`，日志文件将轮转且不被删除（忽略 num_logs 参数）。KEEP_FILES 将最终占满日志文件所在的存储，除非备份或移除这些旧日志文件。|
+    | space_left | 审计日志文件所在的文件系统上剩余的可用空间大小（以 MB 为单位），用于触发 space_left_action 参数中设置的操作。<br> 此参数必须设置为一个数字，以便管理员有足够的时间来响应并释放文件系统空间，并在文件系统仅剩余 admin_space_left 的可用空间前采取行动。|
+    | space_left_action | 默认设置为 `SYSLOG`，这记录 warning 日志。<br> 如果设置为 `EMAIL`，系统上配置了 /usr/lib/sendmail（Postfix 或 Sendmail 提供），email 会发送到由 action_mail_acct 参数指定的地址。可选地，也可设置为 `EXEC /path/to/script` 或 `/path/to/script` 命令来运行。|
+    | admin_space_left | 审计日志文件所在的文件系统上可用空间的绝对最小值（以 MB 为单位），用于触发 admin_space_left_action 参数设置的操作。<br> 此参数必须设置为⼀个数字，确保留出⾜够的空间来记录管理员执⾏的操作。此参数通常会暂停 auditd 守护进程或停⽌整个系统，以保留少量的可⽤空间来修复问题。|
+    | admin_space_left_action | 到达 admin_space_left 参数设置的阈值时执行的操作。<br> 默认设置为 `SUSPEND`，这将引起 auditd 停止向文件系统写入审计记录。许多安全策略要求将此参数设置为 `SINGLE`（将系统置于单用户模式，允许管理员进行修复）或 `HALT`（暂停整个系统）。由于系统没有维持完整的审计日志，这些安全策略设置这些值来禁止操作此系统。|
+    | disk_full_action | 审计日志所在文件系统没有可用空间时触发的操作。<br> 此参数可设置为 `SUSPEND`、`SINGLE` 或 `HALT`。此参数可确保当审计⽆法再记录事件时，系统已关闭或在单⽤⼾模式下。|
+    | disk_error_action | 审计日志所在文件系统还有可用空间，但检测到错误时触发的操作。<br> 默认设置为 `SUSPEND`，这将停止记录审计事件。也可设置为 `SINGLE` 或 `HALT`。|
 
     ```bash
     $ man 5 auditd.conf
-    # 查看auditd服务配置文件参数的详细信息
+    # 查看 auditd 服务配置文件参数的详细信息
     ```
 
-- 调整auditd配置以调优性能：
+- 调整以下 /etc/audit/auditd.conf 参数以提高 auditd 服务性能：
+  - flush = INCREMENTAL_ASYNC：
+    - 达到 freq 指定的写入次数后将记录异步清理到存储，以提高系统性能。
+    - 但由于系统崩溃时审计消息可能丢失，此时需将此参数设置为 DATA 或 SYNC。
+    - 以相对较低的 freq 设置使用 INCREMENTAL_ASYNC，可确保记录快速同步到文件系统，同时保持良好的系统性能。
+  - freq = 50：
+    - 在每 50 条记录后清空 Audit 日志（假设设置 flush = INCREMENTAL_ASYNC）。
+    - 若 flush 设置为 DATA 或 SYNC，则忽略此设置，并且每次写入存储都是同步的。
+  - ❗ 只有设置 flush = INCREMENTAL_ASYNC 时，freq 参数才起作用！
   
-  调整以下/etc/audit/auditd.conf参数以提高auditd服务性能：
-  
-  - flush = INCREMENTAL_ASYNC：达到 freq 指定的写入次数后将记录异步清理到存储，以提高系统性能。
-  - 但由于系统崩溃时审计消息可能丢失，此时需将此参数设置为 DATA 或 SYNC。
-  - 以相对较低的 freq 设置使用 INCREMENTAL_ASYNC，可确保记录快速同步到文件系统，同时保持良好的系统性能。
-  - freq = 50：在每50条记录后清空Audit日志（假设设置 flush=INCREMENTAL_ASYNC）。
-  - 若 flush 设置为 DATA 或 SYNC，则忽略此设置，并且每次写入存储都是同步的。
-  - ❗ 只有设置 flush = INCREMENTAL_ASYNC 时，freq参数才起作用！
+  > 说明：可以理解为减小批次的记录，提高异步刷新的频率来提高审计记录的性能。
 
-### 使用auditd进行远程日志记录
+### 1.4 使用 auditd 进行远程日志记录
 
 - 可通过以下两种方式将审计消息发送到远程系统：
-  - 可将审计消息发送到本地 rsyslog 服务并将其转发至rsyslog配置的远程服务器。
-  - 可将系统配置为将审计消息发送到远程auditd服务。
-- 配置客户端：
-  - 使用以上两种方式均需对系统的/etc/audit/auditd.conf文件进行以下更改：
-    - log_format = ENRICHED：在传输每个事件之前解析UID、GID、系统调用数量、架构和套接字地址信息等，保证该日志信息在远程系统上有意义，远程系统上可能具有以上映射的不同值。
+  - 1️⃣ 可将审计消息发送到本地 rsyslog 服务并将其转发至 rsyslog 配置的远程服务器。
+  - 2️⃣ 可将系统配置为将审计消息发送到远程 auditd 服务。
+- **配置客户端：**
+  - 使用以上两种方式均需对系统的 /etc/audit/auditd.conf 文件进行以下更改：
+    - log_format = ENRICHED：在传输每个事件之前解析 UID、GID、系统调用数量、架构和套接字地址信息等，保证该日志信息在远程系统上有意义，远程系统上可能具有以上映射的不同值。
     - name_format = HOSTNAME：在每条消息中包含主机名，区别审计消息所属的主机。
-    - 针对于第一种方式：
-      - 设置客户端 /etc/audisp/plugins.d/syslog.conf 文件中 active = yes 可将消息发送到rsyslog。
-      - 还需配置本地rsyslog服务，将日志消息发送到/etc/rsyslog.conf文件中定义的远程日志服务器。
-      - 补充示例：使用loganalyzer解析远程rsyslog服务器（MySQL作为日志数据存储后端）
+  - 针对于 **第一种方式**：
+    - 1️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/plugins.d/syslog.conf</span>** 文件中 active = yes 可将消息发送到 rsyslog。
+    - 2️⃣ 配置本地 rsyslog 服务，将日志消息发送到 /etc/rsyslog.conf 文件中定义的远程日志服务器。
+    - 补充示例：[LogAnalyzer 的 Web 界面解析日志，其中日志源于 rsyslog 服务器连接的 MySQL 数据库后端。](https://github.com/Alberthua-Perl/sc-col/tree/master/deploy-rsyslog-viewer)
 
-        收集的auditd审计日志信息（此处有图片）
+      （此处有图片）
 
-    - 针对于第二种方式：
-      - 需在客户端安装 audispd-plugins 软件包。
-      - 设置客户端 /etc/audisp/plugins.d/au-remote.conf 文件中的 active = yes。
-      - 设置客户端 /etc/audisp/audisp-remote.conf 文件中的 remote_server 指令为远程auditd服务器的IP地址或主机名，若远程服务器未监听默认 60/TCP 端口的话，需更新 port 指令。
-- 配置服务端：
-  - 针对于第一种方式：
-    - 配置rsyslog服务/etc/rsyslog.conf文件，配置其为服务端并监听 514/UDP 或 514/TCP 端口，接收来自客户端的审计消息。
-  - 针对于第二种方式：
-    - 设置/etc/audit/auditd.conf文件中的 tcp_listen_port = 60 指令（60/TCP）用以监听远程客户端的审计消息。
-    - 设置firewalld以放行 60/TCP 端口。
-    - ❗ 必须以重启操作系统的方式来重启auditd服务使其配置生效。（此处有图片）
+      <center>收集的 auditd 审计日志信息</center>
+
+  - 针对于 **第二种方式**：
+    - 1️⃣ 需在客户端安装 audispd-plugins 软件包。
+    - 2️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/plugins.d/au-remote.conf</span>** 文件中的 active = yes。
+    - 3️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/audisp-remote.conf</span>** 文件中的 remote_server 指令为远程 auditd 服务器的 IP 地址或主机名，若远程服务器未监听默认 60/TCP 端口的话，需更新 port 指令。
+- **配置服务端：**
+  - 针对于 **第一种方式：**
+    - 1️⃣ 配置 rsyslog 服务 /etc/rsyslog.conf 文件，配置其为服务端并监听 514/UDP 或 514/TCP 端口，接收来自客户端的审计消息。
+  - 针对于 **第二种方式：**
+    - 1️⃣ 设置 /etc/audit/auditd.conf 文件中的 tcp_listen_port = 60 指令（60/TCP）用以监听远程客户端的审计消息。
+    - 2️⃣ 设置 firewalld 以放行 60/TCP 端口。
+    - ❗ 必须以重启操作系统的方式来重启 auditd 服务使其配置生效。（此处有图片）
 - 常用离线帮助文档：
   
   ```bash
