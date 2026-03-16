@@ -13,7 +13,6 @@
   - [硬件监测](#硬件监测)
   - [系统服务](#系统服务)
   - [系统安全](#系统安全)
-  - [Shell 脚本](#shell-脚本)
   - [Ceph](#ceph)
   - [Jenkins](#jenkins)
   - [Ansible](#ansible)
@@ -215,28 +214,6 @@ net.ipv4.conf.all.arp_announce = 2
 - [隐藏了十年的 sudo 漏洞爆出：无需密码就能获取 root 权限](https://blog.csdn.net/zhangge3663/article/details/113501578)
   - CVE-2019-14287
   - CVE-2019-18634
-
-## Shell 脚本
-
-- `set` 命令如何调整 shell 行为：`-o` 选项、`-e` 选项？
-- 如何使用 `expr` 命令与 `bc` 命令联合处理浮点数？
-- 如何使用 `sed` 命令删除指定行、在指定行前后插入新行？
-- `awk` 脚本如何引用 shell 中的变量方法？
-- `shellcheck` 软件包如何检查 shell 语法？
-- shell 截取字符串、统计字符串长度？
-- shell 变量中包含多个字符串时匹配空行使用 `[[ var == [[:space:]] ]]`
-- if 条件判断如何结合正则表达式？
-- while 条件判断的无限循环使用？
-
-- 如何定义 shell 空数组？并在数组中添加元素？
-- 如何使用 shell 数组，并且循环迭代？
-- shell 中的 += 如何实现？
-  - 数组追加元素：array+=(新项1 新项2 …)，带括号才是数组。
-  - 字符串拼接：str+=后缀
-  - 数字累加：((num+=增量))
-- shell 中数字累加有浮点数如何处理？
-- shell 中如何转换浮点数为整形数？
-- shell 中 `trap "exit" INT` 的含义是？
 
 ## Ceph
 

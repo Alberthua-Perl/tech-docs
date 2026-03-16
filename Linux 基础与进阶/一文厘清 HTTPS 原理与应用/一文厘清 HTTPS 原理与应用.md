@@ -11,6 +11,7 @@
 - 该文档使用 openssl 工具创建与管理相关私钥与证书，当然也可使用 cfssl 或 certtool（来源于 gnutls-utils 软件包）工具创建与管理。
 
 ## 文档目录
+
 - [🛡️ 一文厘清 HTTPS 原理与应用](#️-一文厘清-https-原理与应用)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
@@ -19,9 +20,9 @@
   - [保证数据的真实性与完整性：不被篡改](#保证数据的真实性与完整性不被篡改)
   - [保证传输双方的身份验证](#保证传输双方的身份验证)
   - [🦄 数字签名原理](#-数字签名原理)
-  - [SSL/TLS 与 CA 相关术语](#ssltls-与-ca-相关术语)
   - [SSL/TLS 加密通信要点](#ssltls-加密通信要点)
-  - [🚀 基于 SSL/TLS 加密连接的 HTTPS 单/双向认证](#-基于-ssltls-加密连接的-https-单双向认证)
+  - [SSL/TLS 与 CA 相关术语](#ssltls-与-ca-相关术语)
+  - [🚀 SSL/TLS 加密连接的 HTTPS 单/双向认证流程](#-ssltls-加密连接的-https-单双向认证流程)
   - [🧪 HTTPS 单向认证的 Wireshark 抓包分析](#-https-单向认证的-wireshark-抓包分析)
   - [HTTPS 单向认证测试](#https-单向认证测试)
   - [HTTPS 双向认证的 Wireshark 抓包与测试](#https-双向认证的-wireshark-抓包与测试)
@@ -190,7 +191,40 @@
     - 🤝 证书验证在 `SSL/TLS` 握手过程的 `Server Hello Done` 与 `Client Key Exchange` 之间。
   - 🚀 验证过程与原理，如下所示：
 
-    ![ca-signed-certification-verify](images/ca-signed-certification-verify.jpg)
+    <center><img src="images/ca-signed-certification-verify.jpg" style="width:60%"></center>
+
+## SSL/TLS 加密通信要点
+
+- 安全套接字层协议（Secure Socket Layer, SSL）和传输层安全协议（Transport Layer Security, TLS）是同一安全协议的不同世代，TLS 是 SSL 的继任者。**现在 TLS 是唯一标准，SSL 已被完全淘汰。**
+- SSL/TLS 历史背景：
+
+  | 年份 | 协议版本 | 说明 |
+  | ----- | ----- | ----- |
+  | 1994 年 | SSL 1.0 | NetScape 公司设计，但未公开发布，有严重漏洞 |
+  | 1995 年 | SSL 2.0 | NetScape 公司首次公开发布，但很快被攻破 |
+  | 1996 年 | SSL 3.0 | 广泛应用，但 2014 年被 POODLE 攻击击溃 |
+  | 1999 年 | TLS 1.0 → SSL 3.1 | 互联网标准化组织 ISOC 接替 NetScape 公司发布协议版本 |
+  | 2006 年 | TLS 1.1 | 添加 CBC 保护 |
+  | 2008 年 | **TLS 1.2** | ✅ 当前主流，添加 AEAD 加密套件 |
+  | 2018 年 | **TLS 1.3** | ✅ 推荐首选，性能最优，握手简化，0-RTT |
+
+- SSL/TLS 协议在网络模型中的位置：
+  
+  <center><img src="images/ssl-tls-in-network-stack.png" style="width:60%"></center>
+
+- SSL/TLS 协议分为两部分：
+  - Handshake Protocol：
+    🤝 协商通信双方之后在本次会话中用于数据加密的会话密钥（`session key`），该过程为 "握手阶段"，其中会话密钥也称为协商密钥。
+  - Record Protocol：
+    定义使用会话密钥加密的数据的传输格式。
+- SSL 层：
+  借助下层协议（TCP 层）的的信道安全地协商出一份会话密钥，并用此密钥来加密 HTTP 请求。  
+- TCP 层：
+  - 与 Web server 的 443 端口建立连接，传递由 SSL 处理后的数据。
+  - SSL 在 TCP 之上建立一个加密通道，通过这一层的数据经过了加密，因此达到保密的效果。
+- 服务端本地与客户端本地的 SSL 套接字与 TCP 套接字的关系，如下所示：
+  
+  <center><img src="images/client-server-tcp-ssl-socket.png" style="width:60%"></center>
 
 ## SSL/TLS 与 CA 相关术语
 
@@ -212,41 +246,7 @@
 - 支持 SSL/TLS 协议的开源工具：`openssl`、`cfssl`、`gnutls`
 - 📚 man 查看以下命令：openssl、genrsa、rsa、req、x509、verify、s_client、s_server
 
-## SSL/TLS 加密通信要点
-
-- 安全套接字层协议：Secure Socket Layer（SSL）
-- 传输层安全协议：Transport Layer Security（TLS）
-- SSL/TLS 历史背景：
-  - 1994 年，NetScape 公司设计了 SSL 协议的 1.0 版，但未发布。
-  - 1995 年，NetScape 公司发布 SSL 2.0 版，很快发现有严重漏洞。
-  - 1996 年，SSL 3.0 版问世，得到大规模应用。
-  - 1999 年，互联网标准化组织 ISOC 接替 NetScape 公司，发布了 SSL 的升级版 `TLS 1.0` 版。
-  - 2006 年和 2008 年，TLS 进行了两次升级，分别为 TLS 1.1 版和 TLS 1.2 版。
-  - 👉 最新的变动是 2011 年 `TLS 1.2` 的修订版。
-- TLS 与 SSL 之间的版本对应关系：
-  - TLS 1.0 对应 SSL 3.1
-  - TLS 1.1 对应 SSL 3.2
-  - TLS 1.2 对应 SSL 3.3
-- 👉 一般主流浏览器都已经实现了 `TLS 1.2` 的支持。
-- SSL/TLS 协议在网络模型中的位置：
-  
-  ![ssl-tls-in-network-stack](images/ssl-tls-in-network-stack.png)
-
-- SSL/TLS 协议分为两部分：
-  - Handshake Protocol：
-    🤝 协商通信双方之后在本次会话中用于数据加密的会话密钥（`session key`），该过程为 "握手阶段"，其中会话密钥也称为协商密钥。
-  - Record Protocol：
-    定义使用会话密钥加密的数据的传输格式。
-- SSL 层：
-  借助下层协议（TCP 层）的的信道安全地协商出一份会话密钥，并用此密钥来加密 HTTP 请求。  
-- TCP 层：
-  - 与 Web server 的 443 端口建立连接，传递由 SSL 处理后的数据。
-  - SSL 在 TCP 之上建立一个加密通道，通过这一层的数据经过了加密，因此达到保密的效果。
-- 服务端本地与客户端本地的 SSL 套接字与 TCP 套接字的关系，如下所示：
-  
-  ![client-server-tcp-ssl-socket](images/client-server-tcp-ssl-socket.png)
-
-## 🚀 基于 SSL/TLS 加密连接的 HTTPS 单/双向认证
+## 🚀 SSL/TLS 加密连接的 HTTPS 单/双向认证流程
 
 - 以上关于服务端 CA 数字签名证书的验证只是 HTTPS 通信中的一部分，需通过其他步骤共同完成 HTTPS 加密通信。
 - HTTPS 加密通信认证分为两类：单向认证、双向认证
@@ -257,7 +257,7 @@
   无论 HTTPS 单向或双向认证都是客户端与服务端协商出 **<font color=red>会话密钥</font>** 与 **<font color=red>会话加密算法</font>** 的过程。
 - ✨ 以下从 HTTPS 抓包的角度说明 SSL/TLS 四次握手与 HTTPS 单/双向认证的详细过程：
   
-  ![ssl-four-handshakes-https-single-and-mutual-authentication](images/ssl-four-handshakes-https-single-and-mutual-authentication.png)
+  <center><img src="images/ssl-four-handshakes-https-single-and-mutual-authentication.png" style="width:60%"></center>
   
   上图中 **黑色箭头** 表示双向认证过程中多出的步骤，其余过程为单向认证过程。
 
@@ -268,7 +268,7 @@
 - 构建 Nginx 容器使用的 [Dockerfile](https://github.com/Alberthua-Perl/dockerfile-s2i-demo/tree/master/nginx-ssl) 如下所示：
   
   ```dockerfile
-  # modified date: 
+  # modified date:
   #     - 2019-12-10: initial Dockerfile
   #     - 2023-01-16: update nginx and add client ssl authentication
   
@@ -323,17 +323,22 @@
       # alias for domain-based virtual machine
       server_name  www.etiantian.org etiantian.org;
   
-      ssl  on;  # Nginx 启用 SSL/TLS 验证：指定服务端 CA 数字签名证书与私钥
+      ssl  on;
+      # Nginx 启用 SSL/TLS 验证：指定服务端 CA 数字签名证书与私钥
       # enable openssl module to support SSL/TLS
+
       ssl_certificate  /application/nginx/key/server.crt;
       # server.crt 证书发送至客户端用于验证其身份，客户端使用其中的公钥加密
       # pre-master 第三个随机数并发送至服务端协商会话密钥。
+
       ssl_certificate_key  /application/nginx/key/server.key;
       # server.key 用于解密从客户端发送来的已加密的 pre-master 第三个随机数
+
       #ssl_client_certificate  /application/nginx/key/CA-center.crt;
       #ssl_verify_client  on;
       # 启用服务端对客户端 SSL/TLS 双向验证
       # 如果只需服务端单向验证，无需启用 ssl_client_certificate 与 ssl_verify_client。
+      
       ssl_session_timeout  5m;
       ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
       ssl_ciphers  ALL:!DH:!EXPORT:!RC4:+HIGH:+MEDIUM:-LOW:!aNULL:!eNULL;

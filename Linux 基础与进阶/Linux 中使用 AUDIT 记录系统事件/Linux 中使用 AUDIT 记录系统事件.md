@@ -9,11 +9,11 @@
     - [1.2 使用 Audit 审计系统](#12-使用-audit-审计系统)
     - [1.3 配置 auditd](#13-配置-auditd)
     - [1.4 使用 auditd 进行远程日志记录](#14-使用-auditd-进行远程日志记录)
-  - [检查Audit日志](#检查audit日志)
-    - [解读Audit消息](#解读audit消息)
-    - [搜索事件（event）](#搜索事件event)
-    - [Audit消息报告](#audit消息报告)
-    - [追踪程序](#追踪程序)
+  - [2. 检查 Audit 日志](#2-检查-audit-日志)
+    - [2.1 解读 Audit 消息](#21-解读-audit-消息)
+    - [2.2 搜索事件（event）](#22-搜索事件event)
+    - [2.3 Audit 消息报告](#23-audit-消息报告)
+    - [2.4 追踪程序](#24-追踪程序)
   - [编写自定义审计规则](#编写自定义审计规则)
     - [添加规则](#添加规则)
     - [删除规则](#删除规则)
@@ -84,17 +84,17 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   - auditd 护进程具有相关的机制，可以在即将发生这种情况时发出警告，并在存储变低时采取各种操作。
   - /etc/audit/auditd.conf 配置文件参数：
 
-    | 参数/指令（directive）| 描述（description）|
+    | 参数/指令（directive） | 描述（description） |
     | ----- | ----- |
-    | log_file | 用于存储审计日志文件的位置，默认为 /var/log/audit/audit.log。|
-    | max_log_file | 最大审计日志文件大小（以 MB 为单位）。<br> 当到达此阈值，触发 max_log_file_action 参数设置的操作。|
-    | max_log_file_action | 当审计日志文件大小到达 max_log_file 后执行的操作。<br> 默认设置为 `ROTATE`，这将轮转日志文件，由 num_logs 参数指定保持旧日志文件的数量；如果设置为 `KEEP_FILES`，日志文件将轮转且不被删除（忽略 num_logs 参数）。KEEP_FILES 将最终占满日志文件所在的存储，除非备份或移除这些旧日志文件。|
-    | space_left | 审计日志文件所在的文件系统上剩余的可用空间大小（以 MB 为单位），用于触发 space_left_action 参数中设置的操作。<br> 此参数必须设置为一个数字，以便管理员有足够的时间来响应并释放文件系统空间，并在文件系统仅剩余 admin_space_left 的可用空间前采取行动。|
-    | space_left_action | 默认设置为 `SYSLOG`，这记录 warning 日志。<br> 如果设置为 `EMAIL`，系统上配置了 /usr/lib/sendmail（Postfix 或 Sendmail 提供），email 会发送到由 action_mail_acct 参数指定的地址。可选地，也可设置为 `EXEC /path/to/script` 或 `/path/to/script` 命令来运行。|
-    | admin_space_left | 审计日志文件所在的文件系统上可用空间的绝对最小值（以 MB 为单位），用于触发 admin_space_left_action 参数设置的操作。<br> 此参数必须设置为⼀个数字，确保留出⾜够的空间来记录管理员执⾏的操作。此参数通常会暂停 auditd 守护进程或停⽌整个系统，以保留少量的可⽤空间来修复问题。|
-    | admin_space_left_action | 到达 admin_space_left 参数设置的阈值时执行的操作。<br> 默认设置为 `SUSPEND`，这将引起 auditd 停止向文件系统写入审计记录。许多安全策略要求将此参数设置为 `SINGLE`（将系统置于单用户模式，允许管理员进行修复）或 `HALT`（暂停整个系统）。由于系统没有维持完整的审计日志，这些安全策略设置这些值来禁止操作此系统。|
-    | disk_full_action | 审计日志所在文件系统没有可用空间时触发的操作。<br> 此参数可设置为 `SUSPEND`、`SINGLE` 或 `HALT`。此参数可确保当审计⽆法再记录事件时，系统已关闭或在单⽤⼾模式下。|
-    | disk_error_action | 审计日志所在文件系统还有可用空间，但检测到错误时触发的操作。<br> 默认设置为 `SUSPEND`，这将停止记录审计事件。也可设置为 `SINGLE` 或 `HALT`。|
+    | log_file | 用于存储审计日志文件的位置，默认为 /var/log/audit/audit.log。 |
+    | max_log_file | 最大审计日志文件大小（以 MB 为单位）。<br> 当到达此阈值，触发 max_log_file_action 参数设置的操作。 |
+    | max_log_file_action | 当审计日志文件大小到达 max_log_file 后执行的操作。<br> 默认设置为 `ROTATE`，这将轮转日志文件，由 num_logs 参数指定保持旧日志文件的数量；如果设置为 `KEEP_FILES`，日志文件将轮转且不被删除（忽略 num_logs 参数）。KEEP_FILES 将最终占满日志文件所在的存储，除非备份或移除这些旧日志文件。 |
+    | space_left | 审计日志文件所在的文件系统上剩余的可用空间大小（以 MB 为单位），用于触发 space_left_action 参数中设置的操作。<br> 此参数必须设置为一个数字，以便管理员有足够的时间来响应并释放文件系统空间，并在文件系统仅剩余 admin_space_left 的可用空间前采取行动。 |
+    | space_left_action | 默认设置为 `SYSLOG`，这记录 warning 日志。<br> 如果设置为 `EMAIL`，系统上配置了 /usr/lib/sendmail（Postfix 或 Sendmail 提供），email 会发送到由 action_mail_acct 参数指定的地址。可选地，也可设置为 `EXEC /path/to/script` 或 `/path/to/script` 命令来运行。 |
+    | admin_space_left | 审计日志文件所在的文件系统上可用空间的绝对最小值（以 MB 为单位），用于触发 admin_space_left_action 参数设置的操作。<br> 此参数必须设置为⼀个数字，确保留出⾜够的空间来记录管理员执⾏的操作。此参数通常会暂停 auditd 守护进程或停⽌整个系统，以保留少量的可⽤空间来修复问题。 |
+    | admin_space_left_action | 到达 admin_space_left 参数设置的阈值时执行的操作。<br> 默认设置为 `SUSPEND`，这将引起 auditd 停止向文件系统写入审计记录。许多安全策略要求将此参数设置为 `SINGLE`（将系统置于单用户模式，允许管理员进行修复）或 `HALT`（暂停整个系统）。由于系统没有维持完整的审计日志，这些安全策略设置这些值来禁止操作此系统。 |
+    | disk_full_action | 审计日志所在文件系统没有可用空间时触发的操作。<br> 此参数可设置为 `SUSPEND`、`SINGLE` 或 `HALT`。此参数可确保当审计⽆法再记录事件时，系统已关闭或在单⽤⼾模式下。 |
+    | disk_error_action | 审计日志所在文件系统还有可用空间，但检测到错误时触发的操作。<br> 默认设置为 `SUSPEND`，这将停止记录审计事件。也可设置为 `SINGLE` 或 `HALT`。 |
 
     ```bash
     $ man 5 auditd.conf
@@ -109,7 +109,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   - freq = 50：
     - 在每 50 条记录后清空 Audit 日志（假设设置 flush = INCREMENTAL_ASYNC）。
     - 若 flush 设置为 DATA 或 SYNC，则忽略此设置，并且每次写入存储都是同步的。
-  - ❗ 只有设置 flush = INCREMENTAL_ASYNC 时，freq 参数才起作用！
+  - ❗只有设置 flush = INCREMENTAL_ASYNC 时，freq 参数才起作用！
   
   > 说明：可以理解为减小批次的记录，提高异步刷新的频率来提高审计记录的性能。
 
@@ -123,71 +123,206 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
     - log_format = ENRICHED：在传输每个事件之前解析 UID、GID、系统调用数量、架构和套接字地址信息等，保证该日志信息在远程系统上有意义，远程系统上可能具有以上映射的不同值。
     - name_format = HOSTNAME：在每条消息中包含主机名，区别审计消息所属的主机。
   - 针对于 **第一种方式**：
-    - 1️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/plugins.d/syslog.conf</span>** 文件中 active = yes 可将消息发送到 rsyslog。
-    - 2️⃣ 配置本地 rsyslog 服务，将日志消息发送到 /etc/rsyslog.conf 文件中定义的远程日志服务器。
-    - 补充示例：[LogAnalyzer 的 Web 界面解析日志，其中日志源于 rsyslog 服务器连接的 MySQL 数据库后端。](https://github.com/Alberthua-Perl/sc-col/tree/master/deploy-rsyslog-viewer)
-
-      （此处有图片）
-
-      <center>收集的 auditd 审计日志信息</center>
-
+    - 1️⃣ 需在客户端安装 audispd-plugins 软件包。
+    - 2️⃣ 设置客户端 **<font color=orange>/etc/audit/plugins.d/syslog.conf</font>** 文件中 active = yes 可将消息发送到 rsyslog。
+    - 3️⃣ 配置本地 rsyslog 服务，将日志消息发送到 /etc/rsyslog.conf 文件中定义的远程日志服务器。
+    - ⚗️ 补充实验：[LogAnalyzer 集成 auditd 日志](https://github.com/Alberthua-Perl/sc-col/tree/master/rsyslog-loganalyzer-viewer#loganalyzer-%E9%9B%86%E6%88%90-auditd-%E6%97%A5%E5%BF%97)
   - 针对于 **第二种方式**：
     - 1️⃣ 需在客户端安装 audispd-plugins 软件包。
-    - 2️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/plugins.d/au-remote.conf</span>** 文件中的 active = yes。
-    - 3️⃣ 设置客户端 **<span style="color:orange">/etc/audisp/audisp-remote.conf</span>** 文件中的 remote_server 指令为远程 auditd 服务器的 IP 地址或主机名，若远程服务器未监听默认 60/TCP 端口的话，需更新 port 指令。
+    - 2️⃣ 设置客户端 **<font color=orange>/etc/audit/plugins.d/au-remote.conf</font>** 文件中的 active = yes。
+    - 3️⃣ 设置客户端 **<font color=orange>/etc/audit/audisp-remote.conf</font>** 文件中的 remote_server 指令为远程 auditd 服务器的 IP 地址或主机名，若远程服务器未监听默认 60/TCP 端口的话，需更新 port 指令。
 - **配置服务端：**
   - 针对于 **第一种方式：**
-    - 1️⃣ 配置 rsyslog 服务 /etc/rsyslog.conf 文件，配置其为服务端并监听 514/UDP 或 514/TCP 端口，接收来自客户端的审计消息。
+    - 1️⃣ 配置 rsyslog 服务 /etc/rsyslog.conf 文件，配置其为服务端并监听 514/UDP 或 514/TCP 端口，接收来自客户端的审计消息。（参考前文补充实验）
   - 针对于 **第二种方式：**
     - 1️⃣ 设置 /etc/audit/auditd.conf 文件中的 tcp_listen_port = 60 指令（60/TCP）用以监听远程客户端的审计消息。
     - 2️⃣ 设置 firewalld 以放行 60/TCP 端口。
-    - ❗ 必须以重启操作系统的方式来重启 auditd 服务使其配置生效。（此处有图片）
-- 常用离线帮助文档：
+    - ❗必须以重启操作系统的方式来重启 auditd 服务使其配置生效。
+
+    > 注意：<br>
+    > 默认情况下，以上两种方式传输审计日志均通过未加密的明文方式实现，缺少安全加密极可能导致关键信息暴露或窃取。<br>
+    > rsyslog 服务必须通过 TLS 认证与加密保护审计日志传输；auditd 守护进程使用 Kerberos 认证与加密（客户端 /etc/audisp/audisp-remote.conf 与服务端 /etc/audit/auditd.conf）。<br>
+    > 查看 man 手册：audisp-remote.conf(5)，auditd.conf(5)
+
+- 📝 常用离线帮助文档：
   
   ```bash
-  $ man 5 auditd.conf
-  # 查看auditd服务配置文件的详细使用信息
-  $ man 5 audisp-remote.conf
-  # 查看audisp-remote配置文件信息
-  $ man 7 audit.rules
-  # 查看内核审计系统的规则集合信息
+  $ man 5 auditd.conf           # 查看 auditd 服务配置文件的详细使用信息
+  $ man 5 audisp-remote.conf    # 查看 audisp-remote 配置文件信息
+  $ man 7 audit.rules           # 查看内核审计系统的规则集合信息
   ```
 
 -----
 
-## 检查Audit日志
+## 2. 检查 Audit 日志
 
-### 解读Audit消息
+### 2.1 解读 Audit 消息
 
-- /var/log/audit/audit.log中记录的Audit事件在紧凑的格式中纳入许多的信息。
+- /var/log/audit/audit.log 中记录的 Audit 事件在紧凑的格式中纳入许多的信息。
 - 一个事件实际上可能会记录多个不同类型的审计记录到日志中，作为单独的消息。
 - 这些记录可能各自包含多个字段，记录事件的相关信息。
-- 示例：/var/log/audit/audit.log文件中未经处理的单个审计事件（audit event）相关的多条审计记录（audit record）(此处有图片)
+- 示例：/var/log/audit/audit.log 文件中未经处理的单个审计事件（audit event）相关的多条审计记录（audit record）<br>
+  1️⃣ **type=SYSCALL msg=audit(1371716130.596:28708)**: arch=c000003e **syscall=2** success=yes exit=4 a0=261b130 a1=90800 a2=e a3=19 items=1 ppid=2548 pid=26131 **auid=1000** uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=1 comm="aureport" exe="/sbin/aureport" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 **key="audit-access"**<br>
+  2️⃣ type=CWD msg=audit(1371716130.596:28708):  cwd="/root"<br>
+  3️⃣ type=PATH msg=audit(1371716130.596:28708): item=0 name="/var/log/audit" inode=17998 dev=fd:01 mode=040750 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:auditd_log_t:s0<br>
+  
+  以上输出显示了三条审计记录，它们都属于审计事件 **28708** 的一部分。<br>
+  - "type=SYSCALL" 记录指明了 "type" 字段的内容。每条审计记录都有一个记录类型，有时也被称为消息类型，这种类型是由每个记录开头的 "type" 字段体现。此记录为 "SYSCALL" 记录。
+  - "msg=audit(1371716130.596:28708)" 这条记录指出了 "msg" 字段的内容。该 "msg" 字段给出了此记录的 **时间戳** 以及 **审计事件编号**。冒号前的数字（在本例中为 1371716130.596）是以秒为单位表示的自起始时间点（即 1970 年 1 月 1 日 00:00 UTC）以来的时间戳。可使用 `date --date=@<起始时间>` 命令将起始时间转换为本地时间。冒号后的数字（28708）是审计事件编号，该记录与该事件的其他记录共享此编号。
+  - "syscall=2" 记录指代的是系统调用字段。第一条记录的类型为 "SYSCALL"，这表示的是向内核发出的系统调用的相关信息。这个系统调用字段表示的是所发出的系统调用的编号（而非其名称）。系统调用编号与名称之间的对应关系在不同的处理器架构中可能会有所不同（X86/ARM/MIPS/RISC-V 等架构），这就是为什么在没有帮助的情况下直接解读原始格式的日志可能会很困难的原因之一。可以使用 ausearch 命令来提供帮助。
+  
+    ```bash
+    $ sudo uname -a
+    Linux foundation0.ilt.example.com 5.14.0-570.12.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Apr 4 10:41:31 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+    # 查看系统内核版本
+    $ sudo head -n 10 /usr/include/asm/unistd_64.h    # x86_64 架构中系统调用与编号对应关系
+    #ifndef _ASM_UNISTD_64_H
+    #define _ASM_UNISTD_64_H
 
-### 搜索事件（event）
+    #define __NR_read 0
+    #define __NR_write 1
+    #define __NR_open 2
+    #define __NR_close 3
+    #define __NR_stat 4
+    #define __NR_fstat 5
+    #define __NR_lstat 6
+    ```
+
+  - "auid=1000" 记录指代的是 "auid" 字段。该 "auid" 字段记录了触发此事件的用户的审计用户标识（Audit UID）。这是触发此事件的用户最初用于 **<font color=orange>登录此机器的账户的标识</font>**，即便该用户使用了 sudo 或 su 命令以其他用户身份登录也是如此，即 **<font color=orange>原始登录用户</font>**。
+
+### 2.2 搜索事件（event）
 
 - 审计系统附带 ausearch 命令，该命令用于搜索审计日志。
 - 可使用 ausearch 搜索和过滤各种类型的事件。
 - 可将数值转换为更易读的值，如用户名或系统调用名，以解读这些事件。
-- 常用的ausearch命令选项 (此处有图片)
+- 常用的 ausearch 命令选项：
+  
+  | 选项 | 描述 |
+  | ----- | ----- |
+  | -i | 解析日志记录，将数值转换为名称。当拥有原始日志文件时，此功能非常有用。 |
+  | --raw | 打印原始日志条目，甚至不要在事件之间添加分隔符。可配合其他能够解析原始日志格式的工具。与选项 -r 等效。 |
+  | -a `<EVENT-ID>` | 显示具有 `<EVENT-ID>` 作为事件标识的该事件的所有记录。 |
+  | -m `<MESSAGE-TYPE>` | 显示所有包含 `<MESSAGE-TYPE>` 作为其消息类型记录的事件。与长选项 --message 等效。 |
+  | -f `<FILENAME>` | 搜索与特定文件名相关的所有事件。与长选项 --file 等效。 |
+  | -k `<KEY>` | 查找所有标有 `<KEY>` 键的事件。 |
+  | --start `[start-date]` `[start-time]` | 仅需在 *start-date* 和 *start-time* 之后进行搜索。如果未指定开始时间，搜索将默认设定为午夜（midnight）。如果未指定开始日期，搜索将默认设定为今天（today）。 <br> 时间格式取决于当前的地区设置。还可以使用其他值，如 **recent**（过去十分钟内）、**this-week**、**this-month** 和 **this-year**。 <br> **--end** 可用于查找在特定日期和时间之前发生的事件，并且其使用方式与 **--start**相同。 |
 
-```bash
-$ sudo ausearch -i -a <event_id>
-# 查看指定审计事件的全部审计记录
-```
+  ```bash
+  $ sudo ausearch -i -if /path/to/file
+  # 查看指定文件的全部审计记录
 
-```bash
-$ man ausearch
-# 该命令用于查询auditd守护进程日志(此处有图片)
-```
+  $ sudo ausearch -i -a <EVENT-ID>
+  # 查看指定审计事件的全部审计记录
 
-### Audit消息报告
+  $ sudo ausearch -p <PID> --raw
+  # 查看指定进程的原始审计日志条目
+
+  $ sudo ausearch -m <MESSAGE-TYPE>
+  # 根据消息类型搜索审计记录
+
+  $ sudo ausearch -f /path/to/file
+  # 根据文件名称搜索审计记录
+  ```
+
+- 🔎 **解释审计日志条目：**
+
+  Audit 审计事件字段汇总：[Audit Event Fields | RHEL Audit System Reference](https://access.redhat.com/articles/4409591)
+
+  ```bash
+  $ sudo ausearch -i -a 28708
+  ----
+  type=PATH msg=audit(07/31/2023 10:15:30.596:28708) : item=0 name=/var/log/
+  audit inode=17998 dev=fd:01 mode=dir,750 ouid=root ogid=root rdev=00:00
+  obj=system_u:object_r:auditd_log_t:s0
+  type=CWD msg=audit(07/31/2023 10:15:30.596:28708) :  cwd=/root
+  type=SYSCALL msg=audit(07/31/2023 10:15:30.596:28708) : arch=x86_64 syscall=open
+  success=yes exit=4 a0=261b130 a1=90800 a2=e a3=19 items=1 ppid=2548 pid=26131
+  auid=student uid=root gid=root euid=root suid=root fsuid=root egid=root
+  sgid=root fsgid=root tty=pts0 ses=1 comm=aureport exe=/sbin/aureport
+  subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=audit-access
+  ```
+
+  - 每个审计事件之间都以四个破折号隔开。
+  - 此输出显示了 **PATH**、**CWD** 和 **SYSCALL** 事件类型。
+  - PATH 记录是与该事件相关的文件。该文件名为 /var/log/audit（name=/var/log/audit），其 inode 为 17998（inode=17998）。该文件位于文件系统上的一个设备上，其主/次设备号为 253，1（dev=fd:01，设备编号采用**十六进制格式**）。通过使用 ls -l 命令在 /dev 目录中查看，可以看到 /dev/dm-1 设备具有这些编号，并与一个逻辑卷相关联。该文件是一个目录，具有八进制权限 750（mode=dir,750），由 root 用户和 root 组所有（ouid=root ogid=root），具有 SELinux 类型 auditd_log_t（obj=system_u:object_r:auditd_log_t:s0）。
+  - CWD 记录指的是与引发此事件的进程相关联的当前工作目录，在此例中为 /root 目录。
+  - SYSCALL 记录即触发此事件的系统调用。使用 **open()** 系统调用（syscall=open）成功（success=yes）打开了由 PATH 记录指定的文件（即 /var/log/audit 目录）。此调用由具有 26131 PID 的进程执行（pid=26131）。该调用由 /sbin/aureport 可执行文件启动（exe=/sbin/aureport），并以 root 有效用户 ID（euid=root）和无限制 SELinux 域 （subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023）由 root 用户（uid=root）运行。该命令在 pts/0 虚拟终端（tty=pts0）上运行，可能是图形终端窗口或远程登录会话。用户**最初**以 student 用户身份登录（auid=student），此后不知何故变成了 root 用户。此记录设置了审计访问键，以便使用 ausearch 命令更容易找到其事件（key=audit-access）。
+
+### 2.3 Audit 消息报告
 
 - aureport 命令可用于获取审计消息的快速概览和特定类型事件的详细报告。
-- 常用选项：$ man aureport (此处有图片)
-- ❗ aulast 命令与 aulastlog 命令和 last 命令与 lastlog 命令极其类似，但前者不解析 /var/log/wtmp 与 /var/log/btmp 文件。
+- 常用选项：
+  
+  ```bash
+  $ aureport --help
+  usage: aureport [options]
+        -a,--avc                        Avc report
+        -au,--auth                      Authentication report
+        --comm                          Commands run report
+        -c,--config                     Config change report
+        -cr,--crypto                    Crypto report
+        --debug                         Write malformed events that are skipped to stderr
+        --eoe-timeout secs              End of Event Timeout
+        -e,--event                      Event report
+        --escape option                 Escape output
+        -f,--file                       File name report
+        --failed                        only failed events in report
+        -h,--host                       Remote Host name report
+        --help                          help
+        -i,--interpret                  Interpretive mode
+        -if,--input <Input File name>   use this file as input
+        --input-logs                    Use the logs even if stdin is a pipe
+        --integrity                     Integrity event report
+        -k,--key                        Key report
+        -l,--login                      Login report
+        -m,--mods                       Modification to accounts report
+        -ma,--mac                       Mandatory Access Control (MAC) report
+        -n,--anomaly                    aNomaly report
+        -nc,--no-config                 Don't include config events
+        --node <node name>              Only events from a specific node
+        -p,--pid                        Pid report
+        -r,--response                   Response to anomaly report
+        -s,--syscall                    Syscall report
+        --success                       only success events in report
+        --summary                       sorted totals for main object in report
+        -t,--log                        Log time range report
+        -te,--end [end date] [end time] ending date & time for reports
+        -tm,--terminal                  TerMinal name report
+        -ts,--start [start date] [start time]   starting data & time for reports
+        --tty                           Report about tty keystrokes
+        -u,--user                       User name report
+        -v,--version                    Version
+        --virt                          Virtualization report
+        -x,--executable                 eXecutable name report
+        If no report is given, the summary report will be displayed
+  ```
 
-### 追踪程序
+- ❗aulast 命令与 aulastlog 命令和 last 命令与 lastlog 命令极其类似，但前者不解析 `/var/log/wtmp` 与 `/var/log/btmp` 文件。
+
+  | 特性 | /var/log/wtmp | /var/log/btmp |
+  | ----- | ----- | ----- |
+  | **记录内容** | **成功登录**历史 | **失败登录**尝试（暴力破解痕迹） |
+  | **数据格式** | 二进制（utmp 结构） | 二进制（utmp 结构） |
+  | **读取命令** | `last` | `lastb` |
+  | **审计价值** | 追踪用户会话、取证分析 | 检测攻击行为、安全审计 |
+  | **日志轮转** | 通常保留（`wtmp.1`） | 通常保留（`btmp.1`） |
+  | **权限要求** | root 可读 | root 可读 |
+
+  ```bash
+  $ sudo last
+  # 查看系统上全局成功登录记录
+
+  $ sudo last <username>
+  # 查看系统上指定用户的成功登录记录
+
+  $ sudo lastb
+  # 查看系统上全局失败登录记录
+
+  $ sudo lastb <username>
+  # 查看系统上指定用户的失败登录记录
+  ```
+
+### 2.4 追踪程序
 
 - autrace 命令可用于调查进程执行的系统调用，该命令与 strace 命令非常类似。
 - 运行autrace命令将删除所有自定义审计规则，并将其替换为专门用于追踪指定程序的规则。
