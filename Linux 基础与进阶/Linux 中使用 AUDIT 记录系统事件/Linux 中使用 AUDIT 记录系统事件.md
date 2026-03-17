@@ -11,9 +11,9 @@
     - [1.4 使用 auditd 进行远程日志记录](#14-使用-auditd-进行远程日志记录)
   - [2. 检查 Audit 日志](#2-检查-audit-日志)
     - [2.1 解读 Audit 消息](#21-解读-audit-消息)
-    - [2.2 搜索事件（event）](#22-搜索事件event)
-    - [2.3 Audit 消息报告](#23-audit-消息报告)
-    - [2.4 追踪程序](#24-追踪程序)
+    - [2.2 搜索事件：ausearch 命令](#22-搜索事件ausearch-命令)
+    - [2.3 Audit 消息报告：aureport 命令](#23-audit-消息报告aureport-命令)
+    - [2.4 追踪程序：autrace 命令](#24-追踪程序autrace-命令)
   - [编写自定义审计规则](#编写自定义审计规则)
     - [添加规则](#添加规则)
     - [删除规则](#删除规则)
@@ -190,7 +190,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
 
   - "auid=1000" 记录指代的是 "auid" 字段。该 "auid" 字段记录了触发此事件的用户的审计用户标识（Audit UID）。这是触发此事件的用户最初用于 **<font color=orange>登录此机器的账户的标识</font>**，即便该用户使用了 sudo 或 su 命令以其他用户身份登录也是如此，即 **<font color=orange>原始登录用户</font>**。
 
-### 2.2 搜索事件（event）
+### 2.2 搜索事件：ausearch 命令
 
 - 审计系统附带 ausearch 命令，该命令用于搜索审计日志。
 - 可使用 ausearch 搜索和过滤各种类型的事件。
@@ -226,7 +226,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
 
 - 🔎 **解释审计日志条目：**
 
-  Audit 审计事件字段汇总：[Audit Event Fields | RHEL Audit System Reference](https://access.redhat.com/articles/4409591)
+  🎯 Audit 审计事件字段汇总：[Audit Event Fields | RHEL Audit System Reference](https://access.redhat.com/articles/4409591)，如果由于访问权限问题，可直接访问 [GitHub 链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E4%B8%AD%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6/RHEL%20Audit%20System%20Reference%20-%20Red%20Hat%20Customer%20Portal.pdf)。
 
   ```bash
   $ sudo ausearch -i -a 28708
@@ -248,7 +248,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   - CWD 记录指的是与引发此事件的进程相关联的当前工作目录，在此例中为 /root 目录。
   - SYSCALL 记录即触发此事件的系统调用。使用 **open()** 系统调用（syscall=open）成功（success=yes）打开了由 PATH 记录指定的文件（即 /var/log/audit 目录）。此调用由具有 26131 PID 的进程执行（pid=26131）。该调用由 /sbin/aureport 可执行文件启动（exe=/sbin/aureport），并以 root 有效用户 ID（euid=root）和无限制 SELinux 域 （subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023）由 root 用户（uid=root）运行。该命令在 pts/0 虚拟终端（tty=pts0）上运行，可能是图形终端窗口或远程登录会话。用户**最初**以 student 用户身份登录（auid=student），此后不知何故变成了 root 用户。此记录设置了审计访问键，以便使用 ausearch 命令更容易找到其事件（key=audit-access）。
 
-### 2.3 Audit 消息报告
+### 2.3 Audit 消息报告：aureport 命令
 
 - aureport 命令可用于获取审计消息的快速概览和特定类型事件的详细报告。
 - 常用选项：
@@ -322,30 +322,70 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   # 查看系统上指定用户的失败登录记录
   ```
 
-### 2.4 追踪程序
+### 2.4 追踪程序：autrace 命令
 
 - autrace 命令可用于调查进程执行的系统调用，该命令与 strace 命令非常类似。
-- 运行autrace命令将删除所有自定义审计规则，并将其替换为专门用于追踪指定程序的规则。
-- 执行完成后，autrace命令将清除这些规则，然后提供示例ausearch命令来调查这些事件。
+- 💥 运行 autrace 命令将删除所有自定义审计规则，并将其替换为专门用于追踪指定程序的规则。
+- 执行完成后，autrace 命令将清除这些规则，然后提供示例 ausearch 命令来调查这些事件。
 - 这对于排除故障或调查感兴趣的程序非常有用。
-- 示例：使用autrace调查ip命令的系统调用 (此处有图片)
+- 示例：使用 autrace 调查 ip 命令的系统调用
 
-```bash
-$ sudo autrace <command>
-# 追踪命令或程序的系统调用
-```
+  ```bash
+  $ sudo autrace /usr/sbin/ip link show dev eth0
+  Waiting to execute: /usr/sbin/ip
+  2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+      link/ether 52:54:00:00:fa:0a brd ff:ff:ff:ff:ff:ff
+      altname enp1s0
+  Cleaning up...
+  Trace complete. You can locate the records with 'ausearch -i -p 1959'
 
-```bash
-$ sudo ausearch --raw -p <pid> | aureport -i --file
-# 查看指定命令或程序使用的文件（包含系统调用）
-```
+  $ sudo ausearch -i -p 1959                            # 方法1：输出此进程的解析的审计日志
+  ...
+  $ sudo ausearch --raw -p 1959 | aureport -i --file    # 方法2：输出此进程的原始审计日志，配合 aureport 命令解析。
 
-```bash
-$ sudo ausearch --raw | aureport -i --file
-# 查看审计规则涉及的文件
-```
+  File Report
+  ===============================================
+  # date time file syscall success exe auid event
+  ===============================================
+  1. 03/15/26 23:53:23  newfstatat yes /usr/sbin/autrace root 326
+  2. 03/15/26 23:53:24 /usr/sbin/ip execve yes /usr/sbin/ip root 330
+  3. 03/15/26 23:53:24 /etc/ld.so.preload access no /usr/sbin/ip root 333
+  4. 03/15/26 23:53:24 /etc/ld.so.cache openat yes /usr/sbin/ip root 334
+  5. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 335
+  6. 03/15/26 23:53:24 /lib64/libbpf.so.1 openat yes /usr/sbin/ip root 338
+  7. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 340
+  8. 03/15/26 23:53:24 /lib64/libelf.so.1 openat yes /usr/sbin/ip root 347
+  9. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 349
+  10. 03/15/26 23:53:24 /lib64/libmnl.so.0 openat yes /usr/sbin/ip root 357
+  11. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 359
+  12. 03/15/26 23:53:24 /lib64/libcap.so.2 openat yes /usr/sbin/ip root 367
+  13. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 369
+  14. 03/15/26 23:53:24 /lib64/libc.so.6 openat yes /usr/sbin/ip root 375
+  15. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 380
+  16. 03/15/26 23:53:24 /lib64/libz.so.1 openat yes /usr/sbin/ip root 389
+  17. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 391
+  18. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 447
+  19. 03/15/26 23:53:24 /etc/iproute2/group openat yes /usr/sbin/ip root 448
+  20. 03/15/26 23:53:24  newfstatat yes /usr/sbin/ip root 449
+  ```
 
-- ❗ autrace命令将删除所有活动的审计规则，或者要求在运行之前删除所有活动规则，可能导致丢失来自现有规则会记录的其他进程的事件，若审计规则被锁定，autrace命令将不能正常工作。
+  > 说明：
+  > newfstatat 系统调用
+
+- 命令示例：
+
+  ```bash
+  $ sudo autrace /path/to/command
+  # 追踪命令或程序的系统调用
+
+  $ sudo ausearch --raw -p <PID> | aureport -i --file
+  # 查看指定命令或程序使用的文件（包含系统调用）
+
+  $ sudo ausearch --raw | aureport -i --file
+  # 查看审计规则涉及的文件
+  ```
+
+- ❗autrace 命令将删除所有活动的审计规则，或者要求在运行之前删除所有活动规则，可能导致丢失来自现有规则会记录的其他进程的事件，若审计规则被锁定，autrace 命令将不能正常工作。
 
 -----
 

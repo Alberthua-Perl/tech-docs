@@ -24,6 +24,10 @@
     - [9.2](#92)
   - [10. 浮点数计算](#10-浮点数计算)
   - [11. awk 编程示例](#11-awk-编程示例)
+    - [11.1 📝 awk 脚本注意要点](#111--awk-脚本注意要点)
+    - [11.2 **关联数组（哈希）的使用**](#112-关联数组哈希的使用)
+    - [11.3  **根据正则表达式或模式匹配输出指定内容**](#113--根据正则表达式或模式匹配输出指定内容)
+    - [11.4  **通过管道格式化输出指定字段**](#114--通过管道格式化输出指定字段)
   - [❓待解决语法问题](#待解决语法问题)
 
 ## 1. grep 命令示例
@@ -344,7 +348,49 @@ done < /path/to/file
 
 ## 11. awk 编程示例
 
-- 统计文件中指定列的值
+### 11.1 📝 awk 脚本注意要点
+
+- awk 脚本可直接在命令行上定义以单引号方式圈引；也可将其写入文件中，当 awk 命令调用时以 -f 选项指定。
+- awk 脚本中的 if 条件判断语句或 for 循环语句均在 `{}` 中使用。
+- 正则表达式或模式匹配在 `{}` 外使用，如 $1 ~ /regex/；`{}` 中的 if 条件判断中可搭配正则表达式，如 if ($1 ~ /regex/)，两者等效。
+- awk 脚本中的 if 条件判断中字符串用双引号圈引。
+- awk 脚本中的 printf 语句与常规 shell 中的 printf 命令使用存在区别：
+  - 前者示例：echo "/usr/sbin/ls:newfstatat" | awk -F':' '{ printf "%-20s %-5s\n", $1, $2 }'，printf 语句的各参数之间要逗号分隔。
+  - 后者示例：path=/usr/sbin/ls; syscall=newfstatat; printf "%-20s %-5s\n" $path $syscall，printf 命令的各参数之间无需逗号分隔。
+- awk 脚本中的 if 条件判断语法：
+
+  ```awk
+  # 完整结构
+  {
+    ...
+    if (condition1) {
+      statement1
+    } else if (condition2) {
+      statement2
+    } else {
+      statement3
+    }
+    ...
+  }
+
+  # 简化结构
+  { ... if (condition) statement ... }
+  ```
+
+- awk 脚本中的关联数组（哈希）在定义与引用的时候，都不需要使用 `$`。
+- awk 脚本中的正则表达式（以第三列为例）：
+
+  | 语法 | 含义 | 结果 |
+  | ----- | ----- | ----- |
+  | `/pattern/` | 正则匹配 **整行** | ❌ 不适合列匹配 |
+  | `$3 ~ /pattern/` | 正则匹配 **第三列** | ✅ 正确 |
+  | `$3 !~ /pattern/` | 第三列 **不匹配** | ✅ 取反 |
+  | `$3 == "string"` | 第三列 **等于** 字符串 | 精确匹配 |
+  | `$3 ~ /^[1-9]/` | 第三列以 1-9 开头 | 锚定匹配 |
+
+### 11.2 **关联数组（哈希）的使用**
+
+示例：统计文件中指定列的值的数量（统计文件中第二列不同值的数量）
 
 ```bash
 $ cat results.txt
@@ -352,12 +398,99 @@ N40  1
 G39  0
 F30   1
 
-$ awk '{count[$2]++}END{print "0 的数量：", count[0]; print "1 的数量：", count[1]}' results.txt    #1
+# 方法1：直接索引指定值的数量
+$ awk 'BEGIN { print "--- 统计第二列数字出现的次数 ---" }
+       { count[$2]++}
+       END { print "0 的数量：", count[0]; print "1 的数量：", count[1]; print "--- 结束统计 ---" }' results.txt
 0 的数量： 1
 1 的数量： 2
-# 统计第二列中 0 与 1 的数量（count 为关联数组，类似哈希）
-$ awk '{count[$2]++}END{for (v in count) print v "的数量: " count[v]}' results.txt    #2：1与2等效
+
+# 方法2：迭代全部值的数量
+$ awk 'BEGIN { print "--- 统计第二列数字出现的次数 ---" }
+       { count[$2]++ } 
+       END { for (v in count) print v "的数量:" count[v] }' results.txt
 ```
+
+### 11.3  **根据正则表达式或模式匹配输出指定内容**
+
+示例：过滤登录日志用户与 IP
+
+```bash
+$ sudo lastb
+student  ssh:notty    172.25.250.11    Sat Mar 14 12:40 - 12:40  (00:00)
+root     ssh:notty    172.25.250.11    Sat Mar 14 12:39 - 12:39  (00:00)
+
+# 方法1：正则表达式 + if 条件判断
+$ sudo lastb | awk '$3 ~ /^[1-9]+\./ { if ($1 != "root") print $0 }'
+
+# 方法2：直接使用表达式
+$ sudo lastb | awk '$1 != "root" && $3 ~ /^[1-9]+\./ { print $0 }'
+
+# 方法3：if 条件判断绑定正则表达式
+$ sudo lastb | awk '{
+      if ($1 != "root" && $3 ~ /^[1-9]+\./) {
+          print $0
+      }
+  }'
+```
+
+### 11.4  **通过管道格式化输出指定字段**
+
+示例：分析 autrace 追踪的进程的审计信息，以表格形式输出。
+
+```bash
+$ sudo autrace /bin/date
+Waiting to execute: /bin/date
+Tue Mar 17 01:18:25 EDT 2026
+Cleaning up...
+Trace complete. You can locate the records with 'ausearch -i -p 11676'
+```
+
+以下脚本中的 PID 即为上述命令输出的 11676。
+
+```bash
+#!/bin/bash
+
+read -p "请输入 autrace 追踪的进程：" PID
+
+function title_line() {
+    line1=$(printf "%*s" 60 "-" | tr ' ' '-')
+    line2=$(printf "%*s" 30 "-" | tr ' ' '-')
+    printf "+%-60s+%-30s+\n" $line1 $line2
+    printf "| %-58s | %-28s |\n" "autrace: file" "autrace: syscall"
+    printf "+%-60s+%-30s+\n" $line1 $line2
+}
+
+function tail_line() {
+    line1=$(printf "%*s" 60 "-" | tr ' ' '-')
+    line2=$(printf "%*s" 30 "-" | tr ' ' '-')
+    printf "+%60s+%30s+\n" $line1 $line2
+}
+
+### 方法1 ###
+title_line
+ausearch --raw -p $PID | aureport -i -f | tail -n+6 | while IFS= read -r line; do
+    file=$(echo $line | awk '{print $4}')
+    syscall=$(echo $line | awk '{print $5}')
+    [[ $file != "newfstatat" ]] && printf "| %-58s | %-28s |\n" $file $syscall
+done
+# 去除文件头部的 6 行；整行读入格式化；分别使用 awk 截取字段赋值；printf 命令格式化输出
+tail_line
+
+echo -e "\n ---------- 分隔线 ----------\n"
+### 方法2 ###
+title_line
+ausearch --raw -p $PID | aureport -i -f | tail -n+6 | while IFS= read -r line; do
+    awk '{ if ($4 != "newfstatat") printf "| %-58s | %-28s |\n", $4, $5 }'
+done
+# 简化方法1的写法
+tail_line
+```
+
+> 说明：
+> printf 命令格式化输出：<br>
+> `%-30s`：左对齐，宽度 30 个字符。<br>
+> `%30s`：右对齐，宽度 30 个字符。
 
 ## ❓待解决语法问题
 

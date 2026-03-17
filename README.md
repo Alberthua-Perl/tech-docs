@@ -35,6 +35,7 @@
 - **系统故障排除**
   - [Linux 系统安装与启动引导及故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/Linux%20%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%BC%95%E5%AF%BC%E8%A6%81%E7%82%B9%E5%8F%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
   - [【精华】Linux 常用排错工具与方法](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95.md)
+  - [【案例】容器中 glibc 库异常故障排查](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95/%E5%AE%B9%E5%99%A8%E4%B8%AD%20glibc%20%E5%BA%93%E5%BC%82%E5%B8%B8%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
 - **系统性能优化**
   - [【精华】Linux 系统性能优化探究](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6.md)
   - [【精华】Linux 内核参数释义 - 内存篇](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6/Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_Memory_20240907%E6%9B%B4%E6%96%B0.png)
@@ -52,7 +53,7 @@
 - **系统安全**
   - [Linux 进程权限的各类 UID 探讨](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%9A%84%E5%90%84%E7%B1%BB%20UID%20%E6%8E%A2%E8%AE%A8/Linux%20%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%9A%84%E5%90%84%E7%B1%BB%20UID%20%E6%8E%A2%E8%AE%A8.md)
   - [通过 PAM 控制身份认证](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E9%80%9A%E8%BF%87%20PAM%20%E6%8E%A7%E5%88%B6%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81.png)
-  - [使用 AUDIT 记录系统事件](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6.png)
+  - [Linux 中使用 AUDIT 记录系统事件](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E4%B8%AD%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6/Linux%20%E4%B8%AD%E4%BD%BF%E7%94%A8%20AUDIT%20%E8%AE%B0%E5%BD%95%E7%B3%BB%E7%BB%9F%E4%BA%8B%E4%BB%B6.md)
   - [使用 AIDE 监控文件系统更改](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%BD%BF%E7%94%A8%20AIDE%20%E7%9B%91%E6%8E%A7%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9B%B4%E6%94%B9.png)
   - [SELinux 整体框架](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SELinux%20%E6%A1%86%E6%9E%B6.png)
 - **Shell 脚本**
