@@ -1,11 +1,11 @@
-# 第五章 通过PAM控制身份认证
+# 🗝️ Linux 中通过 PAM 控制身份认证
 
 ## 文档目录
 
-- [第五章 通过PAM控制身份认证](#第五章-通过pam控制身份认证)
+- [🗝️ Linux 中通过 PAM 控制身份认证](#️-linux-中通过-pam-控制身份认证)
   - [文档目录](#文档目录)
-  - [审计PAM配置](#审计pam配置)
-    - [描述PAM](#描述pam)
+  - [1. 审计 PAM 配置](#1-审计-pam-配置)
+    - [1.1 描述 PAM](#11-描述-pam)
     - [配置PAM](#配置pam)
   - [修改PAM配置](#修改pam配置)
     - [准备更新配置](#准备更新配置)
@@ -25,9 +25,9 @@
     - [pam\_access模块](#pam_access模块)
     - [pam\_listfile模块](#pam_listfile模块)
 
-## 审计PAM配置
+## 1. 审计 PAM 配置
 
-### 描述PAM
+### 1.1 描述 PAM
 
 - 可插拔式认证模块系统（pluggable authentication modules system，PAM）为应用提供一种通用的方法以实现身份认证（authentication）和授权（authorization）。
 - PAM为应用提供通用的方式，实施对身份认证和授权的支持。
