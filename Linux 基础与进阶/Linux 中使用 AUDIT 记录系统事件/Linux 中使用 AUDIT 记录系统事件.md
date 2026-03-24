@@ -232,6 +232,9 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
 
   $ sudo ausearch -f /path/to/file
   # 根据文件名称搜索审计记录
+
+  $ sudo ausearch -ui <UID>
+  # 根据用户 ID 搜索审计记录
   ```
 
 - 🔎 **解释审计日志条目：**
@@ -305,6 +308,20 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
         --virt                          Virtualization report
         -x,--executable                 eXecutable name report
         If no report is given, the summary report will be displayed
+  ```
+
+  ```bash
+  $ sudo aureport -x -i
+  # 生成命令执行报告
+
+  $ sudo aureport -u -i
+  # 生成用户活动报告
+
+  $ sudo aureport --summary
+  # 生成汇总报告
+
+  $ sudo aureport --tty
+  # 生成终端按键报告
   ```
 
 - ❗aulast 命令与 aulastlog 命令和 last 命令与 lastlog 命令极其类似，但前者不解析 `/var/log/wtmp` 与 `/var/log/btmp` 文件。

@@ -785,5 +785,7 @@ When                Type  Source                                           Valid
 - pam_tally2 模块
 - pam_access 模块
 - pam_listfile 模块
+- pam_time 模块
+- pam_limits 模块
 
 🔗 关于以上模块示例，可参考此 [链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E4%B8%AD%E9%80%9A%E8%BF%87%20PAM%20%E6%8E%A7%E5%88%B6%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81/Linux%20%E4%B8%AD%E9%80%9A%E8%BF%87%20PAM%20%E6%8E%A7%E5%88%B6%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%20(RHEL7.x).png)。
