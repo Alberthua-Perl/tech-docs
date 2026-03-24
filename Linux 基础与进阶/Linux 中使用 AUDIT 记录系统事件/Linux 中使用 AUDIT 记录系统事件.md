@@ -12,8 +12,10 @@
   - [2. 检查 Audit 日志](#2-检查-audit-日志)
     - [2.1 解读 Audit 消息](#21-解读-audit-消息)
     - [2.2 搜索事件：ausearch 命令](#22-搜索事件ausearch-命令)
-    - [2.3 Audit 消息报告：aureport 命令](#23-audit-消息报告aureport-命令)
-    - [2.4 追踪程序：autrace 命令](#24-追踪程序autrace-命令)
+    - [2.3 常见的审计记录类型](#23-常见的审计记录类型)
+    - [2.4 审计记录字段说明](#24-审计记录字段说明)
+    - [2.5 Audit 消息报告：aureport 命令](#25-audit-消息报告aureport-命令)
+    - [2.6 追踪程序：autrace 命令](#26-追踪程序autrace-命令)
   - [3. 编写自定义审计规则](#3-编写自定义审计规则)
     - [3.1 添加规则](#31-添加规则)
     - [3.2 检查规则](#32-检查规则)
@@ -233,6 +235,9 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   $ sudo ausearch -f /path/to/file
   # 根据文件名称搜索审计记录
 
+  $ sudo ausearch -i --start "dd/mm/yyyy" "hh:mm:ss" -f <filename>
+  # 基于文件名的审计日志查询
+
   $ sudo ausearch -ui <UID>
   # 根据用户 ID 搜索审计记录
   ```
@@ -261,7 +266,13 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   - CWD 记录指的是与引发此事件的进程相关联的当前工作目录，在此例中为 /root 目录。
   - SYSCALL 记录即触发此事件的系统调用。使用 **open()** 系统调用（syscall=open）成功（success=yes）打开了由 PATH 记录指定的文件（即 /var/log/audit 目录）。此调用由具有 26131 PID 的进程执行（pid=26131）。该调用由 /sbin/aureport 可执行文件启动（exe=/sbin/aureport），并以 root 有效用户 ID（euid=root）和无限制 SELinux 域 （subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023）由 root 用户（uid=root）运行。该命令在 pts/0 虚拟终端（tty=pts0）上运行，可能是图形终端窗口或远程登录会话。用户**最初**以 student 用户身份登录（auid=student），此后不知何故变成了 root 用户。此记录设置了审计访问键，以便使用 ausearch 命令更容易找到其事件（key=audit-access）。
 
-### 2.3 Audit 消息报告：aureport 命令
+### 2.3 常见的审计记录类型
+
+
+### 2.4 审计记录字段说明
+
+
+### 2.5 Audit 消息报告：aureport 命令
 
 - aureport 命令可用于获取审计消息的快速概览和特定类型事件的详细报告。
 - 常用选项：
@@ -349,7 +360,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
   # 查看系统上指定用户的失败登录记录
   ```
 
-### 2.4 追踪程序：autrace 命令
+### 2.6 追踪程序：autrace 命令
 
 - autrace 命令可用于调查进程执行的系统调用，该命令与 strace 命令非常类似。
 - 💥 运行 autrace 命令将删除所有自定义审计规则，并将其替换为专门用于追踪指定程序的规则。
