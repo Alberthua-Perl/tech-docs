@@ -52,6 +52,8 @@
 
   <center><img src="images/diff-pam-user-role.png" style="width:60%"></center>
 
+  <center><img src="images/linux-pam-arch.jpg" style="width:60%"></center>
+
   - 系统管理员：通过各服务或应用程序的 PAM 配置文件制定认证策略。
   - PAM 模块开发者：利用 PAM SPI 编写验证模块，主要引入 pam_sm_*() 函数供 libpam 调用，将不同的认证机制引入。
   - 应用程序开发者：通过在程序中使用 PAM API 实现对认证方法的调用。
@@ -207,6 +209,26 @@
   Profile ID: sssd
   Enabled features: None
   ```
+
+- authselect 工具的备份机制主要用于在修改系统身份验证配置（如 PAM 和 NSS）之前，保存当前的系统状态，以便在配置出错时能够快速恢复。
+- 其备份的核心原理如下：
+  - 备份触发机制：
+    authselect 在以下情况会触发备份操作：<br>
+    - 强制覆盖（--force）：当用户从非 authselect 管理的配置（如手动修改的文件）切换到 authselect 配置文件时，使用 --force 参数会自动创建备份。
+    - 手动指定（-b / --backup）：在执行 select、apply-changes 或 enable-feature 等命令时，通过 -b 或 --backup=NAME 参数手动触发备份。
+  - 备份存储位置与命名：
+    - 存储路径：备份文件统一存储在 /var/lib/authselect/backups/ 目录下。
+    - 命名规则：如果未手动指定名称，系统通常会以“当前时间戳 + 随机字符串”作为备份文件夹的名称。
+  - 备份内容：
+    备份本质上是对受影响的关键配置文件的“快照”，主要包括：<br>
+    - PAM 配置文件：如 /etc/pam.d/ 目录下的相关文件。
+    - NSS 配置文件：主要是 /etc/nsswitch.conf。
+    - 元数据：记录当时启用的配置文件（Profile）和功能（Features）信息。 
+  - 恢复原理：
+    - 命令：用户可以使用 authselect backup-restore <NAME> 命令进行恢复。
+    - 逻辑：恢复时，authselect 会将备份文件夹中的文件重新覆盖回系统的 /etc 对应位置，并重置 authselect 的内部状态，使系统回到备份时的配置水平。 
+  - 与 authconfig 的区别：
+    - 早期的 authconfig 将备份存储在 /var/lib/authconfig/。authselect 延续了这一思路，但采用了基于 Profile（配置方案） 的管理方式，通过软链接（Symbolic Links）来管理 /etc 下的文件，确保配置的系统性和一致性。
 
 #### 1.2.2 PAM 配置文件语法
   
