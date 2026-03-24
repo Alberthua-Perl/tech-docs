@@ -4,10 +4,10 @@
 
 - [🔑 OpenSSL 体系与证书管理](#-openssl-体系与证书管理)
   - [文档目录](#文档目录)
-  - [openssl 命令说明](#openssl-命令说明)
-  - [openssl req 命令](#openssl-req-命令)
-  - [openssl rsa 命令](#openssl-rsa-命令)
-  - [openssl x509 命令](#openssl-x509-命令)
+  - [1. openssl 命令说明](#1-openssl-命令说明)
+  - [2. openssl req 命令](#2-openssl-req-命令)
+  - [3. openssl rsa 命令](#3-openssl-rsa-命令)
+  - [4. openssl x509 命令](#4-openssl-x509-命令)
   - [创建自签名数字证书的方法](#创建自签名数字证书的方法)
   - [🎯 创建 CA RSA 私钥与 CA 根证书（root-ca）](#-创建-ca-rsa-私钥与-ca-根证书root-ca)
   - [🎉 基于 CA 根证书创建 server 端数字签名证书](#-基于-ca-根证书创建-server-端数字签名证书)
@@ -18,11 +18,11 @@
   - [✔️ 故障排查示例](#️-故障排查示例)
     - [撤销证书签发异常的证书](#撤销证书签发异常的证书)
 
-## openssl 命令说明
+## 1. openssl 命令说明
 
 证书私钥（RSA 私钥）、证书签名请求（CSR）与证书（X509）均存在 **编码形式**（encoded）与人类可读的 **纯文本形式**（text），因此可使用 `-noout` 选项不打印编码形式，`-text` 选项打印纯文本形式。仅使用 `-noout` 选项时，编码形式与纯文本形式均不打印，而两者搭配使用仅返回纯文本形式内容。
 
-## openssl req 命令
+## 2. openssl req 命令
 
 - 功能：创建或查询 `csr` 证书签名请求与数字签名证书（或自签名证书）
 - 常用选项：
@@ -56,7 +56,7 @@
   # 验证请求中的自签名信息，并返回文本形式的请求内容。
   ```
 
-## openssl rsa 命令
+## 3. openssl rsa 命令
 
 - 常用选项：
 
@@ -88,7 +88,7 @@
   RSA key ok
   ```  
 
-## openssl x509 命令
+## 4. openssl x509 命令
 
 - 功能：创建与查询数字签名证书
 - 常用选项：
