@@ -2,13 +2,16 @@
 
 ## 文档说明
 
-- OS 版本：`CentOS Linux release 7.9.2009 (Core)`
-- Kernel 版本：`4.20.3-1.el7.elrepo.x86_64`
-- OpenSSL 版本：`openssl-1.0.2k-21.el7_9.x86_64.rpm`
-- Docker 版本：`20.10.8`
-- Nginx 版本：`1.22.1`
-- ✨ HTTPS 在常规 Web 服务器、中间件服务器及 `RESTful API` 等通信中广泛大量使用，因此理解 HTTPS 及相关概念显得尤为重要。
-- 该文档使用 openssl 工具创建与管理相关私钥与证书，当然也可使用 cfssl 或 certtool（来源于 gnutls-utils 软件包）工具创建与管理。
+| 版本类型 | 版本号 |
+| ----- | ----- |
+| OS 版本| Red Hat Enterprise Linux release 9.6 (Plow) |
+| 内核版本 | 5.14.0-570.12.1.el9_6.x86_64 |
+| Podman 版本 | 5.4.0 |
+| 容器镜像 OS 版本 | Red Hat Enterprise Linux release 9.7 (Plow) |
+| OpenSSL 版本 | OpenSSL 3.5.1 1 Jul 2025 (Library: OpenSSL 3.5.1 1 Jul 2025) |
+| OpenResty 版本 | 1.27.1.2 |
+
+本文使用 `openssl` 工具创建与管理密钥与证书，当然也可使用 `cfssl` 或 `certtool`（来源于 **gnutls-utils** 软件包）工具创建与管理。
 
 ## 文档目录
 
@@ -27,6 +30,7 @@
   - [HTTPS 单向认证测试](#https-单向认证测试)
   - [HTTPS 双向认证的 Wireshark 抓包与测试](#https-双向认证的-wireshark-抓包与测试)
   - [参考链接](#参考链接)
+  - [构建 OpenResty 容器测试 Web 协议与证书](#构建-openresty-容器测试-web-协议与证书)
 
 ## 加密通信背景
 
@@ -506,3 +510,70 @@
 - [常见证书格式和转换](https://blog.csdn.net/justinjing0612/article/details/7770301)
 - [常见证书格式及相互转换](https://www.cnblogs.com/lzjsky/archive/2010/11/14/1877143.html)
 - [openssl 生成自签证书及查看证书细节](https://www.cnblogs.com/threegun/p/7130985.html)
+
+## 构建 OpenResty 容器测试 Web 协议与证书
+
+```bash
+$ git clone git@github.com:Alberthua-Perl/dockerfile-s2i-demo.git
+$ cd dockerfile-s2i-demo/web-ssl/openresty-1.27.1.2
+$ tar -cf conf.tar conf    # 创建构建容器镜像用 tarball
+$ tar -cf html.tar html
+$ tar -cf key.tar key
+$ mkdir ~/.config/containers/
+$ cat > ~/.config/containers/containers.conf <<EOF
+[network]
+default_rootless_network_cmd = "slirp4netns"
+EOF    # 修改 podman 的 rootless 网络模型
+$ podman build -t rhel97-openresty:1.27.1.2 .
+$ podman images --format="table {{ .Names }}\t{{ .Tag }}" | grep openresty
+[localhost/rhel97-openresty:1.27.1.2]                     1.27.1.2
+$ podman run -d --name openresty-https -p 8880:80 -p 8443:443 localhost/rhel97-openresty:1.27.1.2    # 映射端口运行容器
+
+### 测试 HTTP/2 协议（默认） ###
+$ curl -k --cert key/client.crt --key key/client.key \
+  https://www.labsec.example.com:8443/index.html
+Test server and client HTTPS authentication!
+
+$ curl -I -k --cert key/client.crt --key key/client.key \
+  https://www.labsec.example.com:8443/index.html
+HTTP/2 200
+server: openresty
+date: Thu, 26 Mar 2026 03:05:58 GMT
+content-type: text/html; charset=utf-8
+content-length: 45
+last-modified: Wed, 25 Mar 2026 02:43:24 GMT
+etag: "69c34bcc-2d"
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+x-xss-protection: 1; mode=block
+referrer-policy: strict-origin-when-cross-origin
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
+accept-ranges: bytes
+# 指定客户端证书与私钥测试双向认证
+
+$ curl -k --cert key/client.crt --key key/client.key \
+  https://www.labsec.example.com:8443/status.html
+$ curl -I -k --cert key/client.crt --key key/client.key \
+  https://www.labsec.example.com:8443/status.html
+HTTP/2 200
+server: openresty
+date: Thu, 26 Mar 2026 03:10:11 GMT
+content-type: text/html; charset=utf-8
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+x-xss-protection: 1; mode=block
+referrer-policy: strict-origin-when-cross-origin
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
+
+
+### 测试 HTTP/1.1 协议（手动指定）###
+$ curl -I --http1.1 \
+  -k --cert key/client.crt --key key/client.key \
+  https://www.labsec.example.com:8443/index.html
+HTTP/1.1 200 OK
+Server: openresty
+
+### 浏览器测试方式参考 RHEL7.x 文章部分再截图
+```
