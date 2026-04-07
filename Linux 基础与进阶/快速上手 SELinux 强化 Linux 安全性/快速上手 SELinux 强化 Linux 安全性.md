@@ -4,13 +4,20 @@
 
 - [🧱 快速上手 SELinux 强化 Linux 安全性](#-快速上手-selinux-强化-linux-安全性)
   - [文档目录](#文档目录)
+  - [0. SELinux 安全框架](#0-selinux-安全框架)
   - [1. 从禁用状态启用 SELinux](#1-从禁用状态启用-selinux)
     - [1.1 复习 SELinux 基本概念](#11-复习-selinux-基本概念)
     - [1.2 配置 SELinux 模式](#12-配置-selinux-模式)
     - [1.3 从禁用模式启用 SELinux](#13-从禁用模式启用-selinux)
   - [2. 使用受限用户控制访问](#2-使用受限用户控制访问)
     - [2.1 定义 SELinux 用户（SELinux User）](#21-定义-selinux-用户selinux-user)
-    - [限制（confine）用户账户](#限制confine用户账户)
+    - [2.2 🎯 文件上下文类型与源域、目标域的关系](#22--文件上下文类型与源域目标域的关系)
+    - [2.3 限制（confine）用户账户](#23-限制confine用户账户)
+  - [3. 参考链接](#3-参考链接)
+
+## 0. SELinux 安全框架
+
+<center><img src="images/SELinux 安全框架.png" style="width:90%"></center>
 
 ## 1. 从禁用状态启用 SELinux
 
@@ -180,8 +187,6 @@
 -----
 
 ## 2. 使用受限用户控制访问
-
-<center><img src="images/SELinux 安全框架.png" style="width:90%"></center>
 
 ### 2.1 定义 SELinux 用户（SELinux User）
 
@@ -391,7 +396,7 @@ xguest_u        user       s0         s0                             xguest_r
 
     🤔 **Question:** 为何映射到 sysadm_u 的 Linux 用户可以运行 SUID 程序？
 
-    ✒️ **Answer:** 映射至 sysadm_u 用户的 Linux 用户所在的源域为 sysadm_t，此类用户允许执行 SUID 程序。如 /usr/bin/passwd 具有 passwd_exec_t 文件上下文类型，而此二进制可执行文件运行时进程域可转换为 passwd_t 域，最终完成用户密码更改。同理，/usr/bin/chsh 可更新用户登录 shell 类型。
+    ✒️ **Answer:** 映射至 sysadm_u 用户的 Linux 用户所在的源域为 sysadm_t，此类用户允许执行 SUID 程序。如 /usr/bin/passwd 具有 passwd_exec_t 文件上下文类型，而此二进制可执行文件运行时进程域可转换为 passwd_t 域，而 passwd_t 域的进程可对 shadow_t 文件上下文类型的文件（如 /etc/shadow）进行修改，最终完成用户密码更改。同理，/usr/bin/chsh 可更新用户登录 shell 类型。
 
     ```bash
     ## 终端1
@@ -405,21 +410,36 @@ xguest_u        user       s0         s0                             xguest_r
     -rwsr-xr-x. 1 root root system_u:object_r:passwd_exec_t:s0 32K Aug 10  2021 /usr/bin/passwd
     $ sudo ls -lhZ /usr/bin/chsh
     -rws--x--x. 1 root root system_u:object_r:chfn_exec_t:s0 24K Mar 29  2023 /usr/bin/chsh    # 查看二进制可执行文件的文件上下文类型
+
+    $ ls -lhZ /etc/passwd    # 查看文件上下文类型
+    -rw-r--r--. 1 root root system_u:object_r:passwd_file_t:s0 1.8K Mar 27 10:18 /etc/passwd
+    $ ls -lhZ /etc/shadow
+    ----------. 1 root root system_u:object_r:shadow_t:s0 1.5K Apr  3 07:27 /etc/shadow
+
     $ sudo sesearch -T -s sysadm_t -t passwd_exec_t    # 查看源域与目标域的 TE 转换规则
     type_transition sysadm_t passwd_exec_t:process passwd_t;
+    # 当 sysadm_t 域的进程执行 passwd_exec_t 类型的文件时，默认尝试将新进程转换到 passwd_t 域。
+
+    $ sudo sesearch -A --source passwd_t --target shadow_t --class file    # 等效于 sesearch -A -s passwd_t -t shadow_t -c file
+    allow domain file_type:file map; [ domain_can_mmap_files ]:True
+    allow passwd_t shadow_t:file { append create getattr ioctl link lock map open read relabelfrom relabelto rename setattr unlink watch watch_reads write };
+    $ sudo sesearch -A --source passwd_t --target passwd_file_t --class file
+    allow domain file_type:file map; [ domain_can_mmap_files ]:True
+    allow nsswitch_domain passwd_file_t:file { getattr ioctl lock map open read };
+    allow passwd_t passwd_file_t:file { append create link rename setattr unlink watch watch_reads write };
     ```
 
-    以上 TE 规则的说明：当 sysadm_t 域的进程执行 passwd_exec_t 类型的文件时，默认尝试将新进程转换到 passwd_t 域。
+    TE 规则说明：
 
     ```plaintext
     type_transition sysadm_t passwd_exec_t : process passwd_t;
     #                   ↑          ↑            ↑        ↑
     #                   │          │            │        └── 目标域（转换后的新进程域）
     #                   │          │            └────────── 类别（process = 域转换）
-    #                   │          └─────────────────────── 文件类型（被执行的文件）
+    #                   │          └─────────────────────── 文件上下文类型（被执行的文件的类型，触发转换）
     #                   └────────────────────────────────── 源域（执行者的当前域）
 
-    [sysadm_t] --(执行 passwd_exec_t)--> [passwd_t]
+    [sysadm_t] --(执行 passwd_exec_t)--> [passwd_t] --> [文件上下文类型: passwd_file_t + shadow_t]
     ```
 
   - **`staff_u`**:
@@ -491,66 +511,107 @@ xguest_u        user       s0         s0                             xguest_r
 
     🤔 **Question:** 当 user_exec_content 布尔值 off（关闭）的状态下，为什么使用 sh 命令执行脚本依然可以成功，而直接运行脚本却权限拒绝呢？
 
-    ✒️ **Answer:** 无论当 user_exec_content 布尔值 off（关闭）或 on（启用）的状态下，echo.sh 文件的上下文标签始终默认为 user_home_t。
+    ✒️ **Answer:**
 
+    - 1️⃣ 无论当 user_exec_content 布尔值 off（关闭）或 on（启用）的状态下，echo.sh 文件的上下文类型始终为 user_home_t。
+    - 2️⃣ 当 user_exec_content 布尔值 on 状态下，无论是使用 sh 命令执行还是直接执行脚本都可成功返回。通过 `sesearch -A -b user_exec_content` 命令查询可知 `allow user_usertype user_home_type:file { execute execute_no_trans getattr ioctl map open read }; [ user_exec_content ]:True` 与 `allow user_usertype user_tmp_t:file entrypoint; [ user_exec_content ]:True` 两条规则，分别表示在布尔值启用的情况下，可执行文件在用户家目录（上下文类型为 user_home_t）与 /tmp 目录（上下文类型为 user_tmp_t）中均可直接执行。使用 sh 命令直接执行是因为可执行文件仅作为 sh 命令的参数传入，/usr/bin/sh 的上下文类型为 bin_t，通过 `sesearch -A -s user_t -t bin_t -c file` 命令查询可知 `allow user_t bin_t:file entrypoint;` 规则，其表明 user_t 域的进程可以将 bin_t 类型的文件作为进入目标域的合法入口点（entrypoint），因此可直接通过 sh 命令运行。
+    - 3️⃣ 当 user_exec_content 布尔值 off 状态下，sh 命令依然可执行该脚本，不受此布尔值影响（原因如上），而直接执行脚本运行失败是由于布尔值 off 的情况下拒绝上述两条规制的放行。因此，如果要在布尔值关闭且依然能运行脚本的话，可采用 sh 命令或 bash 命令调用的方式实现。
 
+### 2.2 🎯 文件上下文类型与源域、目标域的关系
 
-### 限制（confine）用户账户
+```mermaid
+flowchart LR
+    subgraph Source["源域（Source）"]
+        direction TB
+        S1["进程当前域，如 init_t"]
+    end
 
-- 实施用户限制常规方法
-  
-  - 更新默认的SELinux映射，将Linux用户与 user_u 关联。
-  
-  - (此处有图片)
-  
-  - 将系统管理员映射到 sysadm_u SELinux用户。
-  
-  - (此处有图片)
-  
-  - （可选）将需要sudo权限的Linux用户映射到 staff_u，然后配置sudo。
-  
-  - (此处有图片)
+    subgraph ExecFile["执行文件类型（上下文类型）"]
+        direction TB
+        E1["触发转换的入口，如 httpd_exec_t"]
+    end
 
-- 限制不同的用户账户
+    subgraph Target["目标域（Target）"]
+        direction TB
+        T1["新进程域，如 httpd_t"]
+    end
+
+    Source --> ExecFile --> Target
+    
+    Source -.->|"type_transition 规则"| Target
+    
+    style Source fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style ExecFile fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style Target fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+```
+
+### 2.3 限制（confine）用户账户
+
+- 实施用户限制常规方法：
+  - 1️⃣ 更新默认的 SELinux 映射，将 Linux 用户与 user_u 关联：
   
-  - 若需限制所有Linux用户，通常首先需修改默认的映射为 user_u 映射。
+    ```bash
+    $ sudo semanage login -m -s user_u -r s0 __default__
+    ```
   
-  - 因此，SELinux默认为将所有Linux用户映射到权限最小的一个SELinux用户。
+  - 2️⃣ 将系统管理员，此用户不一定是 root，可以是提权为 root 的其他用户，映射到 sysadm_u SELinux 用户：
   
+    ```bash
+    $ sudo semanage login -a -s sysadm_u operator1
+    $ sudo semanage login -a -s sysadm_u operator2
+    $ sudo semanage login -a -s sysadm_u operator3
+    ```
+  
+  - 3️⃣（可选）将需要 sudo 权限的 Linux 用户映射到 staff_u，然后配置 sudo。
+  
+    ```bash
+    $ sudo semanage login -a -s staff_u developer1
+    $ sudo semanage login -a -s staff_u developer2
+    ```
+
+- 限制不同的 **用户账户**：  
+  - 若需限制所有 Linux 用户，通常首先需修改默认的映射为 user_u 映射。
+  - 因此，SELinux 默认为将所有 Linux 用户映射到权限最小的一个 SELinux 用户。  
   - 如需加强安全防护，还可阻止 user_u 中的用户在其家目录或 /tmp 目录中执行程序。
-  
   - 可将 user_exec_content 布尔值设为 off（见如上示例）
   
-  ```bash
-  $ sudo setsebool -P user_exec_content off
-  # 将user_exec_content布尔值设置为off
-  ```
+    ```bash
+    $ sudo setsebool -P user_exec_content off
+    # 将user_exec_content布尔值设置为off
+    ```
 
-- 限制系统管理员
+- 限制 **系统管理员**：  
+  - 若需限制系统管理员，将其 Linux 用户映射至 sysadm_u SELinux 用户。
   
-  - 若需限制系统管理员，将其Linux用户映射至 sysadm_u SELinux用户。
+    ```bash
+    $ sudo semanage login -a -s sysadm_u <sysadmin_name>
+    ```
   
-  ```bash
-  $ sudo semanage login -a -s sysadm_u <sysadmin_name>
-  ```
+    ```bash
+    $ sudo useradd -G wheel -Z sysadm_u <sysadmin_name>
+    # 创建新用户时，将其映射为 sysadm_u SELinux 用户。 
+    ```
   
-  ```bash
-  $ sudo useradd -G wheel -Z sysadm_u <sysadmin_name>
-  # 创建新用户时，将其映射为sysadm_u SELinux用户。 
-  ```
-  
-  - 将指定的系统管理员用户添加至wheel组中，使其具有sudo权限。
-  
-  - 默认情况下，映射至 sysadm_u 的用户不可通过SSH登录系统（由 ssh_sysadm_login 布尔值定义）
-  
-  - ❗ 删除Linux用户时，务必删除其映射（2种方式）。(此处有图片)
+  - 将指定的系统管理员用户添加至 wheel 组中，使其具有 sudo 权限。
+  - 默认情况下，映射至 sysadm_u 的用户不可通过 SSH 登录系统（由 ssh_sysadm_login 布尔值定义）
+  - ❗删除 Linux 用户时，务必删除其映射（2种方式）：
 
-- 限制staff用户
-  
-  - 某些标准的Linux用户可能需要以root的身份运行特定命令。
-  
-  - 将其映射至 staff_u SELinux用户帐户，然后配置 sudo。
-  
+    ```bash
+    ### 方式1 ###
+    $ sudo userdel operator1
+    $ sudo semanage login -d -s sysadm_u operator1
+
+    ### 方式2 ###
+    $ sudo userdel -Z operator1
+    ```
+
+- 限制 **staff 用户**：
+  - 某些标准的 Linux 用户可能需要以 root 的身份运行特定命令。
+  - 将其映射至 staff_u SELinux 用户帐户，然后配置 sudo。
   - 配置方法与 user_u、sysadm_u 类似。
 
-- ❗ xguest_u 和 guest_u 等受限用户所受限制比 user_u 还多。
+- xguest_u 和 guest_u 等受限用户所受限制比 user_u 还多。
+
+## 3. 参考链接
+
+- [SELinux Project | GitHub](https://github.com/SELinuxProject)
