@@ -12,6 +12,11 @@
   - [2. 使用受限用户控制访问](#2-使用受限用户控制访问)
     - [2.1 定义 SELinux 用户（SELinux User）](#21-定义-selinux-用户selinux-user)
     - [2.2 🎯 文件上下文类型与源域、目标域的关系](#22--文件上下文类型与源域目标域的关系)
+      - [2.2.1 关系总览](#221-关系总览)
+      - [2.2.2 文件上下文类型作为桥梁](#222-文件上下文类型作为桥梁)
+      - [2.2.3 文件上下文类型作为入口点（Entrypoint）](#223-文件上下文类型作为入口点entrypoint)
+      - [2.2.4 完整 Domain Transition 需要三条规则](#224-完整-domain-transition-需要三条规则)
+      - [2.2.5 示例：sshd 启动完整流程](#225-示例sshd-启动完整流程)
     - [2.3 限制（confine）用户账户](#23-限制confine用户账户)
   - [3. 参考链接](#3-参考链接)
 
@@ -37,7 +42,7 @@
 >
 > 1. 身份层：Linux 用户 → 映射到 SELinux User（标识安全身份）
 > 2. 角色层：SELinux User → 授权访问特定 Role（权限边界）
-> 3. 类型层：Role → 允许进入特定 Domain（Type），Domain 通过 TE 规则决定可访问的 Resource Type（**核心强制机制**）
+> 3. 类型层：Role → 允许进入特定 Domain（Type），Domain 通过 TE（Type Enforcement，类型强制）规则决定可访问的 Resource Type（**核心强制机制**）
 > 4. 层级层：MLS/MCS 提供额外的敏感度/类别隔离（可选高级特性）
 >
 > **<font color=orange>最终安全上下文格式：`user:role:type:level`</font>**
@@ -429,19 +434,6 @@ xguest_u        user       s0         s0                             xguest_r
     allow passwd_t passwd_file_t:file { append create link rename setattr unlink watch watch_reads write };
     ```
 
-    TE 规则说明：
-
-    ```plaintext
-    type_transition sysadm_t passwd_exec_t : process passwd_t;
-    #                   ↑          ↑            ↑        ↑
-    #                   │          │            │        └── 目标域（转换后的新进程域）
-    #                   │          │            └────────── 类别（process = 域转换）
-    #                   │          └─────────────────────── 文件上下文类型（被执行的文件的类型，触发转换）
-    #                   └────────────────────────────────── 源域（执行者的当前域）
-
-    [sysadm_t] --(执行 passwd_exec_t)--> [passwd_t] --> [文件上下文类型: passwd_file_t + shadow_t]
-    ```
-
   - **`staff_u`**:
     - 映射到 staff_u 的 Linux 用户：
       - 1️⃣ 允许 sudo 提权为 root 用户
@@ -458,6 +450,13 @@ xguest_u        user       s0         s0                             xguest_r
   | **`staff_exec_content`** | 允许 staff_t 域的用户在其主目录和 /tmp 目录中执行应用程序 |
 
   - 核心功能：**<font color=orange>控制受限用户能否执行自己可写目录中的程序（主目录和 /tmp），防止恶意软件下载到 /tmp 执行与用户运行不受信任的脚本，关闭以上布尔值用户只能运行系统目录（如 /usr/bin）中的程序，无法执行自己下载或创建的可执行文件</font>**。
+  - SELinux 布尔值与 TE 规则对应查询：
+
+    ```bash
+    $ sudo sesearch -A -b <selinux_bool_name>
+    # 查看 SELinux 布尔值与 TE 规则的对应关系
+    ```
+
   - 示例：user_u SELinux 用户与 user_exec_content 布尔值的关系
 
     1️⃣ user_exec_content 布尔值：on（启用）
@@ -519,21 +518,23 @@ xguest_u        user       s0         s0                             xguest_r
 
 ### 2.2 🎯 文件上下文类型与源域、目标域的关系
 
+#### 2.2.1 关系总览
+
 ```mermaid
 flowchart LR
     subgraph Source["源域（Source）"]
         direction TB
-        S1["进程当前域，如 init_t"]
+        S1["进程当前域，如 **init_t**"]
     end
 
     subgraph ExecFile["执行文件类型（上下文类型）"]
         direction TB
-        E1["触发转换的入口，如 httpd_exec_t"]
+        E1["触发转换的入口，如 **httpd_exec_t**"]
     end
 
     subgraph Target["目标域（Target）"]
         direction TB
-        T1["新进程域，如 httpd_t"]
+        T1["新进程域，如 **httpd_t**"]
     end
 
     Source --> ExecFile --> Target
@@ -544,6 +545,79 @@ flowchart LR
     style ExecFile fill:#fff3e0,stroke:#e65100,stroke-width:2px
     style Target fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
 ```
+
+| 类型 | 作用 | 示例 |
+| ----- | ----- | ----- |
+| **源域（Source Domain）** | 执行者的当前域 | `init_t`, `user_t`, `unconfined_t` |
+| **文件上下文类型（Entrypoint Type）** | 被 **执行文件** 的类型，触发转换 | `httpd_exec_t`, `passwd_exec_t`, `shell_exec_t` |
+| **目标域（Target Domain）** | 执行后进入的新域 | `httpd_t`, `passwd_t`, `mozilla_t` |
+
+#### 2.2.2 文件上下文类型作为桥梁
+
+```te
+type_transition sysadm_t passwd_exec_t : process passwd_t;
+#                   ↑          ↑            ↑        ↑
+#                   │          │            │        └── 目标域（转换后的新进程域）
+#                   │          │            └────────── 类别（process = 域转换）
+#                   │          └─────────────────────── 文件上下文类型（被执行的文件的类型，触发转换）
+#                   └────────────────────────────────── 源域（执行者的当前域）
+```
+
+文件类型 secure_services_exec_t 是触发条件 ———— 当源域执行该类型的文件时，自动转换到目标域。
+
+示例（sysadm_t 域的用户执行 SUID 程序）：[sysadm_t] --(执行 passwd_exec_t)--> [passwd_t] --> [文件上下文类型: passwd_file_t + shadow_t]
+
+#### 2.2.3 文件上下文类型作为入口点（Entrypoint）
+
+```te
+allow ext_gateway_t secure_services_exec_t : file entrypoint;
+#     源域/主体类型   目标类型/客体类型
+```
+
+| 字段 | 作用 |
+| ----- | ----- |
+| `ext_gateway_t` | **源域（Source Type）**：执行操作的进程域 |
+| `secure_services_exec_t` | **目标类型（Target Type）**：被执行的文件 |
+| `file` | 目标类别 |
+| `entrypoint` | 权限：指定该文件可作为进入目标域的入口 |
+
+目标域必须将文件类型声明为 entrypoint，否则无法通过该文件进入此域。
+
+示例：参考前文 user_exec_content 布尔值对用户执行可执行程序的影响
+
+#### 2.2.4 完整 Domain Transition 需要三条规则
+
+| 规则 | 作用 | 示例 |
+| ----- | ----- | ----- |
+| **执行权限** | 源域能执行该文件 | `allow unconfined_t secure_services_exec_t : file { execute read };` |
+| **入口点声明** | 文件是目标域的合法入口 | `allow ext_gateway_t secure_services_exec_t : file entrypoint;` |
+| **域转换权限** | 源域能转换到目标域 | `allow unconfined_t ext_gateway_t : process transition;` |
+
+**结论：文件上下文类型是 Domain Transition 的 <font color=orange>触发器（触发条件）</font> 和 <font color=orange>入口点</font> ———— 源域执行特定文件类型时，SELinux 检查该文件是否为目标域的合法入口，若是，则转换到目标域。**
+
+#### 2.2.5 示例：sshd 启动完整流程
+
+```plaintext
+[kernel_t] --(执行 init_exec_t)--> [init_t]
+   ↑                                    │
+   │                                    ▼
+   │                            (执行 initrc_exec_t)
+   │                                    │
+   │                                    ▼
+   │                              [initrc_t]
+   │                                    │
+   │                            (执行 sshd_exec_t)
+   │                                    │
+   └────────────────────────────────────┘
+                                        ▼
+                                   [sshd_t]
+```
+
+| 步骤 | 源域 | 文件类型 | 目标域 |
+| ----- | ----- | ----- | ----- |
+| 1 | `kernel_t` | `init_exec_t` | `init_t` |
+| 2 | `init_t` | `initrc_exec_t` | `initrc_t` |
+| 3 | `initrc_t` | `sshd_exec_t` | `sshd_t` |
 
 ### 2.3 限制（confine）用户账户
 
@@ -614,4 +688,8 @@ flowchart LR
 
 ## 3. 参考链接
 
-- [SELinux Project | GitHub](https://github.com/SELinuxProject)
+- ❤️ [**SELinux Project | GitHub**](https://github.com/SELinuxProject)
+- [Chapter 2. SELinux Contexts | RedHat Docs](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/selinux_users_and_administrators_guide/chap-security-enhanced_linux-selinux_contexts)
+- [SELinux 介绍 | 墨天轮](https://www.modb.pro/db/87706)
+- 👉 [SELinux MAC 强制访问控制](https://lixiaogang03.github.io/2019/10/17/Android-SElinux/)
+- 🔥 [**SELinux 从入门到放弃**](https://saucer-man.com/operation_and_maintenance/84.html)
