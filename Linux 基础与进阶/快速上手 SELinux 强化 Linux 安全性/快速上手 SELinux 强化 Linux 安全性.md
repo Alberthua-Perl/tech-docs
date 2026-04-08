@@ -524,17 +524,17 @@ xguest_u        user       s0         s0                             xguest_r
 flowchart LR
     subgraph Source["源域（Source）"]
         direction TB
-        S1["进程当前域，如 **init_t**"]
+        S1["进程当前域，如 init_t"]
     end
 
     subgraph ExecFile["执行文件类型（上下文类型）"]
         direction TB
-        E1["触发转换的入口，如 **httpd_exec_t**"]
+        E1["触发转换的入口，如 httpd_exec_t"]
     end
 
     subgraph Target["目标域（Target）"]
         direction TB
-        T1["新进程域，如 **httpd_t**"]
+        T1["新进程域，如 httpd_t"]
     end
 
     Source --> ExecFile --> Target
@@ -689,7 +689,9 @@ allow ext_gateway_t secure_services_exec_t : file entrypoint;
 ## 3. 参考链接
 
 - ❤️ [**SELinux Project | GitHub**](https://github.com/SELinuxProject)
+- [The SELinux Notebook | GitHub](https://github.com/SELinuxProject/selinux-notebook?tab=readme-ov-file#the-selinux-notebook)
 - [Chapter 2. SELinux Contexts | RedHat Docs](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/selinux_users_and_administrators_guide/chap-security-enhanced_linux-selinux_contexts)
 - [SELinux 介绍 | 墨天轮](https://www.modb.pro/db/87706)
 - 👉 [SELinux MAC 强制访问控制](https://lixiaogang03.github.io/2019/10/17/Android-SElinux/)
 - 🔥 [**SELinux 从入门到放弃**](https://saucer-man.com/operation_and_maintenance/84.html)
+- ✒️ [比防火墙还厉害的工具 SELinux](https://mp.weixin.qq.com/s/ciHq8V_2J4AVR6qRuvywrA)
