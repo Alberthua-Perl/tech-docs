@@ -1,6 +1,6 @@
 # 🔥 Linux 修行之道
 
-<center><img src="2027-Audi-RS5-007-1440sw.jpg" style="width:80%"></center>
+<center><img src="2027-Audi-RS5-007-1440sw.jpg"></center>
 
 > 以下文档中的内容将根据实际情况进行更新补充！
 
