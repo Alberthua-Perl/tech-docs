@@ -689,7 +689,7 @@ allow ext_gateway_t secure_services_exec_t : file entrypoint;
 ## 3. 参考链接
 
 - ❤️ [**SELinux Project | GitHub**](https://github.com/SELinuxProject)
-- [The SELinux Notebook | GitHub](https://github.com/SELinuxProject/selinux-notebook?tab=readme-ov-file#the-selinux-notebook)
+- [The SELinux Notebook | GitHub](https://github.com/SELinuxProject/selinux-notebook/tree/main/src)
 - [Chapter 2. SELinux Contexts | RedHat Docs](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/selinux_users_and_administrators_guide/chap-security-enhanced_linux-selinux_contexts)
 - [SELinux 介绍 | 墨天轮](https://www.modb.pro/db/87706)
 - 👉 [SELinux MAC 强制访问控制](https://lixiaogang03.github.io/2019/10/17/Android-SElinux/)

@@ -4,7 +4,7 @@
 
 | 版本类型 | 版本号 |
 | ----- | ----- |
-| OS 版本| Red Hat Enterprise Linux release 9.6 (Plow) |
+| OS 版本 | Red Hat Enterprise Linux release 9.6 (Plow) |
 | 内核版本 | 5.14.0-570.12.1.el9_6.x86_64 |
 | Podman 版本 | 5.4.0 |
 | 容器镜像 OS 版本 | Red Hat Enterprise Linux release 9.7 (Plow) |
@@ -18,11 +18,18 @@
 - [🛡️ 一文厘清 HTTPS 原理与应用 (RHEL9.x)](#️-一文厘清-https-原理与应用-rhel9x)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [加密通信背景](#加密通信背景)
-  - [保证数据的机密性：不被窃听](#保证数据的机密性不被窃听)
-  - [保证数据的真实性与完整性：不被篡改](#保证数据的真实性与完整性不被篡改)
-  - [保证传输双方的身份验证](#保证传输双方的身份验证)
-  - [🦄 数字签名原理](#-数字签名原理)
+  - [1. 加密通信背景](#1-加密通信背景)
+    - [1.1 网络安全问题](#11-网络安全问题)
+  - [2. 保证数据的机密性：**不被窃听**](#2-保证数据的机密性不被窃听)
+  - [3. 保证数据的真实性与完整性：**不被篡改**](#3-保证数据的真实性与完整性不被篡改)
+  - [4. 保证传输双方的身份验证](#4-保证传输双方的身份验证)
+  - [🦄 5. 数字签名原理](#-5-数字签名原理)
+    - [5.1 标准的 X.509 格式的 CA 数字签名证书组成](#51-标准的-x509-格式的-ca-数字签名证书组成)
+    - [🔥 5.2 CA 数字签名证书生成过程](#-52-ca-数字签名证书生成过程)
+    - [5.3 客户端证书验证过程](#53-客户端证书验证过程)
+      - [5.3.1 验证服务端 CA 数字签名](#531-验证服务端-ca-数字签名)
+    - [5.3.2 提取服务端公钥](#532-提取服务端公钥)
+    - [🚀 5.3.3 验证过程与原理](#-533-验证过程与原理)
   - [SSL/TLS 加密通信要点](#ssltls-加密通信要点)
   - [SSL/TLS 与 CA 相关术语](#ssltls-与-ca-相关术语)
   - [🚀 SSL/TLS 加密连接的 HTTPS 单/双向认证流程](#-ssltls-加密连接的-https-单双向认证流程)
@@ -32,170 +39,184 @@
   - [参考链接](#参考链接)
   - [构建 OpenResty 容器测试 Web 协议与证书](#构建-openresty-容器测试-web-协议与证书)
 
-## 加密通信背景
+## 1. 加密通信背景
 
-- 网络安全问题：
-  HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来了三大风险：
-  - 窃听风险（eavesdropping）：第三方可以获知通信内容
-  - 篡改风险（tampering）：第三方可以修改通信内容
-  - 冒充风险（pretending）：第三方可以冒充他人身份参与通信
-- 网络安全问题的解决思路：`SSL/TLS` 协议 
-  - 所有信息都是加密传播，第三方无法窃听。
-  - 具有校验机制，一旦被篡改，通信双方会立刻发现。
-  - 配备身份证书，防止身份被冒充。
+### 1.1 网络安全问题
 
-## 保证数据的机密性：不被窃听
+HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三大风险：
 
-- 🧬 实现方式：对称加密算法
-- 💥 单纯的数据加密只能保证数据不被泄露，但不能保证接收方收到的数据的真实性。
+- 窃听风险（eavesdropping）：第三方可以获知通信内容
+- 篡改风险（tampering）：第三方可以修改通信内容
+- 冒充风险（pretending）：第三方可以冒充他人身份参与通信
 
-## 保证数据的真实性与完整性：不被篡改
+ 网络安全问题的解决思路：**SSL/TLS 协议**
 
-- 数据的真实性：真实数据没有被篡改，数据是从真实发送者发来。
-- 🧬 实现方式：消息摘要算法（或称散列算法/单向散列函数）生成数据指纹（特征码）
-- 💥 利用提取数据指纹的方式，完成数据传输的完整性验证。
-- 🔒 实际的算法实现过程概要：
-  - 给一段明文数据（plain text）加上数据信息指纹，这个指纹是通过结合数据信息进行相应算法获得的数据指纹。
-  - 接收方当收到数据信息后，会利用相同的算法对获取的数据计算指纹，确认得到的指纹是否与传送过来的描述数据的指纹一致。
-  - 如果一致，表示数据没有被篡改过；如果不一致，表示数据完整性遭到破坏，数据一概不予以接收处理。
-- 由于可能存在中间人攻击的可能性，因此可对传输过程中的数据指纹进行加密。
-- 发送方利用对称密钥方式对手中的指纹进行加密，接收方会利用相同的密钥对手中的指纹进行解密，从而确认指纹是否一致。
-- 如果中间人将新的指纹也进行了加密，发送给接收方，但接收方无法利用和发送方协商好的解密密钥对指纹进行解密，最终无法识别中间人发送过来的数据指纹信息。
-- 🤘 通过加密指纹可以保证真实数据没有被篡改。
+- 所有信息都是加密传播，第三方无法窃听。
+- 具有校验机制，一旦被篡改，通信双方会立刻发现。
+- 配备身份证书，防止身份被冒充。
 
-## 保证传输双方的身份验证
+## 2. 保证数据的机密性：**<font color=orange>不被窃听</font>**
 
-- 以上信息只是解决数据的交换获取问题，但是网络的身份验证问题依旧没有解决。
-- 🧬 实现方式：非对称加密
+| 实现方式 | 数据是否泄露？ | 数据是否篡改？ |
+| ----- | ----- | ----- |
+| **对称加密算法** | 数据不被泄露 | 数据不能保证是否被篡改 <br> 不能保证接收方收到的数据的 **真实性** |
+
+## 3. 保证数据的真实性与完整性：**<font color=orange>不被篡改</font>**
+
+| 实现方式 | 数据是否泄露？ | 数据是否篡改？ |
+| ----- | ----- | ----- |
+| **消息摘要算法（或称散列算法/单向散列函数）生成数据指纹（特征码）** | 依赖对称加密算法 | 保证数据的真实性 <br> 真实数据没有被篡改 <br> 数据是从真实发送者发来 |
+
+- 利用提取数据指纹的方式，完成数据传输的完整性验证。
+- 算法实现过程概要：
+  - 1️⃣ 给一段明文数据（plain text）加上数据信息指纹，这个指纹是通过结合数据信息进行相应算法获得的数据指纹。
+  - 2️⃣ 接收方当收到数据信息后，会利用相同的算法对获取的数据计算指纹，确认得到的指纹是否与传送过来的描述数据的指纹一致。
+  - 3️⃣ 如果一致，表示数据没有被篡改过；如果不一致，表示数据完整性遭到破坏，数据一概不予以接收处理。
+- 为数据指纹加密：
+  - **由于可能存在中间人攻击的可能性，因此可对传输过程中的数据指纹进行加密。**
+  - 发送方利用对称密钥方式对手中的指纹进行加密，接收方会利用相同的密钥对手中的指纹进行解密，从而确认指纹是否一致。
+  - 如果中间人将新的指纹也进行了加密，发送给接收方，但接收方无法利用和发送方协商好的解密密钥对指纹进行解密，最终无法识别中间人发送过来的数据指纹信息。
+  - 🤘 通过加密指纹可以保证真实数据没有被篡改。
+
+## 4. 保证传输双方的身份验证
+
+- **<font color=red>以上只是解决数据的交换获取问题，但是网络的身份验证问题依旧没有解决。</font>**
+- 🧬 实现方式：**非对称加密**
 - 利用非对称加密算法，可以有效解决网络中数据传输双方的安全身份验证问题。
-- 💥 非对称加密算法中，存在密钥对的概念，即拥有公钥（`public key`）与私钥（`private key`），其中公钥不是自行创建出来的而是从私钥中提取出来一部分作为公钥，因此可以说公钥是来自于私钥的，而私钥才决定密钥加密的安全性，并且私钥的长度可能会非常长，从最初的 1024、2048 到 4096 一直到更多的位数。增加私钥密钥位，从而提升密钥安全性。
-- 非对称加密算法遵循的基本原则：公钥加密的只能利用与之配对的私钥进行解密，反之亦然。
+- 非对称加密算法中，存在密钥对的概念，即公钥（public key）与私钥（private key），其中公钥不是自行创建出来的而是从私钥中提取出来一部分作为公钥，因此可以说公钥是来自于私钥的，而私钥才决定密钥加密的安全性，并且私钥的长度可能会非常长，从最初的 1024、2048 到 4096 一直到更多的位数。增加私钥密钥位，从而提升密钥安全性。
+- 🎯 **非对称加密算法遵循的基本原则：公钥加密的只能利用与之配对的私钥进行解密，反之亦然。**
 - 非对称加密算法可以满足数据传输过程中对传输者身份验证的需求，因为接收者可以拥有相应的公钥，只有与之对应的发送者用相应的私钥进行加密信息，接收者用对应的公钥才可解密，否则可以确认发送者身份已经发生变化。
 
-## 🦄 数字签名原理
+## 🦄 5. 数字签名原理
 
 - **<font color=orange>公钥加密算法</font>** 解决通信双方身份验证问题，但无法确保公钥的真实性。
-- 因此，CA 数字签名使用证书授权中心（Certification Authority，简称 `CA`）解决通信双方交换的公钥的真实性，即数字证书的真实性（公钥包含于数字证书中）。
+- 因此，CA 数字签名使用证书授权中心（Certification Authority，简称 CA）解决通信双方交换的公钥的真实性，即数字证书的真实性（公钥包含于数字证书中）。
 - 数字签名证书的分类：
-  - 自签名数字签名证书：
-    不使用 `ca.key` 加密生成签名，使用自身的私钥加密生成签名，如 `GnuPG` 邮件加密传输。
-  - CA 数字签名证书：
-    使用 CA 证书授权中心的 `ca.key` 与 `ca.crt` 进行加密生成签名，如 `kube-apiserver`、Apache、Nginx、Tomcat 等，以下讨论该类型证书。
+  - 1️⃣ 自签名数字签名证书：不使用 `ca.key` 加密生成签名，使用自身的私钥加密生成签名，如 GnuPG 邮件加密传输。
+  - 2️⃣ CA 数字签名证书：使用 CA 证书授权中心的 `ca.key` 与 `ca.crt` 进行加密生成签名，如 kube-apiserver、Apache、Nginx、Tomcat 等，以下讨论该类型证书。
 - 🧬 实现方式：**<font color=orange>公钥非对称加密算法 + 消息摘要算法</font>**
-- 标准的 `X.509` 格式的 CA 数字签名证书组成：
-  - 证书相关信息（C）：明文显示
-    - 证书的版本信息（Version）
-    - 证书的序列号（Serial Number，`srl`）：每个证书都有一个唯一的证书序列号
-    - 证书所使用的签名算法：`sha256WithRSAEncryption`
-    - 证书的发行机构名称：命名规则一般采用 `X.500` 格式（目录服务协议 X.500）
-    - ⏱ 证书的有效期：现在通用的证书一般采用 UTC 时间格式，计时范围为 1950-2049。
-    - 证书所有人的名称：命名规则一般采用 `X.500` 格式
-    - 证书所有人的公钥信息
-    - CA 数字签名校验码
-  - 证书数字签名（S）：密文显示
-    - 证书发行者（CA 证书授权中心）使用 CA 私钥加密生成签名
-- 🔥 CA 数字签名证书生成过程：
-  - 该生成过程满足函数表达式：`S = F(Digest(C))`
-  - 其中 S 为证书数字签名，F 为签名算法，Digest 为消息摘要算法（MD5/SHA1/SHA256等），C 为证书相关信息。
+
+### 5.1 标准的 X.509 格式的 CA 数字签名证书组成
+
+- 证书相关信息（C）：明文显示
+  - 证书的版本信息（Version）
+  - 证书的序列号（Serial Number，`srl`）：每个证书都有一个唯一的证书序列号
+  - 证书所使用的签名算法：`sha256WithRSAEncryption`
+  - 证书的发行机构名称：命名规则一般采用 `X.500` 格式（目录服务协议 X.500）
+  - 证书的有效期：现在通用的证书一般采用 UTC 时间格式，计时范围为 1950-2049。
+  - 证书所有人的名称：命名规则一般采用 `X.500` 格式
+  - 证书所有人的公钥信息
+  - CA 数字签名校验码
+- 证书数字签名（S）：密文显示
+  - 证书发行者（CA 证书授权中心）使用 CA 私钥加密生成签名
+
+### 🔥 5.2 CA 数字签名证书生成过程
+
+- 生成过程满足函数表达式：$S = F(Digest(C))$
+- 其中 $S$ 为证书数字签名，$F$ 为签名算法，$Digest$ 为消息摘要算法（MD5/SHA1/SHA256等），$C$ 为证书相关信息。
+- 生成过程如下所示：
   - 1️⃣ 服务端或客户端创建各自的私钥，并使用该私钥创建 `csr` 证书签名请求。
-  - 2️⃣ 服务端或客户端的 `csr` 证书签名请求文件中包含证书相关信息 C 与相应的公钥信息。
-  - 3️⃣ 使用消息摘要算法对证书相关信息 C 生成相应指纹（fingerprint），再使用 CA 私钥（ca.key）配合 CA 根证书（ca.crt）加密该指纹，最后生成服务端或客户端的 CA 数字签名证书。
-  - 该 CA 数字签名只能被 CA 私钥（ca.key）对应位于 CA 根证书中的 CA 公钥解开。
-  - 创建过程如下所示：也可参考该 [链接](https://github.com/Alberthua-Perl/scripts-confs/blob/master/shell-examples/create-ssl-certs.sh) 以获得以下过程的完整脚本
+  - 2️⃣ 服务端或客户端的 `csr` 证书签名请求文件中包含证书相关信息 $C$ 与相应的公钥信息。
+  - 3️⃣ 使用消息摘要算法对证书相关信息 $C$ 生成相应指纹（fingerprint），再使用 CA 私钥（ca.key）配合 CA 根证书（ca.crt）加密该指纹，最后生成服务端或客户端的 CA 数字签名证书。
+- 该 CA 数字签名只能被 CA 私钥（ca.key）对应位于 CA 根证书中的 CA 公钥解开。
+- 创建过程如下所示：也可参考此 [链接](https://github.com/Alberthua-Perl/sc-col/blob/master/shell-examples/create-ssl-certs.sh) 以获得以下过程的完整脚本
 
-    ```bash
-    $ openssl genrsa -out CA-center.key 2048
-    $ openssl req -key CA-center.key \
-      -subj "/C=CN/ST=Shanghai/L=Shanghai/O=RedHat/OU=GLS/CN=CA-center.lab.example.com" \
-      -new -x509 -days 3650 -out CA-center.crt
-    # 创建 CA 私钥与 CA 根证书（自签名）
-    $ openssl x509 -noout -text -in CA-center.crt
-      Certificate:
-        Data:
-            Version: 3 (0x2)
-            Serial Number:
-                fb:53:9c:3c:4d:81:f6:de
-        Signature Algorithm: sha256WithRSAEncryption
-            Issuer: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com
-            Validity
-                Not Before: Jan  2 14:04:46 2023 GMT
-                Not After : Dec 30 14:04:46 2032 GMT
-            Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com
-            # 由于使用 CA 私钥自签名生成的 CA 根证书，其证书发行机构与所有人相同。
-            Subject Public Key Info:
-                Public Key Algorithm: rsaEncryption
-                    Public-Key: (2048 bit)
-                    Modulus:
-                        00:bf:9a:3d:48:8c:b9:21:cb:d4:e5:30:df:4a:0e:
-                        05:e1:29:fe:5c:1f:06:4d:fb:89:fe:f5:01:c7:37:
-                        c5:ee:f5:66:8f:2f:bd:48:82:a1:80:1e:00:9d:a0:
-                        ...
-    ```
+  ```bash
+  ### 创建 CA 私钥 + CA 根证书（自签名）###
+  $ openssl genrsa -out CA-center.key 2048
+  $ openssl req -key CA-center.key \
+    -subj "/C=CN/ST=Shanghai/L=Shanghai/O=RedHat/OU=GLS/CN=CA-center.lab.example.com" \
+    -new -x509 -days 3650 -out CA-center.crt
+  $ openssl x509 -noout -text -in CA-center.crt
+    Certificate:
+      Data:
+          Version: 3 (0x2)
+          Serial Number:
+              fb:53:9c:3c:4d:81:f6:de
+      Signature Algorithm: sha256WithRSAEncryption
+          Issuer: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com
+          Validity
+              Not Before: Jan  2 14:04:46 2023 GMT
+              Not After : Dec 30 14:04:46 2032 GMT
+          Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com
+          # 由于使用 CA 私钥自签名生成的 CA 根证书，其证书发行机构与所有人相同。
+          Subject Public Key Info:
+              Public Key Algorithm: rsaEncryption
+                  Public-Key: (2048 bit)
+                  Modulus:
+                      00:bf:9a:3d:48:8c:b9:21:cb:d4:e5:30:df:4a:0e:
+                      05:e1:29:fe:5c:1f:06:4d:fb:89:fe:f5:01:c7:37:
+                      c5:ee:f5:66:8f:2f:bd:48:82:a1:80:1e:00:9d:a0:
+                      ...
 
-    ```bash
-    $ openssl genrsa -out server.key 2048
-    $ openssl req -key server.key \
-      -subj "/C=CN/ST=Shanghai/L=Shanghai/O=RedHat/OU=GLS/CN=cloud-ctl.lab.example.com" \
-      -new -out server.csr
-    $ openssl req -noout -text -in server.csr
-      Certificate Request:
-        Data:
-            Version: 0 (0x0)
-            Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=cloud-ctl.lab.example.com 
-            # 需签名服务端证书的所有人
-            Subject Public Key Info:  # csr 证书签名请求中的公钥信息
-                Public Key Algorithm: rsaEncryption  # 公钥加密算法：RSA（不对称加密）
-                    Public-Key: (2048 bit)
-                    Modulus:
-                        00:e0:bd:e9:ff:f5:16:e5:a9:94:9c:61:2f:27:c5:
-                        e9:76:a2:4b:e3:0f:1a:82:7d:7a:f1:bf:52:37:8d:
-                        54:ea:96:39:8c:c9:55:39:d6:5a:ac:03:2d:16:52:
-                        ...
-    # 创建与查看服务端私钥及 csr 证书签名请求文件
-    
-    $ openssl x509 -req -in server.csr \
-      -CAkey CA-center.key -CA CA-center.crt -CAcreateserial \
-      -days 3650 -out server.crt
-    # 使用 CA 私钥与 CA 根证书签发服务端 CA 数字签名证书
-    $ openssl x509 -noout -text -in server.crt
-      Certificate:
-        Data:
-            Version: 1 (0x0)
-            Serial Number:
-                a9:68:e7:c4:87:87:4e:03
-        Signature Algorithm: sha256WithRSAEncryption
-            Issuer: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com 
-            # 服务端 CA 数字签名证书的发行机构（CA 证书授权中心）
-            Validity
-                Not Before: Jan  2 14:04:46 2023 GMT
-                Not After : Dec 30 14:04:46 2032 GMT
-            Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=cloud-ctl.lab.example.com
-            # 服务端 CA 数字签名证书的所有人：服务端信息
-            Subject Public Key Info:
-                Public Key Algorithm: rsaEncryption
-                    Public-Key: (2048 bit)
-                    Modulus:
-                        00:e0:bd:e9:ff:f5:16:e5:a9:94:9c:61:2f:27:c5:
-                        e9:76:a2:4b:e3:0f:1a:82:7d:7a:f1:bf:52:37:8d:
-                        54:ea:96:39:8c:c9:55:39:d6:5a:ac:03:2d:16:52:
-                        ...
-    # 该数字签名证书中的服务端公钥信息与其 csr 证书签名请求文件中的相同
-    ```
+  ### 创建与查看服务端私钥 + csr 证书签名请求文件 ###
+  $ openssl genrsa -out server.key 2048
+  $ openssl req -key server.key \
+    -subj "/C=CN/ST=Shanghai/L=Shanghai/O=RedHat/OU=GLS/CN=cloud-ctl.lab.example.com" \
+    -new -out server.csr
+  $ openssl req -noout -text -in server.csr
+    Certificate Request:
+      Data:
+          Version: 0 (0x0)
+          Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=cloud-ctl.lab.example.com 
+          # 需签名服务端证书的所有人
+          Subject Public Key Info:  # csr 证书签名请求中的公钥信息
+              Public Key Algorithm: rsaEncryption  # 公钥加密算法：RSA（不对称加密）
+                  Public-Key: (2048 bit)
+                  Modulus:
+                      00:e0:bd:e9:ff:f5:16:e5:a9:94:9c:61:2f:27:c5:
+                      e9:76:a2:4b:e3:0f:1a:82:7d:7a:f1:bf:52:37:8d:
+                      54:ea:96:39:8c:c9:55:39:d6:5a:ac:03:2d:16:52:
+                      ...
+  
+  ### 使用 CA 私钥与 CA 根证书签发服务端 CA 数字签名证书 ###
+  $ openssl x509 -req -in server.csr \
+    -CAkey CA-center.key -CA CA-center.crt -CAcreateserial \
+    -days 3650 -out server.crt
+  $ openssl x509 -noout -text -in server.crt
+    Certificate:
+      Data:
+          Version: 1 (0x0)
+          Serial Number:
+              a9:68:e7:c4:87:87:4e:03
+      Signature Algorithm: sha256WithRSAEncryption
+          Issuer: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=CA-center.lab.example.com 
+          # 服务端 CA 数字签名证书的发行机构（CA 证书授权中心）
+          Validity
+              Not Before: Jan  2 14:04:46 2023 GMT
+              Not After : Dec 30 14:04:46 2032 GMT
+          Subject: C=CN, ST=Shanghai, L=Shanghai, O=RedHat, OU=GLS, CN=cloud-ctl.lab.example.com
+          # 服务端 CA 数字签名证书的所有人：服务端信息
+          Subject Public Key Info:
+              Public Key Algorithm: rsaEncryption
+                  Public-Key: (2048 bit)
+                  Modulus:
+                      00:e0:bd:e9:ff:f5:16:e5:a9:94:9c:61:2f:27:c5:
+                      e9:76:a2:4b:e3:0f:1a:82:7d:7a:f1:bf:52:37:8d:
+                      54:ea:96:39:8c:c9:55:39:d6:5a:ac:03:2d:16:52:
+                      ...
+  # 该数字签名证书中的服务端公钥信息与其 csr 证书签名请求文件中的相同
+  ```
 
-- 客户端验证证书过程：
-  - 验证服务端 CA 数字签名：
-    - 客户端需具有 CA 根证书（ca.crt）
-    - 客户端对服务端 CA 数字签名的验证满足表达式：`F'(S) = Digest(C)`
-    - 客户端将执行两种计算，并将计算结果进行比对：
-      - 1️⃣ 由于证书相关信息（C）以明文显示，通过消息摘要算法计算 C 的哈希值。
-      - 2️⃣ 使用 CA 公钥解密由服务端通过 CA 私钥加密的 CA 数字签名，获得原始证书相关信息（C）的哈希值。
-      - 3️⃣ 如果两者结果一致，说明证书有效且来自该 CA，未被篡改；如果两者结果不一致，说明证书已被中间人篡改或不来自该 CA。
-  - 提取服务端公钥：
-    - CA 数字签名验证通过后，客户端就可以提取出服务端 CA 数字签名证书中的公钥进行通信。
-    - 🤝 证书验证在 `SSL/TLS` 握手过程的 `Server Hello Done` 与 `Client Key Exchange` 之间。
-  - 🚀 验证过程与原理，如下所示：
+### 5.3 客户端证书验证过程
 
-    <center><img src="images/ca-signed-certification-verify.jpg" style="width:60%"></center>
+#### 5.3.1 验证服务端 CA 数字签名
+
+- 客户端需具有 CA 根证书（ca.crt）
+- 客户端对服务端 CA 数字签名的验证满足表达式：$F'(S) = Digest(C)$
+- 客户端将执行两种计算，并将计算结果进行比对：
+  - 1️⃣ 由于证书相关信息 $C$ 以明文显示，通过消息摘要算法计算 $C$ 的哈希值。
+  - 2️⃣ 使用 CA 公钥解密由服务端通过 CA 私钥加密的 CA 数字签名，获得原始证书相关信息 $C$ 的哈希值。
+  - 3️⃣ 如果两者结果一致，说明证书有效且来自该 CA，未被篡改；如果两者结果不一致，说明证书已被中间人篡改或不来自该 CA。
+
+### 5.3.2 提取服务端公钥
+
+- CA 数字签名验证通过后，客户端就可以提取出服务端 CA 数字签名证书中的公钥进行通信。
+- 🤝 证书验证在 `SSL/TLS` 握手过程的 `Server Hello Done` 与 `Client Key Exchange` 之间。
+
+### 🚀 5.3.3 验证过程与原理
+
+<center><img src="images/ca-signed-certification-verify.jpg" style="width:60%"></center>
 
 ## SSL/TLS 加密通信要点
 
