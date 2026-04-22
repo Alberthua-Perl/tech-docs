@@ -291,7 +291,7 @@ $ sudo systemctl [start|stop|restart|enable|disable] auditd.service
 | **syscall** | 发送给内核的系统调用。 |
 | **success** | 显示系统调用是否成功。 |
 | **tty** | 控制该进程的终端或伪终端。如果命令是作为交互式会话的一部分运行的，且用户有多个会话正在进行中，此字段可用于帮助识别是哪个会话用于运行该命令。 |
-| **uid** | 真实 UID。**启动该进程的用户 ID。**这可能与用户的初始登录 ID 不同。例如，用户可以使用 `su` 从一个用户切换到另一个用户，从而更改其真实 UID。同样，如果进程是由 set-user-ID 或 set-group-ID 可执行文件启动的，进程的有效 UID 或 GID 可能会有所不同。 |
+| **uid** | 真实 UID。**启动该进程的用户 ID。** 这可能与用户的初始登录 ID 不同。例如，用户可以使用 `su` 从一个用户切换到另一个用户，从而更改其真实 UID。同样，如果进程是由 set-user-ID 或 set-group-ID 可执行文件启动的，进程的有效 UID 或 GID 可能会有所不同。 |
 
 ### 2.5 Audit 消息报告：aureport 命令
 

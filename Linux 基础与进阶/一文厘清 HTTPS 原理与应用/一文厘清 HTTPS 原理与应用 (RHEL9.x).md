@@ -28,11 +28,11 @@
     - [🔥 5.2 CA 数字签名证书生成过程](#-52-ca-数字签名证书生成过程)
     - [5.3 客户端证书验证过程](#53-客户端证书验证过程)
       - [5.3.1 验证服务端 CA 数字签名](#531-验证服务端-ca-数字签名)
-    - [5.3.2 提取服务端公钥](#532-提取服务端公钥)
-    - [🚀 5.3.3 验证过程与原理](#-533-验证过程与原理)
-  - [SSL/TLS 加密通信要点](#ssltls-加密通信要点)
-  - [SSL/TLS 与 CA 相关术语](#ssltls-与-ca-相关术语)
-  - [🚀 SSL/TLS 加密连接的 HTTPS 单/双向认证流程](#-ssltls-加密连接的-https-单双向认证流程)
+      - [5.3.2 提取服务端公钥](#532-提取服务端公钥)
+      - [🚀 5.3.3 验证过程与原理](#-533-验证过程与原理)
+  - [6. SSL/TLS 加密通信要点](#6-ssltls-加密通信要点)
+  - [7. SSL/TLS 与 CA 相关术语](#7-ssltls-与-ca-相关术语)
+  - [🚀 8. SSL/TLS 加密连接的 HTTPS 单/双向认证流程](#-8-ssltls-加密连接的-https-单双向认证流程)
   - [🧪 HTTPS 单向认证的 Wireshark 抓包分析](#-https-单向认证的-wireshark-抓包分析)
   - [HTTPS 单向认证测试](#https-单向认证测试)
   - [HTTPS 双向认证的 Wireshark 抓包与测试](#https-双向认证的-wireshark-抓包与测试)
@@ -209,16 +209,16 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
   - 2️⃣ 使用 CA 公钥解密由服务端通过 CA 私钥加密的 CA 数字签名，获得原始证书相关信息 $C$ 的哈希值。
   - 3️⃣ 如果两者结果一致，说明证书有效且来自该 CA，未被篡改；如果两者结果不一致，说明证书已被中间人篡改或不来自该 CA。
 
-### 5.3.2 提取服务端公钥
+#### 5.3.2 提取服务端公钥
 
 - CA 数字签名验证通过后，客户端就可以提取出服务端 CA 数字签名证书中的公钥进行通信。
-- 🤝 证书验证在 `SSL/TLS` 握手过程的 `Server Hello Done` 与 `Client Key Exchange` 之间。
+- 🤝 证书验证在 SSL/TLS 握手过程的 `Server Hello Done` 与 `Client Key Exchange` 之间。
 
-### 🚀 5.3.3 验证过程与原理
+#### 🚀 5.3.3 验证过程与原理
 
-<center><img src="images/ca-signed-certification-verify.jpg" style="width:60%"></center>
+<center><img src="images-9/ca-signed-certification-verify.jpg" style="width:60%"></center>
 
-## SSL/TLS 加密通信要点
+## 6. SSL/TLS 加密通信要点
 
 - 安全套接字层协议（Secure Socket Layer, SSL）和传输层安全协议（Transport Layer Security, TLS）是同一安全协议的不同世代，TLS 是 SSL 的继任者。**现在 TLS 是唯一标准，SSL 已被完全淘汰。**
 - SSL/TLS 历史背景：
@@ -235,54 +235,43 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
 
 - SSL/TLS 协议在网络模型中的位置：
   
-  <center><img src="images/ssl-tls-in-network-stack.png" style="width:60%"></center>
+  <center><img src="images-9/ssl-tls-in-network-stack.png" style="width:60%"></center>
 
 - SSL/TLS 协议分为两部分：
-  - Handshake Protocol：
-    🤝 协商通信双方之后在本次会话中用于数据加密的会话密钥（`session key`），该过程为 "握手阶段"，其中会话密钥也称为协商密钥。
-  - Record Protocol：
-    定义使用会话密钥加密的数据的传输格式。
-- SSL 层：
-  借助下层协议（TCP 层）的的信道安全地协商出一份会话密钥，并用此密钥来加密 HTTP 请求。  
+  - 🤝 Handshake Protocol：协商通信双方之后在本次会话中用于数据加密的会话密钥（`session key`），该过程为 "握手阶段"，其中会话密钥也称为协商密钥。
+  - 🔐 Record Protocol：定义使用会话密钥加密的数据的传输格式。
+- SSL 层：借助下层协议（TCP 层）的的信道，安全地协商出一份会话密钥，并用此密钥来加密 HTTP 请求。  
 - TCP 层：
-  - 与 Web server 的 443 端口建立连接，传递由 SSL 处理后的数据。
+  - 与 Web 服务端的 443 端口建立连接，传递由 SSL 处理后的数据。
   - SSL 在 TCP 之上建立一个加密通道，通过这一层的数据经过了加密，因此达到保密的效果。
 - 服务端本地与客户端本地的 SSL 套接字与 TCP 套接字的关系，如下所示：
   
-  <center><img src="images/client-server-tcp-ssl-socket.png" style="width:60%"></center>
+  <center><img src="images-9/client-server-tcp-ssl-socket.png" style="width:60%"></center>
 
-## SSL/TLS 与 CA 相关术语
+## 7. SSL/TLS 与 CA 相关术语
 
-- 证书标准：`X.509`
+- 证书标准：**X.509**
 - 编码格式：
-  - ✨ `PEM`：
-    - privacy enhanced Mail
-    - 纯文本形式的编码格式（Base64 编码），Apache 与 *nix 服务器偏向于使用该格式。
-  - `DER`：
-    - distinguished encoding Rules
-    - 二进制形式的编码格式，Java 与 Windows 服务器偏向于使用该格式。
-- 证书（数字签名证书）：certificate（`CER` 或 `CRT`）
-- 私钥：private key
-- 👉 证书签名请求：
-  - certificate signing request: `CSR`
-  - 该文件使用私钥加密，包含公钥与签名申请者信息等。
+  - ✨ **PEM**（Privacy Enhanced Mail）：纯文本形式的编码格式（Base64 编码），Apache 与 *nix 服务器偏向于使用该格式。
+  - **DER**（Distinguished Encoding Rules）：二进制形式的编码格式，Java 与 Windows 服务器偏向于使用该格式。
+- 证书（Certificate，**CER** 或 **CRT**），也称数字签名证书。
+- 私钥（Private Key）
+- 证书签名请求（Certificate Signing Request，**CSR**）：此文件使用私钥加密，包含公钥与签名申请者信息等。
 - CER 与 CRT 两者都为证书，CRT 在 Linux 上更常见。
 - CER、CRT、KEY、CSR 都可为 PEM 或 DER 编码格式！
-- 支持 SSL/TLS 协议的开源工具：`openssl`、`cfssl`、`gnutls`
+- 🪛 支持 SSL/TLS 协议的开源工具：`openssl`、`cfssl`、`gnutls`
 - 📚 man 查看以下命令：openssl、genrsa、rsa、req、x509、verify、s_client、s_server
 
-## 🚀 SSL/TLS 加密连接的 HTTPS 单/双向认证流程
+## 🚀 8. SSL/TLS 加密连接的 HTTPS 单/双向认证流程
 
 - 以上关于服务端 CA 数字签名证书的验证只是 HTTPS 通信中的一部分，需通过其他步骤共同完成 HTTPS 加密通信。
-- HTTPS 加密通信认证分为两类：单向认证、双向认证
-- 单向认证中只需服务端提供服务端证书与私钥即可，而双向认证中服务端需提供证书与私钥外还需提供 CA 根证书（该证书用于客户端证书的签发），并且客户端需提供客户端证书与私钥。
-- 单向认证的过程，客户端从服务端下载服务端公钥证书进行验证，然后建立安全通信通道。
-- 双向认证的过程，客户端除了需要从服务端下载服务器的公钥证书进行验证外，还需要把客户端的公钥证书上传到服务端给服务端进行验证，等双方都认证通过了，才开始建立安全通信通道进行数据传输。
-- 👨‍🏫 **<font color=red>总结：</font>**
-  无论 HTTPS 单向或双向认证都是客户端与服务端协商出 **<font color=red>会话密钥</font>** 与 **<font color=red>会话加密算法</font>** 的过程。
+- HTTPS 加密通信认证分为两类：
+  - 单向认证：只需服务端提供服务端证书与私钥即可。认证过程中，客户端从服务端下载服务端公钥证书进行验证，然后建立安全通信通道。
+  - 双向认证：服务端需提供证书与私钥外还需提供 CA 根证书（该证书用于客户端证书的签发），并且客户端需提供客户端证书与私钥。即，认证过程中，客户端除了需要从服务端下载服务器的公钥证书进行验证外，还需要把客户端的公钥证书上传到服务端给服务端进行验证，等双方都认证通过了，才开始建立安全通信通道进行数据传输。
+- 👨‍🏫 **<font color=orange>总结：</font>** 无论 HTTPS 单向或双向认证都是客户端与服务端协商出 **<font color=red>会话密钥</font>** 与 **<font color=red>会话加密算法</font>** 的过程。
 - ✨ 以下从 HTTPS 抓包的角度说明 SSL/TLS 四次握手与 HTTPS 单/双向认证的详细过程：
   
-  <center><img src="images/ssl-four-handshakes-https-single-and-mutual-authentication.png" style="width:60%"></center>
+  <center><img src="images-9/ssl-four-handshakes-https-single-and-mutual-authentication.png" style="width:60%"></center>
   
   上图中 **黑色箭头** 表示双向认证过程中多出的步骤，其余过程为单向认证过程。
 
@@ -379,11 +368,11 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
 - 抓包 HTTPS 加密通信的三个过程：TCP 建立连接、SSL/TLS 握手、SSL/TLS 加密通信
 - HTTPS 加密通信 - 抓包整体示意：
   
-  ![wireshark-https-single-progress](images/wireshark-https-single-progress.png)
+  ![wireshark-https-single-progress](images-9/wireshark-https-single-progress.png)
 
 - 🤝 HTTPS 加密通信 - 4 次握手过程示意：
   
-  ![ssl-tls-single-authentication-progress](images/ssl-tls-single-authentication-progress.png)
+  ![ssl-tls-single-authentication-progress](images-9/ssl-tls-single-authentication-progress.png)
   
   👨‍💻 以下将握手过程分为 4 个阶段进行描述。
 
@@ -401,15 +390,15 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
     - 支持的压缩算法 `Compression Methods` 列表，用于后续的信息压缩传输。
     - 扩展字段 Extensions，支持协议与算法的相关参数以及其它辅助信息等，常见的 SNI 就属于扩展字段。
 
-      ![client-hello-body-1](images/client-hello-body-1.png)
+      ![client-hello-body-1](images-9/client-hello-body-1.png)
   
   - 客户端支持的 17 种加密套件供服务端选择使用。
 
-    ![client-hello-body-2](images/client-hello-body-2.png)
+    ![client-hello-body-2](images-9/client-hello-body-2.png)
 
 - 2️⃣ HTTPS 加密通信 - 第 2 次握手过程：服务端给客户端回复的 4 条 SSL 握手信息
   
-  ![server-response-to-client-ssl](images/server-response-to-client-ssl.png)
+  ![server-response-to-client-ssl](images-9/server-response-to-client-ssl.png)
   
   - `Server Hello`：
     - 服务端返回协商的信息结果，包括选择使用的协议版本、选择的加密套件、选择的压缩算法、随机数 `random_S` 等，其中随机数用于后续的密钥协商。
@@ -420,23 +409,23 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
       - 消息摘要算法：`SHA-384`
   - `Certificate`：该 SSL 握手信息中包含服务端 CA 数字签名证书
 
-    ![server-ca-signed-certification](images/server-ca-signed-certification.png)
+    ![server-ca-signed-certification](images-9/server-ca-signed-certification.png)
   
   - `Server Key Exchange`：
 
     使用 `EC Diffie-Hellman` 算法（`ECDHE`）实现服务端与客户端的密钥交换算法协商。
 
-    ![server-key-exchange](images/server-key-exchange.png)
+    ![server-key-exchange](images-9/server-key-exchange.png)
 
     💥 对于使用 `DHE/ECDHE` 非对称密钥协商算法的 SSL 握手，将发送该类型握手。`RSA`、`DH`、`ECDH` 算法不会进行该 server key exchange 握手流程。
   
   - `Server Hello Done`：通知客户端 Server Hello 信息发送结束
 
-    ![server-hello-done](images/server-hello-done.jpg)
+    ![server-hello-done](images-9/server-hello-done.jpg)
 
 - 3️⃣ HTTPS 加密通信 - 第 3 次握手过程：客户端给服务端回复 3 条 SSL 握手信息
   
-  ![client-response-to-server-ssl](images/client-response-to-server-ssl.jpg)
+  ![client-response-to-server-ssl](images-9/client-response-to-server-ssl.jpg)
   
   - 🛡 `Client Key Exchange`：
     - 服务端 CA 数字签名证书合法性验证通过后，客户端计算产生随机数字 `Pre-master`，并用服务端证书中的公钥加密，发送给服务端。
@@ -449,7 +438,7 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
     结合之前所有通信参数的哈希值生成一段数据，采用会话密钥与加密算法进行加密，然后发送给服务器用于数据与握手验证。
 - 4️⃣ HTTPS 加密通信 - 第 4 次握手过程：服务端给客户端回复 2 条 SSL 握手信息
   
-  ![server-response-to-client-4-phase](images/server-response-to-client-4-phase.png)
+  ![server-response-to-client-4-phase](images-9/server-response-to-client-4-phase.png)
   
   - `Change Cipher Spec`：
     - 服务端用私钥解密加密的 `Pre-master` 随机数，基于之前交换的两个明文随机数 random_C 和 random_S，计算得到会话密钥。
@@ -461,23 +450,23 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
   - 客户端计算所有接收信息的哈希值，并采用会话密钥解密 Encrypted Handshake Message，验证服务器发送的会话密钥和数据，验证通过则握手完成。
   - 开始使用会话密钥与加密算法进行加密通信。
 
-    ![ssl-tls-handshake-end](images/ssl-tls-handshake-end.png)
+    ![ssl-tls-handshake-end](images-9/ssl-tls-handshake-end.png)
 
 ## HTTPS 单向认证测试
 
 - 服务端启用 HTTPS 单向认证后，可从浏览器客户端进行访问测试：
   
-  ![https-single-auth-chrome-error-1](images/https-single-auth-chrome-error-1.png)
+  ![https-single-auth-chrome-error-1](images-9/https-single-auth-chrome-error-1.png)
 
 - 该服务端 CA 数字签名使用未经认证的 CA 签发，因此客户端浏览器无法验证其安全性而发出警告，可点击 "高级" 按钮接受该证书继续访问。如果拒绝该证书，即断开此次认证连接，可在如下 Wireshark 抓包中显示安全告警信息：
   
-  ![https-single-auth-chrome-error-2](images/https-single-auth-chrome-error-2.png) 
+  ![https-single-auth-chrome-error-2](images-9/https-single-auth-chrome-error-2.png) 
 
 ## HTTPS 双向认证的 Wireshark 抓包与测试
 
 - HTTPS 双向认证的 Wireshark 抓包过程如下所示，其中具体的步骤参见前文 "SSL/TLS 四次握手与 HTTPS 单/双向认证的详细过程" 与单向认证的过程。
   
-  ![wireshark-https-single-progress](images/wireshark-https-single-progress.png)
+  ![wireshark-https-single-progress](images-9/wireshark-https-single-progress.png)
 
 - HTTPS 双向认证过程的客户端测试：
   - 配置生成客户端所需的数字签名证书与私钥：
@@ -502,23 +491,23 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
   
   - 将 p12 格式的文件导入 Firefox 浏览器客户端：
 
-    ![firefox-import-pc12-certs-1](images/firefox-import-pc12-certs-1.png)
+    ![firefox-import-pc12-certs-1](images-9/firefox-import-pc12-certs-1.png)
 
-    ![firefox-import-pc12-certs-2](images/firefox-import-pc12-certs-2.png)
+    ![firefox-import-pc12-certs-2](images-9/firefox-import-pc12-certs-2.png)
 
-    ![firefox-import-pc12-certs-3](images/firefox-import-pc12-certs-3.png)
+    ![firefox-import-pc12-certs-3](images-9/firefox-import-pc12-certs-3.png)
 
-    ![firefox-import-pc12-certs-4](images/firefox-import-pc12-certs-4.png)
+    ![firefox-import-pc12-certs-4](images-9/firefox-import-pc12-certs-4.png)
   
   - 打开 Firefox 浏览器访问服务端，此时需接受客户端证书来标记自己：
 
-    ![firefox-import-pc12-certs-5](images/firefox-import-pc12-certs-5.png)
+    ![firefox-import-pc12-certs-5](images-9/firefox-import-pc12-certs-5.png)
   
   - 💥 如果双向认证客户端配置错误，将无法正常访问服务端，并且浏览器直接返回如下信息，且 Wireshark 抓包显示 `Encrypted Alert`：
 
-    ![https-mutual-no-client-cert-error-1](images/https-mutual-no-client-cert-error-1.png)
+    ![https-mutual-no-client-cert-error-1](images-9/https-mutual-no-client-cert-error-1.png)
 
-    ![https-mutual-no-client-cert-error-2](images/https-mutual-no-client-cert-error-2.png)
+    ![https-mutual-no-client-cert-error-2](images-9/https-mutual-no-client-cert-error-2.png)
 
 ## 参考链接
 
@@ -546,7 +535,7 @@ $ cat > ~/.config/containers/containers.conf <<EOF
 default_rootless_network_cmd = "slirp4netns"
 EOF    # 修改 podman 的 rootless 网络模型
 $ podman build -t rhel97-openresty:1.27.1.2 .
-$ podman images --format="table {{ .Names }}\t{{ .Tag }}" | grep openresty
+$ podman images-9 --format="table {{ .Names }}\t{{ .Tag }}" | grep openresty
 [localhost/rhel97-openresty:1.27.1.2]                     1.27.1.2
 $ podman run -d --name openresty-https -p 8880:80 -p 8443:443 localhost/rhel97-openresty:1.27.1.2    # 映射端口运行容器
 
