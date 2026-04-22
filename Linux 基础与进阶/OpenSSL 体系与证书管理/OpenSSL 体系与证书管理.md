@@ -8,15 +8,16 @@
   - [2. openssl req 命令](#2-openssl-req-命令)
   - [3. openssl rsa 命令](#3-openssl-rsa-命令)
   - [4. openssl x509 命令](#4-openssl-x509-命令)
-  - [创建自签名数字证书的方法](#创建自签名数字证书的方法)
-  - [🎯 创建 CA RSA 私钥与 CA 根证书（root-ca）](#-创建-ca-rsa-私钥与-ca-根证书root-ca)
-  - [🎉 基于 CA 根证书创建 server 端数字签名证书](#-基于-ca-根证书创建-server-端数字签名证书)
-  - [🎉 基于 CA 根证书创建 client 端数字签名证书](#-基于-ca-根证书创建-client-端数字签名证书)
-  - [🍵 使用数字签名证书实现单双向连接测试](#-使用数字签名证书实现单双向连接测试)
-    - [使用 server 端数字签名证书进行单向连接测试](#使用-server-端数字签名证书进行单向连接测试)
-    - [使用 server 端与 client 端数字签名证书进行双向连接测试](#使用-server-端与-client-端数字签名证书进行双向连接测试)
-  - [✔️ 故障排查示例](#️-故障排查示例)
-    - [撤销证书签发异常的证书](#撤销证书签发异常的证书)
+  - [5. 创建自签名数字证书的方法](#5-创建自签名数字证书的方法)
+  - [🎯 6. 创建 CA RSA 私钥与 CA 根证书（root-ca）](#-6-创建-ca-rsa-私钥与-ca-根证书root-ca)
+  - [🎉 7. 基于 CA 根证书创建 server 端数字签名证书](#-7-基于-ca-根证书创建-server-端数字签名证书)
+  - [🎉 8. 基于 CA 根证书创建 client 端数字签名证书](#-8-基于-ca-根证书创建-client-端数字签名证书)
+  - [🍵 9. 使用数字签名证书实现单双向连接测试](#-9-使用数字签名证书实现单双向连接测试)
+    - [9.1 使用 server 端数字签名证书进行单向连接测试](#91-使用-server-端数字签名证书进行单向连接测试)
+    - [9.2 使用 server 端与 client 端数字签名证书进行双向连接测试](#92-使用-server-端与-client-端数字签名证书进行双向连接测试)
+  - [🎯 10. 故障排查示例](#-10-故障排查示例)
+    - [10.1 撤销证书签发异常的证书](#101-撤销证书签发异常的证书)
+    - [10.2 总结](#102-总结)
 
 ## 1. openssl 命令说明
 
@@ -134,7 +135,7 @@
   # 验证证书链
   ```
 
-## 创建自签名数字证书的方法
+## 5. 创建自签名数字证书的方法
 
 - 1️⃣ 先创建私钥再创建自签名数字证书
 - 2️⃣ 同时创建私钥与自签名数字证书
@@ -147,7 +148,7 @@
     -out server.crt
   ```
 
-## 🎯 创建 CA RSA 私钥与 CA 根证书（root-ca）
+## 🎯 6. 创建 CA RSA 私钥与 CA 根证书（root-ca）
   
 ```bash
 #步骤1
@@ -179,7 +180,7 @@ $ openssl x509 -in ca.crt -noout -text
 # 查看 CA 根证书的纯文本摘要信息
 ```
 
-## 🎉 基于 CA 根证书创建 server 端数字签名证书
+## 🎉 7. 基于 CA 根证书创建 server 端数字签名证书
   
 ```bash
 #步骤1
@@ -227,7 +228,7 @@ $ openssl x509 \
 #            -out 选项：输出服务器证书
 ```
 
-## 🎉 基于 CA 根证书创建 client 端数字签名证书
+## 🎉 8. 基于 CA 根证书创建 client 端数字签名证书
   
 ```bash
 $ openssl genrsa [-des3] -out client.key [1024|2048|4096]
@@ -248,9 +249,9 @@ $ openssl x509 \
 # 创建 client 端数字签名证书
 ```
 
-## 🍵 使用数字签名证书实现单双向连接测试
+## 🍵 9. 使用数字签名证书实现单双向连接测试
 
-### 使用 server 端数字签名证书进行单向连接测试
+### 9.1 使用 server 端数字签名证书进行单向连接测试
   
 ```bash
 $ openssl s_server -accept <port> -key server.key -cert server.crt    
@@ -260,7 +261,7 @@ $ openssl s_client -connect <host_ip>:<port>
 # client 端：连接 server 端，如果连接成功后将在任意一端输入信息后会在另一端显示该信息。
 ```
 
-### 使用 server 端与 client 端数字签名证书进行双向连接测试
+### 9.2 使用 server 端与 client 端数字签名证书进行双向连接测试
   
 ```bash
 $ openssl s_server \
@@ -289,23 +290,19 @@ $ openssl s_client \
   - **末端实体证书（End-entity certificate）**：客户端（或服务端）申请的证书
   - 因此，`N = 中间证书数量 + 1 个 CA 根证书`。
   - 可参考如下所示：5 层深度
+    - 客户端证书（末端实体证书） → 不计入深度 <br>
+      ↓ 1️⃣ 第一层中间 CA <br>
+      ↓ 2️⃣ 第二层中间 CA <br>
+      ↓ 3️⃣ 第三层中间 CA <br>
+      ↓ 4️⃣ 第四层中间 CA <br>
+      ↓ 5️⃣ 根 CA（Top-level）
+    - 以上表示 5 层证书链深度，如果再增加一层中间层 CA，那么客户端连接是将验证失败，返回报错 `X509_V_ERR_CERT_CHAIN_TOO_LONG`。
 
-    ```bash
-    客户端证书（末端实体证书） → 不计入深度
-    ↓  ① 第一层中间 CA
-    ↓  ② 第二层中间 CA
-    ↓  ③ 第三层中间 CA
-    ↓  ④ 第四层中间 CA
-    ↓  ⑤ 根 CA（Top-level）
-    ```
+## 🎯 10. 故障排查示例
 
-  - 以上表示 5 层证书链深度，如果再增加一层中间层 CA，那么客户端连接是将验证失败，返回报错 `X509_V_ERR_CERT_CHAIN_TOO_LONG`。
+> 说明：参考 RH362v9.1 课程 Chapter2 Section3 Lab
 
-## ✔️ 故障排查示例
-
-> 说明：参考 RH362v9.1 课程 Chapter2 Section3
-
-### 撤销证书签发异常的证书
+### 10.1 撤销证书签发异常的证书
 
 root-ca/ 目录与 inter-ca/ 目录中分别存储了根 CA 证书与中间 CA 证书的相关文件，当前的证书链可验证通过，即 `root-ca.cert.pem -> inter-ca.cert.pem -> server001.lab.example.com.cert.pem`。但通过 openssl ca 命令的 `-extensions v3_inter_ca` 选项重新生成中间 CA 证书后，其 subject 主体发生改变，导致 server001.lab.example.com.cert.pem 在证书链验证过程中失败。因此，撤销此服务端证书（末端实体证书）再通过 inter-ca.cert.pem 重新签发此证书即可完成证书链的验证。新的证书链验证过程：`root-ca.cert.pem -> inter-ca.cert.pem -> service.lab.example.com.cert.pem`
 
@@ -417,10 +414,13 @@ $ chmod 0444 certs/service.lab.example.com.cert.pem  #更改证书权限
 $ openssl verify -CAfile certs/ca-chain.cert.pem certs/service.lab.example.com.cert.pem  #使用证书链文件（包含根 CA 证书在内的所有证书）验证服务端证书
 ```
 
-- 总结：证书撤销与重新生成过程
-  - 创建 crlnumber（版本号计数器文件）
-  - 创建 *.crl.pem 撤销证书列表
-  - 使用 openssl ca -revoke 选项撤销证书
-  - 上述命令自动更新 index.txt，写入 R (撤销) 状态的证书序列号。
-  - 自动根据 index.txt 重新生成 *.crl.pem 撤销证书列表（此文件中 Revoked 列表中显示）
-  - crlnumber 文件版本递增 +1，*.crl.pem 文件中存在撤销的证书。
+### 10.2 总结
+
+证书撤销与重新生成过程：
+
+- 创建 crlnumber（版本号计数器文件）
+- 创建 *.crl.pem 撤销证书列表
+- 使用 openssl ca -revoke 选项撤销证书
+- 上述命令自动更新 index.txt，写入 R (撤销) 状态的证书序列号。
+- 自动根据 index.txt 重新生成 *.crl.pem 撤销证书列表（此文件中 Revoked 列表中显示）
+- crlnumber 文件版本递增 +1，*.crl.pem 文件中存在撤销的证书。

@@ -37,7 +37,7 @@
   - [HTTPS 单向认证测试](#https-单向认证测试)
   - [HTTPS 双向认证的 Wireshark 抓包与测试](#https-双向认证的-wireshark-抓包与测试)
   - [参考链接](#参考链接)
-  - [构建 OpenResty 容器测试 Web 协议与证书](#构建-openresty-容器测试-web-协议与证书)
+  - [附录：构建 OpenResty 容器测试 Web 协议与证书](#附录构建-openresty-容器测试-web-协议与证书)
 
 ## 1. 加密通信背景
 
@@ -521,7 +521,7 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
 - [常见证书格式及相互转换](https://www.cnblogs.com/lzjsky/archive/2010/11/14/1877143.html)
 - [openssl 生成自签证书及查看证书细节](https://www.cnblogs.com/threegun/p/7130985.html)
 
-## 构建 OpenResty 容器测试 Web 协议与证书
+## 附录：构建 OpenResty 容器测试 Web 协议与证书
 
 ```bash
 $ git clone git@github.com:Alberthua-Perl/dockerfile-s2i-demo.git
