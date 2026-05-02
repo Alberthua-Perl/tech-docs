@@ -38,6 +38,7 @@
     - [8.16 RHEL9 安装 x11vnc 虚拟桌面与外部登录访问](#816-rhel9-安装-x11vnc-虚拟桌面与外部登录访问)
       - [8.16.1 安装与设置 x11vnc 虚拟桌面](#8161-安装与设置-x11vnc-虚拟桌面)
       - [8.16.2 MobaXterm 的连接访问](#8162-mobaxterm-的连接访问)
+    - [8.17 安装 cockpit 插件](#817-安装-cockpit-插件)
   - [9. dnf 下载软件包及其依赖](#9-dnf-下载软件包及其依赖)
   - [10. dnf 实现软件包安全检测与更新](#10-dnf-实现软件包安全检测与更新)
   - [11. RedHat 订阅服务使用](#11-redhat-订阅服务使用)
@@ -46,7 +47,8 @@
   - [14. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#14-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
   - [15. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#15-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
   - [16. Ubuntu 24.04.4 LTS 中安装 Clash 工具](#16-ubuntu-24044-lts-中安装-clash-工具)
-  - [17. 参考链接](#17-参考链接)
+  - [17. 本地 VS Code 连接远程 VS Code 环境](#17-本地-vs-code-连接远程-vs-code-环境)
+  - [18. 参考链接](#18-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -547,6 +549,18 @@ tcp6       0      0 :::5900                 :::*                    LISTEN      
 
 <img src="images/x11vnc-connect-4.jpg" style="width:80%">
 
+### 8.17 安装 cockpit 插件
+
+```bash
+$ sudo systemctl start cockpit.socket
+# 启用 systemd-cockpit 套接字单元文件
+$ sudo ss -tunlp | grep cockpit
+# 返回监听 9090/tcp 端口
+
+$ sudo dnf install -y cockpit-machines
+# 安装 cockpit 支持虚拟化插件
+```
+
 ## 9. dnf 下载软件包及其依赖
 
 ```bash
@@ -826,7 +840,45 @@ rtt min/avg/max/mdev = 0.063/0.157/0.240/0.072 ms
 
 💥 注意：若调用 OpenAI 的 API，请选择日本或新加坡节点代理，香港节点受地区限制无法调用 API！
 
-## 17. 参考链接
+## 17. 本地 VS Code 连接远程 VS Code 环境
+
+- 安装 Remote-SSH 扩展：在本地 VS Code 的扩展商店搜索并安装
+  - Remote - SSH (Microsoft 官方)
+  - 可选：Remote - SSH: Editing Configuration Files
+- 配置 SSH 连接：通过命令面板
+  - 按 Ctrl+Shift+P（Mac: Cmd+Shift+P）
+  - 输入 Remote-SSH: Connect to Host...
+  - 选择 Configure SSH Hosts → 编辑 ~/.ssh/config
+
+  ```bash
+  Host <server_hostname>
+      HostName <server_hostname>   # 远程服务器 IP 或主机名
+      User <username>              # 远程用户名
+      Port 22                      # SSH 端口（默认22）
+      #IdentityFile ~/.ssh/id_rsa  # 私钥路径（免密登录）
+      # 如果使用密码登录，不配置 IdentityFile 即可
+  ```
+
+- 连接远程服务器：
+  - 按 Ctrl+Shift+P → Remote-SSH: Connect to Host...
+  - 选择刚才配置的 <server_hostname>
+
+    ![vscode-remote-ssh-1](images/vscode-remote-ssh-1.png)
+
+  - 首次连接时，VS Code 会在远程服务器 ~/.vscode-server/ 自动安装 Server 端，此过程将消耗一定安装时间。当下次发起连接时，可直接连接服务端。
+  - 安装完成并建立连接时，将在新的自动打开的 VS Code 中要求输入登录密码。
+
+    ![vscode-remote-ssh-2](images/vscode-remote-ssh-2.png)
+
+- 验证连接成功：
+  - 左下角状态栏会显示 >< SSH: myserver
+
+    ![vscode-remote-ssh-3](images/vscode-remote-ssh-3.png)
+
+  - 打开文件夹时，浏览的是远程服务器的文件系统。
+  - 终端 (`Ctrl+``) 默认打开的是远程服务器的 shell。
+
+## 18. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
