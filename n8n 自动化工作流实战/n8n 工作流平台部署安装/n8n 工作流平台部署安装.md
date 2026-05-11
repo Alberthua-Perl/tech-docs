@@ -15,15 +15,15 @@
 
 | 系统 | 内核 | CPU | 内存 | NVM | npm | n8n | Podman | 功能 |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| Ubuntu 24.04.4 LTS | 6.8.0-110-generic | 8 | 16G | 0.40.4 | 11.12.1 | 2.18.6 | - | 1?? n8n 工作流平台（npm 安装方式） |
-| RHEL 10.0 (Coughlan) | 6.12.0-124.55.1.el10_1.x86_64 | 8 | 16G | - | - | - | 5.6.0 | 1?? Baserow 应用 Pod <br> 2?? 向量数据库 <br> 3?? n8n 工作流平台（容器化方式） |
+| Ubuntu 24.04.4 LTS | 6.8.0-110-generic | 8 | 16G | 0.40.4 | 11.12.1 | 2.18.6 | - | n8n 工作流平台（npm 安装方式） |
+| RHEL 10.0 (Coughlan) | 6.12.0-124.55.1.el10_1.x86_64 | 8 | 16G | - | - | - | 5.6.0 | Baserow 应用 Pod <br> 向量数据库 <br> n8n 工作流平台（容器化方式） |
 
 ## 2. 方式1：npm 模块安装方式
 
 > 说明：这种方式在常规开发调试中常用。
 
-- 1?? 先根据 [1.2 方式2：NVM 管理多版本 Node.js 环境（用户环境安装）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.md#12-%E6%96%B9%E5%BC%8F2nvm-%E7%AE%A1%E7%90%86%E5%A4%9A%E7%89%88%E6%9C%AC-nodejs-%E7%8E%AF%E5%A2%83%E7%94%A8%E6%88%B7%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) 部署 npm 所需版本环境
-- 2?? 参考以下步骤使用淘宝 npm 模块源加速安装 n8n：
+- 先根据 [1.2 方式2：NVM 管理多版本 Node.js 环境（用户环境安装）](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/Jenkins%20%E7%9A%84%20CICD%20%E4%B9%8B%E6%97%85/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95/Node.js%20%E4%B9%8B%20npm%20%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95.md#12-%E6%96%B9%E5%BC%8F2nvm-%E7%AE%A1%E7%90%86%E5%A4%9A%E7%89%88%E6%9C%AC-nodejs-%E7%8E%AF%E5%A2%83%E7%94%A8%E6%88%B7%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) 部署 npm 所需版本环境
+- 参考以下步骤使用淘宝 npm 模块源加速安装 n8n：
   
   ```bash
   ### 检查各组件版本
@@ -77,7 +77,7 @@
   Press "o" to open in Browser.
   ```
 
-- 3?? 打开浏览器（Chrome 或 Firefox），输入 https://<n8n_node_ip>:5678，在指引下设置完成所需字段，即可通过以下界面登录：
+- 打开浏览器（Chrome 或 Firefox），输入 https://<n8n_node_ip>:5678，在指引下设置完成所需字段，即可通过以下界面登录：
 
   <center><img src="images/n8n-login.png" width=30%></center>
 
