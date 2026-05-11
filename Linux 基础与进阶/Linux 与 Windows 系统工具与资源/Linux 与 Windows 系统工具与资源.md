@@ -46,9 +46,19 @@
   - [13. RHEL8/9/10 启用 /var/log/dmesg 日志](#13-rhel8910-启用-varlogdmesg-日志)
   - [14. Windows 客户端使用 RDP 协议控制 RHEL10 远程桌面](#14-windows-客户端使用-rdp-协议控制-rhel10-远程桌面)
   - [15. 使用已存在的 qcow2 虚拟磁盘创建 KVM 虚拟机](#15-使用已存在的-qcow2-虚拟磁盘创建-kvm-虚拟机)
-  - [16. Ubuntu 24.04.4 LTS 中安装 Clash 工具](#16-ubuntu-24044-lts-中安装-clash-工具)
+  - [16. Ubuntu 24.04.4 LTS 中调试 Clash 客户端](#16-ubuntu-24044-lts-中调试-clash-客户端)
+    - [16.1 安装 Clash](#161-安装-clash)
+    - [16.2 启停 Clash 代理](#162-启停-clash-代理)
+    - [16.3 管理订阅地址](#163-管理订阅地址)
+    - [16.4 管理 Clash 工作模式](#164-管理-clash-工作模式)
+    - [16.5 Clash UI 界面访问](#165-clash-ui-界面访问)
+    - [16.6 Clash 连通性测试](#166-clash-连通性测试)
   - [17. 本地 VS Code 连接远程 VS Code 环境](#17-本地-vs-code-连接远程-vs-code-环境)
-  - [18. 参考链接](#18-参考链接)
+  - [18. AI 工具安装部署及常规使用](#18-ai-工具安装部署及常规使用)
+    - [18.1 OpenClaw 客户端安装与设置](#181-openclaw-客户端安装与设置)
+    - [18.2 Kimi Code 客户端安装与设置](#182-kimi-code-客户端安装与设置)
+    - [18.3 Claude Code 客户端安装与 DeepSeek 对接](#183-claude-code-客户端安装与-deepseek-对接)
+  - [19. 参考链接](#19-参考链接)
 
 ## 1. 常用公共服务器
 
@@ -599,6 +609,20 @@ $ sudo dnf update --cve CVE-xxxx-xxxx
 # 更新依赖指定 CVE 编号的软件包
 ```
 
+示例：安装更新 CVE-2026-31431 漏洞内核补丁
+
+此安全漏洞已在 https://access.redhat.com/security/cve/cve-2026-31431 发布，以下给出修复方式：
+
+```bash
+$ sudo subscription-manager register
+# 登录红帽注册账号
+$ sudo dnf updateinfo --security
+# 查看系统安全更新
+$ sudo dnf update --cve CVE-2026-31431
+# 更新此 CVE 涉及的软件包（内核相关的 RPM 包）
+# 注意：/boot 目录预留足够的空间存储 vmlinuz 与 initrd 文件
+```
+
 ## 11. RedHat 订阅服务使用
 
 ```bash
@@ -714,12 +738,13 @@ $ sudo virsh undefine mysle15sp6
 # 删除虚拟机
 ```
 
-## 16. Ubuntu 24.04.4 LTS 中安装 Clash 工具
+## 16. Ubuntu 24.04.4 LTS 中调试 Clash 客户端
 
 此处使用 [nelvko/clash-for-linux-install | GitHub](https://github.com/nelvko/clash-for-linux-install) 仓库安装 Linux 的 Clash 工具。
 
+### 16.1 安装 Clash
+
 ```bash
-### 安装 Clash ###
 $ wget https://github.com/nelvko/clash-for-linux-install/archive/refs/heads/master.zip
 # 下载 Clash 源代码压缩文件
 $ unzip clash-for-linux-install-master.zip
@@ -768,8 +793,18 @@ For more help on how to use clashctl, head to https://github.com/nelvko/clash-fo
 🍃 验证订阅配置...
 🎉 订阅已添加：[1] ********************    # 返回输入的订阅地址
 🔥 订阅已生效
+```
 
-### 管理订阅地址 ###
+### 16.2 启停 Clash 代理
+
+```bash
+$ clashctl on
+$ clashctl off
+```
+
+### 16.3 管理订阅地址
+
+```bash
 $ clashctl sub add <url>
 # 添加新的订阅地址
 $ clashctl sub ls
@@ -785,18 +820,29 @@ profiles:
     url: ********************
 $ clashctl sub use <id>
 # 切换不同的订阅地址
+```
 
-### 管理 Clash 工作模式 ###
-# 注意：此处使用隧道模式实现代理
+### 16.4 管理 Clash 工作模式
+
+🔥 需启用 Clash 的隧道模式或代理模式才能使用订阅。此处使用 **隧道模式**。
+
+1️⃣ Clash 隧道模式开启与关闭：
+
+```bash
 $ clashctl tun on
 $ clashctl tun off
-# 启用或关闭 Clash 的隧道模式
+```
 
+2️⃣ Clash 代理模式开启与关闭：
+
+```bash
 $ clashctl proxy on
 $ clashctl proxy off
-# 启用或关闭 Clash 的系统代理模式
+```
 
-### Clash UI 界面访问 ###
+### 16.5 Clash UI 界面访问
+
+```bash
 $ clashctl ui  # 使用内网方式访问
 
 ╔═══════════════════════════════════════════════╗
@@ -813,10 +859,6 @@ $ clashctl ui  # 使用内网方式访问
 $ clashctl secret
 😼 当前密钥：kCJJrh
 # 查看登录 Web 界面所需的密钥
-
-### 启用或关闭 Clash 代理 ###
-$ clashctl on
-$ clashctl off
 ```
 
 浏览器中输入前文的内网地址与密钥即可登录设置代理：
@@ -824,6 +866,10 @@ $ clashctl off
 <img src="images/login-clash-ui-1.png" style="width:60%">
 
 <img src="images/login-clash-ui-2.png" style="width:60%">
+
+### 16.6 Clash 连通性测试
+
+1️⃣ 方式1：测试 Google 连通性
 
 ```bash
 $ ping -c3 google.com
@@ -835,10 +881,52 @@ PING google.com (28.0.0.23) 56(84) bytes of data.
 --- google.com ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 6005ms
 rtt min/avg/max/mdev = 0.063/0.157/0.240/0.072 ms
-# 测试 Google 连通性
 ```
 
-💥 注意：若调用 OpenAI 的 API，请选择日本或新加坡节点代理，香港节点受地区限制无法调用 API！
+2️⃣ 方式2：测试 Google 连通性
+
+```bash
+### HTTP 测试 ###
+$ curl -I --proxy http://127.0.0.1:7890 http://www.google.com
+HTTP/1.1 200 OK
+Transfer-Encoding: chunked
+Cache-Control: private
+Connection: keep-alive
+Content-Security-Policy-Report-Only: object-src 'none';base-uri 'self';script-src 'nonce-NqjypoCl7zFqZ6-EVFliag' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp
+Content-Type: text/html; charset=ISO-8859-1
+Date: Fri, 08 May 2026 11:39:50 GMT
+Expires: Fri, 08 May 2026 11:39:50 GMT
+Keep-Alive: timeout=4
+P3p: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Proxy-Connection: keep-alive
+Server: gws
+Set-Cookie: AEC=AaJma5tZP2In8R913tyUumZghBjDTxauQhuUsFZkeKKGvsYgMxDLe_gMAQ; expires=Wed, 04-Nov-2026 11:39:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
+Set-Cookie: NID=531=NBda8e5nWwNxYm4qs4fiyAjyXMi-Y-vqaGmUTxnAPTwZ_cAXB0vvN49hbsjkq96-W5dFYChf5zZDYSMWi4G3RFF1hScyk0MRqaRvr4ZBCZPJVuGM7sRX63owpfDAHxsGi2cbmDnD6R4xFCGYttNfy8nGN96zBot2--SAw-FTM8HwallHXaHWeWVqTD8a1uvVtG-YMFrHpX3StXohXMeei0yWgPdF; expires=Sat, 07-Nov-2026 11:39:50 GMT; path=/; domain=.google.com; HttpOnly
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 0
+
+### HTTPS 测试 ###
+url -I --proxy http://127.0.0.1:7890 https://www.google.com
+HTTP/1.1 200 Connection established
+
+HTTP/2 200
+content-type: text/html; charset=ISO-8859-1
+content-security-policy-report-only: object-src 'none';base-uri 'self';script-src 'nonce-C4B8xTcwTjCqbrSiRTFblw' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp
+accept-ch: Sec-CH-Prefers-Color-Scheme
+p3p: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+date: Fri, 08 May 2026 11:39:56 GMT
+server: gws
+x-xss-protection: 0
+x-frame-options: SAMEORIGIN
+expires: Fri, 08 May 2026 11:39:56 GMT
+cache-control: private
+set-cookie: AEC=AaJma5tm9oqJnXmrpvJKSWe5CBDb8cNR3Uo3oYa5p5t86ClTeVU7HD-LBLg; expires=Wed, 04-Nov-2026 11:39:56 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
+set-cookie: NID=531=Oo8BZW4Ah0606IUOj8zzHIpsOA72-WSv306r17GYCc1yDeuaxY09L5K30yaPMvkoNVMceUI87CjUuHy9MIqr4Bh39f2WecgSm8suDgJ7rUnp2GcTq21P8i-RYlZrOFQesGbWyOlcOSGnSP2OkweP1tGSqeg6TP8V--g6yMYpMNW_teXeiDUhdbDnhB6L-osmJUlOesa-n0HoekjiDkBwa1CWv3IA; expires=Sat, 07-Nov-2026 11:39:56 GMT; path=/; domain=.google.com; HttpOnly
+set-cookie: __Secure-BUCKET=CKcG; expires=Wed, 04-Nov-2026 11:39:56 GMT; path=/; domain=.google.com; Secure; HttpOnly
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+```
+
+💥 注意：若调用 **OpenAI** 的 API，请选择**日本**或**新加坡**节点代理，香港节点受地区限制无法调用 API！
 
 ## 17. 本地 VS Code 连接远程 VS Code 环境
 
@@ -878,8 +966,28 @@ rtt min/avg/max/mdev = 0.063/0.157/0.240/0.072 ms
   - 打开文件夹时，浏览的是远程服务器的文件系统。
   - 终端 (`Ctrl+``) 默认打开的是远程服务器的 shell。
 
-## 18. 参考链接
+## 18. AI 工具安装部署及常规使用
+
+### 18.1 OpenClaw 客户端安装与设置
+
+安装过程：
+
+设置认证 token，启用 web 登录：
+
+启用交互模式：
+
+搜索与安装 skill：
+
+对接飞书 channel：
+
+### 18.2 Kimi Code 客户端安装与设置
+
+### 18.3 Claude Code 客户端安装与 DeepSeek 对接
+
+## 19. 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
 - [The /var/log/dmesg file is not created during boot for Red Hat Enterprise Linux](https://access.redhat.com/solutions/3748981)
+- [Kimi Code 介绍](https://www.kimi.com/code?track_id=3ce20bac-cd13-44ed-9882-1273325078b9)
+- [Kimi Code 文档](https://www.kimi.com/code/docs/kimi-code-cli/getting-started.html)
