@@ -4,7 +4,7 @@
 
 > 以下文档中的内容将根据实际情况进行更新补充！
 
-## 🧠 机器学习 & 深度学习 & 大模型
+## 🧠 机器学习 & 深度学习
 
 - **数学基础**
   - [LaTeX 数学公式编辑常用命令](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/LaTeX%20%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/LaTeX%20%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4.md)
@@ -17,14 +17,24 @@
   - [全面认识感知机（perceptron）](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%85%A8%E9%9D%A2%E8%AE%A4%E8%AF%86%E6%84%9F%E7%9F%A5%E6%9C%BA/%E5%85%A8%E9%9D%A2%E8%AE%A4%E8%AF%86%E6%84%9F%E7%9F%A5%E6%9C%BA.ipynb)
   - [【Lab】使用 PyTorch 构建 CNN 模型：识别 MNIST 手写数字](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97/%E3%80%90Lab%E3%80%91%E4%BD%BF%E7%94%A8%20PyTorch%20%E6%9E%84%E5%BB%BA%20CNN%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%AF%86%E5%88%AB%20MNIST%20%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97.ipynb)
   - [深入浅出理解生成对抗网络 (GAN)](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%20%26%20%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN)/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E7%90%86%E8%A7%A3%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%20(GAN).ipynb)
-- **模型推理**
-  - [【Lab】基于 Fedora42 WSL2 部署测试 vLLM 推理框架](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6.md)
-  - [【Lab】vLLM 在 Windows11 中的部署与推理](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/vLLM%20%E5%9C%A8%20Windows11%20%E4%B8%AD%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%8E%A8%E7%90%86/README.md)
 - **Red Hat AI**
   - [【Lab】Red Hat LightSpeed 推理环境离线部署](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/Red%20Hat%20LightSpeed%20%E6%8E%A8%E7%90%86%E7%8E%AF%E5%A2%83%E7%A6%BB%E7%BA%BF%E9%83%A8%E7%BD%B2/Red%20Hat%20LightSpeed%20%E6%8E%A8%E7%90%86%E7%8E%AF%E5%A2%83%E7%A6%BB%E7%BA%BF%E9%83%A8%E7%BD%B2.md) 
   - [【精华】MLOps on RHOAI: RedHat OpenShift AI 介绍与安装](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/AI267v2.x-course/RHOAI-intro_install.ipynb)
   - [【精华】MLOps on RHOAI: 机器学习概述 & 训练 & 评估](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/AI267v2.x-course/RHOAI-machine_learning.ipynb)
   - [【精华】MLOps on RHOAI: 模型服务 & KServe & Knative](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/AI267v2.x-course/RHOAI-model_serving.ipynb)
+
+## ⚙️ AI Infra & 大模型推理
+
+- [【Lab】基于 Fedora42 WSL2 部署测试 vLLM 推理框架](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6/%E5%9F%BA%E4%BA%8E%20Fedora42%20WSL2%20%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%20vLLM%20%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6.md)
+- [【Lab】vLLM 在 Windows11 中的部署与推理](https://github.com/Alberthua-Perl/python-project-demo/blob/develop/vLLM%20%E5%9C%A8%20Windows11%20%E4%B8%AD%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%8E%A8%E7%90%86/README.md)
+
+## 🤖 AI 自动化流程（AIOps）
+
+- **n8n 自动化工作流实战**
+  - [实战1：n8n 重要概念与设置](https://github.com/Alberthua-Perl/tech-docs/blob/master/n8n%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%AE%9E%E6%88%98/%E5%AE%9E%E6%88%981%EF%BC%9An8n%20%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%E4%B8%8E%E8%AE%BE%E7%BD%AE/%E5%AE%9E%E6%88%981%EF%BC%9An8n%20%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%E4%B8%8E%E8%AE%BE%E7%BD%AE.md)
+  - [实战2：n8n 工作流平台部署安装](https://github.com/Alberthua-Perl/tech-docs/blob/master/n8n%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%AE%9E%E6%88%98/%E5%AE%9E%E6%88%982%EF%BC%9An8n%20%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85/%E5%AE%9E%E6%88%982%EF%BC%9An8n%20%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85.md)
+  - [实战3：客户邮件自动收发与飞书通知响应](https://github.com/Alberthua-Perl/tech-docs/blob/master/n8n%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%AE%9E%E6%88%98/%E5%AE%9E%E6%88%983%EF%BC%9A%E5%AE%A2%E6%88%B7%E9%82%AE%E4%BB%B6%E8%87%AA%E5%8A%A8%E6%94%B6%E5%8F%91%E4%B8%8E%E9%A3%9E%E4%B9%A6%E9%80%9A%E7%9F%A5%E5%93%8D%E5%BA%94/%E5%AE%9E%E6%88%983%EF%BC%9A%E5%AE%A2%E6%88%B7%E9%82%AE%E4%BB%B6%E8%87%AA%E5%8A%A8%E6%94%B6%E5%8F%91%E4%B8%8E%E9%A3%9E%E4%B9%A6%E9%80%9A%E7%9F%A5%E5%93%8D%E5%BA%94.md)
+  - [实战4：构建 AI 会话智能体](https://github.com/Alberthua-Perl/tech-docs/blob/master/n8n%20%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81%E5%AE%9E%E6%88%98/%E5%AE%9E%E6%88%984%EF%BC%9A%E6%9E%84%E5%BB%BA%20AI%20%E4%BC%9A%E8%AF%9D%E6%99%BA%E8%83%BD%E4%BD%93/%E5%AE%9E%E6%88%984%EF%BC%9A%E6%9E%84%E5%BB%BA%20AI%20%E4%BC%9A%E8%AF%9D%E6%99%BA%E8%83%BD%E4%BD%93.md)
 
 ## 🐧 **Linux 进阶之路**
 
