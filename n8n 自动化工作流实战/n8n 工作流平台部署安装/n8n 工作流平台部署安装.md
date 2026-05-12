@@ -119,4 +119,4 @@ n8n µÄ **Code ½Úµã** ¿É¼¯³ÉÔËĞĞ JavaScript ´úÂëÓë **Python ´úÂë**£¬µ«ÊÇÎªÁË°²È«Æ
 
 - [Install n8n | n8n docs](https://docs.n8n.io/hosting/installation/npm/#try-n8n-with-npx)
 - [n8nio/n8n | DockerHub](https://hub.docker.com/r/n8nio/n8n)
-- ? [Task runners | n8n docs](https://docs.n8n.io/hosting/configuration/task-runners/)
+- [Task runners | n8n docs](https://docs.n8n.io/hosting/configuration/task-runners/)

@@ -1,11 +1,12 @@
-# n8n 重要基础概念
+# n8n 重要概念与设置
 
 ## 文档目录
 
-- [n8n 重要基础概念](#n8n-重要基础概念)
+- [n8n 重要概念与设置](#n8n-重要概念与设置)
   - [文档目录](#文档目录)
   - [1. n8n 中的节点类型](#1-n8n-中的节点类型)
   - [2. n8n 中数据存储方式](#2-n8n-中数据存储方式)
+  - [3. Community Node（社区节点）安装方式](#3-community-node社区节点安装方式)
   - [参考链接](#参考链接)
 
 ## 1. n8n 中的节点类型
@@ -50,6 +51,20 @@ sqlite> SELECT email FROM user;    # 查询 n8n 中用户与 email 的关系
 hualongfeiyyy@163.com
 sqlite> .quit    # 退出数据库
 ```
+
+## 3. Community Node（社区节点）安装方式
+
+Community Node（社区节点）可从 https://www.npmjs.com/ 站点搜索获取，搜索关键字以 `n8n-nodes` 开头即可查找感兴趣的节点。以下安装 [n8n-nodes-feishu-lite](https://www.npmjs.com/package/n8n-nodes-feishu-lite?activeTab=readme) 为例：
+
+```bash
+$ cd $HOME/.n8n/nodes    # 切换至 n8n 根目录的 nodes 目录中
+$ npm install n8n-nodes-feishu-lite --registry=https://registry.npmmirror.com    # 在以上目录中安装社区节点
+$ npm list n8n-nodes-feishu-lite    # 查看安装的社区节点
+  installed-nodes@ /home/godev/.n8n/nodes
+  └── n8n-nodes-feishu-lite@0.4.3
+```
+
+<center><img src="images/n8n-nodes-feishu-lite.png" width=80%></center>
 
 ## 参考链接
 
