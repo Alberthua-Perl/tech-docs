@@ -57,7 +57,7 @@
   - [18. AI 工具安装部署及常规使用](#18-ai-工具安装部署及常规使用)
     - [18.1 OpenClaw 客户端安装与设置](#181-openclaw-客户端安装与设置)
     - [18.2 Kimi Code 客户端安装与设置](#182-kimi-code-客户端安装与设置)
-    - [18.3 Claude Code 客户端安装与 DeepSeek 对接](#183-claude-code-客户端安装与-deepseek-对接)
+    - [18.3 部署 Claude Code 客户端并集成各类大模型后端](#183-部署-claude-code-客户端并集成各类大模型后端)
   - [19. 参考链接](#19-参考链接)
 
 ## 1. 常用公共服务器
@@ -982,7 +982,49 @@ alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
 
 ### 18.2 Kimi Code 客户端安装与设置
 
-### 18.3 Claude Code 客户端安装与 DeepSeek 对接
+### 18.3 部署 Claude Code 客户端并集成各类大模型后端
+
+1️⃣ 安装 Claude Code 客户端：
+
+```bash
+$ npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com
+# 指定淘宝 npm 模块仓库安装 claude code
+$ npm list -g
+/home/godev/.nvm/versions/node/v24.15.0/lib
+├── @anthropic-ai/claude-code@2.1.143
+├── corepack@0.34.6
+├── n8n@2.18.6
+└── npm@11.12.1
+# 查看模块安装路径
+$ which claude
+/home/godev/.nvm/versions/node/v24.15.0/bin/claude
+$ claude -v
+2.1.143 (Claude Code)
+# 查看 claude 命令版本
+```
+
+2️⃣ 设置 Claude Code 配置：
+
+```bash
+$ mkdir ~/.claude
+$ cat > ~/.claude/settings.json <<EOF
+{
+    "env": {
+        "ANTHROPIC_API_KEY": "sk-xxxxxxxx",    // 设置大模型 API Key
+        "ANTHROPIC_BASE_URL": <llm_api_url>,   // 大模型 API URL
+        "ANTHROPIC_MODEL": <model_name>        // 大模型名称
+    },
+    "theme": "dark"
+}
+```
+
+3️⃣ 运行 Claude Code：
+
+```
+$ claude
+```
+
+<img src="images/claude-code-install.png" style="width:80%">
 
 ## 19. 参考链接
 

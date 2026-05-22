@@ -1,0 +1,313 @@
+$ docker logs -f docker-worker-1    # 文档上传追踪日志
+Running migrations
+Warning! You didn't set docs_url, redoc_url or openapi_url.
+API Documentation will be skipped.
+Preparing database migration...
+Starting database migration.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Database migration successful!
+Starting Celery worker with queues: api_token,dataset,dataset_summary,priority_dataset,priority_pipeline,pipeline,mail,ops_trace,app_deletion,plugin,workflow_storage,conversation,workflow,schedule_poller,schedule_executor,triggered_workflow_dispatcher,trigger_refresh_executor,retention,workflow_based_app_execution
+gRPC patched with gevent.
+psycopg2 patched with gevent.
+Warning! You didn't set docs_url, redoc_url or openapi_url.
+API Documentation will be skipped.
+
+ -------------- celery@c70c1dcacd97 v5.6.2 (recovery)
+--- ***** -----
+-- ******* ---- Linux-6.8.0-111-generic-x86_64-with-glibc2.36 2026-05-18 17:31:11
+- *** --- * ---
+- ** ---------- [config]
+- ** ---------- .> app:         app_factory:0x7822e6763560
+- ** ---------- .> transport:   redis://:**@redis:6379/1
+- ** ---------- .> results:     redis://:**@redis:6379/1
+- *** --- * --- .> concurrency: 1 (gevent)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** -----
+ -------------- [queues]
+                .> api_token        exchange=api_token(direct) key=api_token
+                .> app_deletion     exchange=app_deletion(direct) key=app_deletion
+                .> conversation     exchange=conversation(direct) key=conversation
+                .> dataset          exchange=dataset(direct) key=dataset
+                .> dataset_summary  exchange=dataset_summary(direct) key=dataset_summary
+                .> mail             exchange=mail(direct) key=mail
+                .> ops_trace        exchange=ops_trace(direct) key=ops_trace
+                .> pipeline         exchange=pipeline(direct) key=pipeline
+                .> plugin           exchange=plugin(direct) key=plugin
+                .> priority_dataset exchange=priority_dataset(direct) key=priority_dataset
+                .> priority_pipeline exchange=priority_pipeline(direct) key=priority_pipeline
+                .> retention        exchange=retention(direct) key=retention
+                .> schedule_executor exchange=schedule_executor(direct) key=schedule_executor
+                .> schedule_poller  exchange=schedule_poller(direct) key=schedule_poller
+                .> trigger_refresh_executor exchange=trigger_refresh_executor(direct) key=trigger_refresh_executor
+                .> triggered_workflow_dispatcher exchange=triggered_workflow_dispatcher(direct) key=triggered_workflow_dispatcher
+                .> workflow         exchange=workflow(direct) key=workflow
+                .> workflow_based_app_execution exchange=workflow_based_app_execution(direct) key=workflow_based_app_execution
+                .> workflow_storage exchange=workflow_storage(direct) key=workflow_storage
+
+[tasks]
+  . human_input_form_timeout.check_and_resume
+  . resume_app_execution
+  . resume_workflow_execution
+  . schedule.check_upgradable_plugin_task.check_upgradable_plugin_task
+  . schedule.trigger_provider_refresh_task.trigger_provider_refresh
+  . schedule.update_api_token_last_used_task.batch_update_api_token_last_used
+  . schedule.workflow_schedule_task.poll_workflow_schedules
+  . tasks.add_document_to_index_task.add_document_to_index_task
+  . tasks.annotation.add_annotation_to_index_task.add_annotation_to_index_task
+  . tasks.annotation.batch_import_annotations_task.batch_import_annotations_task
+  . tasks.annotation.delete_annotation_index_task.delete_annotation_index_task
+  . tasks.annotation.disable_annotation_reply_task.disable_annotation_reply_task
+  . tasks.annotation.enable_annotation_reply_task.enable_annotation_reply_task
+  . tasks.annotation.update_annotation_to_index_task.update_annotation_to_index_task
+  . tasks.app_generate.workflow_execute_task.workflow_based_app_execution_task
+  . tasks.async_workflow_tasks.execute_workflow_professional
+  . tasks.async_workflow_tasks.execute_workflow_sandbox
+  . tasks.async_workflow_tasks.execute_workflow_team
+  . tasks.batch_clean_document_task.batch_clean_document_task
+  . tasks.batch_create_segment_to_index_task.batch_create_segment_to_index_task
+  . tasks.clean_dataset_task.clean_dataset_task
+  . tasks.clean_document_task.clean_document_task
+  . tasks.clean_notion_document_task.clean_notion_document_task
+  . tasks.deal_dataset_index_update_task.deal_dataset_index_update_task
+  . tasks.deal_dataset_vector_index_task.deal_dataset_vector_index_task
+  . tasks.delete_account_task.delete_account_task
+  . tasks.delete_conversation_task.delete_conversation_related_data
+  . tasks.delete_segment_from_index_task.delete_segment_from_index_task
+  . tasks.disable_segment_from_index_task.disable_segment_from_index_task
+  . tasks.disable_segments_from_index_task.disable_segments_from_index_task
+  . tasks.document_indexing_sync_task.document_indexing_sync_task
+  . tasks.document_indexing_task.document_indexing_task
+  . tasks.document_indexing_task.normal_document_indexing_task
+  . tasks.document_indexing_task.priority_document_indexing_task
+  . tasks.document_indexing_update_task.document_indexing_update_task
+  . tasks.duplicate_document_indexing_task.duplicate_document_indexing_task
+  . tasks.duplicate_document_indexing_task.normal_duplicate_document_indexing_task
+  . tasks.duplicate_document_indexing_task.priority_duplicate_document_indexing_task
+  . tasks.enable_segments_to_index_task.enable_segments_to_index_task
+  . tasks.generate_summary_index_task.generate_summary_index_task
+  . tasks.mail_account_deletion_task.send_account_deletion_verification_code
+  . tasks.mail_account_deletion_task.send_deletion_success_task
+  . tasks.mail_change_mail_task.send_change_mail_completed_notification_task
+  . tasks.mail_change_mail_task.send_change_mail_task
+  . tasks.mail_email_code_login.send_email_code_login_mail_task
+  . tasks.mail_human_input_delivery_task.dispatch_human_input_email_task
+  . tasks.mail_inner_task.send_inner_email_task
+  . tasks.mail_invite_member_task.send_invite_member_mail_task
+  . tasks.mail_owner_transfer_task.send_new_owner_transfer_notify_email_task
+  . tasks.mail_owner_transfer_task.send_old_owner_transfer_notify_email_task
+  . tasks.mail_owner_transfer_task.send_owner_transfer_confirm_task
+  . tasks.mail_register_task.send_email_register_mail_task
+  . tasks.mail_register_task.send_email_register_mail_task_when_account_exist
+  . tasks.mail_reset_password_task.send_reset_password_mail_task
+  . tasks.mail_reset_password_task.send_reset_password_mail_task_when_account_not_exist
+  . tasks.ops_trace_task.process_trace_tasks
+  . tasks.process_tenant_plugin_autoupgrade_check_task.process_tenant_plugin_autoupgrade_check_task
+  . tasks.rag_pipeline.priority_rag_pipeline_run_task.priority_rag_pipeline_run_task
+  . tasks.rag_pipeline.rag_pipeline_run_task.rag_pipeline_run_task
+  . tasks.recover_document_indexing_task.recover_document_indexing_task
+  . tasks.regenerate_summary_index_task.regenerate_summary_index_task
+  . tasks.remove_app_and_related_data_task.remove_app_and_related_data_task
+  . tasks.remove_document_from_index_task.remove_document_from_index_task
+  . tasks.retry_document_indexing_task.retry_document_indexing_task
+  . tasks.sync_website_document_indexing_task.sync_website_document_indexing_task
+  . tasks.trigger_processing_tasks.dispatch_triggered_workflows_async
+  . tasks.trigger_subscription_refresh_tasks.trigger_subscription_refresh
+  . tasks.workflow_execution_tasks.save_workflow_execution_task
+  . tasks.workflow_node_execution_tasks.save_workflow_node_execution_task
+  . tasks.workflow_schedule_tasks.run_schedule_trigger
+
+2026-05-18 17:31:11.203 INFO [MainThread] [connection.py:22]  - Connected to redis://:**@redis:6379/1
+2026-05-18 17:31:11.209 INFO [MainThread] [mingle.py:40]  - mingle: searching for neighbors
+2026-05-18 17:31:12.243 INFO [MainThread] [mingle.py:49]  - mingle: all alone
+2026-05-18 17:31:12.660 INFO [Dummy-1] [pidbox.py:111]  - pidbox: Connected to redis://:**@redis:6379/1.
+2026-05-18 17:31:12.684 INFO [MainThread] [worker.py:176]  - celery@c70c1dcacd97 ready.
+2026-05-18 17:32:10.293 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[a677a5a3-0689-4c2b-ab1f-b2cbcba10952] received
+2026-05-18 17:32:10.485 INFO [Dummy-2] [trace.py:128] 14f4ec1e71885a939df270d066c35ac0 - Task human_input_form_timeout.check_and_resume[a677a5a3-0689-4c2b-ab1f-b2cbcba10952] succeeded in 0.18908395000016753s: None
+2026-05-18 17:32:10.987 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[7bb4dae0-d62d-4732-ae79-7735a794e10b] received
+2026-05-18 17:32:11.201 INFO [Dummy-3] [trace.py:128] 8bb350f6053b56d7972ccaec0f841d1f - Task schedule.workflow_schedule_task.poll_workflow_schedules[7bb4dae0-d62d-4732-ae79-7735a794e10b] succeeded in 0.21292259900019417s: None
+2026-05-18 17:33:10.258 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[81f2d598-b72b-43c4-acdb-5762e96ac8b8] received
+2026-05-18 17:33:10.315 INFO [Dummy-4] [trace.py:128] 644de518ee1557dd873c2feaf8394147 - Task human_input_form_timeout.check_and_resume[81f2d598-b72b-43c4-acdb-5762e96ac8b8] succeeded in 0.05536282299999584s: None
+2026-05-18 17:33:11.257 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[951ba5e7-7977-47a6-b62e-8fa8956015b8] received
+2026-05-18 17:33:11.297 INFO [Dummy-5] [trace.py:128] 46fc8940b9955320b3aa1ec3388fcf9d - Task schedule.workflow_schedule_task.poll_workflow_schedules[951ba5e7-7977-47a6-b62e-8fa8956015b8] succeeded in 0.03790167399984057s: None
+2026-05-18 17:34:10.272 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[61c5b2d2-5acd-4825-8599-74c64158e841] received
+2026-05-18 17:34:10.313 INFO [Dummy-6] [trace.py:128] 7511fb0c12fa5ab88112ee56e0135ac2 - Task human_input_form_timeout.check_and_resume[61c5b2d2-5acd-4825-8599-74c64158e841] succeeded in 0.03944729900013044s: None
+2026-05-18 17:34:11.565 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[cdea16dd-556c-4206-b22b-006c58d5c02d] received
+2026-05-18 17:34:11.606 INFO [Dummy-7] [trace.py:128] 3722fa183e105e928a20aec116032997 - Task schedule.workflow_schedule_task.poll_workflow_schedules[cdea16dd-556c-4206-b22b-006c58d5c02d] succeeded in 0.04142661700007011s: None
+2026-05-18 17:35:10.282 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[0461718f-dc7e-4372-9e08-63a817c5bddd] received
+2026-05-18 17:35:10.330 INFO [Dummy-8] [trace.py:128] 4167156521d0545fac1fdbc13d500fc3 - Task human_input_form_timeout.check_and_resume[0461718f-dc7e-4372-9e08-63a817c5bddd] succeeded in 0.04650211099988155s: None
+2026-05-18 17:35:11.922 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[296df9a6-691e-45a4-8192-2250f0f00881] received
+2026-05-18 17:35:11.959 INFO [Dummy-9] [trace.py:128] 713d306f10835ea19d13cee0dc0f8df8 - Task schedule.workflow_schedule_task.poll_workflow_schedules[296df9a6-691e-45a4-8192-2250f0f00881] succeeded in 0.035448933000225225s: None
+2026-05-18 17:36:10.285 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[8cc2a8f1-c34e-4a4f-a7b3-ab23775e65c9] received
+2026-05-18 17:36:10.325 INFO [Dummy-10] [trace.py:128] a91e5fee2810557aab9540c6622c53c8 - Task human_input_form_timeout.check_and_resume[8cc2a8f1-c34e-4a4f-a7b3-ab23775e65c9] succeeded in 0.039088861999971414s: None
+2026-05-18 17:36:12.262 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[215594d2-328f-48d7-abab-03dfd562f2b4] received
+2026-05-18 17:36:12.304 INFO [Dummy-11] [trace.py:128] 71fd506c62a5531da37f4015656e103e - Task schedule.workflow_schedule_task.poll_workflow_schedules[215594d2-328f-48d7-abab-03dfd562f2b4] succeeded in 0.039954356999714946s: None
+2026-05-18 17:37:10.281 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[2df53709-baa9-4047-83b6-4acd72747801] received
+2026-05-18 17:37:10.316 INFO [Dummy-12] [trace.py:128] e2e78a9aaa1c5d8784ddd716998ff6d4 - Task human_input_form_timeout.check_and_resume[2df53709-baa9-4047-83b6-4acd72747801] succeeded in 0.034210592999897926s: None
+2026-05-18 17:37:10.554 INFO [MainThread] [strategy.py:161]  - Task schedule.workflow_schedule_task.poll_workflow_schedules[5f06ef1c-78d7-4792-8166-438c09b7fa63] received
+2026-05-18 17:37:10.595 INFO [Dummy-13] [trace.py:128] bc421cd325755523855b404f7b067200 - Task schedule.workflow_schedule_task.poll_workflow_schedules[5f06ef1c-78d7-4792-8166-438c09b7fa63] succeeded in 0.04034382700001515s: None
+2026-05-18 17:38:03.099 INFO [MainThread] [strategy.py:161]  - Task tasks.rag_pipeline.priority_rag_pipeline_run_task.priority_rag_pipeline_run_task[4624a8d1-9120-42b7-ac9d-f5b1dd44c170] received
+2026-05-18 17:38:03.109 INFO [Dummy-14] [priority_rag_pipeline_run_task.py:50] 25147314da5d536ab53fd176e61f9b16 - tenant cf347633-58d5-426b-88dc-3359b1c10a13 received 2 rag pipeline invoke entities
+2026-05-18 17:38:04.100 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/tool?provider=general_chunker&plugin_id=langgenius%2Fgeneral_chunker "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.204 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/tool?provider=general_chunker&plugin_id=langgenius%2Fgeneral_chunker "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.252 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/tool/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.260 WARNING [GraphWorker-0] [log.py:232]  -
+[on_tool_execution]
+
+2026-05-18 17:38:04.261 WARNING [GraphWorker-0] [log.py:232]  - Tool: general_chunker
+
+2026-05-18 17:38:04.264 WARNING [GraphWorker-0] [log.py:232]  - Outputs: {"type":"variable","message":{"variable_name":"result","variable_value":["A Security Analysis of the OpenClaw AI Agent\r\nFramework\r\nSurada Suwansathit\r\nSUCCESS Lab\r\nTexas A&M University\r\nsurada@tamu.edu\r\nYuxuan Zhang\r\nSUCCESS Lab\r\nTexas A&M University\r\nyuz516@tamu.edu\r\nGuofei Gu\r\nSUCCESS Lab\r\nTexas A&M University\r\nguofei@cse.tamu.edu\r\nApril 2026\r\nAbstract\r\nAI agent frameworks that connect large language model (LLM) reasoning to host execution\r\nsurfaces—shell, filesystem, containers, browser automation, and messaging platforms—introduce\r\na class of security challenges that differs structurally from those of conventional software","We\r\npresent a systematic security taxonomy of 470 advisories filed against OpenClaw [1], an open￾source AI agent runtime, organizing the corpus by architectural layer and trust-violation type.\r\nOur taxonomy reveals that vulnerabilities cluster along two orthogonal axes: (1) the system\r\naxis, which reflects where in the
+
+2026-05-18 17:38:04.313 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/tool/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.317 WARNING [GraphWorker-0] [log.py:232]  -
+[on_tool_execution]
+
+2026-05-18 17:38:04.317 WARNING [GraphWorker-0] [log.py:232]  - Tool: general_chunker
+
+2026-05-18 17:38:04.317 WARNING [GraphWorker-0] [log.py:232]  - Outputs: {"type":"variable","message":{"variable_name":"result","variable_value":["The Path of a Packet Through the Linux Kernel\r\nAlexander Stephan, Lars Wüstrich∗\r\n∗Chair of Network Architectures and Services\r\nSchool of Computation, Information and Technology, Technical University of Munich, Germany\r\nEmail: alexander.stephan@tum.de, wuestrich@net.in.tum.de\r\nAbstract—Networking stacks are the backbone of communi￾cation and information exchangeThis paper investigates the\r\nTCP/IPv4 and UDP/IPv4 network stack of Linux, the most\r\ncommon server OSWe describe a trace of the most critical\r\nnetworking functions of the Linux kernel 5.10.8Although\r\nLinux networking code documentation exists, it is often out￾dated or only covers specific aspects like the IP or TCP layer.\r\nWe address this holistically, covering a packet’s egress and\r\ningress path through the Linux networking stackMoreover,\r\nwe highlight intricacies of the implementation and present\r\nhow the Linux kernel realizes n
+
+2026-05-18 17:38:04.325 INFO [ThreadPoolExecutor-0_0] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/tool?provider=general_chunker&plugin_id=langgenius%2Fgeneral_chunker "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.412 INFO [ThreadPoolExecutor-0_1] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/tool?provider=general_chunker&plugin_id=langgenius%2Fgeneral_chunker "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.503 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/models?page=1&page_size=256 "HTTP/1.1 200 OK"
+2026-05-18 17:38:04.578 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/management/models?page=1&page_size=256 "HTTP/1.1 200 OK"
+2026-05-18 17:38:05.190 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/num_tokens "HTTP/1.1 200 OK"
+2026-05-18 17:38:05.223 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/num_tokens "HTTP/1.1 200 OK"
+2026-05-18 17:38:07.209 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/meta "HTTP/1.1 200 OK"
+2026-05-18 17:38:07.236 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/.well-known/ready "HTTP/1.1 200 OK"
+2026-05-18 17:38:07.239 INFO [GraphWorker-0] [vector_factory.py:204]  - start embedding 31 texts 1779125887.239775
+2026-05-18 17:38:07.240 INFO [GraphWorker-0] [vector_factory.py:210]  - Processing batch 1/1030 (31 texts)
+2026-05-18 17:38:07.561 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:07.660 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/.well-known/ready "HTTP/1.1 200 OK"
+2026-05-18 17:38:07.661 INFO [GraphWorker-0] [vector_factory.py:204]  - start embedding 102 texts 1779125887.6618307
+2026-05-18 17:38:07.663 INFO [GraphWorker-0] [vector_factory.py:210]  - Processing batch 1/1101 (102 texts)
+2026-05-18 17:38:08.047 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:08.097 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:08.404 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:08.699 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:08.949 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:09.079 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:09.582 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:09.866 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:10.015 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:10.293 INFO [MainThread] [strategy.py:161]  - Task human_input_form_timeout.check_and_resume[0c1981f1-ee0d-4348-b887-a2c2ff0be325] received
+2026-05-18 17:38:10.306 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:10.505 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:10.644 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:10.871 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:11.185 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:11.268 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:11.639 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:11.689 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:12.076 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:12.469 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:12.926 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:13.144 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:13.464 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:13.512 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:13.840 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:14.932 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:14.981 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:15.274 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:15.555 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:16.089 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:16.852 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:16.987 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:17.145 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:17.437 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:17.656 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:17.711 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:18.017 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:18.140 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:18.296 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:20.269 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:20.324 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:20.737 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:20.894 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:21.027 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:21.478 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:21.515 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:21.927 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:22.478 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:22.729 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:22.864 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.007 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.132 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.269 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.702 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.734 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.965 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:23.997 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:24.212 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:24.271 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:24.599 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:24.814 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.581 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.663 INFO [GraphWorker-0] [vector_factory.py:212]  - Embedding batch 1/1030 took 18.422836303710938 s
+2026-05-18 17:38:25.668 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/schema/Vector_index_56ee0058_ddbf_4c55_b262_394f3289813e_Node "HTTP/1.1 404 Not Found"
+2026-05-18 17:38:25.849 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://weaviate:8080/v1/schema "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.854 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/schema/Vector_index_56ee0058_ddbf_4c55_b262_394f3289813e_Node "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.858 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/schema/Vector_index_56ee0058_ddbf_4c55_b262_394f3289813e_Node "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.865 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/schema/Vector_index_56ee0058_ddbf_4c55_b262_394f3289813e_Node "HTTP/1.1 200 OK"
+2026-05-18 17:38:25.874 INFO [BgDynamicBatchRate] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/nodes "HTTP/1.1 200 OK"
+2026-05-18 17:38:26.217 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:26.572 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:26.884 INFO [BgDynamicBatchRate] [_client.py:1025]  - HTTP Request: GET http://weaviate:8080/v1/nodes "HTTP/1.1 200 OK"
+2026-05-18 17:38:26.978 INFO [GraphWorker-0] [vector_factory.py:216]  - Embedding 31 texts took 19.738650798797607 s
+2026-05-18 17:38:27.514 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:27.814 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:28.389 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:28.673 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:29.872 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:30.608 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:31.113 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:31.559 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:31.963 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:34.102 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:34.468 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:35.352 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:36.010 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:36.287 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:36.568 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:36.924 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:37.306 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:38.941 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:39.376 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:39.973 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:40.582 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:42.655 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:42.926 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:43.195 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:43.502 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:43.938 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:44.215 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:44.593 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:44.949 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:45.322 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:45.724 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:46.299 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:46.594 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:38:47.085 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:13.102 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:15.673 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:15.997 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:16.393 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:18.059 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:18.466 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:18.828 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:19.132 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:19.754 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:20.179 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:20.688 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:20.978 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:21.264 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:21.654 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:21.991 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:22.229 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:23.614 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:23.915 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:24.318 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:24.726 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:25.039 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:25.422 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:26.923 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"
+2026-05-18 17:39:27.203 INFO [GraphWorker-0] [_client.py:1025]  - HTTP Request: POST http://plugin_daemon:5002/plugin/cf347633-58d5-426b-88dc-3359b1c10a13/dispatch/text_embedding/invoke "HTTP/1.1 200 OK"

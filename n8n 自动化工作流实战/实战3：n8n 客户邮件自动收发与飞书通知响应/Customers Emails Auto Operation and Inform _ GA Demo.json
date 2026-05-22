@@ -1,0 +1,719 @@
+{
+  "name": "Customers Emails Auto Operation and Inform | GA Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "mailbox": "收件箱",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -4896,
+        -400
+      ],
+      "id": "01b5649e-bbf5-4ffd-9587-c0b3bd1ff2a8",
+      "name": "Email Trigger (IMAP)1",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "executeOnce": false,
+      "credentials": {
+        "imap": {
+          "id": "wKAhSGtwIckphPnq",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 检测乱码类型\nconst items = $input.all();\n\nreturn items.map(item => {\n  const text = item.json.textPlain || '';\n  \n  // 乱码检测逻辑\n  const hasQuestionMark = text.includes('�');\n  const hasLatin1HighBytes = /[\\x80-\\xFF]/.test(text);\n  \n  // 计算中文比例\n  const chineseChars = (text.match(/[\\u4e00-\\u9fa5]/g) || []).length;\n  const chineseRatio = text.length > 0 ? chineseChars / text.length : 0;\n  \n  let isGarbled = false;\n  let garbledType = 'none';\n  \n  if (hasQuestionMark && chineseRatio < 0.05) {\n    isGarbled = true;\n    garbledType = 'question_mark';     // 不可修复\n  } else if (hasLatin1HighBytes && chineseRatio < 0.1) {\n    isGarbled = true;\n    garbledType = 'latin1_misdecode'; // 可能可修复\n  }\n  \n  return {\n    json: {\n      ...item.json,\n      is_garbled: isGarbled,\n      garbled_type: garbledType,\n      chinese_ratio: chineseRatio\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4624,
+        -400
+      ],
+      "id": "efb05e21-f5ef-4f96-a8b1-8bc0b36d28cf",
+      "name": "Code in JavaScript",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0af1069b-1ce1-4315-a1fa-6604f87f0cdc",
+              "leftValue": "={{ $json.is_garbled.toString() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4368,
+        -400
+      ],
+      "id": "79149470-caf2-4b41-a9da-2a6992095890",
+      "name": "If1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "databaseToken",
+        "operation": "batchCreate",
+        "tableId": 665,
+        "rowsUi": {
+          "rowValues": [
+            {
+              "fieldsUi": {
+                "fieldValues": [
+                  {
+                    "fieldId": 6223,
+                    "fieldValue": "={{ $json.from }}"
+                  },
+                  {
+                    "fieldId": 6226,
+                    "fieldValue": "={{ $json.subject }}"
+                  },
+                  {
+                    "fieldId": 6224,
+                    "fieldValue": "={{ $json.textPlain }}"
+                  },
+                  {
+                    "fieldId": 6225,
+                    "fieldValue": "={{ $json.date }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1.1,
+      "position": [
+        -3760,
+        -320
+      ],
+      "id": "0b39d62c-48fb-47de-8a40-bf539b3b2af6",
+      "name": "Create multiple rows",
+      "credentials": {
+        "baserowTokenApi": {
+          "id": "EftOqIkM4BqCmw0D",
+          "name": "Baserow account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "databaseToken",
+        "operation": "batchCreate",
+        "tableId": 666,
+        "rowsUi": {
+          "rowValues": [
+            {
+              "fieldsUi": {
+                "fieldValues": [
+                  {
+                    "fieldId": 6227,
+                    "fieldValue": "={{ $json.from }}"
+                  },
+                  {
+                    "fieldId": 6230,
+                    "fieldValue": "={{ $json.subject }}"
+                  },
+                  {
+                    "fieldId": 6228,
+                    "fieldValue": "={{ $json.textPlain }}"
+                  },
+                  {
+                    "fieldId": 6229,
+                    "fieldValue": "={{ $json.date }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1.1,
+      "position": [
+        -4096,
+        -528
+      ],
+      "id": "63d31223-8702-44a8-a3f3-ac39f33c2338",
+      "name": "Create multiple rows1",
+      "credentials": {
+        "baserowTokenApi": {
+          "id": "EftOqIkM4BqCmw0D",
+          "name": "Baserow account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "- 异常邮件、乱码邮件写入异常邮件数据表\n- 来源：邮件**网页客户端**",
+        "height": 240,
+        "width": 278,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4160,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "8c1076ab-5c83-48ab-afba-711df8826d2d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n- 常规邮件写入邮件数据表\n- 来源：邮件**本地客户端**",
+        "height": 224,
+        "width": 246
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3808,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "9994dd15-6e04-43cc-8503-00cd40bcfc97",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.feishu.cn/open-apis/bot/v2/hook/2a8cb86a-72ac-4d14-bd49-b3b168948bb6",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text",
+        "body": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -3360,
+        -608
+      ],
+      "id": "48f83962-204a-4f36-9070-ae2b8e9c8417",
+      "name": "HTTP Request",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "825989090@qq.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "已接受到您的技术支持咨询",
+        "emailFormat": "text",
+        "text": "您好！我们已经收到您的技术支持咨询，我们的技术团队会在24小时内回复您。感谢您的耐心等待！",
+        "options": {
+          "appendAttribution": true
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -3184,
+        -416
+      ],
+      "id": "e8a8810a-d0c8-4e0c-a384-12f091a6d07c",
+      "name": "Send an Email",
+      "webhookId": "ea4e72b3-5e68-4371-bb14-49726ff12aaa",
+      "alwaysOutputData": true,
+      "credentials": {
+        "smtp": {
+          "id": "4yJg8W88KMFJPgQT",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    payload: JSON.stringify({\n      msg_type: 'text',\n      content: {\n        text: item.json.feishu_message\n      }\n    })\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3584,
+        -512
+      ],
+      "id": "bdc8e63f-1d63-4da7-bf13-9727539a28be",
+      "name": "Code in JavaScript1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ee48f1f-0c79-4e6f-a2ed-e8c2e2e27dc6",
+              "name": "feishu_message",
+              "value": "={{ '新消息：' + $json.subject + '\\n来自 ' + $json.from }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3760,
+        -512
+      ],
+      "id": "65cb0704-782b-4ded-aaef-d82040dee15b",
+      "name": "Edit Fields",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const payloadStr = item.json.payload || '';\n  \n  // 正则提取邮箱\n  const emailMatch = payloadStr.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);\n  const email = emailMatch ? emailMatch[0] : null;\n  \n  return {\n    json: {\n      ...item.json,\n      email: email           // 第一个邮箱\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3360,
+        -416
+      ],
+      "id": "2e3f0bef-c6e4-4655-bda9-d5cfca7f5f03",
+      "name": "Code in JavaScript2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "- 模拟企业 QQ 邮箱等待接收客户新邮件\n- 收到新邮件后进入下一步解析",
+        "height": 240,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4944,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "91db3853-6001-404e-95af-57efd4a58701",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "- 解析邮件中内容是否存在**乱码**\n- 根据情况将邮件进行**分选**",
+        "height": 240,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4720,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "eb8c4590-14e2-484c-aa48-8398cd2e8a21",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "- 邮件内容乱码：存入 Baserow 的乱码邮件表中\n- 邮件内容正常：存入  Baserow 的客户信息表中",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4464,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "4b06d8ac-75a0-42f3-8fcf-1ef951e90a20",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "- 合并前一步中输出的相关字段，生成 **feishu_message**。\n- 封装 feishu_message 为 **JSON 请求体**\n- 单纯的 feishu_message 值无法被解析，最终**飞书群组机器人**输出空值。\n\n\n\n\n\n\n\n\n\n\n",
+        "height": 288,
+        "width": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3808,
+        -640
+      ],
+      "typeVersion": 1,
+      "id": "2207635b-82db-45e6-9e10-ba0db27cdfe1",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "- 通过暴露的飞书群组机器人 **webhook** 接收工作流的信息\n- 关注飞书中群组的新消息\n",
+        "height": 240,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3424,
+        -688
+      ],
+      "typeVersion": 1,
+      "id": "e4ef54ef-0f9e-4a70-8117-e3b352a1058e",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## 客户邮件自动分选、自动回复与飞书通知工作流",
+        "height": 80,
+        "width": 304,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4944,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "6124b257-cf46-44cc-b4e3-7311ac205f36",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n- 提取最初客户邮箱，用于下一步邮件自动回复。\n- 自动回复客户邮件",
+        "height": 224,
+        "width": 438
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3424,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "4980d3b0-0502-425a-bf39-5610b9053db0",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    payload: JSON.stringify({\n      msg_type: 'text',\n      content: {\n        text: item.json.other_info\n      }\n    })\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3568,
+        -48
+      ],
+      "id": "743405f5-3f8e-4cf4-8c0b-7d6d16ebe03e",
+      "name": "Code in JavaScript3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f698689-c1ff-4115-9105-30ff0130dd5f",
+              "name": "other_info",
+              "value": "={{ '低优先级消息：' + $json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3760,
+        -48
+      ],
+      "id": "46451dde-0b4d-4781-a8b1-f95a7b2005fb",
+      "name": "Edit Fields1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.feishu.cn/open-apis/bot/v2/hook/2a8cb86a-72ac-4d14-bd49-b3b168948bb6",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text",
+        "body": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -3360,
+        -48
+      ],
+      "id": "21d4eed5-6080-4a0f-b163-2109595d94c1",
+      "name": "HTTP Request1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "- 未入数据表的邮件也发送飞书群消息",
+        "height": 208,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3808,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "dcbaed9e-f4fc-4f4d-a262-8342077cabc9",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.textPlain }}",
+                    "rightValue": "技术支持",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "209d83ce-1675-4edb-b9b9-7b62bde6ec27"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=高优先级"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cbd2400b-458d-4d5d-8395-27db0649aee6",
+                    "leftValue": "={{ $json.textPlain }}",
+                    "rightValue": "技术支持",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notContains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "低优先级"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -4096,
+        -304
+      ],
+      "id": "ba9be768-ebfc-4092-a87f-2df52964c75a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "- 使用多分支节点完成邮件分选",
+        "height": 208,
+        "width": 288,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4160,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "802d3e23-7211-4adc-bc58-d1038e2322ac",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Email Trigger (IMAP)1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create multiple rows1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create multiple rows": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create multiple rows1": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create multiple rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Shanghai",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedPerExecution": 5
+  },
+  "versionId": "9671141b-3af3-45b9-93b5-fb208cf30769",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dbcb9f32684fcc3ada295ced1b93b49afe72d76b37a1193d684d7075a41a5d61"
+  },
+  "id": "kAW0JhI3EeanthZp",
+  "tags": []
+}
