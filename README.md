@@ -191,7 +191,7 @@
   - [【二进制部署】基于 GitLab + Jenkins + Harbor + Podman 的 Java 应用 CI/CD 示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/DevOps%20%E6%8A%80%E6%9C%AF%E6%A0%88/%E5%9F%BA%E4%BA%8E%20GitLab%20%2B%20Jenkins%20%2B%20Harbor%20%2B%20Podman%20%E7%9A%84%20CICD%20%E7%A4%BA%E4%BE%8B/%E5%9F%BA%E4%BA%8E%20GitLab%20%2B%20Jenkins%20%2B%20Harbor%20%2B%20Podman%20%E7%9A%84%20CICD%20%E7%A4%BA%E4%BE%8B.md)
   - [【Ansible 部署】Deploy and manage GitLab-CE and Jenkins CI platform by Ansible](https://github.com/Alberthua-Perl/ansible-demo/tree/master/ansible-cicd-plt)
 
-### 📚 Ansible 进阶之路
+## 📚 Ansible 进阶之路
 
 - [【精华】SLE15SP6 中实践 ansible-navigator 与 EE 容器镜像](https://github.com/Alberthua-Perl/tech-docs/blob/master/Ansible%20%E8%BF%9B%E9%98%B6%E4%B9%8B%E8%B7%AF/SLE15SP6%20%E4%B8%AD%E5%AE%9E%E8%B7%B5%20ansible-navigator%20%E4%B8%8E%20EE%20%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F.md)
 - [Ansible 自动化进阶实践 (1) —— 利用推荐做法进行 Playbook 开发](https://github.com/Alberthua-Perl/tech-docs/blob/master/Ansible%20%E8%BF%9B%E9%98%B6%E4%B9%8B%E8%B7%AF/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20(1)%20-%20%E5%88%A9%E7%94%A8%E6%8E%A8%E8%8D%90%E5%81%9A%E6%B3%95%E8%BF%9B%E8%A1%8C%20Playbook%20%E5%BC%80%E5%8F%91/Ansible%20%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5%20(1)%20-%20%E5%88%A9%E7%94%A8%E6%8E%A8%E8%8D%90%E5%81%9A%E6%B3%95%E8%BF%9B%E8%A1%8C%20Playbook%20%E5%BC%80%E5%8F%91.md)
