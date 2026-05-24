@@ -2,33 +2,35 @@
 
 ## 文档说明
 
-## 环境资源要求矩阵
+## 环境资源要求
 
 | 操作系统类型 | CPU 数量 | 内存容量 | Docker 版本 | Dify 版本 | Milvus 版本 | Attu 版本 |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| Ubuntu 24.04.4 LTS (Noble Numbat) | 8 | 16GB | docker-ce 29.5.0 <br> docker-ce-cli 29.5.0 <br> docker-ce-rootless-extras 29.5.0 <br> docker-compose-plugin 5.1.3 | 1.13.3 | v2.6.16 | v2.6 |
+| Ubuntu 24.04.4 LTS (Noble Numbat) | 8 | 16GB | 1️⃣ docker-ce 29.5.0 <br> 2️⃣ docker-ce-cli 29.5.0 <br> 3️⃣ docker-ce-rootless-extras 29.5.0 <br> 4️⃣ docker-compose-plugin 5.1.3 | 1.13.3 | v2.6.16 | v2.6 |
 
 ## 文档目录
 
 - [📚 RAG 知识库构建与在线检索优化实践](#-rag-知识库构建与在线检索优化实践)
   - [文档说明](#文档说明)
-  - [环境资源要求矩阵](#环境资源要求矩阵)
+  - [环境资源要求](#环境资源要求)
   - [文档目录](#文档目录)
   - [Dify 容器化部署](#dify-容器化部署)
   - [Dify 插件安装](#dify-插件安装)
   - [Milvus 数据库部署：Standalone 模式](#milvus-数据库部署standalone-模式)
+    - [Docker 单容器运行方式](#docker-单容器运行方式)
+    - [Docker Compose 运行方式](#docker-compose-运行方式)
   - [Dify 节点执行报错汇总](#dify-节点执行报错汇总)
   - [待测试内容](#待测试内容)
   - [参考链接](#参考链接)
 
 ## Dify 容器化部署
 
-截止笔者部署 Dify 时，其最新版本更新至 `1.14.0`，遂尝试此版本部署，但在使用过程中发现，以下两大问题：
+截止笔者部署 Dify 时，其最新版本更新为 `1.14.0`，遂尝试此版本部署，但在使用过程中发现，以下两大问题：
 
-- ❌ 创建知识库后使用内置 DSL 知识库模板无法正确渲染。
-- ❌ 在自定义知识库流水线中调试单个节点常出现实例失败，原因在于内部数据库通信异常。
+- ⚠️ 创建知识库后使用内置 DSL 知识库模板无法正确渲染
+- ⚠️ 在自定义知识库流水线中由于内部数据库通信异常而导致调试单个节点常出现实例失败
 
-因此，笔者选择 Dify 3.13.3 版本部署测试。
+因此，笔者选择 Dify 1.13.3 版本部署测试。
 
 Dify 以 **Docker Compose** 多容器运行方式，其中包含多个组件，启动过程如下：
 
@@ -93,6 +95,8 @@ failed to init environment
 
 ## Milvus 数据库部署：Standalone 模式
 
+### Docker 单容器运行方式
+
 本文采用 `Milvus Standalone` 模式部署数据库，但采用 [官方脚本](https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh) 无法正确启动 Milvus 数据库，需更改以下内容修复：
 
 <img src="images/standalone_milvus_bugfix.png" width=80%>
@@ -129,6 +133,8 @@ To change the default Milvus configuration, add your settings to the user.yaml f
 $ docker ps --format="table {{ .Names }} {{ .Status }}" | grep milvus
 milvus-standalone Up 54 minutes (healthy)
 ```
+
+### Docker Compose 运行方式
 
 ## Dify 节点执行报错汇总
 
