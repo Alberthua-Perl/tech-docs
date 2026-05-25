@@ -1,4 +1,4 @@
-# Kerberos 基本原理与集成
+# 🪪 Kerberos 基本原理与集成
 
 ## 文档说明
 
@@ -18,52 +18,61 @@
 
 ## 文档目录
 
-- [Kerberos 基本原理与集成](#kerberos-基本原理与集成)
+- [🪪 Kerberos 基本原理与集成](#-kerberos-基本原理与集成)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [Kerberos 核心概念](#kerberos-核心概念)
-  - [Kerberos 认证原理](#kerberos-认证原理)
-  - [管理 Kerberos Principals](#管理-kerberos-principals)
-  - [Kerberos Server (KDC) 部署](#kerberos-server-kdc-部署)
-  - [Kerberos 客户端对接 KDC 与 SSO 验证](#kerberos-客户端对接-kdc-与-sso-验证)
-  - [实现访问 Kerberos SSO 认证的 Web 服务方式](#实现访问-kerberos-sso-认证的-web-服务方式)
-  - [Nginx + Apache + Kerberos 实现 SSO 访问](#nginx--apache--kerberos-实现-sso-访问)
-    - [Nginx 反向代理配置](#nginx-反向代理配置)
-    - [安装与配置 mod\_auth\_gssapi 模块](#安装与配置-mod_auth_gssapi-模块)
-    - [安装与配置 GSS-Proxy](#安装与配置-gss-proxy)
+  - [1. Kerberos 核心概念](#1-kerberos-核心概念)
+    - [1.1 Kerberos Principals（主体）](#11-kerberos-principals主体)
+    - [1.2 常见的 SPN 前缀](#12-常见的-spn-前缀)
+  - [2. Kerberos 认证原理](#2-kerberos-认证原理)
+    - [2.1 Kerberos 认证过程与密钥加密过程](#21-kerberos-认证过程与密钥加密过程)
+    - [2.2 Kerberos 认证过程中 principal 类型的变化](#22-kerberos-认证过程中-principal-类型的变化)
+    - [🔥 2.3 为什么通过 kadmin.local 命令行创建 principal 后，依然无法在 Web 页面上显示用户已创建？](#-23-为什么通过-kadminlocal-命令行创建-principal-后依然无法在-web-页面上显示用户已创建)
+  - [3. 管理 Kerberos Principals](#3-管理-kerberos-principals)
+    - [3.1 创建新的 principal](#31-创建新的-principal)
+    - [3.2 删除已创建的 principal](#32-删除已创建的-principal)
+  - [4. Kerberos Server (KDC) 部署](#4-kerberos-server-kdc-部署)
+  - [🎯 5. Kerberos 客户端对接 KDC 与 SSO 验证](#-5-kerberos-客户端对接-kdc-与-sso-验证)
+  - [6. 示例：实现访问 Kerberos SSO 认证的 Web 服务方式](#6-示例实现访问-kerberos-sso-认证的-web-服务方式)
+    - [6.1 方法1：Nginx 反向代理 + Apache mod\_auth\_gssapi 模块](#61-方法1nginx-反向代理--apache-mod_auth_gssapi-模块)
+      - [6.1.1 步骤1：Nginx 反向代理配置](#611-步骤1nginx-反向代理配置)
+      - [6.2.2 步骤2：安装与配置 mod\_auth\_gssapi 模块](#622-步骤2安装与配置-mod_auth_gssapi-模块)
+      - [6.2.3 安装与配置 GSS-Proxy](#623-安装与配置-gss-proxy)
+    - [6.2 方法2：Nginx ngx\_http\_auth\_gssapi 模块](#62-方法2nginx-ngx_http_auth_gssapi-模块)
   - [参考链接](#参考链接)
+  - [待解决问题](#待解决问题)
 
+## 1. Kerberos 核心概念
 
-## Kerberos 核心概念
+### 1.1 Kerberos Principals（主体）
 
-- Kerberos Principals（主体）：
-  - Kerberos principals 是 Kerberos 认证系统中用于唯一标识实体（如用户、服务或主机）的名称。它通常采用 `primary[/instance]@REALM` 的格式，其中 ‌primary‌ 表示主体的基本名称（如用户名或 host），‌instance‌ 是可选的实例部分用于进一步区分（例如 admin），‌REALM‌ 是大写的 Kerberos 领域名称，类似于域名。‌
-  - Kerberos 里只有两种 principal 类型，区别完全体现在 **命名格式** 和 **用途**，协议本身没有额外的类型字段。
+- Kerberos principals 是 Kerberos 认证系统中用于唯一标识实体（如用户、服务或主机）的名称。它通常采用 `primary[/instance]@REALM` 的格式，其中 ‌primary‌ 表示主体的基本名称（如用户名或 host），‌instance‌ 是可选的实例部分用于进一步区分（例如 admin），‌REALM‌ 是大写的 Kerberos 领域名称，类似于域名。‌
+- Kerberos 里只有两种 principal 类型，区别完全体现在 **命名格式** 和 **用途**，协议本身没有额外的类型字段。
 
-  | 名称 | 格式 | 作用 | 示例 |
-  | ----- | ----- | ----- | ----- |
-  | **User Principal（UPN）**  | `用户名@REALM` | 代表 **人**（用户、管理员、机器人） | `alice@LAB.EXAMPLE.COM` |
-  | **Service Principal（SPN）** | `服务/主机@REALM` | 代表 **服务实例**（HTTP、LDAP、SSH、CIFS 等） | `HTTP/serverb.example.com@LAB.EXAMPLE.COM` |
+| 名称 | 格式 | 作用 | 示例 |
+| ----- | ----- | ----- | ----- |
+| **User Principal（UPN）**  | `用户名@REALM` | 代表 **人**（用户、管理员、机器人） | `alice@LAB.EXAMPLE.COM` |
+| **Service Principal（SPN）** | `服务/主机@REALM` | 代表 **服务实例**（HTTP、LDAP、SSH、CIFS 等） | `HTTP/serverb.example.com@LAB.EXAMPLE.COM` |
 
-  - 常见的 SPN 前缀：
+### 1.2 常见的 SPN 前缀
 
-  | 前缀 | 服务 | 典型 SPN |
-  | ----- | ----- | ----- |
-  | `HTTP/` | Web 服务器 | `HTTP/www.lab.example.com@LAB.EXAMPLE.COM` |
-  | `ldap/` | 目录服务器 | `ldap/dc.lab.example.com@LAB.EXAMPLE.COM` |
-  | `host/` | 主机通用 | `host/serverb.lab.example.com@LAB.EXAMPLE.COM` |
-  | `nfs/` | NFS 服务器 | `nfs/nfs.lab.example.com@LAB.EXAMPLE.COM` |
-  | `postgres/` | PostgreSQL | `postgres/db.lab.example.com@LAB.EXAMPLE.COM` |
+| 前缀 | 服务 | 典型 SPN |
+| ----- | ----- | ----- |
+| `HTTP/` | Web 服务器 | `HTTP/www.lab.example.com@LAB.EXAMPLE.COM` |
+| `ldap/` | 目录服务器 | `ldap/dc.lab.example.com@LAB.EXAMPLE.COM` |
+| `host/` | 主机通用 | `host/serverb.lab.example.com@LAB.EXAMPLE.COM` |
+| `nfs/` | NFS 服务器 | `nfs/nfs.lab.example.com@LAB.EXAMPLE.COM` |
+| `postgres/` | PostgreSQL | `postgres/db.lab.example.com@LAB.EXAMPLE.COM` |
 
-## Kerberos 认证原理
+## 2. Kerberos 认证原理
 
-- Kerberos 认证过程与密钥加密过程：
-  - 图1：客户端请求 TGT、TGS 与服务的过程中密钥加密的变化
-  - 图2：客户端请求 TGT、TGS 与服务的过程中请求与响应
+### 2.1 Kerberos 认证过程与密钥加密过程
 
-  <center><img src="images/kerberos-authentication-summary.jpg" style="width:90%"></center>
+如下图：客户端请求 TGT、TGS 与服务的过程中密钥加密的变化
 
-- Kerberos 认证过程中 principal 类型的变化：
+<center><img src="images/kerberos-authentication-summary.jpg" style="width:90%"></center>
+
+### 2.2 Kerberos 认证过程中 principal 类型的变化
 
 ```mermaid
 graph LR
@@ -92,16 +101,79 @@ graph LR
     KEYTAB -- 验证 --> S
 ```
 
-- 💥 注意：为什么通过 kadmin.local 命令行创建 principal 后，依然无法在 Web 页面上显示用户已创建？
-  - FreeIPA/IdM/OpenLDAP 中的用户与 Kerberos principal 强绑定（一一对应），通过创建用户将同时创建对应的 principal。
-  - 而纯命令行 kadmin.local add_principal 只生成 Kerberos principal，不会在 FreeIPA/IdM/OpenLDAP 里创建 posixAccount（即 uid、gid、home 等系统账号属性）。
-  - 因此，即使在客户端使用 kinit demo@LAB.EXAMPLE.COM 此类命令保存了 principal 的 TGT 缓存，但是 SSSD 在枚举用户时根本无法感知这个新建的 principal，自然也不会把它缓存到 /var/lib/sss/db/ 中。
-  - 要让 “裸 principal” 也能被 sssctl 显示并用于 SSH 登录，必须手动补录一条同名的 posixAccount 到 LDAP，让 SSSD 有账可查。
-  - 所以，kadmin.local add_principal 命令新建 principal 不能在 Web 页面查看。
+### 🔥 2.3 为什么通过 kadmin.local 命令行创建 principal 后，依然无法在 Web 页面上显示用户已创建？
 
-## 管理 Kerberos Principals
+FreeIPA/IdM/OpenLDAP 中的用户与 Kerberos principal 强绑定（一一对应），通过创建用户将同时创建对应的 principal。而纯命令行 kadmin.local add_principal 只生成 Kerberos principal，不会在 FreeIPA/IdM/OpenLDAP 里创建 `posixAccount`（即 uid、gid、home 等系统账号属性）。因此，即使在客户端使用 `kinit demo@LAB.EXAMPLE.COM` 此类命令保存了 principal 的 TGT 缓存，但是 SSSD 在枚举用户时根本无法感知这个新建的 principal，自然也不会把它缓存到 `/var/lib/sss/db/` 中。要让 “裸 principal” 也能被 sssctl 显示并用于 SSH 登录，必须手动补录一条同名的 `posixAccount` 到 LDAP，让 SSSD 有账可查。所以，kadmin.local add_principal 命令新建 principal 不能在 Web 页面查看。
 
-创建新的 principal：
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e1f5fe', 'primaryTextColor': '#01579b', 'primaryBorderColor': '#0288d1', 'lineColor': '#0288d1', 'secondaryColor': '#fff3e0', 'tertiaryColor': '#e8f5e9'}}}%%
+
+flowchart LR
+    subgraph STEP1["1️⃣ 创建方式"]
+        direction TB
+        A1["ipa user-add demo"]
+        B1["kadmin.local addprinc demo"]
+    end
+
+    subgraph STEP2["2️⃣ LDAP 记录"]
+        direction TB
+        A2["✓ uid=demo<br/>cn=users,..."]
+        B2["✗ 无记录"]
+    end
+
+    subgraph STEP3["3️⃣ POSIX 属性"]
+        direction TB
+        A3["✓ uid/gid<br/>home/shell"]
+        B3["✗ 无属性"]
+    end
+
+    subgraph STEP4["4️⃣ Kerberos Principal"]
+        direction TB
+        A4["✓ 自动生成"]
+        B4["✓ 手动创建"]
+    end
+
+    subgraph STEP5["5️⃣ SSSD 枚举"]
+        direction TB
+        A5["✓ 通过 LDAP<br/>可发现"]
+        B5["✗ 无法发现"]
+    end
+
+    subgraph STEP6["6️⃣ Web UI 显示"]
+        direction TB
+        A6["✓ 显示"]
+        B6["✗ 不显示"]
+    end
+
+    subgraph STEP7["7️⃣ SSH 登录"]
+        direction TB
+        A7["✓ 可用"]
+        B7["✗ 不可用"]
+    end
+
+    A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> A7
+    B1 --> B2 --> B3 --> B4 --> B5 --> B6 --> B7
+
+    style A1 fill:#e8f5e9,stroke:#2e7d32
+    style A2 fill:#e8f5e9,stroke:#2e7d32
+    style A3 fill:#e8f5e9,stroke:#2e7d32
+    style A4 fill:#e8f5e9,stroke:#2e7d32
+    style A5 fill:#e8f5e9,stroke:#2e7d32
+    style A6 fill:#e8f5e9,stroke:#2e7d32
+    style A7 fill:#e8f5e9,stroke:#2e7d32
+
+    style B1 fill:#ffebee,stroke:#c62828
+    style B2 fill:#ffebee,stroke:#c62828
+    style B3 fill:#ffebee,stroke:#c62828
+    style B4 fill:#c8e6c9,stroke:#2e7d32
+    style B5 fill:#ffebee,stroke:#c62828
+    style B6 fill:#ffebee,stroke:#c62828
+    style B7 fill:#ffebee,stroke:#c62828
+```
+
+## 3. 管理 Kerberos Principals
+
+### 3.1 创建新的 principal
 
 ```bash
 ##Kerberos 认证服务节点/FreeIPA/IdM
@@ -110,7 +182,7 @@ $ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw demotes
 #创建指定名称的 UPN 并设置密码，覆盖默认的严格的 IdM 认证限制。
 ```
 
-删除已创建的 principal：
+### 3.2 删除已创建的 principal
 
 ```bash
 ##Kerberos 认证服务节点/FreeIPA/IdM
@@ -118,7 +190,7 @@ $ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal <usernam
 $ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal demo
 ```
 
-## Kerberos Server (KDC) 部署
+## 4. Kerberos Server (KDC) 部署
 
 ```bash
 ###servera.lab.example.com
@@ -200,9 +272,11 @@ $ scp ./http.keytab root@serverb.lab.example.com:/opt/http.keytab  #同步 keyta
 $ scp /etc/krb5.conf root@serverb.lab.example.com:/etc/krb5.conf  #同步 Kerberos 配置文件至客户端
 ```
 
-## Kerberos 客户端对接 KDC 与 SSO 验证
+## 🎯 5. Kerberos 客户端对接 KDC 与 SSO 验证
 
 本示例中使用 HTTP 类型票据（SPN）进行 Kerberos 客户端连接，完成 SSO 验证。
+
+> 注意：SSO（Single Sign-On，单点登录）是指用户只需认证一次，就能访问多个相互信任的系统/应用，无需重复输入密码。
 
 ```bash
 ###serverb.lab.example.com
@@ -219,9 +293,11 @@ $ sudo klist -A  #列举 Kerberos 缓存中的票据（SPN 条目）
 $ sudo kdestroy  #清除所有缓存的票据（SPN 条目）
 ```
 
-## 实现访问 Kerberos SSO 认证的 Web 服务方式
+## 6. 示例：实现访问 Kerberos SSO 认证的 Web 服务方式
 
-- 1️⃣方法1：Nginx 作为反向代理（Reverse Proxy），Apache HTTPD 接收流量并调用 `mod_auth_gssapi` 模块，此模块通过 `/run/gssproxy/http.sock` 套接字与 gssproxy 守护进程通信，使用 keytab 文件完成服务主体 `HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM` 的解密，最终实现 SSO 认证。
+### 6.1 方法1：Nginx 反向代理 + Apache mod_auth_gssapi 模块
+
+Nginx 作为反向代理（Reverse Proxy），Apache HTTPD 接收流量并调用 `mod_auth_gssapi` 模块，此模块通过 `/run/gssproxy/http.sock` 套接字与 gssproxy 守护进程通信，使用 keytab 文件完成服务主体 `HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM` 的解密，最终实现 SSO 认证。
 
 ```mermaid
 %% 时序图：浏览器/curl → Nginx → Apache → GSS-Proxy → KDC → Nginx
@@ -258,13 +334,7 @@ sequenceDiagram
     Nginx-->>Client: 200 OK
 ```
 
-- 2️⃣ 方法2：Nginx 直接接收客户端流量，由于其自身不支持 GSS 认证，需要额外编译 `ngx_http_auth_gssapi` 模块，让 GSS-Proxy 提供 `SPNEGO` 认证套接字，Nginx 通过 `ngx_http_auth_gssapi` 模块（动态加载）与之通信，实现 Kerberos SSO。
-
-## Nginx + Apache + Kerberos 实现 SSO 访问
-
-此处以 `方式1` 为例，实现 Kerberos SSO 认证。
-
-### Nginx 反向代理配置
+#### 6.1.1 步骤1：Nginx 反向代理配置
 
 ```bash
 ###serverb.lab.example.com
@@ -290,7 +360,7 @@ server {
 }
 ```
 
-### 安装与配置 mod_auth_gssapi 模块
+#### 6.2.2 步骤2：安装与配置 mod_auth_gssapi 模块
 
 Apache HTTPD 在 mod_auth_gssapi 模块安装过程中也将一并安装，配置过程如下所示：
 
@@ -321,7 +391,7 @@ Listen 127.0.0.1:8080  #由于 Nginx 与 Apache 部署在同一节点上，且 N
 $ sudo systemctl enable --now httpd.service
 ```
 
-### 安装与配置 GSS-Proxy
+#### 6.2.3 安装与配置 GSS-Proxy
 
 Apache HTTPD 与 GSS-Proxy 服务之间的关系如下所示：
 
@@ -345,6 +415,14 @@ $ sudo vim /etc/gssproxy/80-http.conf
   euid = apache
 ```
 
+### 6.2 方法2：Nginx ngx_http_auth_gssapi 模块
+
+Nginx 直接接收客户端流量，由于其自身不支持 GSS 认证，需要额外编译 `ngx_http_auth_gssapi` 模块，让 GSS-Proxy 提供 `SPNEGO` 认证套接字，Nginx 通过 `ngx_http_auth_gssapi` 模块（动态加载）与之通信，实现 Kerberos SSO。
+
 ## 参考链接
 
 - [Kerberos: An Authentication Service for Computer Networks](https://gost.isi.edu/publications/kerberos-neuman-tso.html)
+
+## 待解决问题
+
+- 
