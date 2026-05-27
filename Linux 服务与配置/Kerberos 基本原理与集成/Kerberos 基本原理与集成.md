@@ -28,10 +28,10 @@
     - [2.1 Kerberos 认证过程与密钥加密过程](#21-kerberos-认证过程与密钥加密过程)
     - [2.2 Kerberos 认证过程中 principal 类型的变化](#22-kerberos-认证过程中-principal-类型的变化)
     - [🔥 2.3 为什么通过 kadmin.local 命令行创建 principal 后，依然无法在 Web 页面上显示用户已创建？](#-23-为什么通过-kadminlocal-命令行创建-principal-后依然无法在-web-页面上显示用户已创建)
-  - [3. 管理 Kerberos Principals](#3-管理-kerberos-principals)
-    - [3.1 创建新的 principal](#31-创建新的-principal)
-    - [3.2 删除已创建的 principal](#32-删除已创建的-principal)
-  - [4. Kerberos Server (KDC) 部署](#4-kerberos-server-kdc-部署)
+  - [3. Kerberos Server (KDC) 服务端部署](#3-kerberos-server-kdc-服务端部署)
+  - [4. 管理 Kerberos Principals](#4-管理-kerberos-principals)
+    - [4.1 创建新的 principal](#41-创建新的-principal)
+    - [4.2 删除已创建的 principal](#42-删除已创建的-principal)
   - [🎯 5. Kerberos 客户端对接 KDC 与 SSO 验证](#-5-kerberos-客户端对接-kdc-与-sso-验证)
   - [6. 示例：实现访问 Kerberos SSO 认证的 Web 服务方式](#6-示例实现访问-kerberos-sso-认证的-web-服务方式)
     - [6.1 方法1：Nginx 反向代理 + Apache mod\_auth\_gssapi 模块](#61-方法1nginx-反向代理--apache-mod_auth_gssapi-模块)
@@ -51,8 +51,9 @@
 
 | 名称 | 格式 | 作用 | 示例 |
 | ----- | ----- | ----- | ----- |
-| **User Principal（UPN）**  | `用户名@REALM` | 代表 **人**（用户、管理员、机器人） | `alice@LAB.EXAMPLE.COM` |
-| **Service Principal（SPN）** | `服务/主机@REALM` | 代表 **服务实例**（HTTP、LDAP、SSH、CIFS 等） | `HTTP/serverb.example.com@LAB.EXAMPLE.COM` |
+| **User Principal（UPN）** | `用户名@REALM` | 代表 **人**（用户、管理员、机器人），用于人认证（密码/TGT） | `alice@LAB.EXAMPLE.COM` |
+| **Host Principal（HPN）** | `HOST/主机名@REALM` | 代表 **主机本身**（服务器、工作站、节点），用于主机加入域、验证主机身份、SSSD/LDAP 绑定 | `HOST/servera.lab.example.com@LAB.EXAMPLE.COM` |
+| **Service Principal（SPN）** | `服务/主机名@REALM` | 代表 **运行在主机上的服务实例**（HTTP、LDAP、SSH、CIFS 等），用于服务认证（客户端申请服务票据） | `HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM` |
 
 ### 1.2 常见的 SPN 前缀
 
@@ -171,26 +172,7 @@ flowchart LR
     style B7 fill:#ffebee,stroke:#c62828
 ```
 
-## 3. 管理 Kerberos Principals
-
-### 3.1 创建新的 principal
-
-```bash
-##Kerberos 认证服务节点/FreeIPA/IdM
-$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw <password> <username>@REALM
-$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw demotest123 demo@LAB.EXAMPLE.COM
-#创建指定名称的 UPN 并设置密码，覆盖默认的严格的 IdM 认证限制。
-```
-
-### 3.2 删除已创建的 principal
-
-```bash
-##Kerberos 认证服务节点/FreeIPA/IdM
-$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal <username>
-$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal demo
-```
-
-## 4. Kerberos Server (KDC) 部署
+## 3. Kerberos Server (KDC) 服务端部署
 
 ```bash
 ###servera.lab.example.com
@@ -269,7 +251,26 @@ $ sudo kadmin.local -q "ktadd -k ./http.keytab HTTP/serverb.lab.example.com@LAB.
 #导出创建的票据为 keytab 文件
 $ ls -lh ./http.keytab
 $ scp ./http.keytab root@serverb.lab.example.com:/opt/http.keytab  #同步 keytab 文件至 Kerberos 客户端
-$ scp /etc/krb5.conf root@serverb.lab.example.com:/etc/krb5.conf  #同步 Kerberos 配置文件至客户端
+$ scp /etc/krb5.conf root@serverb.lab.example.com:/etc/krb5.conf   #同步 Kerberos 配置文件至 Kerberos 客户端
+```
+
+## 4. 管理 Kerberos Principals
+
+### 4.1 创建新的 principal
+
+```bash
+##Kerberos 认证服务节点/FreeIPA/IdM
+$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw <password> <username>@REALM
+$ sudo kadmin.local -x ipa-setup-override-restrictions add_principal -pw demotest123 demo@LAB.EXAMPLE.COM
+#示例：创建指定名称的 UPN 并设置密码，覆盖默认的严格的 IdM 认证限制。
+```
+
+### 4.2 删除已创建的 principal
+
+```bash
+##Kerberos 认证服务节点/FreeIPA/IdM
+$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal <username>
+$ sudo kadmin.local -x ipa-setup-override-restrictions delete_principal demo
 ```
 
 ## 🎯 5. Kerberos 客户端对接 KDC 与 SSO 验证
@@ -281,12 +282,13 @@ $ scp /etc/krb5.conf root@serverb.lab.example.com:/etc/krb5.conf  #同步 Kerber
 ```bash
 ###serverb.lab.example.com
 $ sudo dnf install -y krb5-workstation krb5-libs
-$ kinit -kt /path/to/http.keytab HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM
+$ kinit -kt /opt/http.keytab HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM
+#前文 "3. Kerberos Server (KDC) 服务端部署" 中已创建
 #使用 SPN 以及指定的 keytab 文件连接 KDC 完成认证（SSO 验证）
 # 💥 注意：
 #   1. keytab 文件每次在 KDC 节点新生成或者导出后都要在 Kerberos 更新一次，否则将认证失败。
 #   2. 若上述命令运行返回成功，则无任何输出。
-#   3. 若运行报错 "Could not find ..."，则表明 KDC 中 SPN 对应的 keytab 与指定的 keytab 不一致，
+#   3. 若运行报错 "Could not find ..."，则表明 KDC 中 SPN 对应的 keytab 与命令行中指定的 keytab 不一致，
 #      或者客户端不存在 /etc/krb5.conf，或者 /etc/krb5.conf 中的配置存在错误，需进行更正。
 
 $ sudo klist -A  #列举 Kerberos 缓存中的票据（SPN 条目）
@@ -397,10 +399,10 @@ Apache HTTPD 与 GSS-Proxy 服务之间的关系如下所示：
 
 | 组件 | 作用 |
 | ----- | ----- |
-| `mod_auth_gssapi` | Apache HTTPD 的 GSSAPI 认证模块（取代旧 `mod_auth_kerb`）|
+| `mod_auth_gssapi` | Apache HTTPD 的 GSSAPI 认证模块（取代旧 `mod_auth_kerb`） |
 | `gssproxy` | 让 **非 root 的 httpd 用户** 安全读取 keytab |
 | Apache HTTPD | 监听端口，触发 GSSAPI → GSS-Proxy → Kerberos |
-| KDC | 颁发 TGT / ST，验证票据。|
+| KDC | 颁发 TGT / ST，验证票据。 |
 
 ```bash
 ###serverb.lab.example.com
@@ -425,4 +427,62 @@ Nginx 直接接收客户端流量，由于其自身不支持 GSS 认证，需要
 
 ## 待解决问题
 
-- 
+1. sssd 对接 idm 的过程？主机上的用户如何通过 su 切换用户，经由 sssd 完成 kerberos 认证？
+2. idm 中的 httpd 服务端证书过期，但是 ca 证书没有过期应该如何更新此证书？这个证书会影响 kerberos 认证吗？
+3. ipa web 页面上的登录用户是 kerberos 中的用户吗？
+4. kerberos 中的用户和 ipa 中在 web 端可见的用户是什么关系？
+5. 如何重置 ipa web 页面上的登录用户密码？
+6. sssd 对接 idm 和 kerberos 客户端对接 idm，这两者的差别是什么？
+
+
+
+```bash
+# 查看主机的 HPN
+ipa host-show servera.lab.example.com
+# 输出包含: Principal name: HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+
+# 查看某主机上的 SPN
+ipa service-find --host serverb.lab.example.com
+# HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM
+# LDAP/serverb.lab.example.com@LAB.EXAMPLE.COM
+
+# 查看 keytab 中的主体
+klist -k /etc/krb5.keytab
+# Keytab name: FILE:/etc/krb5.keytab
+# KVNO Principal
+# ---- --------------------------------------------------------------------------
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+```
+
+```bash
+# 直接在 openssl 命令中使用密码
+sudo openssl req -new \
+  -key /var/lib/ipa/private/httpd.key \
+  -out /tmp/httpd.csr \
+  -passin file:/var/lib/ipa/passwd/utility.lab.example.com-443-RSA \
+  -subj "/CN=utility.lab.example.com/O=LAB.EXAMPLE.COM" \
+  -addext "subjectAltName=DNS:utility.lab.example.com,DNS:ipa-ca.lab.example.com"
+```
+
+用 CA 私钥手动签发证书（应急场景）
+
+```bash
+#导出 CA 证书（公钥）
+sudo certutil -L -d /etc/pki/pki-tomcat/alias/ \
+  -n "caSigningCert cert-pki-ca" \
+  -a \
+  -o /tmp/ca-cert.pem
+
+
+# 使用 /var/lib/ipa/private/ca.key 签发新证书
+sudo openssl x509 -req \
+  -in /tmp/httpd.csr \
+  -CA /var/lib/ipa/certs/ca.crt \
+  -CAkey /var/lib/ipa/private/ca.key \
+  -CAcreateserial \
+  -out /tmp/new-cert.pem \
+  -days 365 \
+  -sha256
+```

@@ -1,6 +1,6 @@
 # 🔥 Linux 修行之道
 
-<center><img src="QR-code.jpg" width=70%></center>
+<center><img src="QR-code.jpg" width=50%></center>
 
 <center><img src="2027-Audi-RS5-007-1440sw.jpg"></center>
 
