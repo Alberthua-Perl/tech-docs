@@ -252,14 +252,21 @@ HTTP 不使用 SSL/TLS 进行加密通信，所有信息明文传播，带来三
 
 - 证书标准：**X.509**
 - 编码格式：
-  - ✨ **PEM**（Privacy Enhanced Mail）：纯文本形式的编码格式（Base64 编码），Apache 与 *nix 服务器偏向于使用该格式。
+  - **PEM**（Privacy Enhanced Mail）：纯文本形式的编码格式（Base64 编码），Apache 与 *nix 服务器偏向于使用该格式。
   - **DER**（Distinguished Encoding Rules）：二进制形式的编码格式，Java 与 Windows 服务器偏向于使用该格式。
-- 证书（Certificate，**CER** 或 **CRT**），也称数字签名证书。
-- 私钥（Private Key）
-- 证书签名请求（Certificate Signing Request，**CSR**）：此文件使用私钥加密，包含公钥与签名申请者信息等。
-- CER 与 CRT 两者都为证书，CRT 在 Linux 上更常见。
-- CER、CRT、KEY、CSR 都可为 PEM 或 DER 编码格式！
-- 🪛 支持 SSL/TLS 协议的开源工具：`openssl`、`cfssl`、`gnutls`
+
+  | 对比项 | CRT | PEM |
+  | ----- | ----- | ----- |
+  | **本质** | 文件扩展名 | 编码格式标准 |
+  | **关系** | `.crt` 文件 **通常就是 PEM 格式** | 一种 Base64 编码方式 |
+  | **内容** | 证书数据 | 证书/私钥/CSR 等均可 |
+  | **头尾标记** | PEM 有 `-----BEGIN CERTIFICATE-----` | 必须有 |
+  | **二进制版本** | DER 格式（`.cer` `.der`） | 无 |
+
+- 证书（Certificate，**CER** 或 **CRT**）：称数字签名证书，文件扩展名为 `.crt`、`.cer`、`.der` 等。
+- 私钥（Private Key）：文件扩展名为 `.key`。
+- 证书签名请求（Certificate Signing Request，**CSR**）：此文件使用私钥加密，包含公钥与签名申请者信息等，文件扩展名为 `.csr`。
+- 🪛 支持 SSL/TLS 协议的开源工具：`openssl`、`cfssl`、`gnutls`、`certutil`、`pk12util`
 - 📚 man 查看以下命令：openssl、genrsa、rsa、req、x509、verify、s_client、s_server
 
 ## 🚀 8. SSL/TLS 加密连接的 HTTPS 单/双向认证流程

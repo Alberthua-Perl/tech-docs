@@ -433,56 +433,5 @@ Nginx 直接接收客户端流量，由于其自身不支持 GSS 认证，需要
 4. kerberos 中的用户和 ipa 中在 web 端可见的用户是什么关系？
 5. 如何重置 ipa web 页面上的登录用户密码？
 6. sssd 对接 idm 和 kerberos 客户端对接 idm，这两者的差别是什么？
-
-
-
-```bash
-# 查看主机的 HPN
-ipa host-show servera.lab.example.com
-# 输出包含: Principal name: HOST/servera.lab.example.com@LAB.EXAMPLE.COM
-
-# 查看某主机上的 SPN
-ipa service-find --host serverb.lab.example.com
-# HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM
-# LDAP/serverb.lab.example.com@LAB.EXAMPLE.COM
-
-# 查看 keytab 中的主体
-klist -k /etc/krb5.keytab
-# Keytab name: FILE:/etc/krb5.keytab
-# KVNO Principal
-# ---- --------------------------------------------------------------------------
-#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
-#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
-#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
-```
-
-```bash
-# 直接在 openssl 命令中使用密码
-sudo openssl req -new \
-  -key /var/lib/ipa/private/httpd.key \
-  -out /tmp/httpd.csr \
-  -passin file:/var/lib/ipa/passwd/utility.lab.example.com-443-RSA \
-  -subj "/CN=utility.lab.example.com/O=LAB.EXAMPLE.COM" \
-  -addext "subjectAltName=DNS:utility.lab.example.com,DNS:ipa-ca.lab.example.com"
-```
-
-用 CA 私钥手动签发证书（应急场景）
-
-```bash
-#导出 CA 证书（公钥）
-sudo certutil -L -d /etc/pki/pki-tomcat/alias/ \
-  -n "caSigningCert cert-pki-ca" \
-  -a \
-  -o /tmp/ca-cert.pem
-
-
-# 使用 /var/lib/ipa/private/ca.key 签发新证书
-sudo openssl x509 -req \
-  -in /tmp/httpd.csr \
-  -CA /var/lib/ipa/certs/ca.crt \
-  -CAkey /var/lib/ipa/private/ca.key \
-  -CAcreateserial \
-  -out /tmp/new-cert.pem \
-  -days 365 \
-  -sha256
-```
+7. 如何比较两张 CA 证书是否是同一张？
+8. 如何确认 CA 证书与密钥文件是否匹配？

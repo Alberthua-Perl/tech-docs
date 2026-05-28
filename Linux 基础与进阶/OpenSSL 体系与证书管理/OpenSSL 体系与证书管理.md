@@ -8,6 +8,9 @@
   - [2. openssl req 命令](#2-openssl-req-命令)
   - [3. openssl rsa 命令](#3-openssl-rsa-命令)
   - [4. openssl x509 命令](#4-openssl-x509-命令)
+    - [4.1 证书查询命令](#41-证书查询命令)
+    - [4.2 证书与私钥匹配验证](#42-证书与私钥匹配验证)
+    - [4.3 验证是否是相同的证书](#43-验证是否是相同的证书)
   - [5. 创建自签名数字证书的方法](#5-创建自签名数字证书的方法)
   - [🎯 6. 创建 CA RSA 私钥与 CA 根证书（root-ca）](#-6-创建-ca-rsa-私钥与-ca-根证书root-ca)
   - [🎉 7. 基于 CA 根证书创建 server 端数字签名证书](#-7-基于-ca-根证书创建-server-端数字签名证书)
@@ -109,31 +112,50 @@
   -out             指定输出的数字签名证书名称
   ```
 
-- 常用命令：
+### 4.1 证书查询命令
 
-  ```bash
-  $ openssh x509 -in /path/to/<cert_file>.crt
-  # 仅返回编码的 PEM 证书本身（-----BEGIN/END----- 块）
+```bash
+$ openssh x509 -in /path/to/<cert_file>.crt
+# 仅返回 Base64 编码的 PEM 证书块（-----BEGIN/END----- 块）
 
-  $ openssl x509 -in /path/to/<cert_file>.crt -noout -text 
-  # 不打印编码的 PEM 证书：纯文本形式打印证书详情（版本、序列号、有效期、公钥、扩展等）
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -text 
+# 仅返回证书的详情（版本、序列号、有效期、公钥、扩展等）
 
-  $ openssl x509 -in /path/to/<cert_file>.crt -noout -subject
-  # 不打印编码的 PEM 证书：打印证书的主题信息
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -subject
+# 仅返回证书的主题信息
 
-  $ openssl x509 -in /path/to/<cert_file>.crt -noout -dates
-  # 不打印编码的 PEM 证书：打印证书的起始与过期的日期（有效期）
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -dates
+# 仅返回证书的起始与过期的日期（有效期）
 
-  $ openssl x509 -in /path/to/<cert_file>.crt -noout -serial
-  # 不打印编码的 PEM 证书：查看证书的序列号
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -serial
+# 仅返回证书的序列号
 
-  $ openssl x509 -in /path/to/<cert_file>.crt -noout -pubkey
-  # 不打印编码的 PEM 证书：查看证书中的公钥信息，该公钥与 RSA 私钥中提取的公钥一致。
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -pubkey
+# 仅返回证书的公钥信息，该公钥与 RSA 私钥中提取的公钥一致。
 
-  $ openssl verify -CAfile root-ca.cert.pem inter-ca.cert.pem 
-  inter-ca.cert.pem: OK
-  # 验证证书链
-  ```
+$ openssl verify -CAfile root-ca.cert.pem inter-ca.cert.pem 
+inter-ca.cert.pem: OK
+# 验证证书链
+```
+
+### 4.2 证书与私钥匹配验证
+
+通过 CA 证书与 CA 证书私钥的模数匹配来实现：
+
+```bash
+$ openssl x509 -in /path/to/<cert_file>.crt -noout -modulus | md5sum
+$ openssl rsa -in /path/to/<cert_file>.key -noout -modulus | md5sum
+# 比对两者的 md5 校验和，如果一致说明两者匹配。
+```
+
+### 4.3 验证是否是相同的证书
+
+此处使用 **证书公钥** 来验证：提取两个证书中的公钥（PEM 编码格式），将公钥装换成 DER 二进制形式后比较 sha256 校验和。若两者一致，说明是同一张证书；反之证书不同。
+
+```bash
+$ openssl x509 -in /etc/ipa/ca.crt -noout -pubkey | openssl pkey -pubin -outform DER | openssl dgst -sha256
+$ openssl x509 -in /var/lib/ipa/certs/ca.crt -noout -pubkey | openssl pkey -pubin -outform DER | openssl dgst -sha256
+```
 
 ## 5. 创建自签名数字证书的方法
 
