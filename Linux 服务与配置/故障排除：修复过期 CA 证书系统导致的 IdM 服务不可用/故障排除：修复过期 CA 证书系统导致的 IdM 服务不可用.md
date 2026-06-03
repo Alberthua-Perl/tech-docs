@@ -326,7 +326,10 @@ pki-tomcatd@pki-tomcat.service 启动:
             bound as uid=pkidbuser,ou=people,o=ipaca
   ```
 
-- 核心绑定流程：**subsystemCert (subject: CN=CA Subsystem) --certmap--> seeAlso=CN=CA Subsystem,O=LAB.EXAMPLE.COM --SASL EXTERNAL--> uid=pkidbuser,ou=people,o=ipaca**
+- 核心绑定流程：<br>
+  **subsystemCert (subject: CN=CA Subsystem) ==certmap==>** <br>
+  **seeAlso=CN=CA Subsystem,O=LAB.EXAMPLE.COM ==SASL EXTERNAL==>** <br>
+  **uid=pkidbuser,ou=people,o=ipaca**
 
 - 查询与更新 LDAP 中的 userCertificate：
 
@@ -630,7 +633,7 @@ $ sudo ipa-cert-fix -v --log-file=/tmp/ipa_cert_fix.log
 
   ```bash
   $ sudo kinit admin@LAB.EXAMPLE.COM    #密码：RedHat123^
-  $ sudo ipactl status
+  $ sudo ipa ping
   # 依然 SSL 认证报错，提示 ipa 命令使用 CA 客户端证书
   ```
 
@@ -649,6 +652,8 @@ $ sudo ipa-cert-fix -v --log-file=/tmp/ipa_cert_fix.log
   $ sudo openssl verify -CAfile /var/lib/ipa-client/pki/kdc-ca-bundle.pem /var/kerberos/krb5kdc/kdc.crt
   # KDC 客户端证书信任锚与 KDC 证书的证书链验证失败
   ```
+
+  ![18-krb5kdc%20证书链验证失败](images/18-krb5kdc%20证书链验证失败.png)
 
 ### 2.6 修复步骤4：更新客户端 CA 根证书
 
@@ -729,8 +734,9 @@ $ sudo getcert list -i <request_id>
 # 查看证书监控更新的状态
 ```
 
-🎯 注意：certmonger 监控的证书状态变化为 **SUBMITTING -> POST_SAVED -> MONITORING**
+🎯 注意：certmonger 监控的证书状态变化为 **<font color=red>SUBMITTING > POST_SAVED > MONITORING</font>**
 
 ## 3. 参考链接
 
 - [73.2. 续订后验证 IdM 域中的其他 IdM 服务器 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/8/html/configuring_and_managing_identity_management/verifying-other-idm-servers-in-the-domain-after-renewal_renewing-expired-system-certificates-when-idm-is-offline)
+- [第 12 章 使用 certmonger | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/7/html/system-level_authentication_guide/certmongerx)
