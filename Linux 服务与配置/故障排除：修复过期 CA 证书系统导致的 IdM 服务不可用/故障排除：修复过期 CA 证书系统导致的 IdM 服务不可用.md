@@ -25,6 +25,7 @@ FreeIPA 作为 IdM 的开源版本，文中提及的 IdM 操作均可在 FreeIPA
     - [2.6 修复步骤4：更新客户端 CA 根证书](#26-修复步骤4更新客户端-ca-根证书)
     - [2.7 修复步骤5：ipa 命令行验证与 IPA Web UI 登录验证](#27-修复步骤5ipa-命令行验证与-ipa-web-ui-登录验证)
     - [2.8 修复步骤6：同步 IdM 证书监控状态](#28-修复步骤6同步-idm-证书监控状态)
+  - [3. 参考链接](#3-参考链接)
 
 ## 1. IdM 中的组件与认证体系
 
@@ -729,3 +730,7 @@ $ sudo getcert list -i <request_id>
 ```
 
 🎯 注意：certmonger 监控的证书状态变化为 **SUBMITTING -> POST_SAVED -> MONITORING**
+
+## 3. 参考链接
+
+- [73.2. 续订后验证 IdM 域中的其他 IdM 服务器 | RedHat Docs](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/8/html/configuring_and_managing_identity_management/verifying-other-idm-servers-in-the-domain-after-renewal_renewing-expired-system-certificates-when-idm-is-offline)
