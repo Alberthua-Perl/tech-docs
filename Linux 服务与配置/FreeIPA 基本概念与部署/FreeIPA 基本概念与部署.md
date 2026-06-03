@@ -15,17 +15,18 @@
 - [FreeIPA 基本概念与部署](#freeipa-基本概念与部署)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [FreeIPA 基础概要](#freeipa-基础概要)
-  - [FreeIPA 节点角色与逻辑架构](#freeipa-节点角色与逻辑架构)
-  - [FreeIPA 部署：服务端](#freeipa-部署服务端)
-  - [查看与调试部署过程中的问题](#查看与调试部署过程中的问题)
-  - [部署后命令行验证](#部署后命令行验证)
-  - [部署后 Web 登录验证](#部署后-web-登录验证)
-  - [添加 FreeIPA 客户端主机](#添加-freeipa-客户端主机)
-  - [添加域用户与设置策略](#添加域用户与设置策略)
-  - [参考链接](#参考链接)
+  - [1. FreeIPA 基础概要](#1-freeipa-基础概要)
+  - [2. FreeIPA 节点角色与逻辑架构](#2-freeipa-节点角色与逻辑架构)
+  - [3. FreeIPA 部署：服务端](#3-freeipa-部署服务端)
+  - [4. 查看与调试部署过程中的问题](#4-查看与调试部署过程中的问题)
+  - [5. 部署后命令行验证](#5-部署后命令行验证)
+  - [6. 部署后 Web 登录验证](#6-部署后-web-登录验证)
+  - [7. 添加 FreeIPA 客户端主机](#7-添加-freeipa-客户端主机)
+  - [8. 添加域用户与设置策略](#8-添加域用户与设置策略)
+  - [9. 定位 FreeIPA 平台中的各类主体（principle）](#9-定位-freeipa-平台中的各类主体principle)
+  - [10. 参考链接](#10-参考链接)
 
-## FreeIPA 基础概要
+## 1. FreeIPA 基础概要
 
 - Red Hat Identity Management（`IdM`）身份验证解决方案，基于上游开源项目 `FreeIPA`。
 - FreeIPA 是用于 Linux/Unix 环境的开源身份管理系统，它提供集中式帐户管理和身份验证，类似于 `Microsoft Active Directory` 或 `OpenLDAP`。
@@ -44,7 +45,7 @@
   - 策略：配置设置、访问控制信息
   - 审计跟踪：事件、日志、分析
 
-## FreeIPA 节点角色与逻辑架构
+## 2. FreeIPA 节点角色与逻辑架构
 
 - FreeIPA 中具有 3 种节点角色：
   - 服务端（server）：管理域成员使用的所有服务
@@ -64,7 +65,7 @@
   
   <img src="images/ipa-server-arch-2.png" style="width:60%">
 
-## FreeIPA 部署：服务端
+## 3. FreeIPA 部署：服务端
 
 - `ipa-server` 节点角色：
   - 主机域名：ipa-server.lab.example.com
@@ -116,7 +117,7 @@
 
 - 服务端部署日志可查看：`/var/log/ipaserver-install.log`
 
-## 查看与调试部署过程中的问题
+## 4. 查看与调试部署过程中的问题
 
 - 若指定 forwarder，该 forwarder 不可配置有相同域名的 zone 区域数据，否则安装报错失败！
 
@@ -143,7 +144,7 @@
 
   <img src="images/static-dynamic-dns.jpg" style="width:60%">
   
-## 部署后命令行验证
+## 5. 部署后命令行验证
 
 ```bash
 $ sudo ipactl status
@@ -177,7 +178,7 @@ $ sudo firewall-cmd --reload
 # 添加 ipa-server 所需放行的端口并重载 firewall 规则
 ```
 
-## 部署后 Web 登录验证
+## 6. 部署后 Web 登录验证
 
 - 在浏览器地址栏中输入 ipa-server 的 IP 地址，将自动转换为域名并返回登录界面。
 - 用户名为 `admin`，密码为 `1qazZSE$`。
@@ -190,7 +191,7 @@ $ sudo firewall-cmd --reload
   
   <img src="images/firefox-ca-cache-2.jpg" style="width:60%">
 
-## 添加 FreeIPA 客户端主机
+## 7. 添加 FreeIPA 客户端主机
 
 ```bash
 $ sudo yum install -y ipa-client
@@ -216,7 +217,7 @@ ipa-client 主机添加成功后，在浏览器中可查看该客户端主机。
 
 <img src="images/add-ipa-client-host-3.png" style="width:60%">
 
-## 添加域用户与设置策略
+## 8. 添加域用户与设置策略
 
 - 打开浏览器点击 "Identity" -> "Users"，再点击 "+Add" 创建新的域用户。
   
@@ -244,7 +245,29 @@ ipa-client 主机添加成功后，在浏览器中可查看该客户端主机。
   
   <img src="images/add-user-policy-9.png" style="width:60%">
 
-## 参考链接
+## 9. 定位 FreeIPA 平台中的各类主体（principle）
+
+```bash
+# 1. 查看主机的 HPN
+$ sudo ipa host-show servera.lab.example.com
+# 输出包含: Principal name: HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+
+# 2. 查看某主机上的 SPN
+$ sudo ipa service-find --host serverb.lab.example.com
+# HTTP/serverb.lab.example.com@LAB.EXAMPLE.COM
+# LDAP/serverb.lab.example.com@LAB.EXAMPLE.COM
+
+# 3. 查看 keytab 中的主体
+$ klist -k /etc/krb5.keytab
+# Keytab name: FILE:/etc/krb5.keytab
+# KVNO Principal
+# ---- --------------------------------------------------------------------------
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+#    2 HOST/servera.lab.example.com@LAB.EXAMPLE.COM
+```
+
+## 10. 参考链接
 
 - [AD user unable to login with error : pam_sss(sshd:auth): authentication failure - Red Hat Customer Portal](https://access.redhat.com/solutions/7004011)
 - [Active Directory User failed to login with Error: pam_sss(sshd:account): Access denied - Red Hat Customer Portal](https://access.redhat.com/solutions/2187581)
