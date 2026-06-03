@@ -11,7 +11,7 @@ FreeIPA 作为 IdM 的开源版本，文中提及的 IdM 操作均可在 FreeIPA
   - [文档目录](#文档目录)
   - [1. IdM 中的组件与认证体系](#1-idm-中的组件与认证体系)
     - [1.1 组件名称与功能介绍](#11-组件名称与功能介绍)
-    - [1.2 PKI-Tomcatd / DirSrv / NSS / Certmonger 核心交互时序图](#12-pki-tomcatd--dirsrv--nss--certmonger-核心交互时序图)
+    - [🧬 1.2 PKI-Tomcatd / DirSrv / NSS / Certmonger 核心交互时序图](#-12-pki-tomcatd--dirsrv--nss--certmonger-核心交互时序图)
     - [🎯 1.3 pki-tomcatd 服务内部调用过程](#-13-pki-tomcatd-服务内部调用过程)
     - [🚩 1.4 PKI-Tomcatd 与 DirSrv 认证连接过程（SASL EXTERNAL 认证）](#-14-pki-tomcatd-与-dirsrv-认证连接过程sasl-external-认证)
     - [🪝 1.5 PKI-Tomcatd 与 DirSrv 的强依赖说明](#-15-pki-tomcatd-与-dirsrv-的强依赖说明)
@@ -57,7 +57,7 @@ FreeIPA 作为 IdM 的开源版本，文中提及的 IdM 操作均可在 FreeIPA
 | `389DS` | dirsrv@LAB-EXAMPLE.COM.service (ns-slapd) | 389 目录服务器 |
 | `Certmonger` | certmonger.service | NSS 数据库中证书有效性追踪 |
 
-### 1.2 PKI-Tomcatd / DirSrv / NSS / Certmonger 核心交互时序图
+### 🧬 1.2 PKI-Tomcatd / DirSrv / NSS / Certmonger 核心交互时序图
 
 ```mermaid
 sequenceDiagram
