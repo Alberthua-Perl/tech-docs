@@ -4,19 +4,26 @@
 
 - [🧬 Linux 性能分析工具之 perf](#-linux-性能分析工具之-perf)
   - [文档目录](#文档目录)
-  - [perf 介绍与说明](#perf-介绍与说明)
-  - [perf 的主要特性](#perf-的主要特性)
-  - [perf 的工作原理与事件类型](#perf-的工作原理与事件类型)
-  - [perf 子命令概览](#perf-子命令概览)
-  - [perf stat 子命令](#perf-stat-子命令)
-  - [perf top 子命令](#perf-top-子命令)
-  - [perf record 与 perf report 子命令](#perf-record-与-perf-report-子命令)
-  - [perf annotate 子命令](#perf-annotate-子命令)
-  - [perf 示例与排查](#perf-示例与排查)
-  - [火焰图生成与解读](#火焰图生成与解读)
-  - [参考链接](#参考链接)
+  - [1. Perf 介绍与说明](#1-perf-介绍与说明)
+  - [2. Perf 的主要特性](#2-perf-的主要特性)
+  - [3. Perf 的工作原理与事件类型](#3-perf-的工作原理与事件类型)
+  - [4. perf 子命令概览](#4-perf-子命令概览)
+  - [5. perf stat 子命令](#5-perf-stat-子命令)
+  - [6. perf top 子命令](#6-perf-top-子命令)
+    - [6.1 分析示例：goSimpleWeb 程序在 ab 压力测试时的性能事件解析](#61-分析示例gosimpleweb-程序在-ab-压力测试时的性能事件解析)
+    - [6.2 分析示例：指定内核函数性能事件](#62-分析示例指定内核函数性能事件)
+  - [7. perf record 与 perf report 子命令](#7-perf-record-与-perf-report-子命令)
+  - [8. perf annotate 子命令](#8-perf-annotate-子命令)
+  - [9. perf 示例与排查](#9-perf-示例与排查)
+  - [10. 火焰图原理与应用](#10-火焰图原理与应用)
+    - [10.1 火焰图说明](#101-火焰图说明)
+    - [10.2 工具安装](#102-工具安装)
+    - [10.3 采集程序性能数据](#103-采集程序性能数据)
+    - [10.4 生成火焰图](#104-生成火焰图)
+    - [10.5 火焰图解读](#105-火焰图解读)
+  - [11. 参考链接](#11-参考链接)
 
-## perf 介绍与说明
+## 1. Perf 介绍与说明
 
 - ✨ perf 是一个基于 `Linux 2.6+` 系统的分析工具，它抽象了在 Linux 中性能度量中 CPU 的硬件差异，提供一个简单的用户空间命令行界面，它基于内核的 **`perf_events`** 接口。
 - Linux 内核可提供 `perf_event` 接口，它是一个用于在应用程序和内核之间传递性能数据的接口。
@@ -42,29 +49,29 @@
   - sampling 采样模式，按照指定频率去采样 event，记录每次采样时，采样事件输出的信息（CPU、进程 ID、运行栈等）。这种方式由于每次都记录信息，所以额外的资源消耗比较大，需要权衡采样频率。同时产生的数据量也容易很大，可能需要大量的硬盘空间。
   - BPF 可以对对应的 event 执行用户自己设计的代码，也就是说记录的信息、执行的操作可以由用户定制。
 
-## perf 的主要特性
+## 2. Perf 的主要特性
 
 - perf 主要特性包括以下几个方面：
-  - 性能计数器：
+  - 性能计数器：</br>
     利用 Linux 内核的 perf_events 子系统，它能够监控和记录各种硬件事件，如 CPU cycles、指令执行、缓存未命中的次数、分支预测失败等，还可以监控软件事件，如系统调用、页错误等。
-  - CPU 性能监测：
+  - CPU 性能监测：</br>
     监控各个进程或线程的 CPU 使用率，识别哪些函数或代码路径大量消耗 CPU。
-  - 缓存行为分析：
+  - 缓存行为分析：</br>
     分析内存访问模式，包括 L1、L2、L3 缓存的命中和未命中的情况，有助于优化内存访问策略。
-  - 🚀 函数级和指令级热点分析：
+  - 🚀 函数级和指令级热点分析：</br>
     perf 可以通过采样分析，精确到函数级别或甚至指令级别来发现 CPU 占用率高的热点代码段。
-  - 系统调用和事件跟踪：
+  - 系统调用和事件跟踪：</br>
     记录和分析程序运行过程中的系统调用，以及相关的事件流。
-  - 🚀 调用图生成：
+  - 🚀 调用图生成：</br>
     创建函数调用图，可视化地展示函数间的调用关系，方便理解程序执行流程及其开销。
-  - 动态跟踪：
+  - 动态跟踪：</br>
     支持动态跟踪技术，可以实时捕获和分析程序运行时的行为。
-  - 跨进程和跨线程分析：
+  - 跨进程和跨线程分析：</br>
     不仅能分析单个进程的性能，还能处理多进程间的数据关联，提供全面的系统级视图。
-  - 兼容性：
+  - 兼容性：</br>
     由于其**直接集成在内核**中，perf 具备良好的硬件兼容性，能够充分利用不同架构 CPU 的性能监控单元（PMU）。
 
-## perf 的工作原理与事件类型
+## 3. Perf 的工作原理与事件类型
 
 - perf 工作原理的核心在于对 Linux 内核性能事件的支持和利用。
 - perf 工具支持一系列的可测量事件，该工具和底层内核接口可以测量来自不同来源的事件。
@@ -95,7 +102,7 @@
 
 > 以上可通过 man perf-list 命令查询  
 
-## perf 子命令概览
+## 4. perf 子命令概览
 
 - perf 子命令如下所示：
 
@@ -139,7 +146,7 @@
 
 - 在使用 perf 命令前必须了解能监控的系统及其硬件的性能指标，可使用 `perf list` 命令列举硬件事件、软件事件与追踪点等。
 
-## perf stat 子命令
+## 5. perf stat 子命令
 
 - 功能：
   - 分析系统/进程的整体性能概况
@@ -250,29 +257,30 @@
 
   > 🔥 注意：以下所示的事件可能在不同的平台上会返回 `<not supported>`
 
-  - cpu-cycles：只计算程序在 CPU 上执行的 CPU 周期数，即除去中断、异常等其他周期的 CPU 周期数。
-  - cycles：程序执行期间的总 CPU 周期数，包括指令周期、浮点周期、访存周期、中断周期、异常周期等等。
-  - cpu-clock：CPU 消耗的时间
-  - task-clock (msec): CPU 处理 task 所消耗的时间，表示目标任务真正占用 CPU 的时间，单位 ms。`CPUs utilized` 表示 CPU 使用率，该值越高代表程序是 CPU bound（计算密集型）而非 IO bound（I/O密集型），除去等待 I/O 与其他阻塞操作的时间。
-  - cpu-migrations：进程运行过程中从一个 CPU 迁移到另一个 CPU 的次数
-  - `instructions`：执行的指令条数。insns per cycle：即 `IPC`，每个 CPU 周期执行的指令条数，IPC 比上面的 CPU 使用率更能说明 CPU 的使用情况（很多指令需要多个处理周期才能执行完毕），IPC 越大越好，说明程序充分利用了处理器的特征。
-  - alignment-faults：统计内存对齐错误发生的次数，当访问的非对齐的内存地址时，内核会进行处理，已保存不会发生问题，但会降低性能。
-  - branches：这段时间内发生分支预测的次数。现代的 CPU 都有分支预测方面的优化。
-  - branch-instructions：分支预测成功次数
-  - branch-misses：这段时间内分支预测失败的次数，该值越小越好。
-  - cache-references：cache 命中次数
-  - cache-misses：cache 失效次数
-  - `context-switches`：上下文切换次数，前半部分是切换次数，后面是平均每秒发生次数（M 是 10^6 次方）。
-  - L1-dcache-loads：L1 数据缓存读取次数
-  - L1-dcache-load-missed：L1 数据缓存读取失败次数
-  - LLC-loads：末级缓存读取次数
-  - LLC-load-misses：末级缓存读取失败次数
-    > LLC 表示 Last-Level Cache（最后一级缓存）是 CPU Cache 层级结构中的最后一级缓存，也称为智能缓存或共享缓存，有时也称为 L3 缓存。
-  - major-faults：页错误，内存页已经被换出到硬盘上，需要将页面换入。
-  - minor-faults：页错误，内存页在物理内存中，只是没有和逻辑页进行映射。
-  - 💥 `page-faults`：缺页异常的次数。当程序请求的页面尚未建立、请求的页面不在物理内存中，或请求的页面虽然在内存中，但物理地址和虚拟地址的映射关系尚未建立时，都会触发一次缺页异常。另外 `TLB` 不命中，页面访问权限不匹配等情况也会触发缺页异常。
-  - stalled-cycles-frontend 和 stalled-cycles-backend：CPU 停滞统计
-  - XXX seconds time elapsed：程序持续时间
+  | 指标 | 说明 |
+  | ----- | ----- |
+  | cpu-cycles | 只计算程序在 CPU 上执行的 CPU 周期数，即除去中断、异常等其他周期的 CPU 周期数。 |
+  | cycles | 程序执行期间的总 CPU 周期数，包括指令周期、浮点周期、访存周期、中断周期、异常周期等等。 |
+  | cpu-clock | CPU 消耗的时间 |
+  | task-clock (msec) | CPU 处理 task 所消耗的时间，表示目标任务真正占用 CPU 的时间，单位 ms。`CPUs utilized` 表示 CPU 使用率，该值越高代表程序是 CPU bound（计算密集型）而非 IO bound（I/O密集型），除去等待 I/O 与其他阻塞操作的时间。 |
+  | cpu-migrations | 进程运行过程中从一个 CPU 迁移到另一个 CPU 的次数 |
+  | `instructions` | 执行的指令条数。insns per cycle：即 `IPC`，每个 CPU 周期执行的指令条数，IPC 比上面的 CPU 使用率更能说明 CPU 的使用情况（很多指令需要多个处理周期才能执行完毕），IPC 越大越好，说明程序充分利用了处理器的特征。 |
+  | alignment-faults | 统计内存对齐错误发生的次数，当访问的非对齐的内存地址时，内核会进行处理，已保存不会发生问题，但会降低性能。 |
+  | branches | 这段时间内发生分支预测的次数。现代的 CPU 都有分支预测方面的优化。 |
+  | branch-instructions | 分支预测成功次数 |
+  | branch-misses | 这段时间内分支预测失败的次数，该值越小越好。 |
+  | cache-references | cache 命中次数 |
+  | cache-misses | cache 失效次数 |
+  | `context-switches` | 上下文切换次数，前半部分是切换次数，后面是平均每秒发生次数（M 是 10^6 次方）。 |
+  | L1-dcache-loads | L1 数据缓存读取次数 |
+  | L1-dcache-load-missed | L1 数据缓存读取失败次数 |
+  | LLC-loads | 末级缓存读取次数 |
+  | LLC-load-misses | 末级缓存读取失败次数 </br> **LLC 表示 Last-Level Cache（最后一级缓存）是 CPU Cache 层级结构中的最后一级缓存，也称为智能缓存或共享缓存，有时也称为 L3 缓存。** |
+  | major-faults | 页错误，内存页已经被换出到硬盘上，需要将页面换入。 |
+  | minor-faults | 页错误，内存页在物理内存中，只是没有和逻辑页进行映射。 |
+  | 💥 `page-faults` | 缺页异常的次数。当程序请求的页面尚未建立、请求的页面不在物理内存中，或请求的页面虽然在内存中，但物理地址和虚拟地址的映射关系尚未建立时，都会触发一次缺页异常。另外 `TLB` 不命中，页面访问权限不匹配等情况也会触发缺页异常。 |
+  | stalled-cycles-frontend 和 stalled-cycles-backend | CPU 停滞统计 |
+  | XXX seconds time elapsed | 程序持续时间 |
 
   ```bash
   $ sudo perf stat -B -e cpu-clock:[u|k] dd if=/dev/zero of=/dev/null count=1000000
@@ -290,7 +298,7 @@
   # -a 选项指定来自所有 CPU 的系统全局范围，-e 选项指定事件，在 10s 后完成性能事件的收集。
   ```
 
-## perf top 子命令
+## 6. perf top 子命令
 
 - 功能：实时显示系统/进程的性能统计信息
 - 命令示例：
@@ -317,37 +325,57 @@
   $ sudo perf top -g
   # 实时全局性能计数器概览
   
-  $ sudo perf top -p <pid>
+  $ sudo perf top -g -p <pid>
   # 指定进程的性能事件概览，包括程序自身的函数、库调用、系统调用或内核函数调用等，
   # 并且可选中其中的函数调用定位汇编指令在 CPU 中的资源消耗。
   ```
 
-  如下图所示，使用 `perf top -p <pid>` 显示 goSimpleWeb 程序在 ab 压力测试时的性能事件：
+### 6.1 分析示例：goSimpleWeb 程序在 ab 压力测试时的性能事件解析
 
-  ![perf-top-pid](images/perf-top-pid.png)
+![perf-top-pid](images/perf-top-pid.png)
+
+💡 现象展示：在实时监测 goSimpleWeb 程序的过程中，当使用 ab 命令发起多并发压力测试请求后，perf top 界面中显示图中 `_raw_spin_unlock_irqrestore()` 内核函数的 CPU 开销达到 46% 左右。</br>
+
+🩺 根因分析：
+
+- 内核 TCP 协议栈中，每个 struct sock 实例包含 socket_lock_t sk_lock 字段（内嵌 spinlock_t slock）。当 Go 服务端调用 accept() 陷入内核时，执行路径 sys_accept4() → inet_csk_accept() 需获取 sk->sk_lock.slock；同时，网卡收包触发的软中断路径 tcp_v4_rcv() 同样需要获取同一自旋锁。两者形成内核态软中断与用户态进程的直接竞争，火焰图中 _raw_spin_unlock_irqrestore 的显著宽度正是该锁频繁抢锁/解锁的累积表现。
+- ab 的 500 并发短连接导致服务端同时存在大量活跃连接。Go 调度器使用 futex 实现 M:N goroutine 调度：当 goroutine 因 I/O 阻塞（如等待 accept 返回或 read 数据）时，调度器执行 futex(FUTEX_WAIT) 挂起 OS 线程；当 epoll 通知 I/O 就绪或连接建立完成时，通过 futex(FUTEX_WAKE) 唤醒线程重新调度。高并发下，大量 goroutine 的频繁阻塞/唤醒 导致 futex 系统调用激增，火焰图中 futex_wake → do_futex → sys_futex 形成宽柱。注意：futex 是 Go 调度器同步机制，与内核 accept() 的完成是异步解耦关系，非直接因果。
+- Go 标准库 net/http.Server.Serve() 采用 "每个连接一个 goroutine" 模型：主 goroutine 在 for { c, err := ln.Accept() } 循环中，为每个返回的 net.Conn 启动独立 goroutine 执行 go c.serve(ctx)。该设计将并发复杂度委托给 Go 调度器，但在高并发短连接场景（如 ab 测试）下产生** goroutine 数量爆炸（连接数 = goroutine 数）。火焰图1中 runtime.findrunnable 的显著宽度，是调度器在全局可运行队列（Global Run Queue）中扫描 goroutine** 的直接证据；同时大量 goroutine 加剧 sk->sk_lock 竞争，形成调度器开销与内核锁开销的叠加效应。
+- 采用 Worker Pool（固定 goroutine 池） 是降低 futex 与 sk->sk_lock 竞争的有效策略。实现机制：预创建 N 个 worker goroutine（N 通常等于 CPU 核心数或 2*CPU），通过有缓冲 channel（chan net.Conn）分发连接任务。
+
+### 6.2 分析示例：指定内核函数性能事件  
   
-  ```bash
-  $ sudo perf top -e kmem:kmem_cache_alloc
-  # 实时查看内核 kmem_cache_alloc 内存缓存分配函数（用于分配小块内存）的性能事件（如下图所示）
-  ```
+```bash
+$ sudo perf top -e kmem:kmem_cache_alloc
+# 实时查看内核 kmem_cache_alloc 内存缓存分配函数（用于分配小块内存）的性能事件（如下图所示）
+```
 
-  ![perf-top-event-tracing-1](images/perf-top-event-tracing-1.png)
+![perf-top-event-tracing-1](images/perf-top-event-tracing-1.png)
 
-  如上图所示，从第三行开始每行代表一个事件信息。`Overhead` 代表每个事件的开销百分比，表示该事件在总采样中所占的比重；`call_site` 代表一个内存地址，表示调用 kmem_cache_alloc 的指令位置；`ptr` 代表分配的内存块的起始地址；`bytes_req` 代表请求分配的内存字节数；`bytes_alloc` 代表实际分配的内存字节数；`gfp_flags` 代表内存分配标志，指示内存分配属性，其中 `GFP_KERNEL` 代表内存分配用于内存空间，`GFP_KERNEL | __GFP_ZERO` 代表分配的内存将被初始化为零。从上图可知，存在多个调用点（call_site）正在分配不同大小的内存块，即 kmem_cache_alloc 函数被多次调用，并且显示不同分配的开销。
+如上图所示：
   
-  ```bash
-  $ sudo perf top -e cycles:k
-  # 实时查看内核与模块中 CPU 周期的性能事件
-  ```
+- 从第三行开始每行代表一个事件信息。
+- `Overhead` 代表每个事件的开销百分比，表示该事件在总采样中所占的比重。
+- `call_site` 代表一个内存地址，表示调用 kmem_cache_alloc 的指令位置。
+- `ptr` 代表分配的内存块的起始地址；`bytes_req` 代表请求分配的内存字节数。
+- `bytes_alloc` 代表实际分配的内存字节数。
+- `gfp_flags` 代表内存分配标志，指示内存分配属性，其中 `GFP_KERNEL` 代表内存分配用于内存空间，`GFP_KERNEL | __GFP_ZERO` 代表分配的内存将被初始化为零。
   
-  ![perf-top-event-tracing-2](images/perf-top-event-tracing-2.png)
+从上图可知，存在多个调用点（call_site）正在分配不同大小的内存块，即 kmem_cache_alloc 函数被多次调用，并且显示不同分配的开销。
+  
+```bash
+$ sudo perf top -e cycles:k
+# 实时查看内核与模块中 CPU 周期的性能事件
+```
+  
+![perf-top-event-tracing-2](images/perf-top-event-tracing-2.png)
 
-  第一列：符号引发的性能事件的比例，默认指占用的 CPU 周期比例。
-  第二列：符号所在的 DSO (Dynamic Shared Object)，可以是应用程序、内核、动态链接库、模块。
-  第三列：DSO 的类型。[.] 表示此符号属于用户态的 ELF 文件，包括可执行文件与动态链接库。[k] 表示此符号属于内核或模块。
-  第四列：符号名。有些符号不能解析为函数名，只能用地址表示。
+第一列：符号引发的性能事件的比例，默认指占用的 CPU 周期比例。</br>
+第二列：符号所在的 DSO (Dynamic Shared Object)，可以是应用程序、内核、动态链接库、模块。</br>
+第三列：DSO 的类型。[.] 表示此符号属于用户态的 ELF 文件，包括可执行文件与动态链接库。[k] 表示此符号属于内核或模块。</br>
+第四列：符号名。有些符号不能解析为函数名，只能用地址表示。
 
-## perf record 与 perf report 子命令
+## 7. perf record 与 perf report 子命令
 
 - perf record 功能：记录一段时间内系统/进程的性能事件写入默认的 perf.data 二进制文件中
 - perf report 功能：读取 perf record 生成的二进制文件，显示并分析性能数据。
@@ -366,7 +394,15 @@
   # --stdio 选项：标准输出中查看事件
   ```
 
-## perf annotate 子命令
+- 示例：
+
+  ```bash
+  $ sudo perf record -g --call-graph=fp $(pidof goSimpleWeb) sleep 20s
+  $ sudo perf report --stdio -i ./perf.data    # 生成各函数调用关系
+  $ sudo perf script | 
+  ```
+
+## 8. perf annotate 子命令
 
 - 功能：
   - perf annotate 提供指令级别的 record 文件定位。使用调试信息 `-g` 编译的文件能够显示汇编和本身源码信息。
@@ -449,7 +485,7 @@
 
   ![perf-annotate-source-demo](images/perf-annotate-source-demo.png)
 
-## perf 示例与排查
+## 9. perf 示例与排查
 
 - 程序示例：
 
@@ -508,13 +544,190 @@
 
   ![perf-example-4](images/perf-example-4.png)
 
-## 火焰图生成与解读
+## 10. 火焰图原理与应用
 
-## 参考链接
+### 10.1 火焰图说明
 
+- 火焰图以 SVG 格式呈现与保存，它的核心思想是将程序运行时的 **调用栈信息** 收集起来，并将其转换为一种 **层次化的图形** 表示。
+- 火焰图说明：
+  - X 轴：表示采样数，如果一个函数在 X 轴占据的宽度越宽，就表示它被抽到的次数多，即执行的时间长。注意，X 轴不代表时间，而是所有的调用栈合并后，按字母顺序排列的。
+  - Y 轴：表示调用栈，每个矩形块都是一个函数。调用栈越深，火焰就越高，顶部就是正在执行的函数，下方都是它的父函数。
+  - 颜色：通常用来区分不同的函数或模块，但颜色本身没有特定含义，主要是为了视觉上的区分。因为火焰图表示的是 CPU 的繁忙程度，所以一般选择暖色调。
+- **<font color=orange>火焰图就是看顶层的哪个函数占据的宽度最大。只要有 "平顶"（plateaus），就表示该函数可能存在性能问题。</font>**
+- 互动性：鼠标悬浮、点击放大、搜索
+- 局限性：两种情况下，无法画出火焰图，需要修正系统行为。
+  - 调用栈不完整：当调用栈过深时，某些系统只返回前面的一部分（比如前10层）。
+  - 函数名缺失：有些函数没有名字，编译器只用内存地址来表示（比如匿名函数）。
+
+### 10.2 工具安装
+
+从 Brendan Gregg 的 GitHub 仓库拉取火焰图工具仓库或压缩包：
+
+```bash
+$ git clone https://github.com/brendangregg/FlameGraph.git
+#或者
+$ wget https://github.com/brendangregg/FlameGraph/archive/refs/tags/v1.0.zip
+$ unzip FlameGraph-1.0.zip
+```
+
+### 10.3 采集程序性能数据
+
+```bash
+$ sudo perf record -F 99 -a -g /path/to/programme
+$ sudo perf record -F 99 -a -g --call-graph=dwarf /path/to/programme
+$ sudo perf record -F 99 -a -g --call-graph=dwarf -p <PID>
+$ sudo perf record -F 99 -a -g --call-graph=dwarf -p $(pidof programme)
+# -F 99 选项：Perf 默认每分钟采样 99 次
+# -a 选项：对全部 CPU 进行采样
+# -g 选项：仅对程序的用户空间函数调用栈采样（user namespace），与 --call-graph=fp 同效。
+# --call-graph=dwarf 选项：对程序的用户空间与内核空间函数调用栈都采样
+# -p 选项：指定进程的 PID
+# -o 选项：指定输出的二进制数据文件，默认为 perf.data。
+# 注意：perf record 命令采样生成的数据保存在默认名为 perf.data 的二进制数据文件中
+```
+
+### 10.4 生成火焰图
+
+收集完数据后，使用 perf script 将收集的 perf.data 数据转换为文本格式，然后通过火焰图脚本生成 SVG 图像。
+
+```bash
+$ sudo perf script > out.perf
+# 将 perf.data 数据转换为调用栈格式（文本数据）
+$ /path/to/FlameGraph-1.0/stackcollapse-perf.pl out.perf > out.folded
+# 使用 stackcollapse-perf.pl 脚本将调用栈格式输出转换为折叠格式
+$ /path/to/FlameGraph-1.0/flamegraph.pl out.folded > flamegraph.svg
+# 使用 flamegraph.pl 生成火焰图（可查看 --help 获取更多信息）
+```
+
+当然，也可将上述多条命令合并为一条运行，如下所示：
+
+```bash
+$ sudo perf script | /path/to/FlameGraph-1.0/stackcollapse-perf.pl | /path/to/FlameGraph-1.0/flamegraph.pl > flamegraph.svg
+```
+
+### 10.5 火焰图解读
+
+- 图像说明：
+  - 宽块：表示该函数占用了较多的 CPU 时间，可能是性能瓶颈。
+  - 高块：表示该函数调用层次较深，可能涉及复杂的逻辑或递归调用。
+  - 热点区域：多个宽块聚集在一起的区域，表明这些函数共同构成了性能瓶颈。
+- 优化建议：
+  - 识别瓶颈：找到最宽的块，它们通常是性能瓶颈所在。
+  - 减少调用次数：对于频繁调用的小函数，考虑是否可以通过缓存或其他方式减少调用次数。
+  - 优化算法：对于耗时较长的大函数，检查是否有更高效的算法或数据结构可以替代。
+  - 并行化：如果某些函数可以并行执行，考虑使用多线程或多进程来提高效率。
+
+## 11. 参考链接
+
+- 📚 [kernel doc](https://www.kernel.org/doc/html/)
+- 📚 [kernel doc: sysctl](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
+- [Linux man pages online](https://man7.org/linux/man-pages/index.html)
 - [Perf Wiki main page](https://perf.wiki.kernel.org/index.php/Main_Page)
 - [Linux kernel perf architecture](https://terenceli.github.io/%E6%8A%80%E6%9C%AF/2020/08/29/perf-arch)
-- 💪 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)
-- 💪 [kernel doc](https://www.kernel.org/doc/html/)
-- 💪 [kernel doc: sysctl](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
-- [Linux man pages online](https://man7.org/linux/man-pages/index.html)
+- 🎉 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)
+- [brendangregg/FlameGraph | GitHub](https://github.com/brendangregg/FlameGraph)
+- [node.js Flame Graphs on Linux | Brendan Gregg's Blog](https://www.brendangregg.com/blog/2014-09-17/node-flame-graphs-on-linux.html)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    
+    participant NIC as 网卡 (NIC)
+    participant DMA as DMA 引擎
+    participant IRQ as 硬中断
+    participant SOFTIRQ as ksoftirqd (NET_RX_SOFTIRQ)
+    participant DRIVER as 网卡驱动 (e1000/vmxnet3)
+    participant NETCORE as 网络核心层
+    participant TCP as TCP 协议栈
+    participant SOCK as struct sock (sk_lock)
+    participant APP as 用户进程 (accept)
+
+    %% ========== 阶段1: 网卡收包 → 触发软中断 ==========
+    Note over NIC,SOFTIRQ: 阶段1: 网卡收包 → 触发软中断 [^193^]
+    
+    NIC->>DMA: 以太网帧到达
+    DMA->>DMA: DMA 写入 rx_ring buffer (描述符环) [^193^]
+    DMA->>IRQ: 触发硬中断 (MSI/INTx)
+    
+    IRQ->>IRQ: 关硬中断, __napi_schedule()
+    IRQ->>SOFTIRQ: 置位 NET_RX_SOFTIRQ [^193^]
+    
+    %% ========== 阶段2: 软中断轮询 → 驱动拆环 ==========
+    Note over SOFTIRQ,DRIVER: 阶段2: NAPI 轮询 → 驱动拆环 [^193^]
+    
+    SOFTIRQ->>SOFTIRQ: net_rx_action()
+    SOFTIRQ->>DRIVER: n->poll(n, weight) 即 e1000_clean() / vmxnet3_poll_rx_only()
+    
+    DRIVER->>DRIVER: e1000_clean_rx_irq() / vmxnet3_rq_rx_complete()
+    DRIVER->>DRIVER: 读 rx_desc[head] USED 位
+    DRIVER->>DRIVER: 取 rx_buffer[head] DMA 页 → 构造 skb
+    DRIVER->>DRIVER: 清描述符, 挂新空页 (ring buffer 重用) [^193^]
+    DRIVER->>NETCORE: netif_receive_skb() [^193^]
+    
+    %% ========== 阶段3: 协议栈分层处理 ==========
+    Note over NETCORE,TCP: 阶段3: 协议栈分层处理 [^193^]
+    
+    NETCORE->>NETCORE: __netif_receive_skb_core()
+    NETCORE->>NETCORE: 按 eth->h_proto 分发 → ip_rcv()
+    
+    NETCORE->>TCP: ip_rcv() → ip_rcv_finish() → dst_input()
+    TCP->>TCP: tcp_v4_rcv() [^193^]
+    
+    %% ========== 阶段4: sk_lock 竞争 → backlog 机制 ==========
+    Note over TCP,SOCK: 阶段4: sk_lock 竞争与 sk_backlog 队列 [^194^]
+    
+    alt sk_lock.owned == 0 (socket 空闲)
+        TCP->>SOCK: bh_lock_sock_nested(sk)
+        TCP->>SOCK: sock_owned_by_user(sk) == false
+        TCP->>SOCK: tcp_prequeue(sk, skb) 或 tcp_v4_do_rcv(sk, skb) [^194^]
+        SOCK->>SOCK: 直接处理, 报文入 sk_receive_queue
+    else sk_lock.owned == 1 (socket 正被用户态占用)
+        TCP->>SOCK: sk_add_backlog(sk, skb) [^194^]
+        Note right of SOCK: 用户态正在 send/recv/accept<br/>不能直接处理, 报文暂存 sk_backlog
+    end
+    
+    %% ========== 阶段5: release_sock → 处理 backlog ==========
+    Note over SOCK,APP: 阶段5: release_sock 释放锁 → 补处理 sk_backlog [^194^]
+    
+    APP->>SOCK: release_sock() (send/recv/accept 结束)
+    SOCK->>SOCK: __release_sock()
+    
+    loop sk_backlog 队列非空
+        SOCK->>SOCK: sk_backlog_rcv() → tcp_v4_do_rcv() [^194^]
+        SOCK->>SOCK: 报文移入 sk_receive_queue
+    end
+    
+    SOCK->>APP: sk_data_ready() → 唤醒等待进程
+    
+    %% ========== 阶段6: 三次握手 → SYN 队列 ==========
+    Note over TCP,SOCK: 阶段6: 三次握手与 SYN 队列 [^195^]
+    
+    APP->>SOCK: listen(fd, backlog=128)
+    SOCK->>SOCK: inet_csk_listen_start() → 初始化 inet_connection_sock [^195^]
+    
+    TCP->>SOCK: SYN 报文到达 → tcp_v4_do_rcv()
+    SOCK->>SOCK: tcp_conn_request() → 创建 req (request_sock)
+    SOCK->>SOCK: inet_csk_reqsk_queue_add() → 入 SYN 队列 (icsk_accept_queue) [^195^]
+    
+    Note right of SOCK: SYN 队列长度 = tcp_max_syn_backlog
+    
+    TCP->>SOCK: ACK (第三次握手) → tcp_check_req()
+    SOCK->>SOCK: inet_csk_complete_hashdance() → 创建子 socket (struct sock *child)
+    SOCK->>SOCK: inet_csk_reqsk_queue_moved() → 子 socket 入 accept 队列 [^195^]
+    
+    %% ========== 阶段7: accept 返回 ==========
+    Note over SOCK,APP: 阶段7: accept 阻塞返回 [^195^]
+    
+    APP->>SOCK: accept() → 阻塞等待
+    SOCK->>SOCK: inet_csk_accept() → 从 icsk_accept_queue 取子 socket [^195^]
+    
+    alt accept 队列为空
+        SOCK->>APP: sk_wait_event() → 睡眠等待 sk_data_ready 唤醒
+        SOCK->>APP: (SYN 到达后 sk_data_ready 唤醒)
+    else accept 队列非空
+        SOCK->>SOCK: reqsk_queue_get_child() → 取出已建立连接
+    end
+    
+    SOCK->>APP: 返回新 fd (子 socket)
+    APP->>APP: read()/write() → 正常通信
+```

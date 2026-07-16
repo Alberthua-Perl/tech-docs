@@ -1,4 +1,4 @@
-# ⭕ Red Hat OpenShift 基础架构与原理详解
+# ⭕ OpenShift 集群架构与原理详解
 
 ## 文档说明
 
@@ -10,30 +10,53 @@
 
 ## 文档目录
 
-- [⭕ Red Hat OpenShift 基础架构与原理详解](#-red-hat-openshift-基础架构与原理详解)
+- [⭕ OpenShift 集群架构与原理详解](#-openshift-集群架构与原理详解)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [OpenShift 基础架构概述](#openshift-基础架构概述)
-  - [OpenShift 集群部署方法说明](#openshift-集群部署方法说明)
-  - [OpenShift 帮助与登录](#openshift-帮助与登录)
-  - [CRI-O 容器运行时相关命令](#cri-o-容器运行时相关命令)
-  - [🔥 OpenShift 资源对象详解](#-openshift-资源对象详解)
-    - [Master 节点](#master-节点)
-    - [Compute 节点](#compute-节点)
-    - [Project](#project)
-    - [ImageStream \[`is`\], ImageStream tag \[`istag`\]](#imagestream-is-imagestream-tag-istag)
-    - [BuildConfig \[`bc`\], Build](#buildconfig-bc-build)
-    - [DeploymentConfig \[`dc`\], Deploy](#deploymentconfig-dc-deploy)
-    - [💎 补充：Deployment](#-补充deployment)
-    - [ReplicationController \[`rc`\], ReplicaSet](#replicationcontroller-rc-replicaset)
-    - [Pod](#pod)
-    - [Label](#label)
-    - [🔥 Service \[`svc`\]](#-service-svc)
-    - [Route](#route)
-    - [PersistentVolume \[`pv`\]](#persistentvolume-pv)
-    - [PersistentVolumeClaim \[`pvc`\]](#persistentvolumeclaim-pvc)
-    - [Secret](#secret)
-    - [ConfigureMap \[`cm`\]](#configuremap-cm)
+  - [1. OpenShift 基础架构概述](#1-openshift-基础架构概述)
+  - [2. OpenShift 集群部署方法说明](#2-openshift-集群部署方法说明)
+  - [3. OpenShift 帮助与登录](#3-openshift-帮助与登录)
+  - [4. CRI-O 容器运行时相关命令](#4-cri-o-容器运行时相关命令)
+  - [🔥 5. OpenShift 资源对象详解](#-5-openshift-资源对象详解)
+    - [5.1 Master 类型节点](#51-master-类型节点)
+    - [5.2 Worker 类型节点](#52-worker-类型节点)
+    - [5.3 Project 资源对象](#53-project-资源对象)
+    - [📦 5.4 ImageStream (is) 与 ImageStreamTag (istag) 资源对象](#-54-imagestream-is-与-imagestreamtag-istag-资源对象)
+      - [5.4.1 基础概念](#541-基础概念)
+      - [👨‍💻 5.4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**](#-542-示例从-ocp-external-registry-导入外部容器镜像至-ocp-集群)
+      - [5.4.3 OCP internal registry 镜像缓存说明](#543-ocp-internal-registry-镜像缓存说明)
+      - [5.4.4 image stream 资源使用](#544-image-stream-资源使用)
+      - [💎 5.4.5 OCP4 internal registry 说明](#-545-ocp4-internal-registry-说明)
+      - [5.4.6 image stream 使用报错示例](#546-image-stream-使用报错示例)
+    - [⚙️ 5.5 BuildConfig (bc) 与 Build 资源对象](#️-55-buildconfig-bc-与-build-资源对象)
+      - [5.5.1 基础概念](#551-基础概念)
+      - [5.5.2 构建触发器（build trigger）类型](#552-构建触发器build-trigger类型)
+      - [5.5.3 build 构建与 S2I 说明](#553-build-构建与-s2i-说明)
+    - [5.6 DeploymentConfig (dc) 与 Deploy 资源对象](#56-deploymentconfig-dc-与-deploy-资源对象)
+    - [💎 5.7 Deployment 资源对象](#-57-deployment-资源对象)
+    - [5.8 ReplicationController (rc) 与 ReplicaSet 资源对象](#58-replicationcontroller-rc-与-replicaset-资源对象)
+    - [5.9 Pod 资源对象](#59-pod-资源对象)
+    - [5.10 Label 资源对象](#510-label-资源对象)
+    - [🔥 5.11 Service (svc) 资源对象](#-511-service-svc-资源对象)
+      - [🚀 5.11.1 OCP3 \& OCP4 的网络模型类型](#-5111-ocp3--ocp4-的网络模型类型)
+      - [5.11.2 service 资源对象处理的场景](#5112-service-资源对象处理的场景)
+      - [5.11.3 service 在 Kubernetes 中的实现方式](#5113-service-在-kubernetes-中的实现方式)
+      - [5.11.4 service 的类型](#5114-service-的类型)
+      - [5.11.4 service 与 pod 的关联方式](#5114-service-与-pod-的关联方式)
+      - [5.11.5 service 与服务发现](#5115-service-与服务发现)
+      - [5.11.6 service 与实现跨节点通信的 CNI 插件的关系](#5116-service-与实现跨节点通信的-cni-插件的关系)
+    - [5.12 Route 资源对象](#512-route-资源对象)
+    - [5.13 PersistentVolume (pv) 资源对象](#513-persistentvolume-pv-资源对象)
+    - [5.14 PersistentVolumeClaim (pvc) 资源对象](#514-persistentvolumeclaim-pvc-资源对象)
+    - [5.15 Secret 资源对象](#515-secret-资源对象)
+      - [5.15.1 基础概念](#5151-基础概念)
+      - [5.15.2 创建与使用 secret 资源对象](#5152-创建与使用-secret-资源对象)
+      - [5.15.3 提取与更新 secret](#5153-提取与更新-secret)
+      - [👨‍💻 **5.15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**](#-5154-示例ocp-46-中使用-secret-拉取外部私有容器镜像)
+      - [5.15.5 serviceaccount 与 secret 的关联](#5155-serviceaccount-与-secret-的关联)
+    - [5.16 ConfigureMap (cm) 资源对象](#516-configuremap-cm-资源对象)
+      - [5.16.1 基础概念](#5161-基础概念)
+      - [5.16.2 创建与使用 configmap 资源](#5162-创建与使用-configmap-资源)
   - [🧪 OpenShift 资源对象使用](#-openshift-资源对象使用)
   - [OpenShift 用户与访问控制](#openshift-用户与访问控制)
     - [OpenShift 用户认证（Authentication）](#openshift-用户认证authentication)
@@ -43,9 +66,9 @@
   - [OpenShift 日志与事件](#openshift-日志与事件)
   - [参考链接](#参考链接)
 
-## OpenShift 基础架构概述
+## 1. OpenShift 基础架构概述
 
-- 上游 `Origin` 项目与 `OpenShift` 项目的发展对应关系
+- 上游 `Origin` 项目与 `OpenShift` 项目的发展对应关系：
   
   ![ocp3-origion-developer](images/ocp3-origion-developer.jpg)
   
@@ -73,7 +96,7 @@
   
   ![ocp4-sourth-north-east-west-traffic](images/ocp4-sourth-north-east-west-traffic.png)
 
-## OpenShift 集群部署方法说明
+## 2. OpenShift 集群部署方法说明
 
 - OCP3 集群部署方法：  
   - 生产环境：
@@ -100,7 +123,7 @@
   - CRC 开发与测试环境：[Red Hat OpenShift Local (CRC) v2.35 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20Local%20v2.35%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
   - MicroShift 单节点集群环境（边缘计算场景）：[基于 RHEL9.3 的 Red Hat MicroShift v4.15 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
 
-## OpenShift 帮助与登录
+## 3. OpenShift 帮助与登录
 
 - 帮助命令：
   
@@ -201,7 +224,7 @@
   
   ![docker-registry-route](images/docker-registry-route.jpg)
 
-## CRI-O 容器运行时相关命令
+## 4. CRI-O 容器运行时相关命令
 
 - 虽然流行的容器运行时包括 Docker、Containerd、Podman 等，但在 OpenShift 集群中的各节点上使用 CRI-O 容器运行时运行容器与 Pod。从 OCP4 开始，集群中的容器运行时均使用 CRI-O，不再使用 OCP3 中的 Docker。
 - CRI-O 提供一个命令行接口可使用 `crictl` 工具管理容器与 Pod。
@@ -243,9 +266,9 @@
 
   ![crictl-get-container-info-2](images/crictl-get-container-info-2.png)
 
-## 🔥 OpenShift 资源对象详解
+## 🔥 5. OpenShift 资源对象详解
 
-### Master 节点
+### 5.1 Master 类型节点
 
 - OCP 集群或 Kubernetes 集群的控制节点
 - 生产环境中建议使用 3 个或奇数个 master 节点确保控制平面（control plane）的高可用性，推荐将 etcd 数据库集群单独分开。
@@ -266,7 +289,7 @@
 
     ![ocp3-master-etcd](images/ocp3-master-etcd.jpg)
 
-### Compute 节点
+### 5.2 Worker 类型节点
 
 - OCP 集群与 Kubernetes 集群的计算节点
 - compute 节点用于运行 pod 提供服务
@@ -277,15 +300,17 @@
 
 ![atomic-openshift-node-error-2](images/atomic-openshift-node-error-2.jpg)
 
-### Project
+### 5.3 Project 资源对象
 
-- 项目，也称为命名空间（namespace），OCP 集群使用项目来隔离资源（硬隔离），区别于 Linux namespace。
+- 中文名称：项目，也称为命名空间（namespace），OCP 集群使用项目来隔离资源（硬隔离），区别于 Linux namespace。
 - 若未将 `self-provisioner` 角色从指定用户去除，使用指定用户创建的项目，该用户即为项目的项目管理员。
 - default 项目与 openshift 项目能被所有用户使用，但只能由 `system:admin` 用户或具有 `cluster-admin` 角色的用户管理。
 
-### ImageStream [`is`], ImageStream tag [`istag`]
+### 📦 5.4 ImageStream (is) 与 ImageStreamTag (istag) 资源对象
 
-- 镜像流、镜像流标签：
+#### 5.4.1 基础概念
+
+- 中文名称：镜像流、镜像流标签
 
   ```bash
   $ oc get imagestream -n openshift -o name
@@ -308,184 +333,190 @@
 - OpenShift 确保新部署的 pod 使用的 image ID 与第一个部署的 pod 的 image ID 是相同的。
 - `openshift` 项目中保存 S2I 使用的构建镜像（S2I builder image）的 image stream。
 - 构建镜像的组成：基础 OS 运行环境、编程语言环境、应用依赖、编程语言框架等
-- image stream 引用的容器镜像可来自 `OCP external registry` 或 `OCP internal registry`。
+- **image stream 引用的容器镜像可来自 `OCP external registry` 或 `OCP internal registry`。**
 - 以下可作为 OCP external registry：
   - docker.io
   - registry.access.redhat.com
   - registry.redhat.io
   - quay.io
   - 公司或组织内部的 Harbor、Red Hat Quay、registry v2、docker-distribution 等
+
     > 👉 关于 Red Hat Quay 的容器镜像仓库的原理与部署可参考 [此 GitHub 链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20Quay%20v3%20registry%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0.md)。
   
 - 以下可作为 OCP internal registry：
-  > ✅ external 与 internal 相对于 OCP 集群内外而言。
   - OCP 集群内的 docker-registry pod
   - OCP 集群内的 quay pod
+
+  > ✅ external 与 internal 相对于 OCP 集群内外而言
   
-- 从 OCP external registry 导入外部容器镜像至 OCP 集群：
-  - 方式 1：
-    `skopeo` 命令拷贝已从 OCP external registry 中拷贝的 `OCI` 格式目录至 OCP internal registry 中成为指定项目的 image stream，该 image stream 在项目中会自动创建（见如下补充中的示例）。
-  - 方式 2：
-    > 💥 若 openshift 项目中存在 image stream tag 但不引用任何镜像时，需导入 image stream tag 至容器镜像的引用。
-    - oc import-image 命令创建 `image stream tag` 引用外部 `公共` 容器镜像。
+#### 👨‍💻 5.4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**
 
-      ```bash
-      $ oc import-image <imagestream>:[<tag>] --confirm \
-        --from <container_registry_for_imagestream> [--insecure] \
-        -n <project_name>
-      # 在指定项目中创建 image stream tag 引用外部容器镜像
-      # 需确认容器镜像仓库是否使用 TLS 连接
-      # 注意：
-      #   openshift 项目中 image stream 无法使用相应 tag 的容器镜像报错处理：
-      #   1. 查看集成的 OCP 外部镜像仓库中是否具有相应 tag 的容器镜像
-      #   2. 删除报错的 image stream，报错信息如 "! error: Import ..."。
-      #      $ oc tag -d <imagestream>:<tag> -n openshift 
-      #   3. 重新导入 OCP 外部镜像仓库中的容器镜像的 metadata 至 image stream。
-      #      $ oc import-image apache-httpd:2.5 --confirm \
-      #        --from registry.lab.example.com:5000/do288/apache-httpd \
-      #        --insecure -n openshift
+- 1️⃣ 方式 1：</br>
+  `skopeo` 命令拷贝已从 OCP external registry 中拷贝的 `OCI` 格式目录至 OCP internal registry 中成为指定项目的 image stream，该 image stream 在项目中会自动创建（见如下补充中的示例）。
+- 2️⃣ 方式 2：</br>
+  💥 若 openshift 项目中存在 image stream tag 但不引用任何镜像时，需导入 image stream tag 至容器镜像的引用。
+  - oc import-image 命令创建 `image stream tag` 引用外部 `公共` 容器镜像。
+
+    ```bash
+    $ oc import-image <imagestream>:[<tag>] --confirm \
+      --from <container_registry_for_imagestream> [--insecure] \
+      -n <project_name>
+    # 在指定项目中创建 image stream tag 引用外部容器镜像
+    # 需确认容器镜像仓库是否使用 TLS 连接
+    # 注意：
+    #   openshift 项目中 image stream 无法使用相应 tag 的容器镜像报错处理：
+    #   1. 查看集成的 OCP 外部镜像仓库中是否具有相应 tag 的容器镜像
+    #   2. 删除报错的 image stream，报错信息如 "! error: Import ..."。
+    #      $ oc tag -d <imagestream>:<tag> -n openshift 
+    #   3. 重新导入 OCP 外部镜像仓库中的容器镜像的 metadata 至 image stream。
+    #      $ oc import-image apache-httpd:2.5 --confirm \
+    #        --from registry.lab.example.com:5000/do288/apache-httpd \
+    #        --insecure -n openshift
         
-      $ oc import-image <imagestream>[:<tag>] --confirm
-      # 指定当前存在的 image stream 更新其引用至 OCP external registry 中最新的 image ID
-      ```
+    $ oc import-image <imagestream>[:<tag>] --confirm
+    # 指定当前存在的 image stream 更新其引用至 OCP external registry 中最新的 image ID
+    ```
 
-    - oc import-image 命令创建 `image stream tag` 引用外部 `私有` 容器镜像。
-      引用外部私有容器镜像时需提供 `access token` 作为 secret，这与通过外部私有容器镜像仓库中的镜像部署应用的方式相同，只是不需要链接（link）任何 service account，oc import-image 命令能在当前项目中搜寻匹配外部私有容器镜像仓库名称的 secret，如下所示：
+  - oc import-image 命令创建 `image stream tag` 引用外部 `私有` 容器镜像。引用外部私有容器镜像时需提供 `access token` 作为 secret，这与通过外部私有容器镜像仓库中的镜像部署应用的方式相同，只是不需要链接（link）任何 service account，oc import-image 命令能在当前项目中搜寻匹配外部私有容器镜像仓库名称的 secret，如下所示：
 
-      ![oc-import-image-private-is](images/oc-import-image-private-is.jpg)
+    ![oc-import-image-private-is](images/oc-import-image-private-is.jpg)
 
-    - 👨‍💻 以上示例如下：
-
-      ```bash
-      $ podman login -u alberthua quay.io
-      $ oc create secret generic privateis \
-        --from-file .dockerconfigjson=/run/user/1000/containers/auth.json \
-        --type kubernetes.io/dockerconfigjson
-      $ oc import-image nginx-ssl:1.0.1 --confirm \
-        --from quay.io/alberthua/nginx-ssl:1.0.1
-      ```
-
-  - 🚀 默认情况下，oc import-image 命令使用 `--reference-policy=source` 选项，创建 image stream tag 引用 OCP external registry，不将容器镜像缓存至 OCP internal registry 中，因此，删除外部私有镜像仓库后将无法构建应用镜像。
-    - 未删除外部私有镜像时，可被正确拉取构建，追踪 BUILD_LOGLEVEL=4 的 build 日志，如下所示：
-
-      ![project-imagestream-reference-external-private-image-exist](images/project-imagestream-reference-external-private-image-exist.jpg)
-
-    - 删除外部私有镜像后，将无法从外部拉取，如下所示：
-
-      ![project-imagestream-reference-external-private-image-not-exist](images/project-imagestream-reference-external-private-image-not-exist.jpg)
-
-  - 🚀 而 `--reference-policy=local` 将 OCP external registry 中的容器镜像缓存至 OCP internal registry，相当于在集群本地实现了 `镜像缓存`，可加速应用构建，即使删除外部私有镜像后也不影响应用镜像的构建，如下所示：
-
-    ![import-image-reference-policy-local-test](images/import-image-reference-policy-local-test.jpg)
-
-    skopeo 命令验证是否存在镜像缓存：
-
-    ![skopeo-internal-registry-cache-layer](images/skopeo-internal-registry-cache-layer.jpg)
-
-  - 👨‍💻 示例：
-    使用 S2I 方式与导入的外部私有构建镜像构建 `NodeJS` 应用
-    > 该示例说明以上 --reference-policy=local 选项的使用
+  - 以上示例如下：
 
     ```bash
     $ podman login -u alberthua quay.io
-    $ oc create secret generic quaypriv \
+    $ oc create secret generic privateis \
       --from-file .dockerconfigjson=/run/user/1000/containers/auth.json \
       --type kubernetes.io/dockerconfigjson
-    $ oc import-image nodejs:12-latest \
-      --confirm \
-      --reference-policy local \
-      --from quay.io/alberthua/nodejs-12-rhel7:latest
-    # 创建 image stream tag，将外部私有镜像缓存至 OCP internal registry 中。
-      
-    ### 注意：去删除外部私有镜像测试是否在集群内缓存了外部私有镜像
-      
-    $ oc secrets link builder quaypriv
-    # 将名为 quaypriv 的 secret 链接至名为 builder 的 service account 上
-    # 若不进行链接，将无法验证身份与拉取构建镜像
-    $ oc new-app --name myapp \
-      --build-env npm_config_registry=http://${RHT_OCP4_NEXUS_SERVER}/repository/nodejs \
-      --build-env BUILD_LOGLEVEL=4 \
-      nodejs:12-latest~https://github.com/alberthua-perl/DO288-apps#app-config \
-      --context-dir app-config
-    # 指定构建日志级别进行应用镜像构建与应用部署
-    $ oc logs -f buildconfig/myapp
-    # 可追踪查看构建过程详细日志，即可得到以上示意图。
+    $ oc import-image nginx-ssl:1.0.1 --confirm \
+      --from quay.io/alberthua/nginx-ssl:1.0.1
     ```
+
+#### 5.4.3 OCP internal registry 镜像缓存说明
+
+- 🚀 默认情况下，oc import-image 命令使用 `--reference-policy=source` 选项，创建 image stream tag 引用 OCP external registry，不将容器镜像缓存至 OCP internal registry 中，因此，删除外部私有镜像仓库后将无法构建应用镜像。
+  - 未删除外部私有镜像时，可被正确拉取构建，追踪 BUILD_LOGLEVEL=4 的 build 日志，如下所示：
+
+    ![project-imagestream-reference-external-private-image-exist](images/project-imagestream-reference-external-private-image-exist.jpg)
+
+  - 删除外部私有镜像后，将无法从外部拉取，如下所示：
+
+    ![project-imagestream-reference-external-private-image-not-exist](images/project-imagestream-reference-external-private-image-not-exist.jpg)
+
+- 🚀 而 `--reference-policy=local` 将 OCP external registry 中的容器镜像缓存至 OCP internal registry，相当于在集群本地实现了 `镜像缓存`，可加速应用构建，即使删除外部私有镜像后也不影响应用镜像的构建，如下所示：
+
+  ![import-image-reference-policy-local-test](images/import-image-reference-policy-local-test.jpg)
+
+  skopeo 命令验证是否存在镜像缓存：
+
+  ![skopeo-internal-registry-cache-layer](images/skopeo-internal-registry-cache-layer.jpg)
+
+- 👨‍💻 **示例：使用 S2I 方式与导入的外部私有构建镜像构建 NodeJS 应用**
+
+  > 该示例说明以上 --reference-policy=local 选项的使用
+
+  ```bash
+  $ podman login -u alberthua quay.io
+  $ oc create secret generic quaypriv \
+    --from-file .dockerconfigjson=/run/user/1000/containers/auth.json \
+    --type kubernetes.io/dockerconfigjson
+  $ oc import-image nodejs:12-latest \
+    --confirm \
+    --reference-policy local \
+    --from quay.io/alberthua/nodejs-12-rhel7:latest
+  # 创建 image stream tag，将外部私有镜像缓存至 OCP internal registry 中。
+      
+  ### 注意：去删除外部私有镜像测试是否在集群内缓存了外部私有镜像 ###
+      
+  $ oc secrets link builder quaypriv
+  # 将名为 quaypriv 的 secret 链接至名为 builder 的 service account 上
+  # 注意：若不进行链接，将无法验证身份与拉取构建镜像！
+  $ oc new-app --name myapp \
+    --build-env npm_config_registry=http://${RHT_OCP4_NEXUS_SERVER}/repository/nodejs \
+    --build-env BUILD_LOGLEVEL=4 \
+    nodejs:12-latest~https://github.com/alberthua-perl/DO288-apps#app-config \
+    --context-dir app-config
+  # 指定构建日志级别进行应用镜像构建与应用部署
+  $ oc logs -f buildconfig/myapp
+  # 可追踪查看构建过程详细日志，即可得到以上示意图。
+  ```
+
+#### 5.4.4 image stream 资源使用
   
 - 在 openshift 项目中的 image stream 与 template 资源在各个项目中均可共享，但只由具有 `cluster-admin` 角色的管理员用户管理。  
 - 自 OCP4 开始可使用 `Samples operator` 管理 openshift 项目并可删除由手动添加的资源。
-- 使用来自另一个项目的 image stream（基于 private registry）构建与部署应用：
-  - 方式 1：
+- **示例：使用来自另一个项目的 image stream（基于 private registry）构建与部署应用**
+  - 1️⃣ 方式 1：</br>
     在每个使用 image stream 的项目中创建包含可访问私有 OCP external registry 的 access token 的 secret，并将其 link 至每个项目中的 service account。
-  - 方式 2：
+  - 2️⃣ 方式 2：</br>
     仅仅在创建 image stream 的项目中创建包含可访问私有 OCP external registry 的 access token 的 secret，并配置 image stream 具有本地引用策略（`local reference policy`），即，将外部容器镜像缓存于 OCP internal registry，并为每个使用 image stream 的项目中使用 image stream 的 `service account` 授权。
 
     ![oc-import-image-shared-is-between-project](images/oc-import-image-shared-is-between-project.jpg)
 
-  > ✅ 注意：
-  > 可为 service account 添加 scc 与 role，也可将相关的 secret 链接至 service account。
+  > ✅ 注意：可为 service account 添加 scc 与 role，也可将相关的 secret 链接至 service account。
   
+#### 💎 5.4.5 OCP4 internal registry 说明
+
 - OCP internal registry 只存储由 `S2I` 构建或 `Dockerfile/Containerfile` 构建的应用镜像，以实现一次构建多次部署。
-- OCP3 中新构建的应用镜像将存储于 default 项目中的 `docker-registry pod` 中。
-- 该 pod 根据其资源定义文件中的 pvc 将应用镜像存储于后端存储中，默认存储 provider 为 NFS，也可集成 Ceph RBD。
-- 💎 补充：OCP4 internal registry 概要
-  - OpenShift 安装程序将 internal registry 配置为仅仅集群内部可被集群管理员、各项目用户或各个组件等访问。
-  - 使用集群管理员（`cluster-admin`）权限即可暴露 internal registry，对外暴露的路由信息可被集群外部访问，如下所示：
+- OpenShift 安装程序将 internal registry 配置为仅仅集群内部可被集群管理员、各项目用户或各个组件等访问。
+- 使用集群管理员（`cluster-admin`）权限即可暴露 internal registry，对外暴露的路由信息可被集群外部访问，如下所示：
 
-    ```bash
-    $ oc patch config.imageregistry cluster -n openshift-image-registry \
-      --type merge -p '{"spec":{"defaultRoute":true}}'
-    ```
+  ```bash
+  $ oc patch config.imageregistry cluster -n openshift-image-registry \
+    --type merge -p '{"spec":{"defaultRoute":true}}'
+  ```
 
-    ![ocp4-operator-oc-patch-internal-registry-expose-route](images/ocp4-operator-oc-patch-internal-registry-expose-route.jpg)
+  ![ocp4-operator-oc-patch-internal-registry-expose-route](images/ocp4-operator-oc-patch-internal-registry-expose-route.jpg)
 
-  - internal registry 位于 `openshift-image-registry` 项目中，以 `image-registry pod` 的形式运行，并可通过 `cluster-image-registry-operator` 控制。
+- internal registry 位于 `openshift-image-registry` 项目中，以 `image-registry pod` 的形式运行，并可通过 `cluster-image-registry-operator` 控制。
 
-    ![ocp4-internal-registry-operator](images/ocp4-internal-registry-operator.jpg)
+  ![ocp4-internal-registry-operator](images/ocp4-internal-registry-operator.jpg)
 
   > ✅ 默认 OpenShift 不允许常规用户访问 `openshift-*` 项目中的任何资源！
 
-  - 若要使用 Linux container tools（Podman、Skopeo）来登录暴露的 internal registry，必须获得登录 OpenShift 集群用户的 `token`。
+- 若要使用 Podman、Skopeo 来登录暴露的 internal registry，必须获得登录 OpenShift 集群用户的 `token`。
 
-    ```bash
-    $ TOKEN=$(oc whoami -t)
-    # 获得登录 OpenShift 集群用户的 token
+  ```bash
+  $ TOKEN=$(oc whoami -t)
+  # 获得登录 OpenShift 集群用户的 token
       
-    $ INTERNAL_REGISTRY=$(oc get route default-route \
-      -n openshift-image-registry -o jsonpath='{.spec.host}')
-    # 查看 internal registry 对外暴露的 route 信息
+  $ INTERNAL_REGISTRY=$(oc get route default-route \
+    -n openshift-image-registry -o jsonpath='{.spec.host}')
+  # 查看 internal registry 对外暴露的 route 信息
       
-    $ podman login -u <ocp_project_user> -p ${TOKEN} ${INTERNAL_REGISTRY}
-    # 使用 OpenShift 集群用户与 token 登录内部镜像仓库
+  $ podman login -u <ocp_project_user> -p ${TOKEN} ${INTERNAL_REGISTRY}
+  # 使用 OpenShift 集群用户与 token 登录内部镜像仓库
       
-    $ skopeo inspect --creds=<ocp_project_user>:${TOKEN} \
-      docker://${INTERNAL_REGISTRY}/<project>/<imagename>
+  $ skopeo inspect --creds=<ocp_project_user>:${TOKEN} \
+    docker://${INTERNAL_REGISTRY}/<project>/<imagename>
       
-    ### 示例 ###
-    $ skopeo inspect --creds=iwootz:${TOKEN} \
-      docker://${INTERNAL_REGISTRY}/iwootz-app-config/myapp
+  ### 示例 ###
+  $ skopeo inspect --creds=iwootz:${TOKEN} \
+    docker://${INTERNAL_REGISTRY}/iwootz-app-config/myapp
       
-    $ skopeo copy --dest-creds=iwootz:${TOKEN} \
-      oci:/home/student/DO288/labs/expose-registry/ubi-info \
-      docker://${INTERNAL_REGISTRY}/iwootz-common/ubi-info:1.0
-    # 通过认证 OpenShift 用户拷贝本地 OCI 格式目录（存储镜像的目录）至
-    # internal registry 的 iwootz-common 项目目录中
-    # 注意：同时在对应项目中也将自动创建同名的 image stream 引用该镜像
-    ```
+  $ skopeo copy --dest-creds=iwootz:${TOKEN} \
+    oci:/home/student/DO288/labs/expose-registry/ubi-info \
+    docker://${INTERNAL_REGISTRY}/iwootz-common/ubi-info:1.0
+  # 通过认证 OpenShift 用户拷贝本地 OCI 格式目录（存储镜像的目录）至
+  # internal registry 的 iwootz-common 项目目录中
+  # 注意：同时在对应项目中也将自动创建同名的 image stream 引用该镜像
+  ```
 
-  - 访问 internal registry 内镜像的角色（role）：
-    - `registry-viewer` and `system:image-puller`：允许用户从 internal registry 中拉取与查看容器镜像
-    - `registry-editor` and `system:image-pusher`：允许用户推送并 tag 镜像至 internal registry 中
-    - `registry-*` 角色为 registry 管理提供了更全面的功能，这些角色授予额外的权限，如创建新项目，但不授予其他权限，如构建和部署应用程序。OCI 标准没有指定如何管理 registry，所以管理 OpenShift internal registry 的用户需要知道 OpenShift 管理概念和 oc 命令，这使得 registry-* 不那么友好。
-    - `system:*` 角色提供了将镜像拉取与推送到 internal registry 所需的最小功能，已经在项目中拥有 admin 或 edit 角色的 OpenShift 用户不需要这些 system:* 角色。
-- image stream 使用报错示例：
-  - 若已存在的 image stream 报错 `! error`，可将其删除再从外部容器镜像仓库导入。
-  - 删除已存在的 image stream 需指定 `tag`：
+- 访问 internal registry 内镜像的角色（role）：
+  - `registry-viewer` and `system:image-puller`：允许用户从 internal registry 中拉取与查看容器镜像
+  - `registry-editor` and `system:image-pusher`：允许用户推送并 tag 镜像至 internal registry 中
+  - `registry-*` 角色为 registry 管理提供了更全面的功能，这些角色授予额外的权限，如创建新项目，但不授予其他权限，如构建和部署应用程序。OCI 标准没有指定如何管理 registry，所以管理 OpenShift internal registry 的用户需要知道 OpenShift 管理概念和 oc 命令，这使得 registry-* 不那么友好。
+  - `system:*` 角色提供了将镜像拉取与推送到 internal registry 所需的最小功能，已经在项目中拥有 admin 或 edit 角色的 OpenShift 用户不需要这些 system:* 角色。
 
-    ```bash
-    $ oc tag -d <imagestream_name>:[tag] -n <project>
-    # 删除指定项目中 image stream 的 image stream tag，使其可重新上传。
-    ```
+#### 5.4.6 image stream 使用报错示例
+
+- 若已存在的 image stream 报错 `! error`，可将其删除再从外部容器镜像仓库导入。
+- 删除已存在的 image stream 需指定 `tag`：
+
+  ```bash
+  $ oc tag -d <imagestream_name>:[tag] -n <project>
+  # 删除指定项目中 image stream 的 image stream tag，使其可重新上传。
+  ```
 
   ![imagestream-error-1](images/imagestream-error-1.jpg)
 
@@ -493,28 +524,40 @@
 
   ![imagestream-error-3](images/imagestream-error-3.jpg)
 
-### BuildConfig [`bc`], Build
+### ⚙️ 5.5 BuildConfig (bc) 与 Build 资源对象
 
-- 构建配置、构建
+#### 5.5.1 基础概念
+
+- 中文名称：构建配置、构建
 - 创建 buildconfig 的方法：
   - 直接使用 `oc new-app` 命令创建或通过 template 模板中的参数化定义创建
   - `oc create -f` 命令使用 buildconfig 的 JSON 或 YAML 资源定义文件创建
 - `oc new-app` 命令使用 `List` 资源定义文件，该文件定义 image stream、buildconfig、deploymentconfig、service，但不定义 route，必须手动定义 route 资源定义文件，或手动暴露 service 来创建 route 资源对象。
-- buildconfig 资源中重要的字段说明，如下所示：
+- buildconfig 资源中重要的字段说明：
 
-  ![buildconfig-introduce](images/buildconfig-introduce.jpg)
+  | 参数名 | 说明 |
+  | ----- | ----- |
+  | **spec.runPolicy** | 构建策略，默认值为Serial。有3种类型：<br> 1. Serial：按顺序执行构建 <br> 2. SerialLatestOnly：执行最新的构建 <br> 3. Parallel：并行执行构建 |
+  | **spec.triggers** | 构建触发器的配置。可指定3种类型的触发器：<br> 1. Webhook：支持以向 OpenShift 发送 HTTP 请求的方式触发构建，支持 GitHub、GitLab、BitBucket、Generic 4种 Webhook <br> 2. ImageChange：镜像更新时触发构建 <br>3. ConfigChange：配置更新时触发构建 |
+  | **spec.source** | 构建输入源。支持5种类型的输入源：<br> 1. Dockerfile：Dockerfile 文件内容 <br> 2. Images：从指定镜像获取构建所需文件或目录 <br> 3. Git：源代码仓库地址 <br> 4. Binary：二进制资源 <br> 5. configmap/secret：以 ConfigMap 或者 Secret 传入拉取构建所需内容的凭据 |
+  | **spec.strategy** | 构建策略。支持3种构建策略：<br> 1. Source策略：S2I 策略，基于源代码和基础镜像来构建应用镜像 <br> 2. Docker 策略：通过docker build 命令使用 Dockerfile 文件构建应用镜像 <br> 3. JenkinsPipeline 策略：通过 Jenkinsfile 文件生成应用自动集成流水线 |
+  | **spec.output** | 镜像构建完成后，将镜像推送到镜像仓库。有两种类型：<br> 1. ImageStream：OpenShift 内部镜像仓库，创建对应的ImageStreamTag <br> 2. DockerImage：将镜像推送到公有或私有的外部镜像仓库 |
+  | **spec.postCommit** | 构建过程中的钩子脚本。镜像构建完成后，推送至内部镜像仓库前，需要在执行构建的容器中运行的脚本 |
   
+#### 5.5.2 构建触发器（build trigger）类型
+
 - OpenShift 可通过 buildconfig 手动触发构建，也可自动触发构建。
-- 在 OpenShift中，可定义构建触发器（`build trigger`），以允许平台根据特定事件（event）自动启动新的构建。
+- 在 OpenShift中，可定义构建触发器，以允许平台根据特定事件（event）自动启动新的构建。
 - buildconfig 中支持的三种构建触发器：
-  - Image change trigger：
+  - 1️⃣ **ImageChange trigger：**
     - 根据 image stream tag 引用的 S2I 构建镜像发生改变
     - Dockerfile/Containerfile 中 FROM 指令指定的父镜像发生改变而触发构建
     - S2I 构建镜像的更改将 `自动` 触发构建过程，如下所示：
 
       ![imagechange-trigger-auto-build](images/imagechange-trigger-auto-build.jpg)
 
-  - Webhook trigger：
+  - 2️⃣ **Webhook trigger：**
+  
     > 关于不同类型的 webhook 触发器的使用可参考 [Chapter 8. Triggering and modifying builds](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/builds/index#triggering-builds-build-hooks)
 
     - 根据 `VCS`（version control system）中构建所使用的应用源代码的改变而触发构建，可通过手动触发与自动触发两种。
@@ -545,7 +588,7 @@
           处于 `running` 或 `pending` 状态的 build 构建可被取消。
           取消构建意味着 `build pod` 的终止，不推送新镜像至 OCP internal registry 中，deploymentconfig 也不被触发。
 
-        > 失败的 build 构建状态：failed、canceled、error
+          > 失败的 build 构建状态：failed、canceled、error
 
         - 💥 `oc start-build` 构建报错示例：
 
@@ -555,7 +598,7 @@
 
       - 2️⃣ GitHub：
         - 配置 GitHub 的 webhook 功能可在代码更新时向 OpenShift 推送代码以 `自动` 触发构建。
-        - 👨‍💻 示例：`Java` 应用 GitHub webhook 配置过程
+        - 👨‍💻 **示例：`Java` 应用 GitHub webhook 配置过程**
           oc describe bc 获得 github 类型的 `webhook URL`，其中的 `<secret>` 字段可被 oc get bc 中 triggers 的 github `secret` 字段所替换而获得完整的 URL。
 
           ![buildconfig-webhook-github-5](images/buildconfig-webhook-github-5.jpg)
@@ -576,8 +619,8 @@
 
           ![buildconfig-webhook-github-4](images/buildconfig-webhook-github-4.jpg)
 
-      - 3️⃣ GitLab：
-        - 该类型常用于公司或组织内部离线的代码仓库，与以上 GitHub 配置方式类似，也可 `自动` 触发构建。
+      - 3️⃣ GitLab：</br>
+        该类型常用于公司或组织内部离线的代码仓库，与以上 GitHub 配置方式类似，也可 `自动` 触发构建。
       - 4️⃣ BitBucket
     - oc new-app 命令默认创建了 `generic` 和 `github` webhook，这两种自动创建的触发器默认会创建对应的 secret。
 
@@ -597,7 +640,7 @@
     - 该 key 的值（secret）将与 webhook 调用时提供的 secret 进行比较。
       > 💥 默认创建的 github webhook 不使用 WebHookSecretKey！
 
-  - Configuration change trigger：
+  - 3️⃣ **Configuration change trigger：**</br>
     buildconfig 中定义的构建用环境变量（`--build-env` 选项指定）可被注入于 build pod 中，若使用如下命令更改 buildconfig 中的环境变量，可手动触发新的构建：
 
     ```bash
@@ -607,7 +650,9 @@
     # 列出 buildconfig 中定义的环境变量
     $ oc start-build <build_name> -F 
     ```
-  
+
+#### 5.5.3 build 构建与 S2I 说明
+
 - build 资源对象以 pod 的方式运行，即，应用源代码通过 S2I 注入构建镜像后运行的 pod，用于创建 buildconfig 中 S2I 构建新的应用镜像的环境，成功构建后将触发部署应用 pod。
 - 根据一个 buildconfig 可进行 `多次 build 构建`，因此，在删除 build 时需指定 build 的名称。
 
@@ -676,18 +721,18 @@
     - 使用 shell 脚本模式：
       使用 `/bin/sh -ic` 命令配合脚本来实现所有的功能，如参数扩展、重定向等，并且 build pod 必须可提供 `sh` 的 shell 解释器。
 
-### DeploymentConfig [`dc`], Deploy
+### 5.6 DeploymentConfig (dc) 与 Deploy 资源对象
 
-- 部署配置、部署
+- 中文名称：部署配置、部署
 - 在 Kubernetes 1.0 中并不像现在如此方便可快速部署应用，而是需要繁复的手动配置才能满足要求，而在 OpenShift 3.0 中 Red Hat 开发了 `deploymentconfig`，以提供参数化部署输入、执行滚动部署、启用回滚至先前部署状态，以及通过触发器（`trigger`）以驱动自动部署等（buildconfig 构建配置完成后触发 deploymentconfig）。  
 - 由于 buildconfig 中 imagestreamtag 的改变，deploymentconfig 或 deployment 中可探测到 imagestreamtag 的改变针对新构建应用镜像的自动重新部署。
   - 👉 OCP3 中 deploymentconfig 的 `imagestreamtag trigger`：
 
-  ![ocp3-imagestreamtag-trigger-dc-deploy](images/ocp3-imagestreamtag-trigger-dc-deploy.jpg)
+    ![ocp3-imagestreamtag-trigger-dc-deploy](images/ocp3-imagestreamtag-trigger-dc-deploy.jpg)
 
   - 👉 OCP4 中 deployment 的 `imagestreamtag trigger`：
 
-  ![ocp4-imagestreamtag-trigger-deployment-deploy](images/ocp4-imagestreamtag-trigger-deployment-deploy.jpg)
+    ![ocp4-imagestreamtag-trigger-deployment-deploy](images/ocp4-imagestreamtag-trigger-deployment-deploy.jpg)
   
 - deploymentconfig 中的许多功能最终成为 `Kubernetes deployment` 功能集的一部分。
   > ✅ 目前 OCP4 同时兼容 deployment 资源与 deploymentconfig 资源。
@@ -698,7 +743,7 @@
 - 若新部署的 pod 无法正确运行，删除 deploy pod 后，将自动删除正在由 deploy pod 部署的其他 pod。
 - 🔎 关于 deploymentconfig 资源 deprecated 状态的说明，可参考 [DeploymentConfig API is being deprecated in Red Hat OpenShift Container Platform 4.14](https://access.redhat.com/articles/7041372)。
 
-### 💎 补充：Deployment
+### 💎 5.7 Deployment 资源对象
 
 - OCP4 中建议使用 Deployment 以代替 DeploymentConfig，而此资源对象为保证兼容性依然得以保留。
 - OCP4 中 deploymentconfig 集成 replication controller，该控制器支持基于等值类型的标签选择器（`equality-based selector`），而 deployment 中集成 `replicaset`，该控制器支持基于集合类型的标签选择器（`set-based selector`），两者均通过与 pod 的特定标签与 pod 进行关联，实现 pod 副本数的高可用。
@@ -713,22 +758,22 @@ $ oc rollout restart deployment <deployment_name>
 # 根据新更新的 deployment 重新部署相关资源
 ```
 
-- 💥 `kubectl create` 与 `kubectl apply` 的区别：
+- 🎯 **`kubectl create` 与 `kubectl apply` 的区别：**
 
-| 序号    | kubectl create    | kubectl apply    |
-|-----|-----|-----|
-| 1    | 首先删除集群中现有的所有资源，然后重新根据 yaml 文件（必须是完整的配置信息）生成新的资源对象。    | 根据 yaml 文件中包含的字段（yaml 文件可以只写需要改动的字段），直接升级集群中的现有资源对象。    |
-| 2    | yaml 文件必须是完整的配置字段内容    | yaml 文件可以不完整，只写需要的字段。    |
-| 3    | kubectl create 工作在 yaml 文件中的所有字段    | kubectl apply 只工作在 yaml 文件中的某些改动过的字段    |
-| 4    | 在没有改动 yaml 文件时，使用同一个 yaml 文件执行命令 kubectl replace，将不会成功（fail 掉），因为缺少相关改动信息。    | 在只改动了 yaml 文件中的某些声明时，而不是全部改动，可以使用 kubectl apply。    |
+  | 序号 | kubectl create | kubectl apply |
+  | ----- | ----- | ----- |
+  | 1 | 首先删除集群中现有的所有资源，然后重新根据 yaml 文件（必须是完整的配置信息）生成新的资源对象。 | 根据 yaml 文件中包含的字段（yaml 文件可以只写需要改动的字段），直接升级集群中的现有资源对象。 |
+  | 2 | yaml 文件必须是完整的配置字段内容 | yaml 文件可以不完整，只写需要的字段。 |
+  | 3 | kubectl create 工作在 yaml 文件中的所有字段 | kubectl apply 只工作在 yaml 文件中的某些改动过的字段 |
+  | 4 | 在没有改动 yaml 文件时，使用同一个 yaml 文件执行命令 kubectl replace，将不会成功（fail 掉），因为缺少相关改动信息。 | 在只改动了 yaml 文件中的某些声明时，而不是全部改动，可以使用 kubectl apply。 |
 
-### ReplicationController [`rc`], ReplicaSet
+### 5.8 ReplicationController (rc) 与 ReplicaSet 资源对象
 
 - 前者已集成至 deploymentconfig 中，而后者集成至 deployment 中。
 - 该资源对象保证运行的 pod 的高可用，使其当前的数量趋近于 desired 数量。
 - 若 pod 由于某些原因故障停止，该资源对象将根据配置的 pod 数量（replicas）重新部署 pod 保证不间断服务，此类 pod 为无状态应用居多。
 
-### Pod
+### 5.9 Pod 资源对象
 
 - pod 是 Kubernetes 集群与 OCP 集群中容器运行的原子单位（最小粒度）
 - 单个 pod 中可以运行单个或多个容器，它们共享 `network namespace` 与 `volume`。
@@ -752,141 +797,119 @@ $ oc rollout restart deployment <deployment_name>
     >
     > 📝 Kubernetes 官方推荐的日志架构可参考 [此链接](https://kubernetes.io/zh/docs/concepts/cluster-administration/logging/)。
 
-### Label
+### 5.10 Label 资源对象
 
-- 标签
-- 基于等值类型的标签
-  > OCP4 中支持基于集合类型的标签
+- 中文名称：标签
+- 类型：基于等值类型的标签 + 基于集合类型的标签（OCP4 已支持）
 - OCP 集群中的各种资源使用 label 标签进行匹配
 
-### 🔥 Service [`svc`]
+### 🔥 5.11 Service (svc) 资源对象
 
-- 服务
-- 🚀 OCP3 & OCP4 的网络模型继承于 Kubernetes，包含以下四种类型：
-  - 1️⃣ 高耦合的 pod 内部容器间（container-to-container）的通信
-  - 2️⃣ pod 与 pod 间（pod-to-pod）的通信（同节点或跨节点）：`CNI plugins`
-  - 3️⃣ pod 与 service 间（pod-to-service）的通信：`iptables`、`ipvs`、`OpenFlow rules`、`Cillium eBPF`
-  - 4️⃣ 集群外部与 service 间（external-to-service）的通信：`openshift route`、`ingress`
-  - OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件：
+#### 🚀 5.11.1 OCP3 & OCP4 的网络模型类型
 
-    ```bash
-    $ oc get deployment/network-operator -n openshift-network-operator
-    # 查看 CNO 部署的 deployment 与 pod
-    ```
+- 1️⃣ 高耦合的 pod 内部容器间（container-to-container）的通信
+- 2️⃣ pod 与 pod 间（pod-to-pod）的通信（同节点或跨节点）：`CNI plugins`
+- 3️⃣ pod 与 service 间（pod-to-service）的通信：`iptables`、`ipvs`、`OpenFlow rules`、`Cillium eBPF`
+- 4️⃣ 集群外部与 service 间（external-to-service）的通信：`openshift route`、`ingress`
+- OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件：
 
-    ![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
+  ```bash
+  $ oc get deployment/network-operator -n openshift-network-operator
+  # 查看 CNO 部署的 deployment 与 pod
+  ```
 
-  - OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
+  ![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
 
-    ```bash
-    $ oc get network.config.openshift.io cluster -o yaml
-    $ oc get network.config/cluster -o yaml
-    # 以上命令等效
-    ```
+- OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
 
-    ![ocp4-pod-service-subnet](images/ocp4-pod-service-subnet.png)
+  ```bash
+  $ oc get network.config.openshift.io cluster -o yaml
+  $ oc get network.config/cluster -o yaml
+  # 以上命令等效
+  ```
 
-- service 资源对象处理的场景：
-  - 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
-  - service 为 pod 提供统一的入口 IP 地址，该入口地址默认为 service 的虚拟 IP 地址（`ClusterIP`）。
-  - service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。  
-- service 在 Kubernetes 中的实现方式：
-  - service 提供三种代理模式：
-    - `userspace`：
-      - 早期的代理模式，由于性能较差该模式已废弃不再使用。
-    - `iptables`：
-      - OpenShift 当前默认的代理模式
-      - 但是，该模式只能支持简单的负载均衡能力，若需实现复杂的负载均衡算法需引入其他方式。
-    - `ipvs`：
-      - 该模式自 `Kubernetes v1.11` 版本开始已达到 GA（一般可用性）水平，并在之后的版本中成为默认的 service 代理模式。
-      - Kubernetes 既可使用 iptables 实现流量的转发规则，也可使用 ipvs 实现流量的负载均衡能力。
-  - service 资源由 `kube-proxy` 组件实现，其虚拟 IP 地址存在于每个节点的 iptables NAT 表中，使用 `iptables -t nat -nvL` 命令即可查看指定的 ClusterIP。
-  - 使用原生 `kube-proxy` 实现的 service 与自研的 service 解决方案的响应对比：
+  ![ocp4-pod-service-subnet](images/ocp4-pod-service-subnet.png)
 
-    ![service-performance](images/service-performance.jpg)
+#### 5.11.2 service 资源对象处理的场景
 
-  - 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
-  - Kubernetes 源码中定义的 service 相关的 iptables 自定义链，如下所示：
+- 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
+- service 为 pod 提供统一的入口 IP 地址，该入口地址默认为 service 的虚拟 IP 地址（`ClusterIP`）。
+- service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。  
 
-    ```go
-    // 代码路径：kubernetes-1.16.1 -> pkg/proxy/iptables/proxier.go
-    ...
-    const (
-        // the services chain
-        kubeServicesChain utiliptables.Chain = "KUBE-SERVICES"
-      
-        // the external services chain
-        kubeExternalServicesChain utiliptables.Chain = "KUBE-EXTERNAL-SERVICES"
-      
-        // the nodeports chain
-        kubeNodePortsChain utiliptables.Chain = "KUBE-NODEPORTS"
-      
-        // the kubernetes postrouting chain
-        kubePostroutingChain utiliptables.Chain = "KUBE-POSTROUTING"
-      
-        // KubeMarkMasqChain is the mark-for-masquerade chain
-        KubeMarkMasqChain utiliptables.Chain = "KUBE-MARK-MASQ"
-      
-        // KubeMarkDropChain is the mark-for-drop chain
-        KubeMarkDropChain utiliptables.Chain = "KUBE-MARK-DROP"
-      
-        // the kubernetes forward chain
-        kubeForwardChain utiliptables.Chain = "KUBE-FORWARD"
-    )
-    ...
-    ```
+#### 5.11.3 service 在 Kubernetes 中的实现方式
 
-    OCP3 中的 service 网段与 pod 网段的定义示意：
+- service 提供三种代理模式：
+  - `userspace`：
+    - 早期的代理模式，由于性能较差该模式已废弃不再使用。
+  - `iptables`：
+    - OpenShift 当前默认的代理模式
+    - 但是，该模式只能支持简单的负载均衡能力，若需实现复杂的负载均衡算法需引入其他方式。
+  - `ipvs`：
+    - 该模式自 `Kubernetes v1.11` 版本开始已达到 GA（一般可用性）水平，并在之后的版本中成为默认的 service 代理模式。
+    - Kubernetes 既可使用 iptables 实现流量的转发规则，也可使用 ipvs 实现流量的负载均衡能力。
+- service 资源由 `kube-proxy` 组件实现，其虚拟 IP 地址存在于每个节点的 iptables NAT 表中，使用 `iptables -t nat -nvL` 命令即可查看指定的 ClusterIP。
+- 使用原生 `kube-proxy` 实现的 service 与自研的 service 解决方案的响应对比：
 
-    ![ocp3-network-plugin](images/ocp3-network-plugin.jpg)
+  ![service-performance](images/service-performance.jpg)
 
-- service 的类型：
+- 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
+- OCP3 中的 service 网段与 pod 网段的定义示意：
+
+  ![ocp3-network-plugin](images/ocp3-network-plugin.jpg)
+
+#### 5.11.4 service 的类型
+
+- 4大类型：
   - 1️⃣ `ClusterIP`
   - 2️⃣ `NodePort`
   - 3️⃣ `LoadBalancer`：这种类型构建在 NodePort 类型之上，其通过 cloud provider 提供的负载均衡器将服务暴露到集群外部，因此 LoadBalancer 一样具有 NodePort 和 ClusterIP。
   - 4️⃣ `ExternalIPs`
 
-  ![K8s-service-type](images/K8s-service-type.jpg)
+![K8s-service-type](images/K8s-service-type.jpg)
 
-  > 💥 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 `spec.externalTrafficPolicy` 字段，否则创建失败！
-  >
-  > ![change-service-type-error](images/change-service-type-error.jpg)
+- 💥 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 `spec.externalTrafficPolicy` 字段，否则创建失败！
+  
+  ![change-service-type-error](images/change-service-type-error.jpg)
 
-- service 与 pod 的关联方式：
-  service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 ReplicationController (OCP3) 或 Deployment (OCP4) 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
+#### 5.11.4 service 与 pod 的关联方式
 
-  ![ocp-service-selector-match-pod-label](images/ocp-service-selector-match-pod-label.jpg)
+service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 ReplicationController (OCP3) 或 Deployment (OCP4) 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
 
-  > 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
+![ocp-service-selector-match-pod-label](images/ocp-service-selector-match-pod-label.jpg)
 
-- service 与服务发现：
-  - service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。
-  - 服务发现的实现方式：
-    - 1️⃣ service 环境变量：
-      - 前端应用 pod 使用后端应用的 `service 环境变量` 来发现后端应用 pod
-      - 对于项目内的每个 service，将自动定义环境变量，并注入到同一项目中的所有 pod 中。
-      - service 环境变量的服务发现方式：
-        - *svc_name*_SERVICE_HOST：service 的 IP 地址
-        - *svc_name*_SERVICE_PORT：service 的 TCP 端口号
+> 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
 
-      > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
+#### 5.11.5 service 与服务发现
 
-    - 2️⃣ SkyDNS（OCP4 中已经 deprecated）：
-      - OCP3 中通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
-      - `SkyDNS` 服务发现方式：
-        - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
-        - SkyDNS 将每个 service 动态分配一个 `FQDN` 格式的 `SRV 记录`：*svc_name*.*project_name*.svc.cluster.local
+- service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。
+- 服务发现的实现方式：
+  - 1️⃣ service 环境变量：
+    - 前端应用 pod 使用后端应用的 `service 环境变量` 来发现后端应用 pod
+    - 对于项目内的每个 service，将自动定义环境变量，并注入到同一项目中的所有 pod 中。
+    - service 环境变量的服务发现方式：
+      - *svc_name*_SERVICE_HOST：service 的 IP 地址
+      - *svc_name*_SERVICE_PORT：service 的 TCP 端口号
 
-      > ✅ 在 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找相应的 service。
+    > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
 
-    - 3️⃣ CoreDNS：
-      - OCP4 中通过名为 dns 的 `ClusterOperator` 部署 `CoreDNS`，CoreDNS 是 CNCF 毕业的成熟的云原生领域域名解析系统。
-      - 集群中各个 pod 可通过其 `/etc/resolv.conf` 中的 nameserver 实现服务发现，其中 nameserver 的 IP 地址为 CoreDNS pod 的 `service IP`。
-      - 每个 pod 都可通过 CoreDNS 查询动态分配的 service 与 `FQDN` 格式的 `SRV 记录`，每条 SRV 记录中的 FQDN 对应一条 A 记录，而 A 记录中的 IP 地址即为一组 pod 的 service IP。其中 SRV 记录的 FQDN 格式为 *svc_name*.*project_name*.svc.cluster.local。通过这种方式不同 pod 间可发现其他 pod 中的服务。以下示例为 web-server pod 可通过 DNS 查询发现 gcw 应用的 service IP：
+  - 2️⃣ SkyDNS（OCP4 中已淘汰）：
+    - OCP3 中通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
+    - `SkyDNS` 服务发现方式：
+      - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
+      - SkyDNS 将每个 service 动态分配一个 `FQDN` 格式的 `SRV 记录`：*svc_name*.*project_name*.svc.cluster.local
 
-      ![ocp4-coredns-service-discovery-demo](images/ocp4-coredns-service-discovery-demo.png)
+    > ✅ 在 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找相应的 service。
 
-      ![coredns-pod-resolv-2](images/coredns-pod-resolv-2.png)
+  - 3️⃣ CoreDNS：
+    - OCP4 中通过名为 dns 的 `ClusterOperator` 部署 `CoreDNS`，CoreDNS 是 CNCF 毕业的成熟的云原生领域域名解析系统。
+    - 集群中各个 pod 可通过其 `/etc/resolv.conf` 中的 nameserver 实现服务发现，其中 nameserver 的 IP 地址为 CoreDNS pod 的 `service IP`。
+    - 每个 pod 都可通过 CoreDNS 查询动态分配的 service 与 `FQDN` 格式的 `SRV 记录`，每条 SRV 记录中的 FQDN 对应一条 A 记录，而 A 记录中的 IP 地址即为一组 pod 的 service IP。其中 SRV 记录的 FQDN 格式为 *svc_name*.*project_name*.svc.cluster.local。通过这种方式不同 pod 间可发现其他 pod 中的服务。以下示例为 web-server pod 可通过 DNS 查询发现 gcw 应用的 service IP：
+
+    ![ocp4-coredns-service-discovery-demo](images/ocp4-coredns-service-discovery-demo.png)
+
+    ![coredns-pod-resolv-2](images/coredns-pod-resolv-2.png)
+
+#### 5.11.6 service 与实现跨节点通信的 CNI 插件的关系
 
 - service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源进行暴露。
 - OCP3 中建议将 service 整合入 DeploymentConfig 中，而 Kubernetes 中建议将 service 定义在 Deployment 中。
@@ -918,9 +941,9 @@ $ oc rollout restart deployment <deployment_name>
 
   ![NodePort-service-iptables-nat-ovs-analyze](images/NodePort-service-iptables-nat-ovs-analyze.jpg)
 
-### Route
+### 5.12 Route 资源对象
   
-- 路由
+- 中文名称：路由
 - 可借助 service 实现 OCP 集群内前后端 pod 间的通信，而 OCP 集群外部对内部 pod 的访问默认需要使用 default 项目的 `router pod` 来实现。
 - OCP 集群外部通过泛域名解析（wildcard）指向特定 `infra` 节点（前端可加负载均衡与高可用），router pod 需指定在该 infra 节点上运行，其 IP 地址与 infra 节点绑定。
 - router pod 以 `HAProxy` 的方式实现。
@@ -934,13 +957,14 @@ $ oc rollout restart deployment <deployment_name>
 - 💎 补充：
   - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 ingress controller 与 ingress，而在 OpenShift 中 ingress controller 对应为 HAProxy router pod，而 ingress 对应为 route。
 
-### PersistentVolume [`pv`]
+### 5.13 PersistentVolume (pv) 资源对象
 
-- 持久卷
+- 中文名称：持久卷
 - 持久卷属于 OCP 集群资源，必须使用 `system:admin` 管理员用户或具有 `cluster-role` 角色的用户进行管理、创建与删除。
 - pv 资源定义中默认使用 `NFS` 服务端提供 NFS 存储，可为 pod 提供永久存储。
 - pv 的访问模式：
-  > 注意：`NFS` 均支持以下三种模式
+
+  > 注意：NFS 均支持以下三种模式
 
   ![pv-access-mode](images/pv-access-mode.jpg)
   
@@ -952,27 +976,28 @@ $ oc rollout restart deployment <deployment_name>
 
   ![pv-recycle-policy](images/pv-recycle-policy.jpg)
 
-  - `retain`（默认方式）：pv 中的数据将保留，管理员需手动处理该卷。
-    若需清除 pv 中的数据，可执行以下操作：
-    👉 手动删除 pv。
-    👉 手动清理后端存储卷中数据，以免数据被重用。
-    👉 手动删除后端存储卷。
-    👉 创建新的 pv 以重用之前的数据。
-  - `recycle`：
-    👉 通过执行 rm -rf 命令删除卷上所有数据，使得卷可被新 pvc 使用。
-    👉 目前只有 NFS 与 hostPath 支持该回收模式。
+  - `retain`（默认方式）：pv 中的数据将保留，管理员需手动处理该卷。</br>
+    若需清除 pv 中的数据，可执行以下操作：</br>
+    👉 手动删除 pv。</br>
+    👉 手动清理后端存储卷中数据，以免数据被重用。</br>
+    👉 手动删除后端存储卷。</br>
+    👉 创建新的 pv 以重用之前的数据。</br>
+  - `recycle`：</br>
+    👉 通过执行 rm -rf 命令删除卷上所有数据，使得卷可被新 pvc 使用。</br>
+    👉 目前只有 NFS 与 hostPath 支持该回收模式。</br>
+
     > 💥 pv 与 pvc 可绑定成功，但不代表 pv 使用的后端存储可正常使用！
 
-### PersistentVolumeClaim [`pvc`]
+### 5.14 PersistentVolumeClaim (pvc) 资源对象
 
-- 持久卷声明  
+- 中文名称：持久卷声明  
 - 持久卷声明属于项目（或命名空间）资源，使用项目用户即可管理 pvc。  
 - pv 与 pvc 通过访问模式（`accessMode`）与存储大小（`storage`）进行匹配。  
 - 若存在相同访问模式与存储大小的 pv，pvc 在使用时将随机使用 pv，但第一次匹配成功使用后将持久使用该 pv。  
 - pv 与 pvc 的使用方法：
   - NFS 存储卷共享（属组与权限）
   - pv 资源定义与创建
-  - pvc 资源定义与创建 
+  - pvc 资源定义与创建
 - 更改 dc 或 pod 资源定义的 `persistentVolumeClaim.claimName` 属性值以创建 pod 资源
 - OCP 部署过程中定义 NFS 存储作为 OCP internal registry 的存储后端：
 
@@ -984,7 +1009,9 @@ $ oc rollout restart deployment <deployment_name>
 
   ![ocp3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
 
-### Secret
+### 5.15 Secret 资源对象
+
+#### 5.15.1 基础概念
 
 - 该资源对象保存 OCP 集群中的敏感数据，如密码、token 凭据等，将敏感数据与 pod 解耦。
 - 数据使用 `base64` 编码（encode）存储在 secret 资源对象中。
@@ -996,144 +1023,150 @@ $ oc rollout restart deployment <deployment_name>
 
   ![k8s-ocp-secret-type](images/k8s-ocp-secret-type.png)
 
-- 创建与使用 secret 资源对象：
-  若使用 Web 控制台创建 secret 资源对象，由于使用 `base64` 编码该资源对象，需对其解码才能注入 secret 的值，而使用 CLI 创建的方式如下所示：
+#### 5.15.2 创建与使用 secret 资源对象
 
-  ```bash
-  $ oc create secret --help
-  # 查看创建 secret 的方法
-  ```
+若使用 Web 控制台创建 secret 资源对象，由于使用 `base64` 编码该资源对象，需对其解码才能注入 secret 的值，而使用 CLI 创建的方式如下所示：
 
-  ![oc-create-secret](images/oc-create-secret.jpg)
+```bash
+$ oc create secret --help
+# 查看创建 secret 的方法
+```
 
-  ```bash
-  $ oc create secret generic <secret_name> \
-    --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
-  # 指定 key 与 value 的值创建 secret 资源，使敏感数据与 pod 解耦。
+![oc-create-secret](images/oc-create-secret.jpg)
+
+```bash
+$ oc create secret generic <secret_name> \
+  --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
+# 指定 key 与 value 的值创建 secret 资源，使敏感数据与 pod 解耦。
     
-  $ oc create secret generic <secret_name> \
-    --from-file <key1>=/path/to/file1 ... --from-file <keyN>=/path/to/fileN
-  # 指定 key 与文件的内容创建 secret 资源
+$ oc create secret generic <secret_name> \
+  --from-file <key1>=/path/to/file1 ... --from-file <keyN>=/path/to/fileN
+# 指定 key 与文件的内容创建 secret 资源
 
-  $ oc create secret tls <secret_name> \
-    --cert /path/to/certification-file --key /path/to/certification-key
-  # 指定 CA 证书文件与 CA 私钥文件创建 secret
+$ oc create secret tls <secret_name> \
+  --cert /path/to/certification-file --key /path/to/certification-key
+# 指定 CA 证书文件与 CA 私钥文件创建 secret
     
-  ### 示例 ###
-  $ oc create secret generic mysql \
-    --from-literal='database-user'='mysql' \
-    --from-literal='database-password'='redhat' \
-    --from-literal='database-root-password'='do285-admin'
-  # 创建 secret 资源以存储 MySQL 相关的用户名与密码，该 secret 可被其他资源所引用。
+### 示例 ###
+$ oc create secret generic mysql \
+  --from-literal='database-user'='mysql' \
+  --from-literal='database-password'='redhat' \
+  --from-literal='database-root-password'='do285-admin'
+# 创建 secret 资源以存储 MySQL 相关的用户名与密码，该 secret 可被其他资源所引用。
 
-  $ oc create secret generic <secret_name> \
-    --from-file .dockerconfigjson=<access_token_file> \
-    --type kubernetes.io/dockerconfigjson
-  # 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
+$ oc create secret generic <secret_name> \
+  --from-file .dockerconfigjson=<access_token_file> \
+  --type kubernetes.io/dockerconfigjson
+# 使用登录用 token 创建可访问外部私有镜像仓库的 secret 资源
 
-  $ oc create secret generic quayio \
-    --from-file .dockerconfigjson=/run/user/1000/containers/auth.json
-    --type kubernetes.io/dockerconfigjson
-  # 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至 serviceaccount 以拉取私有镜像。
+$ oc create secret generic quayio \
+  --from-file .dockerconfigjson=/run/user/1000/containers/auth.json
+  --type kubernetes.io/dockerconfigjson
+# 使用 podman 登录 Quay 的认证 token 创建 secret 资源，可使用该资源链接至 serviceaccount 以拉取私有镜像。
 
-  ### 示例：secret 通过链接（link）与 serviceaccount 关联 ###
-  $ oc secrets link <serviceaccount_name> <secret_name> --for=pull
-  # 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
-  # serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
-  # 拉取镜像，否则 pod 创建失败。
-  ```
+### 示例：secret 通过链接（link）与 serviceaccount 关联 ###
+$ oc secrets link <serviceaccount_name> <secret_name> --for=pull
+# 将拉取外部私有镜像所需的 secret（包含拉取所需的 token）链接至项目中指定的
+# serviceaccount（默认为 default），该 serviceaccount 在创建 pod 时即可
+# 拉取镜像，否则 pod 创建失败。
+```
 
-  💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
+💎 补充：OCP3 中若应用已部署，但需将创建的 secret 资源对象注入应用 pod 中，可参考如下命令，而在 OCP4 中使用 `deployment` 资源对象代替 `deploymentconfig` 资源对象即可：
 
-  ```bash
-  $ oc create secret generic myappfilesec \
-    --from-file ~/DO288-apps/app-config/myapp.sec
-  # 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
+```bash
+$ oc create secret generic myappfilesec \
+  --from-file ~/DO288-apps/app-config/myapp.sec
+# 使用指定的文件创建 secret 资源，其中资源定义的 data 字段中 key 为文件的名称，value 为文件中的内容。
     
-  $ oc set volume dc/myapp \
-    --add --type secret \
-    --secret-name myappfilesec \
-    --mount-path /opt/app-root/secure \
-    --name myappsec-vol
-  # OCP3 中以卷挂载的方式将 secret 资源挂载至容器的 /opt/app-root/secure/ 目录中，
-  # 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
+$ oc set volume dc/myapp \
+  --add --type secret \
+  --secret-name myappfilesec \
+  --mount-path /opt/app-root/secure \
+  --name myappsec-vol
+# OCP3 中以卷挂载的方式将 secret 资源挂载至容器的 /opt/app-root/secure/ 目录中，
+# 由于 deploymentconfig 中 ConfigChange 将触发应用 pod 的重新部署
 
-  $ oc set volume deployment/<name> \
-    --add --type secret \
-    --secret-name <secret_name> \
-    --mount-path /path/to/directory
-  # OCP4 中以卷挂载的方式将 secret 资源挂载至容器的指定挂载点上（OCP3 与 OCP4 的区别在于 dc 与 deployment）
-  ```
+$ oc set volume deployment/<name> \
+  --add --type secret \
+  --secret-name <secret_name> \
+  --mount-path /path/to/directory
+# OCP4 中以卷挂载的方式将 secret 资源挂载至容器的指定挂载点上（OCP3 与 OCP4 的区别在于 dc 与 deployment）
+```
 
-  除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
+除了以上 CLI 方式外，还可使用 YAML 文件定义的方式创建 secret 资源对象，但在 YAML 文件中标准的 `data` 字段需使用 `base64` 编码的值，因此，该标准方法不能用于 `template` 模板中，可使用 `stringData` 字段替换 data 字段，并且使用明文的值替换 base64 编码的值，但是该替代语法永远不会保存在 OpenShift 的 `etcd` 数据库中。
 
-- 提取与更新 secret：
+#### 5.15.3 提取与更新 secret
 
-  以下示例为 `HTPasswd` 作为 `Identity Provider` 的场景中，通过提取的文件更新集群中的用户：
+以下示例为 `HTPasswd` 作为 `Identity Provider` 的场景中，通过提取的文件更新集群中的用户：
 
-  ```bash
-  $ oc extract secret/htpasswd-secret -n openshift-config --to /tmp --confirm
-  # 提取 openshift-config 项目中名为 htpasswd-secret 的 secret 至 /tmp 目录中以文件的形式保存
-  # 注意：提取的文件中存储用户的用户名与加密的哈希
+```bash
+$ oc extract secret/htpasswd-secret -n openshift-config --to /tmp --confirm
+# 提取 openshift-config 项目中名为 htpasswd-secret 的 secret 至 /tmp 目录中以文件的形式保存
+# 注意：提取的文件中存储用户的用户名与加密的哈希
 
-  $ oc set data secret/htpasswd-secret -n openshift-config --from htpasswd=/tmp/htpasswd
-  # 使用更新后 htpasswd 文件设置 secret
-  # 注意：使用 htpasswd 命令更新 /tmp/htpasswd 文件中的用户信息
+$ oc set data secret/htpasswd-secret -n openshift-config --from htpasswd=/tmp/htpasswd
+# 使用更新后 htpasswd 文件设置 secret
+# 注意：使用 htpasswd 命令更新 /tmp/htpasswd 文件中的用户信息
 
-  $ oc get pods -w -n openshift-authentication
-  # authentication ClusterOperator (OAuth operator) 在上述 secret 更新后将重新部署名为 oauth-openshift 的 pod
-  ```
+$ oc get pods -w -n openshift-authentication
+# authentication ClusterOperator (OAuth operator) 在上述 secret 更新后将重新部署名为 oauth-openshift 的 pod
+```
 
-- 💎 补充：
-  👨‍💻 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像
+#### 👨‍💻 **5.15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**
 
-  由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
+由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
 
-  ![oc-new-app-fail-for-no-secret](images/oc-new-app-fail-for-no-secret.jpg)
+![oc-new-app-fail-for-no-secret](images/oc-new-app-fail-for-no-secret.jpg)
 
-  因此，在项目中创建 secret 并将其链接至名为 default 的 `service account`，实则是为 service account 添加对应的 `imagePullSecrets`，如下所示：
+因此，在项目中创建 secret 并将其链接至名为 default 的 `service account`，实则是为 service account 添加对应的 `imagePullSecrets`，如下所示：
 
-  ![oc-secretes-link-help](images/oc-secretes-link-help.jpg)
+![oc-secretes-link-help](images/oc-secretes-link-help.jpg)
 
-  ```bash
-  $ echo ${XDG_RUNTIME_DIR}
-    /run/user/1000
-  # 默认的容器镜像仓库认证文件路径前缀
+```bash
+$ echo ${XDG_RUNTIME_DIR}
+  /run/user/1000
+# 默认的容器镜像仓库认证文件路径前缀
     
-  $ oc create secret generic quayio \
-    --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
-    --type kubernetes.io/dockerconfigjson
-  # 使用 podman 登录容器镜像仓库的 token 创建 secret
+$ oc create secret generic quayio \
+  --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
+  --type kubernetes.io/dockerconfigjson
+# 使用 podman 登录容器镜像仓库的 token 创建 secret
     
-  $ oc secrets link default quayio --for=pull
+$ oc secrets link default quayio --for=pull
     
-  $ oc new-app --name sleep \
-    --docker-image=quay.io/${RHT_OCP4_QUAY_USER}/ubi-sleep:1.0
-  # 成功拉取镜像并部署
-  ```
+$ oc new-app --name sleep \
+  --docker-image=quay.io/${RHT_OCP4_QUAY_USER}/ubi-sleep:1.0
+# 成功拉取镜像并部署
+```
 
-  ![oc-get-serviceaccounts-default-imagepullsecrets](images/oc-get-serviceaccounts-default-imagepullsecrets.jpg)
+![oc-get-serviceaccounts-default-imagepullsecrets](images/oc-get-serviceaccounts-default-imagepullsecrets.jpg)
 
-  ![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
+![oc-get-secret-quayio](images/oc-get-secret-quayio.jpg)
 
-  secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。  
-- 每个项目中 default serviceaccount（sa）与 secret 的关联：
-  - 必须指定 sa 以运行 pod，若未指定将使用 default sa。
-  - default sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
-  - token分别用于：
-    - 👉 pod 与 apiserver 间的认证通信
-    - 👉 从 OCP internal registry 中拉取已构建的应用镜像
+secret 中通过 base64 编码的数据可通过 `echo <base64_string> | base64 -d` 命令进行解码查看原始数据。
 
-    ![service-account-secret-1](images/service-account-secret-1.jpg)
+#### 5.15.5 serviceaccount 与 secret 的关联
 
-  - pod 运行后将 secret 挂载至 `/var/run/secrets/kubernetes.io/serviceaccount/` 目录中。
-  - 该目录中的 token 即为 sa 中的 secret 对应的 token。
+每个项目中 default serviceaccount（sa）与 secret 的关联：
 
-    ![service-account-secret-2](images/service-account-secret-2.jpg)
+- 必须指定 sa 以运行 pod，若未指定将使用 default sa。
+- default sa 中包含两个 secret，并且每个 secret 分别具有一个 token。
+- token分别用于：
+  - 👉 pod 与 apiserver 间的认证通信
+  - 👉 从 OCP internal registry 中拉取已构建的应用镜像
 
-    ![service-account-secret-3](images/service-account-secret-3.jpg)
+  ![service-account-secret-1](images/service-account-secret-1.jpg)
 
-### ConfigureMap [`cm`]
+- pod 运行后将 secret 挂载至 `/var/run/secrets/kubernetes.io/serviceaccount/` 目录中。
+- 该目录中的 token 即为 sa 中的 secret 对应的 token。
+
+  ![service-account-secret-2](images/service-account-secret-2.jpg)
+
+  ![service-account-secret-3](images/service-account-secret-3.jpg)
+
+### 5.16 ConfigureMap (cm) 资源对象
+
+#### 5.16.1 基础概念
 
 - 该资源对象类似于 secret 资源对象，但它们存储的是不敏感的数据。
 - configmap 资源对象可用于存储细粒度（`fine-grained`）信息，如独立的属性，或粗粒度（`coarse-grained`）信息，如整个配置文件和 JSON 数据。
@@ -1142,43 +1175,44 @@ $ oc rollout restart deployment <deployment_name>
   - 均可以独立地被定义（definition）与被引用（referenced）
   - 出于安全原因，为这些资源挂载的卷由临时文件存储（tmpfs）支持，不存储在节点上。
   - 它们均作用于所在的命令空间（namespace）
-- 创建与使用 configmap 资源：
 
-  ```bash
-  $ oc create configmap --help
-  # 查看创建 configmap 的多种方式
-  ```
+#### 5.16.2 创建与使用 configmap 资源
 
-  ![oc-configmap-create](images/oc-configmap-create.jpg)
+```bash
+$ oc create configmap --help
+# 查看创建 configmap 的多种方式
+```
 
-  ```bash
-  $ oc create configmap <configmap_name> \
-    --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
-  # 创建 configmap 资源，并可使用于 deploymentconfig 中。
+![oc-configmap-create](images/oc-configmap-create.jpg)
+
+```bash
+$ oc create configmap <configmap_name> \
+  --from-literal='<key1>'='<value1>' ... --from-literal='<keyN>'='<valueN>'
+# 创建 configmap 资源，并可使用于 deploymentconfig 中。
     
-  ### 示例 ###
-  $ oc create configmap myappconf \
-    --from-literal APP_MSG="Test Message"
-  ```
+### 示例 ###
+$ oc create configmap myappconf \
+  --from-literal APP_MSG="Test Message"
+```
 
-  ```bash
-  $ oc set env dc/<deploymentconfig_name> --from=configmap/<configmap_name>
-  # OCP3 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
-  # 注入至应用 pod 中
+```bash
+$ oc set env dc/<deploymentconfig_name> --from=configmap/<configmap_name>
+# OCP3 中将 configmap 资源定义的配置以环境变量的方式通过 deploymentconfig 
+# 注入至应用 pod 中
     
-  ### 示例 ###
-  $ oc set env dc/myapp --from=configmap/myappconf
-  # OCP3 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
-  # 以环境变量的方式存在。
-  ```
+### 示例 ###
+$ oc set env dc/myapp --from=configmap/myappconf
+# OCP3 中通过 deploymentconfig 向已部署的应用 pod 中注入 configmap，在 pod 中
+# 以环境变量的方式存在。
+```
 
-  ```bash
-  $ oc rollout latest dc/<deploymentconfig_name>
-  # OCP3 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
+```bash
+$ oc rollout latest dc/<deploymentconfig_name>
+# OCP3 中 dc 将根据 REVISION 中的版本更新至最新版本，pod 将重新部署至最新版本。
     
-  $ oc rollback 
-  # OCP3 中 oc rollout/rollback 都是针对 dc 来实现
-  ```
+$ oc rollback 
+# OCP3 中 oc rollout/rollback 都是针对 dc 来实现
+```
   
 - 如下所示，由于注入 configmap 与更改 dc 配置导致两次触发 dc 部署全新的 pod：
 

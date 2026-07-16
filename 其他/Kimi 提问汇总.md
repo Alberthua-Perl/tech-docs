@@ -1,61 +1,62 @@
 # 📚 Kimi 提问汇总
 
-## 目录
+## 0. 目录
 
 - [📚 Kimi 提问汇总](#-kimi-提问汇总)
-  - [目录](#目录)
-  - [Linux 内核](#linux-内核)
-  - [Linux 系统编程](#linux-系统编程)
-  - [Linux 性能优化](#linux-性能优化)
-  - [Linux 网络](#linux-网络)
-    - [Linux ARP 特性](#linux-arp-特性)
-  - [系统组件](#系统组件)
-  - [硬件监测](#硬件监测)
-  - [系统服务](#系统服务)
-  - [系统安全](#系统安全)
-  - [Ceph](#ceph)
-  - [Jenkins](#jenkins)
-  - [Ansible](#ansible)
-  - [容器 \& Kubernetes](#容器--kubernetes)
-    - [K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系](#k8s-networkpolicy-与-calico-networkpolicy-间的关系)
-  - [OpenShift](#openshift)
-  - [CNI 如何玩转 Linux Bridge](#cni-如何玩转-linux-bridge)
-  - [Python](#python)
-  - [机器学习](#机器学习)
-  - [深度学习](#深度学习)
-  - [大模型](#大模型)
-  - [模型部署 \& 推理](#模型部署--推理)
-  - [Red Hat Satellite \& Insights](#red-hat-satellite--insights)
+  - [0. 目录](#0-目录)
+  - [1. Linux 内核原理](#1-linux-内核原理)
+  - [2. Linux 系统编程](#2-linux-系统编程)
+  - [3. Linux 性能优化](#3-linux-性能优化)
+  - [4. Linux 网络](#4-linux-网络)
+    - [4.1 Linux ARP 特性](#41-linux-arp-特性)
+  - [5. 系统组件](#5-系统组件)
+  - [6. 硬件监测](#6-硬件监测)
+  - [7. 系统服务](#7-系统服务)
+  - [8. 系统安全](#8-系统安全)
+  - [9. Ceph](#9-ceph)
+  - [10. Jenkins](#10-jenkins)
+  - [11. 容器 \& Kubernetes](#11-容器--kubernetes)
+    - [11.1 K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系](#111-k8s-networkpolicy-与-calico-networkpolicy-间的关系)
+  - [12. OpenShift](#12-openshift)
+  - [13. CNI 如何玩转 Linux Bridge](#13-cni-如何玩转-linux-bridge)
+  - [14. Python](#14-python)
+  - [15. 机器学习](#15-机器学习)
+  - [16. 深度学习](#16-深度学习)
+  - [17. Transformer](#17-transformer)
+  - [18. 大模型基础](#18-大模型基础)
+  - [19. vLLM 推理](#19-vllm-推理)
 
-## Linux 内核
+## 1. Linux 内核原理
 
-- **源码分析**：Linux 从加电启动 → start 内核→ 用户空间？
+- Linux 内核中 head_64.S 的解读？
+- Linux 从加电启动 → start 内核 → 用户空间过程的源码分析？
 - Linux 内核模块参数设置后，没有在 parameters 中显示，是什么原因？module_param() 声明在哪里查看？
 - 如何理解 Linux 中 dmesg 命令的 ring buffer？
-- 🔥 Linux 内核自身的内存管理在物理内存上是如何组织分布的？
-  - Linux 内核在初始化阶段就把整台机器的物理 RAM 抽象成一张 “多级目录表”，随后所有分配/回收动作都在这张表里完成。
-  - “自顶向下” 的顺序：从 NUMA 节点 → 内存域（Zone）→ 页帧（Page Frame）→ 每 CPU/伙伴/Slab 三级缓存
-  - Linux 把物理 RAM 先切成 NUMA 节点，节点内再切成 Zone，Zone 里用 **伙伴系统** 管理 2^n 页块，每页对应一个 `struct page`；小对象再由 **slab** 切分，形成 “节点-域-页-对象” 四级物理内存版图。
-- 🔥 Linux 内核自身运行所在的内存与用户空间程序运行所在的内存有何区别？
-  - Linux 内核永远跑在 **高地址、特权级、固定映射** 的那一段内存里；所有用户态进程只能呆在 **低地址、非特权、按需映射** 的另一半。两边用页表+特权级完全隔离，互不干扰。
-  
-  | 维度 | 内核空间 (Kernel Space) | 用户空间 (User Space) |
-  | ----- | ----- | ----- |
-  | **虚拟地址范围** | x86-64：ffff 8000 0000 0000 以上（128 TiB 高地址）<br>x86-32：0xC000 0000 ~ 0xFFFF FFFF（高 1 GB）| x86-64：0000 0000 0000 0000 ~ 0000 7FFF FFFF FFFF（128 TiB 低地址）<br>x86-32：0x0000 0000 ~ 0xBFFF FFFF（低 3 GB）|
-  | **特权级** | Ring 0，可直接执行特权指令、访问所有硬件寄存器 | Ring 3，任何 I/O 或特权指令都会触发 #GP → 进入内核 |
-  | **页表** | 所有进程共享一份 “主内核页表”；当 CPU 运行在 Ring 0 时，页表项 PGD 高位恒映射内核 | 每个进程独立一份用户页表；切进程 ⇒ 切 CR3 ⇒ 切换用户页表，但高位内核映射不变 |
-  | **物理内存来源** | 启动早期一次性把低端物理页“线性映射”到高地址；高端内存临时用 `kmap` | 通过 `brk/mmap` 向伙伴系统申请，按需建立/撤销映射，可换出到 swap |
-  | **内存保护** | 页表始终可读可写；没有 page-fault 换出概念（swappable=No）| 页表项有 R/W/X、Dirty/Accessed、swap 位；可被换出、写保护、COW |
-  | **异常/中断** | 自己处理自己；中断向量表、IDT、TSS 都在内核段 | 任何中断/异常 CPU 自动切到 Ring 0 入口，内核保存用户寄存器后处理 |
+- x86_64 模式下 Linux 中的 “段”：
+  - 在 x86_64 下 Linux 早已把 “段” 晾在一边 —— 段只起恒等映射作用，既不参与地址分配，也不提供隔离；
+  - 所有 “虚拟地址空间” 的划分、保护、换入换出完全由页表（页机制）包办。
+  - 段与页的关系是：段负责 “把逻辑地址→线性地址” 这一步，但 64-bit 模式下它被固定成 0 基址、无限长，因而这一步恒等；真正的内存管理发生在页表，把线性地址→物理地址。
+  - 硬件把段基址强制设为 0，限长视为无限 → 逻辑地址 = 线性地址（恒等映射，段部件不做任何算术）。
+  - 因此用户代码里看到的地址就是线性地址，Linux 只通过四级/五级页表把它映射到物理页；分段机制既不参与分配，也不提供隔离。
+  - 结论：“分段” 在 64-bit Linux 中名存实亡，所有虚拟地址 ↔ 物理地址的转换完全由分页机制完成。
 
-  - 32 位内核的 高端内存（HIGHMEM）是内核自己也要临时映射才能访问的 “用户可用物理页”；64 位因地址空间巨大，已取消 HIGHMEM。
-  - 用户调用 read()、malloc() 等库函数时，CPU 通过 syscall/sysenter 指令从 Ring 3 跳到 Ring 0，栈也瞬间切换到内核栈；返回时再用 sysret/iret 回到 Ring 3，继续跑用户代码。
-  - cat /proc/<pid>/maps 只能看到用户地址；sudo cat /proc/kallsyms 才能看到内核符号地址，印证了 “用户看不见内核”。
-  - 总结：
-    - 用户空间 = 低地址 + Ring 3 + 按需映射
-    - 内核空间 = 高地址 + Ring 0 + 永远映射
-    - 两边地址空间重叠但权限隔离，用户态永远触碰不到内核那半张页表。
-- 🔥 Linux 内核如何为自己分配内存？ 如何为用户空间进程分配内存？
+- 🎉 Linux 对物理内存划分的图谱？
+
+  | 物理地址区间 (示例) | Zone 类型 | 内核虚拟窗口 | 主要用途 / 备注 |
+  | ----- | ----- | ----- | ----- |
+  | 0 ~ 1 MB | ZONE\_DMA | `__va(x)` 直接映射 | ISA/老式 PCI 16-bit DMA；**预留** |
+  | 1 MB ~ 896 MB | ZONE\_NORMAL | `__va(x)` 直接映射 | 内核代码、数据、slab、伙伴热页；**>90% 内核分配** |
+  | 896 MB ~ 4 GB (可选) | ZONE\_DMA32 | `__va(x)` 直接映射 | 32 位设备 DMA；64 位系统才有 |
+  | > 4 GB ~ 物理顶 | ZONE\_MOVABLE + 剩余 NORMAL | `__va(x)` 直接映射 | 用户进程、page cache、匿名页、CMA、热插拔页；**大页/巨页**也在这里 |
+  | 任意离散页框 | **无 Zone** | **vmalloc 区** (新建页表) | 模块、ioremap、大缓冲区、per-cpu、kmap\_atomic 临时映射 |
+  | 任意页框 | **无 Zone** | **vmemmap 区** (线性数组) | `struct page` 描述符仓库，一一对应物理页 |
+  | 设备 MMIO / 保留区 | ZONE\_DEVICE | **ioremap 窗口** | PCIe 寄存器、ROM、ACPI、IOMMU 窗口；**非 RAM** |
+  | 低 1 MB 预留 | **无 Zone** | **固定映射区** | APIC、IOAPIC、HPET、early ioremap；**编译期常量 VA** |
+
+  64 位 Linux 把物理内存切成 DMA → NORMAL → MOVABLE 三带，全部通过 128 TB 直接映射区实现零成本内核寻址；</br>
+  离散或设备用途再走 vmalloc/ioremap 另建页表 —— 物理地址→Zone→虚拟窗口三张地图一一对应，构成内核视角的完整物理内存图谱。
+
+- 🔥 Linux 内核如何为自己分配物理内存？如何为用户空间进程分配物理内存？
   - 把 Linux 内核的内存分配机制拆成两条主线：
     - “内核给自己用” —— 内核地址空间
     - “内核给用户进程用” —— 用户地址空间
@@ -69,45 +70,88 @@
     | **per-CPU 变量** | `alloc_percpu(type)` | 每 CPU 一段 | 每 CPU 固定线性映射 | `free_percpu()` |
     | **bootmem/memblock** 早期 | `memblock_alloc()` | 启动早期预留 | 静态映射 | 启动完成后转交伙伴系统 |
 
-- 请详细描述从 CR3 寄存器开始的线性地址到物理地址的寻址过程？
-- 上述 CR3 寄存器是什么结构？
+- 🔥 Linux 内核自身的内存管理在物理内存上是如何组织分布的？
+  - Linux 内核在初始化阶段就把整台机器的物理 RAM 抽象成一张 “多级目录表”，随后所有分配/回收动作都在这张表里完成。
+  - “自顶向下” 的顺序：从 NUMA 节点 → 内存域（Zone）→ 页帧（Page Frame）→ 每 CPU/伙伴/Slab 三级缓存
+  - Linux 把物理 RAM 先切成 NUMA 节点，节点内再切成 Zone，Zone 里用 **伙伴系统** 管理 2^n 页块，每页对应一个 `struct page`；小对象再由 **slab** 切分，形成 “节点-域-页-对象” 四级物理内存版图。
+- 🔥 Linux 内核自身运行所在的内存与用户空间程序运行所在的内存有何区别？
+  - Linux 内核永远跑在 **高地址、特权级、固定映射** 的那一段内存里；所有用户态进程只能呆在 **低地址、非特权、按需映射** 的另一半。两边用页表+特权级完全隔离，互不干扰。
+  
+  | 维度 | 内核空间 (Kernel Space) | 用户空间 (User Space) |
+  | ----- | ----- | ----- |
+  | **虚拟地址范围** | x86_64：ffff 8000 0000 0000 以上（128 TiB 高地址）<br>x86-32：0xC000 0000 ~ 0xFFFF FFFF（高 1 GB）| x86_64：0000 0000 0000 0000 ~ 0000 7FFF FFFF FFFF（128 TiB 低地址）<br>x86-32：0x0000 0000 ~ 0xBFFF FFFF（低 3 GB）|
+  | **特权级** | Ring 0，可直接执行特权指令、访问所有硬件寄存器 | Ring 3，任何 I/O 或特权指令都会触发 #GP → 进入内核 |
+  | **页表** | 所有进程共享一份 “主内核页表”；当 CPU 运行在 Ring 0 时，页表项 PGD 高位恒映射内核 | 每个进程独立一份用户页表；切进程 ⇒ 切 CR3 ⇒ 切换用户页表，但高位内核映射不变 |
+  | **物理内存来源** | 启动早期一次性把低端物理页“线性映射”到高地址；高端内存临时用 `kmap` | 通过 `brk/mmap` 向伙伴系统申请，按需建立/撤销映射，可换出到 swap |
+  | **内存保护** | 页表始终可读可写；没有 page-fault 换出概念（swappable=No）| 页表项有 R/W/X、Dirty/Accessed、swap 位；可被换出、写保护、COW |
+  | **异常/中断** | 自己处理自己；中断向量表、IDT、TSS 都在内核段 | 任何中断/异常 CPU 自动切到 Ring 0 入口，内核保存用户寄存器后处理 |
+
+  - 32 位内核的 高端内存（HIGHMEM）是内核自己也要临时映射才能访问的 “用户可用物理页”；64 位因地址空间巨大，已取消 HIGHMEM。
+  - 用户调用 read()、malloc() 等库函数时，CPU 通过 syscall/sysenter 指令从 Ring 3 跳到 Ring 0，栈也瞬间切换到内核栈；返回时再用 sysret/iret 回到 Ring 3，继续跑用户代码。
+  - cat /proc/<pid>/maps 只能看到用户地址；sudo cat /proc/kallsyms 才能看到内核符号地址，印证了 “用户看不见内核”。
+  - 总结：
+    - 用户空间 = 低地址 + Ring 3 + 按需映射
+    - 内核空间 = 高地址 + Ring 0 + 永远映射
+    - 两边地址空间重叠但权限隔离，用户态永远触碰不到内核那半张页表。
+
+- CR3 寄存器是什么结构？
+- 从 CR3 寄存器开始的线性地址到物理地址的寻址过程？
+- Linux 用户空间的每个进程有各自的页表，那么 CR3 寄存器中的基址是如何确定的呢？CR3 寄存器中的基址是如何更新的呢？
+  - CR3 里的“基址”就是当前进程顶级页表（PGD/PML4）那一页的物理地址；
+  - 每次调度器挑中新进程时，内核把 task_struct->mm->pgd_paddr 写进 CR3，硬件立刻用新页表树做地址转换。
+  - CR3 基址 = 当前进程顶级页表页的物理地址；
+  - 只在调度器切任务时由内核写一次，硬件立刻按新地址开始查表。
+- 如果进程被杀死，CR3 寄存器的基址会怎样变化？
+  - 进程被杀死时，CR3 本身不会被立即改写；
+  - **只有 “调度器再次选中新进程” 那一刻才会把新任务的顶级页表物理地址写进 CR3。**
+  - 中间这段时间 CPU 继续用旧进程的页表运行 —— 但已处于内核态，不会访问用户空间，因此无害。
 - Linux 内核是如何操作 MMU 和 TLB，请详述过程？
+- Linux 内核中操作 MMU 的代码是什么？
+
+  Linux 内核中操作 MMU 的代码分布在启动初始化、进程切换、缺页处理、TLB 刷新四个关键环节，下面按真实源码位置逐层拆解。
+
+  | 功能 | 文件路径 |
+  | ----- | ----- |
+  | 启动建页表、开 MMU | `arch/x86/kernel/head_64.S` / `arch/arm/mm/proc-v6.S` |
+  | 进程切换写 CR3/TTBR | `arch/x86/include/asm/mmu_context.h` / `arch/arm64/include/asm/mmu_context.h` |
+  | 缺页建表 | `arch/x86/mm/fault.c` → `mm/memory.c` |
+  | TLB 刷新 | `arch/x86/include/asm/tlbflush.h` / `arch/x86/mm/tlb.c` |
+  | 直接映射宏 | `arch/x86/include/asm/page_64.h` |
+  | 页表项操作 | `include/asm-generic/pgtable.h` |
+
+  Linux 操作 MMU 的代码 = "启动时填页表 → 开分页 → 切进程写 CR3 → 缺页补页表 → 改表后刷 TLB" 五个动作；</br>
+  MMU 本身（四级遍历、TLB 查询）是纯硬件自动完成，内核只负责维护页表内容和触发刷新时机 
+
 - 详解 /proc/meminfo 文件中的各项参数？
-
-在 Linux 运行的 x86-64 模式下：
-硬件把段基址强制设为 0，限长视为无限 → 逻辑地址 = 线性地址（恒等映射，段部件不做任何算术）。
-因此用户代码里看到的地址就是线性地址，Linux 只通过四级/五级页表把它映射到物理页；分段机制既不参与分配，也不提供隔离。
-结论：“分段” 在 64-bit Linux 中名存实亡，所有虚拟地址 ↔ 物理地址的转换完全由分页机制完成。
-
 - 以下 Linux 内核 call trace 代表的含义是？每个符号与后面的十六进制分别代表是？
   
-```plaintext
-[Sat Jun  7 16:54:14 2025] Call Trace:
-[Sat Jun  7 16:54:14 2025]  <TASK>
-[Sat Jun  7 16:54:14 2025]  dump_stack_lvl+0x34/0x48
-[Sat Jun  7 16:54:14 2025]  dump_header+0x4a/0x201
-[Sat Jun  7 16:54:14 2025]  oom_kill_process.cold+0xb/0x10
-[Sat Jun  7 16:54:14 2025]  out_of_memory+0xed/0x2e0
-[Sat Jun  7 16:54:14 2025]  __alloc_pages_slowpath.constprop.0+0x6e8/0x960
-[Sat Jun  7 16:54:14 2025]  __alloc_pages+0x21d/0x250
-[Sat Jun  7 16:54:14 2025]  __folio_alloc+0x17/0x50
-[Sat Jun  7 16:54:14 2025]  ? policy_node+0x4f/0x70
-[Sat Jun  7 16:54:14 2025]  vma_alloc_folio+0xa3/0x390
-[Sat Jun  7 16:54:14 2025]  do_anonymous_page+0x63/0x520
-[Sat Jun  7 16:54:14 2025]  __handle_mm_fault+0x32b/0x670
-[Sat Jun  7 16:54:14 2025]  ? nohz_balancer_kick+0x31/0x250
-[Sat Jun  7 16:54:14 2025]  handle_mm_fault+0xcd/0x290
-[Sat Jun  7 16:54:14 2025]  do_user_addr_fault+0x1b4/0x6a0
-[Sat Jun  7 16:54:14 2025]  ? sched_clock_cpu+0x9/0xc0
-[Sat Jun  7 16:54:14 2025]  exc_page_fault+0x62/0x150
-[Sat Jun  7 16:54:14 2025]  asm_exc_page_fault+0x22/0x30
-```
+  ```plaintext
+  [Sat Jun  7 16:54:14 2025] Call Trace:
+  [Sat Jun  7 16:54:14 2025]  <TASK>
+  [Sat Jun  7 16:54:14 2025]  dump_stack_lvl+0x34/0x48
+  [Sat Jun  7 16:54:14 2025]  dump_header+0x4a/0x201
+  [Sat Jun  7 16:54:14 2025]  oom_kill_process.cold+0xb/0x10
+  [Sat Jun  7 16:54:14 2025]  out_of_memory+0xed/0x2e0
+  [Sat Jun  7 16:54:14 2025]  __alloc_pages_slowpath.constprop.0+0x6e8/0x960
+  [Sat Jun  7 16:54:14 2025]  __alloc_pages+0x21d/0x250
+  [Sat Jun  7 16:54:14 2025]  __folio_alloc+0x17/0x50
+  [Sat Jun  7 16:54:14 2025]  ? policy_node+0x4f/0x70
+  [Sat Jun  7 16:54:14 2025]  vma_alloc_folio+0xa3/0x390
+  [Sat Jun  7 16:54:14 2025]  do_anonymous_page+0x63/0x520
+  [Sat Jun  7 16:54:14 2025]  __handle_mm_fault+0x32b/0x670
+  [Sat Jun  7 16:54:14 2025]  ? nohz_balancer_kick+0x31/0x250
+  [Sat Jun  7 16:54:14 2025]  handle_mm_fault+0xcd/0x290
+  [Sat Jun  7 16:54:14 2025]  do_user_addr_fault+0x1b4/0x6a0
+  [Sat Jun  7 16:54:14 2025]  ? sched_clock_cpu+0x9/0xc0
+  [Sat Jun  7 16:54:14 2025]  exc_page_fault+0x62/0x150
+  [Sat Jun  7 16:54:14 2025]  asm_exc_page_fault+0x22/0x30
+  ```
 
-- 以 Linux 内核 call trace 中的 do_anonymous_page+0x63/0x520 为例，请给出 addr2line 定位源代码行号的示例？
-- 那么上述函数的长度在定位源码行数的过程中没有实际作用吗？
-- 以上示例中，什么是函数入口地址、相对地址与绝对地址？
+  - 以 Linux 内核 call trace 中的 do_anonymous_page+0x63/0x520 为例，请给出 addr2line 定位源代码行号的示例？
+  - 那么上述函数的长度在定位源码行数的过程中没有实际作用吗？
+  - 以上示例中，什么是函数入口地址、相对地址与绝对地址？
 
-## Linux 系统编程
+## 2. Linux 系统编程
 
 - 二进制、十进制、八进制与十六进制数据间的转换？
 - 请编写多个 C 语言程序示例，并使用 makefile 完成编译。
@@ -120,14 +164,16 @@
 - 给出一个示例，使用 linux io_uring 来实现大文件的拷贝？
 - io_uring 相比传统的读写操作有哪些优势？
 
-## Linux 性能优化
+## 3. Linux 性能优化
 
 - Linux 中 PCP 的 pmlogger 默认是采集所有的性能指标吗？是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
 - 磁盘 IO 请求的合并是由内核调度算法来完成的吗？和磁盘驱动有关系吗？
 
-## Linux 网络
+## 4. Linux 网络
 
-### Linux ARP 特性
+- 如何在 RHEL9.6 中部署测试 DPDK+SR-IOV？
+
+### 4.1 Linux ARP 特性
 
 - `LVS DR` 模式
 - Linux 主机有这么一个特性，假设我们的主机上有两块网卡，比如 eth0、eth1，当 `arp` 请求 eth1 的 `mac` 地址的时候，eth1 会答复，这个是理所当然的，但是 eth0 也会 "好心" 的帮 eth1 回答这个 arp 请求。要防止这样的话，就需要更改下我们的一些内核参数：
@@ -148,7 +194,7 @@ net.ipv4.conf.all.arp_announce = 2
 
 - net.ipv4.conf.all.proxy_arp = 1
 
-## 系统组件
+## 5. 系统组件
 
 - systemd 的 service 单元文件 [Service] 部分中的 Type 类型介绍？
 - D-Bus 框架的工作原理？它与 socket 编程有何不同？
@@ -166,7 +212,7 @@ net.ipv4.conf.all.arp_announce = 2
 - 如何理解 tmpfs，此文件系统在当前运行的内存中是否占据空间？
 - 挂载 tmpfs 时，怎样设置大小上限？
 
-## 硬件监测
+## 6. 硬件监测
 
 - 如何理解磁盘固件中的 S.M.A.R.T 子系统？这种固件的形式或者说源码是如何实现的？
 - Linux 中 smartctl 命令检查磁盘健康状态？
@@ -197,29 +243,28 @@ net.ipv4.conf.all.arp_announce = 2
 
 - 什么是 Linux 内核中的 NMI watchdog（不可屏蔽中断看门狗）？
 
-## 系统服务
+## 7. 系统服务
 
 - LDAP：
   - 本身是一种协议
   - LDAP 的实现：OpenLDAP (Community), 389ds/389-ds-base (redhat)
   - Kerberos 身份认证服务：OpenLDAP+Kerberos, 389-ds-base+Kerberos
   - 集成解决方案：FreeIPA (Community) ==> RedHat IdM (redhat)
-- RH342v8.4 课程环境中 sssd 实验存在问题，需要排错。
 - HAProxy：
   - haproxy.cfg 配置文件参数说明 (option 参数、timeout 参数、listen 段)
 
-## 系统安全
+## 8. 系统安全
 
 - OpenSSL 中的 3DES 对称加密算法中 PBKDF2 是什么？老式的 EVP_BytesToKey 是什么？
 - [隐藏了十年的 sudo 漏洞爆出：无需密码就能获取 root 权限](https://blog.csdn.net/zhangge3663/article/details/113501578)
   - CVE-2019-14287
   - CVE-2019-18634
 
-## Ceph
+## 9. Ceph
 
 - 如何理解 Ceph MDS 缓存以及 MDS 客户端的缓存一致性？
 
-## Jenkins
+## 10. Jenkins
   
 - Jenkinsfile 中的 script { ... } 块作用是什么？与直接使用 sh 有何区别？
 - 安装 Pipeline Stage View 查看流程方块视图
@@ -227,11 +272,7 @@ net.ipv4.conf.all.arp_announce = 2
   - Credentials Binding Plugin: withCredentials 指令 (动态使用)
 - Credentials Plugin: checkout 步骤 credentialsID (静态使用)
 
-## Ansible
-
-- python 如何调用 ansible-playbook？ansible-runner 如何使用？
-
-## 容器 & Kubernetes
+## 11. 容器 & Kubernetes
 
 - 如何理解 overlayfs 文件系统，并用示例说明？
 - flatpak 与 Podman 容器在实现上的异同点是什么？
@@ -270,7 +311,7 @@ net.ipv4.conf.all.arp_announce = 2
 
 - flatpak 与 ostree 的关系？安装路径在用户的哪个目录？
   - 用户级安装（--user，无需 sudo，推荐）：
- 
+
     ```plaintext
     应用主文件
     ~/.local/share/flatpak/
@@ -342,18 +383,19 @@ net.ipv4.conf.all.arp_announce = 2
 - 💡 OpenShift 安装 operator 的过程中，subscription 资源对象的作用是什么？
 - 🌐 KServe 与 Knative 之间的联系？它们的架构如何实现？
 
-### K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系
+### 11.1 K8s NetworkPolicy 与 Calico NetworkPolicy 间的关系
 
 - kubernetes v1.8 版本开始支持 `networkpolicy` 类型的 API，但其原生支持的功能较弱。
 - 因此，可以使用 `calico` 的 networkpolicy 做功能的扩展。
 - `nerdctl` 的端口不是用户态监听的，而是直接 `iptables nat` 转发的。
 
-## OpenShift
+## 12. OpenShift
 
+- 如何计算单个 OpenShift 集群中最大能承载的 Pod 数量（IPv4 地址规划）？
 - 如何在本地部署一个单节点的 RHACM？
 - 如何使用 RHACM + ZTP 配合 GitOps 创建部署新的 OpenShift 集群？
 
-## CNI 如何玩转 Linux Bridge
+## 13. CNI 如何玩转 Linux Bridge
 
 ```bash
 ### 在宿主机上
@@ -384,7 +426,7 @@ $ ip route add default via 10.244.0.1 dev eth0
 $ ip addr add 10.244.0.1/24 dev cni0
 ```
 
-## Python
+## 14. Python
 
 - cookie 与 session 的联系与区别是什么？如何通过 wireshark 抓包的方式获取它们呢？
 - 如何创建一个 python 服务端实现示例完整演示 cookie 和 session 之间的关系？
@@ -394,9 +436,8 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - 二叉树中序遍历
 - Python 面向对象中的封装与多态？
 - Python 中多线程互斥锁、自旋锁与原子操作的实现？内核底层是如何实现的？
-- 如何使用 Python 获取当前系统中各 CPU 的运行队列？
 
-## 机器学习
+## 15. 机器学习
 
 - 数学基础：
   - 什么是雅可比矩阵（Jacobian）？ 
@@ -416,10 +457,8 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - 举例说明最小二乘法的具体步骤？
   - 均方根误差是不是通过最小二乘法推导而来的？
   - 分别阐述一阶导数与二阶导数的几何意义（Latex 公式输出）？
-
 - 概率 & 统计：
   - 均值、方差、协方差、标准差、偏差的数学定义？
-
 - 📊 给出 NumPy 与 Pandas 在实际数据清洗过程中的完整示例？
 - 评估数据相关性的有哪些指标？
 - 详细描述线性回归的训练过程？
@@ -427,7 +466,6 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - 🎉 什么是 XGBoost（以 LaTex 公式演示）？它是否既可以做预测分析，也可以做多分类呢？它与决策树与随机森林的关系是什么？
 - 🧩 什么是 LightGBM（以 LaTex 公式演示）？此算法的数学推导与应用场景是什么？
 - 🎲 什么是 GaussianNB（以 LaTex 公式演示）？此算法的数学推导与应用场景是什么？(from sklearn.naive_bayes import GaussianNB)
-
 - 📝 案例：
   - 如何获取 Ames House Prices 数据集，该数据集是以何种方式存储的？如何理解 Ames House Prices 数据集结构？
   - 如何对 Ames House Prices 数据集进行特征工程？
@@ -436,7 +474,7 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - 如何计算模型的方差和偏差，并利用这两个值判断欠拟合或过拟合？
   - 如何实现偏差-方差权衡？
 
-## 深度学习
+## 16. 深度学习
 
 - tensorflow.keras.datasets 下载的数据存放路径是什么？
 - 什么是数据标准化？它的功能是什么？
@@ -444,7 +482,6 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - 数据预处理中 OneHotEncoder 是什么？它的功能是什么？
 - ANN 中为何要构建数据加载器 DataLoader？
 - CNN 中的下采样操作是什么？
-
 - 梯度下降算法的公式是如何基于泰勒公式推导出来的？
 - 以一元函数的泰勒公式为例，详细演示如何推导出梯度下降算法公式？
 - 以多元函数的泰勒公式为例，详细演示如何推导出梯度下降算法公式？
@@ -455,48 +492,178 @@ $ ip addr add 10.244.0.1/24 dev cni0
 - 为什么激活函数可以有效解决梯度消失问题？
 - 深度学习中为什么会出现梯度消失与梯度爆炸，请详细说明原因？
 - Scikit-learn, PyTorch, TensorFlow 保存的模型格式，这些格式的具体结构是如何组织的？
-
 - 📝 案例：
   - 如何查看 MNIST 或 CIFAR-10 数据集中的图片，并将其以 png 格式保存在指定目录中？
   - CIFAR-10 数据集：使用 CNN 实现图片中物体识别的代码示例？
 
-## 大模型
+## 17. Transformer
 
-- 请举例现在流行的大语言模型和对应的蒸馏模型 (如果有的话)？
-- 位置编码与词向量化哪个先执行？
-- LLM 提取 token 的 python 示例 (各大模型的方式存在差异)？
-- tokenizer 不属于 Transformer 的一部分，而是每个模型实现的一部分，是吗？
-- 为什么每个 Transformer 模型都需要一个特定的 tokenizer？
-- BPE 是什么？
-- 如何使用 LangChain + Qwen3 + RAG 实现个人知识库？
-- 如何微调蒸馏的 Qwen3？
-- 什么是 Hugging Face Transformers 格式（config.json + tokenizer.json + .safetensors 分片）格式？
-- 什么是 GGUF（*.gguf）格式？
-- TensorFlow 中的 tf.random.set_seed(10) 与 tf.keras.utils.set_random_seed(10) 功能是什么？
+- 学习路径：Pythoh ➡ Transformer ➡ 提示词工程 ➡ RAG ➡ LangChain ➡ LangGraph ➡ Agent ➡ 多 Agent ➡ 私有化部署 ➡ 微调 ➡ 量化 ➡ 多模态
+- 模型格式1：HuggingFace 格式（config.json + tokenizer.json + .safetensors 分片）
+- 模型格式2：GGUF（*.gguf）格式
+- Transformer 中维度引入的时间线：
 
-- 如何解决 WSL2 中 Linux 主机 8000/tcp 端口不通问题？
+```plaintext
+ Token ID（整数，无维度概念）
+    ↓
+【嵌入层】← 维度在这里首次引入！
+    │
+    └── 嵌入矩阵形状：[vocab_size, hidden_dim]
+    │
+    输出：[batch, seq_len, hidden_dim]  ← 768/1024/1536 等
+    ↓
+【位置编码】
+    │
+    输出：[batch, seq_len, hidden_dim]  ← 同维度
+    ↓
+【Transformer 层】
+    │
+    ├── Q/K/V 投影矩阵：[hidden_dim, hidden_dim] 或 [hidden_dim, num_heads × head_dim]
+    ├── FFN 第一层：[hidden_dim, 4×hidden_dim]
+    ├── FFN 第二层：[4×hidden_dim, hidden_dim]
+    └── 输出：[batch, seq_len, hidden_dim]  ← 维度保持不变！
+    ↓
+【池化层】
+    │
+    输出：[batch, hidden_dim]  ← 句子向量
 
-## 模型部署 & 推理
+维度在嵌入层首次引入（hidden_dim 超参数），后续所有权重矩阵（Q/K/V、FFN、LayerNorm）的维度都继承自这个值，通过残差连接保证维度一致，形成 "768 维贯穿始终" 的架构。
+```
+
+- Transformer 维度传递的完整链条：
+
+```plaintext
+模型设计时确定 hidden_dim（如 768）
+    ↓
+嵌入层权重：[vocab_size, 768]
+    ↓
+位置编码：[max_seq_len, 768]
+    ↓
+Transformer 层 × N：
+    ├─ Q/K/V 投影：[768, 768]
+    ├─ Attention 输出：[768, 768]
+    ├─ FFN 升维：[768, 3072]
+    ├─ FFN 降维：[3072, 768]
+    └─ 残差连接：输入输出都是 [batch, seq, 768]
+    ↓
+池化层：输入 [batch, seq, 768] → 输出 [batch, 768]
+    ↓
+最终句子向量：768 维
+```
+
+- 以 how are you? 为例，解释一下 token 化的过程？维度在何时引入？
+
+```plaintext
+以 "how are you?" 为例
+    ↓
+【Tokenization】BPE 分词
+    │
+    "how" → 15496
+    " are" → 389
+    " you" → 345
+    "?" → 30
+    │
+    输出: [15496, 389, 345, 30]  ← 纯整数，无维度
+    ↓
+【嵌入层】nn.Embedding(50257, 768)
+    │
+    查表获取每行向量
+    │
+    15496 → [0.11, 0.67, ..., 0.33]  (768 维)
+    389   → [0.23, -0.15, ..., 0.88] (768 维)
+    345   → [0.05, 0.22, ..., -0.17] (768 维)
+    30    → [-0.08, 0.91, ..., 0.44]  (768 维)
+    │
+    输出: [4, 768]  ← 维度首次引入！
+    ↓
+【位置编码】+ [4, 768]
+    │
+    输出: [4, 768]  ← 维度保持
+    ↓
+【Transformer × 12】
+    │
+    ├─ W_q [768,768] → 输出 [4,768]
+    ├─ W_k [768,768] → 输出 [4,768]
+    ├─ W_v [768,768] → 输出 [4,768]
+    ├─ W_ffn1 [768,3072] → 中间 [4,3072]
+    ├─ W_ffn2 [3072,768] → 输出 [4,768]
+    │
+    输出: [4, 768]  ← 维度始终 768
+    ↓
+【池化】Mean/CLS
+    │
+    输出: [768]  ← 句子向量
+
+"how are you?" 先被 BPE 切成 4 个 token 并转为整数 ID，此时无维度概念。进入嵌入层后，每个 ID 通过查表映射为 768 维向量，维度在此首次引入。后续所有权重矩阵（Q/K/V、FFN、LayerNorm）的维度都继承自这个 768，通过残差连接保持维度一致，最终输出 768 维的句子向量。
+```
+
+- 如何对给定序列 "How are you?" 使用 tokenizer 实现 token 化，计算出 QKV 三个矩阵，给出具体的代码示例与数学计算过程。
+- 嵌入后的矩阵每行代表一个 token，每列代表一个（语义）维度。接下来既可以用这个矩阵和 transformer 的权重矩阵分别进行 QKV 三个矩阵的运算。对吗？是的，完全正确。</br>
+
+  Embedding 矩阵的每行是 token 向量，与 Transformer 的 Q/K/V 权重矩阵分别相乘，得到三个投影矩阵，进入 Attention 计算。
+
+```plaintext
+Embedding 输出: [batch_size, seq_len, hidden_dim]
+                    [1, 4, 4096]
+
+每行 = 一个 token 的向量 (4096 维)
+每列 = 一个语义维度
+
+    ↓
+
+分别与三个权重矩阵相乘:
+
+W_Q: [4096, 4096]    W_K: [4096, 4096]    W_V: [4096, 4096]
+    ↓                    ↓                    ↓
+Q: [1, 4, 4096]      K: [1, 4, 4096]      V: [1, 4, 4096]
+```
+
+- 如何理解 batch_size？
+- 权重矩阵 W_Q, W_K, W_V 的维度是怎么来的？它们的维度和 Embedding 维度，以及 d_model 维度一样吗？</br>
+  W_Q, W_K, W_V 的输入维度始终等于 d_model（4096），但输出维度取决于注意力类型：标准 MHA 输出 4096，GQA 压缩到 1024，MQA 压缩到 128，目的是减少 KV Cache 显存。
+
+## 18. 大模型基础
 
 - ❓如何在 Kubernetes 集群中进行分布式模型训练（图像识别或大语言模型）？数据集是如何拆分至不同 GPU 中的？训练过程中模型的参数是如何协同更新的？
 - 运行 OpenVINO 模型服务器的命令（python 原生运行）？如何运行 OpenVINO 容器？
 - 运行 ONNX 运行时的命令（python 原生运行）？如何运行 ONNX 容器？
 - distilbert 模型能在 24 核心 CPU 和 32 GB 内存的平台上运行吗？
 - distilbert 模型如何转换为 ONNX 格式，并且使用 OpenVINO 部署？
-- ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 vLLM 模型服务运行时部署此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
-- ❓如何在 WSL2 环境中下载 ibm-granit-350M 模型，使用 OpenVINO/model_server 模型服务运行时此模型，满足 8GB 显存执行环境（精度量化），并完成推理测试？
-- 如何使用 vLLM 部署指定的模型（每类模型都具有特定的参数）？
-- 如何理解某个大语言模型？
+- ❓如何理解某个大语言模型？
   - 模型的使用场景
-  - 模型可以在多大的显存上运行
-  - 模型是否量化
+  - 模型运行需要多大的显存空间
+  - 模型是否可量化
   - 模型量化的方式
+  - 模型的维度
   - 模型的精度
   - 模型的权重
   - 模型生成 token 的速度（每秒多少 token）
   - 模型的并发能多大
   - 模型实现的原理
 - 多个模型服务运行时对比：llama.cpp、ONNX、OpenVINO、vLLM
+
+## 19. vLLM 推理
+
+- tokenized 之后的 Embedding 过程不归 vLLM 接管，而是到达大模型之后再做 Embedding？是的</br>
+  Embedding 是大模型的第一层神经网络，vLLM 只负责把 token IDs 送到 GPU，实际的向量转换由大模型权重完成。
+
+```plaintext
+  Tokenization (vLLM CPU)
+    │
+    ▼ [101, 2345, 5678, 8910]
+Scheduler 组织 batch
+    │
+    ▼ input_ids 张量送入 GPU
+Embedding Layer (大模型第一层)
+    │
+    ▼ [num_tokens, hidden_dim]
+Transformer Layers (大模型主体)
+    │
+    ▼ ...
+```
+
+- 描述 vLLM 的完整推理过程？
+- 一个推理请求通过 vLLM 和基于 Transformer 模型后，token 在整个链路中的变化是怎么样的？对应的源码位置在哪里？这个源码的功能是什么？
 - vLLM 部署后第1次的推理请求中并没有 KV cache，那么 vLLM 也会使用 KV cache 吗？
   - 会。
   - vLLM 的 KV cache 是“推理过程中在线填充”的，而不是“请求前就已存在”。流程如下：
@@ -506,7 +673,7 @@ $ ip addr add 10.244.0.1/24 dev cni0
   - 因此：
     - “第 1 次”只是 cache 起点，并非不用 KV cache；
     - 从第 2 次请求起，若命中相同前缀或重用 block，即可享受到缓存加速。
-- 将大模型部署于 vLLM 中，那么 vLLM 是如何处理大模型的请求吗？
+- 将大模型部署于 vLLM 中，那么 vLLM 如何处理大模型的请求？
 
   ```plaintext
   客户端 HTTP 请求
@@ -524,8 +691,8 @@ $ ip addr add 10.244.0.1/24 dev cni0
   KV 块回收 ← 请求完成
   ```
 
-- 大模型在整个 vllm 推理过程中如何发挥作用？
-  - 可以把 vLLM 的推理流程想象成一条“token 流水线”
+- 大模型在整个 vLLM 推理过程中如何发挥作用？
+  - 可以把 vLLM 的推理流程想象成一条 “token 流水线”
   - 大模型（权重）就是流水线上唯一的那台核心机床；vLLM 只负责把原材料（token）分批、排产、送料、收料，让机床永远处于切削状态， never idle。具体分工如下：
     - 权重常驻显存
       - 启动时 vLLM 一次性把完整模型（FP16/BF16/FP8/Int4）加载到 GPU，之后不再移动；后续所有计算都直接引用这片显存，节省重复 IO。
@@ -541,6 +708,211 @@ $ ip addr add 10.244.0.1/24 dev cni0
       - logits 回传后，vLLM 在 CPU 端做 beam/nucleus/repetition 处理，选出下一个 token；大模型不参与采样，只负责“打分”。
   → 总结：大模型在 vLLM 里就是一块被“分页 + 批量化”调用的大算子；它只关心“输入矩阵维度对不对”，其余负载均衡、内存碎片、连续批、流式返回等全部由 vLLM 框架代劳。因此同样一张 GPU，vLLM 能让大模型每秒处理的 token 数提升一个数量级，而模型本身一行代码都不用改。
 
-## Red Hat Satellite & Insights
+- vLLM 是上层的调度器，底层是如何与 CUDA 联系实现 GPU 层面的调度呢？
+- 如何理解 CUDA kernel？
+- 大模型文件是如何组织的？以 HuggingFace 上的模型为例，说明模型的文件结构，以及如何被 vLLM 加载运行。
 
-- 如何部署与管理离线版 Red Hat Satellite 并集成 Insights？
+```plaintext
+以 Llama-2-7B 为例的标准结构：
+
+meta-llama/Llama-2-7b-hf/
+├── config.json                 # 模型架构配置（核心）
+├── model.safetensors           # 权重文件（新格式，推荐）
+├── model.safetensors.index.json # 多文件权重索引（大模型）
+├── generation_config.json      # 生成参数默认配置
+├── tokenizer.json              # 分词器词汇表和规则
+├── tokenizer_config.json       # 分词器配置
+├── special_tokens_map.json     # 特殊token映射
+├── vocab.json / merges.txt     # BPE分词器文件（旧格式）
+└── pytorch_model.bin           # 旧格式权重（PyTorch原生）
+```
+
+```plaintext
+vLLM 加载流程全景图：
+
+┌─────────────────────────────────────────────────────────────┐
+│  Stage 1: 配置解析 (Python/HF Transformers)                  │
+│  ─────────────────────────────────────────                   │
+│  1. 从 HF Hub 或本地路径读取 config.json                     │
+│  2. 确定模型架构 (LlamaForCausalLM → vLLM 的 Llama 实现)      │
+│  3. 解析超参数 (hidden_size, num_layers, num_heads, etc.)    │
+│                                                              │
+│  vLLM/config.py:                                             │
+│  ModelConfig → 验证并转换 HF 配置到 vLLM 内部格式            │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Stage 2: 权重加载与分布 (关键阶段)                            │
+│  ─────────────────────────────────────────                   │
+│                                                              │
+│  单机单卡 (简单情况):                                         │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐                  │
+│  │ Safetensors│ → │ 内存映射  │ → │ GPU显存  │                  │
+│  │  文件    │    │ (CPU RAM)│    │ (VRAM)   │                  │
+│  └─────────┘    └─────────┘    └─────────┘                  │
+│       ↑              ↑              ↑                        │
+│  零拷贝加载      按需加载特定层      全量加载                  │
+│  (memory-map)   (lazy loading)   (cuda:0)                    │
+│                                                              │
+│  多卡并行 (Tensor Parallelism):                               │
+│  ┌─────────┐         ┌─────────┐         ┌─────────┐       │
+│  │  GPU 0  │← NVLink →│  GPU 1  │← NVLink →│  GPU 2  │       │
+│  │ [层0-15]│         │ [层16-31]│         │ [层0-15] │       │
+│  │ TP Rank0│         │ TP Rank1 │         │ TP Rank2 │       │
+│  └─────────┘         └─────────┘         └─────────┘       │
+│       ↑                                               ↑      │
+│  每个GPU加载部分权重，通过 NCCL All-Reduce 同步中间结果        │
+│                                                              │
+│  vLLM/model_executor/model_loader.py:                        │
+│  load_weights() → 根据并行策略分配权重到各设备                  │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Stage 3: 模型初始化与编译 (GPU Kernel 准备)                   │
+│  ─────────────────────────────────────────                   │
+│                                                              │
+│  1. 创建 Transformer 层对象 (nn.Module)                      │
+│     ┌─────────────────────────────────────────┐              │
+│     │  self.layers = nn.ModuleList([          │              │
+│     │    LlamaDecoderLayer(config) for _ in    │              │
+│     │    range(config.num_hidden_layers)        │              │
+│     │  ])                                       │              │
+│     └─────────────────────────────────────────┘              │
+│                                                              │
+│  2. 权重格式转换 (如有必要)                                    │
+│     • FP32 → FP16/BF16 (节省显存)                            │
+│     • 合并 Q/K/V 投影矩阵 (优化内存布局)                        │
+│                                                              │
+│  3. CUDA Graph 捕获 (可选优化)                                │
+│     • 对固定形状的推理路径预编译 kernel 序列                    │
+│     • 减少 CPU launch overhead                               │
+│                                                              │
+│  vLLM/model_executor/models/llama.py:                        │
+│  LlamaForCausalLM.__init__() → 构建模型结构                   │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Stage 4: 运行时执行 (推理循环)                                │
+│  ─────────────────────────────────────────                   │
+│                                                              │
+│  输入文本 → Tokenizer → Token IDs → GPU Tensor               │
+│                              ↓                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  vLLM Engine (Python)                                   │ │
+│  │  ┌─────────┐    ┌─────────┐    ┌─────────────────┐    │ │
+│  │  │Scheduler│ → │Batch Prep│ → │ execute_model() │    │ │
+│  │  └────┬────┘    └────┬────┘    └────────┬────────┘    │ │
+│  └───────┼──────────────┼──────────────────┼─────────────┘ │
+│          │              │                  │                 │
+│          └──────────────┴──────────────────┘                 │
+│                         ↓                                    │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  GPU Kernel Execution (CUDA)                              │ │
+│  │  ┌─────────────────────────────────────────────────────┐ │ │
+│  │  │  1. Embedding Lookup (token → vector)                │ │ │
+│  │  │  2. For each layer:                                  │ │ │
+│  │  │     ┌─────────────────────────────────────────────┐   │ │ │
+│  │  │     │ • RMSNorm (input)                           │   │ │ │
+│  │  │     │ • Q/K/V Projection (Linear)               │   │ │ │
+│  │  │     │ • Rotary Position Embedding (RoPE)        │   │ │ │
+│  │  │     │ • PagedAttention Kernel (核心，见前文)       │   │ │ │
+│  │  │     │ • MLP (Gate Up Proj + SwiGLU + Down Proj) │   │ │ │
+│  │  │     │ • Residual Connection                       │   │ │ │
+│  │  │     └─────────────────────────────────────────────┘   │ │ │
+│  │  │  3. Final Norm + LM Head (logits)                      │ │ │
+│  │  └─────────────────────────────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                         ↓                                    │
+│  Sampling (GPU) → Token ID → Detokenizer → 输出文本           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- vLLM 中的连续批处理是在哪个阶段？
+
+连续批处理（Continuous Batching）在 vLLM 中发生在 Python 调度层，具体在 Scheduler 阶段。
+
+```plaintext
+┌─────────────────────────────────────────┐
+│  Layer 1: Python 调度层                  │
+│  ┌─────────┐  ← 连续批处理发生在这里     │
+│  │Scheduler│                              │
+│  │  ├─ 维护 waiting/running/swapped 队列 │
+│  │  ├─ 每 step 动态选择可加入的请求      │
+│  │  └─ 决定哪些请求可以 prefill/decode   │
+│  └────┬────┘                              │
+│       ↓                                   │
+│  ┌─────────┐                              │
+│  │Batch Prep│ ← 组装当前 step 的 batch    │
+│  │(连续批处理│   (可能混合 prefill+decode) │
+│  │ 的结果) │                              │
+│  └────┬────┘                              │
+└───────┼───────────────────────────────────┘
+        ↓
+┌─────────────────────────────────────────┐
+│  Layer 2: GPU 执行层                     │
+│  (模型实际计算，不再做调度决策)            │
+└─────────────────────────────────────────┘
+```
+
+- vLLM 如何知道多个请求？
+
+```python
+# vLLM 如何知道 "这是 3 个独立请求"
+# vLLM 内部维护的数据结构
+class SequenceGroup:
+    seq_id: int              # 唯一标识这个请求
+    prompt_token_ids: List[int]  # 分词后的结果
+    output_token_ids: List[int]  # 已生成的token
+    
+# Scheduler 维护的队列
+waiting_queue: List[SequenceGroup] = [req0, req1, req2]
+
+# 每次 schedule() 时，选择哪些请求加入当前 batch
+selected: List[SequenceGroup] = scheduler.select_batch()
+# batch_size = len(selected)  # 由调度策略动态决定
+```
+
+```plaintext
+实际 vLLM：
+  batch_size = scheduler._schedule_waiting() 
+             + scheduler._schedule_running()
+             + scheduler._schedule_swapped()
+             
+  这个值是"算出来"的，不是"设进去"的
+```
+
+- vLLM 的 worker 在推理的哪个阶段？
+- vLLM 中的 waiting 队列和 running 队列是什么数据结构实现的？这两个队列的长度有限制吗？分别存了哪些数据？</br>
+  waiting 存的是"待处理的完整请求"（无长度硬限制，受系统内存和客户端限流约束），running 存的是"正在 GPU 计算的请求"（长度受 max_num_seqs 硬性约束）。两者存储的是同一个 SequenceGroup 对象，只是状态不同，在队列间移动时数据完整保留。
+- max_num_batched_tokeens 参数含义？
+- max_num_batched_tokens 与 max_model_len 参数关系：</br>
+  max_model_len 限制单个序列，max_num_batched_tokens 限制batch 总和。它们独立配置，没有强制的大小约束关系。
+
+```plaintext
+场景1：短序列高并发（如对话机器人）
+  max_model_len = 4096
+  max_num_batched_tokens = 2048
+  
+  含义：支持最长 4096 的上下文，但单次只算 2048 个 token
+        （可能是 10 个 200 token 的请求，或 4 个 512 token 的请求）
+        
+  关系：max_num_batched_tokens < max_model_len ✓ 常见
+
+场景2：长序列优化（如文档处理）
+  max_model_len = 32768
+  max_num_batched_tokens = 8192
+  
+  含义：支持 32k 上下文，单次算 8k token
+        （可能是一个 8k 的长请求，或 4 个 2k 的请求）
+        
+  关系：max_num_batched_tokens < max_model_len ✓ 常见
+
+场景3：极端吞吐（短 prompt 为主）
+  max_model_len = 4096
+  max_num_batched_tokens = 8192
+  
+  含义：序列最长 4k，但单次 batch 算 8k token
+        （必须是 2 个以上的请求才能填满）
+        
+  关系：max_num_batched_tokens > max_model_len ✓ 也可行
+```

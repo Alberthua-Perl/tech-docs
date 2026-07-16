@@ -1,8 +1,8 @@
-# 🚀 Red Hat OpenShift 应用构建与部署详解
+# 🚀 OpenShift 应用构建与部署详解
 
 ## 文档目录
 
-- [🚀 Red Hat OpenShift 应用构建与部署详解](#-red-hat-openshift-应用构建与部署详解)
+- [🚀 OpenShift 应用构建与部署详解](#-openshift-应用构建与部署详解)
   - [文档目录](#文档目录)
   - [OCP Project 相关命令](#ocp-project-相关命令)
   - [使用 `容器镜像` 创建应用 Pod 流程](#使用-容器镜像-创建应用-pod-流程)

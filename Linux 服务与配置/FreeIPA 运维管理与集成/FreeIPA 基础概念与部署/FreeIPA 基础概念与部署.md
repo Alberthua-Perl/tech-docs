@@ -1,4 +1,4 @@
-# FreeIPA 基本概念与部署
+# FreeIPA 基础概念与部署
 
 ## 文档说明
 
@@ -12,7 +12,7 @@
 
 ## 文档目录
 
-- [FreeIPA 基本概念与部署](#freeipa-基本概念与部署)
+- [FreeIPA 基础概念与部署](#freeipa-基础概念与部署)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
   - [1. FreeIPA 基础概要](#1-freeipa-基础概要)
@@ -53,17 +53,17 @@
   - 客户端（client）：属于 Kerberos 域，接收服务端发布的证书与 `ticket`，并且可使用集中的验证与授权服务。
 - 服务端与副本端之间的通信：
   
-  <img src="images/ipa-server-replica-comm.png" style="width:60%">
+  <img src="images/ipa-server-replica-comm.png" style="width:80%">
 
 - 客户端与服务端之间的通信：
   
-  <img src="images/ipa-client-server-comm.png" style="width:60%">
+  <img src="images/ipa-client-server-comm.png" style="width:80%">
 
 - FreeIPA 的逻辑架构与组件：
   
-  <img src="images/ipa-server-arch-1.png" style="width:60%">
+  <img src="images/ipa-server-arch-1.png" style="width:80%">
   
-  <img src="images/ipa-server-arch-2.png" style="width:60%">
+  <img src="images/ipa-server-arch-2.png" style="width:80%">
 
 ## 3. FreeIPA 部署：服务端
 
@@ -92,7 +92,7 @@
 - 服务端的部署方式：
   - 1️⃣ `ipa-server-install` 交互式命令行安装：/etc/resolv.conf 中的 nameserver 作为 forwarder
 
-    <img src="images/ipa-prompt-install.png" style="width:60%">
+    <img src="images/ipa-prompt-install.png" style="width:80%">
 
   - 2️⃣ `ipa-server-install` 非交互式命令行安装：`--no-forwarder` 选项不使用 forwarder
 
@@ -113,7 +113,7 @@
       --admin-password <kerberos_admin_password>
     ```
   
-    <img src="images/ipa-server-install-command.jpg" style="width:60%">
+    <img src="images/ipa-server-install-command.jpg" style="width:80%">
 
 - 服务端部署日志可查看：`/var/log/ipaserver-install.log`
 
@@ -121,11 +121,11 @@
 
 - 若指定 forwarder，该 forwarder 不可配置有相同域名的 zone 区域数据，否则安装报错失败！
 
-  <img src="images/resolv.conf-existed-domain-error.jpg" style="width:60%">
+  <img src="images/resolv.conf-existed-domain-error.jpg" style="width:80%">
   
 - 若 ipa-server-install 命令安装时卡住或被中断，重新执行该命令时将报错，需先执行卸载操作，再重新安装！
 
-  <img src="images/ipa-server-reinstall-failed.jpg" style="width:60%">
+  <img src="images/ipa-server-reinstall-failed.jpg" style="width:80%">
 
 - 卸载 ipa-server：
 
@@ -133,7 +133,7 @@
   $ sudo ipa-server-install --uninstall
   ```
 
-  <img src="images/ipa-server-uninstall.jpg" style="width:60%">
+  <img src="images/ipa-server-uninstall.jpg" style="width:80%">
   
 - 查看 DNS 静态与动态解析文件：
 
@@ -142,7 +142,7 @@
   $ sudo cat /etc/resolv.conf
   ```
 
-  <img src="images/static-dynamic-dns.jpg" style="width:60%">
+  <img src="images/static-dynamic-dns.jpg" style="width:80%">
   
 ## 5. 部署后命令行验证
 
@@ -169,7 +169,7 @@ $ sudo ipa user-find admin
 # 查看 admin 域用户的概要信息
 ```
 
-<img src="images/ipa-server-verify.jpg" style="width:60%">
+<img src="images/ipa-server-verify.jpg" style="width:80%">
 
 ```bash
 $ sudo firewall-cmd --permanent \
@@ -183,13 +183,13 @@ $ sudo firewall-cmd --reload
 - 在浏览器地址栏中输入 ipa-server 的 IP 地址，将自动转换为域名并返回登录界面。
 - 用户名为 `admin`，密码为 `1qazZSE$`。
   
-  <img src="images/ipa-web-ui-login.jpg" style="width:60%">
+  <img src="images/ipa-web-ui-login.jpg" style="width:80%">
 
 - 有时浏览器由于之前登陆过相同域名的主机获取过 CA 证书，再次登录相同域名的主机将无法认证通过新的 CA 证书，此时需清理浏览器缓存中 CA 证书，将其删除后即可访问。
   
-  <img src="images/firefox-ca-cache-1.jpg" style="width:60%">
+  <img src="images/firefox-ca-cache-1.jpg" style="width:80%">
   
-  <img src="images/firefox-ca-cache-2.jpg" style="width:60%">
+  <img src="images/firefox-ca-cache-2.jpg" style="width:80%">
 
 ## 7. 添加 FreeIPA 客户端主机
 
@@ -199,7 +199,7 @@ $ sudo cat /etc/resolv.conf
 # 配置 ipa-client 主机的 DNS 为 ipa-server 的 IP 地址
 ```
 
-<img src="images/add-ipa-client-host-1.jpg" style="width:60%">
+<img src="images/add-ipa-client-host-1.jpg" style="width:80%">
 
 ```bash
 $ sudo ipa-client-install \
@@ -211,39 +211,39 @@ $ sudo ipa-client-install \
 # --no-ntp 选项为不配置时间同步，--mkhomedir 选项为首次登录主机时创建家目录。
 ```
 
-<img src="images/add-ipa-client-host-2.jpg" style="width:60%">
+<img src="images/add-ipa-client-host-2.jpg" style="width:80%">
 
 ipa-client 主机添加成功后，在浏览器中可查看该客户端主机。
 
-<img src="images/add-ipa-client-host-3.png" style="width:60%">
+<img src="images/add-ipa-client-host-3.png" style="width:80%">
 
 ## 8. 添加域用户与设置策略
 
 - 打开浏览器点击 "Identity" -> "Users"，再点击 "+Add" 创建新的域用户。
   
-  <img src="images/add-user-policy-1.png" style="width:60%">
+  <img src="images/add-user-policy-1.png" style="width:80%">
   
-  <img src="images/add-user-policy-2.png" style="width:60%">
+  <img src="images/add-user-policy-2.png" style="width:80%">
   
-  <img src="images/add-user-policy-3.png" style="width:60%">
+  <img src="images/add-user-policy-3.png" style="width:80%">
 
 - 点击 "Policy" -> "Host-Based Access Control"，再点击需要设置的 `HBAC` 规则名称或创建新的 `HBAC` 规则。
   
-  <img src="images/add-user-policy-4.png" style="width:60%">
+  <img src="images/add-user-policy-4.png" style="width:80%">
   
-  <img src="images/add-user-policy-5.png" style="width:60%">
+  <img src="images/add-user-policy-5.png" style="width:80%">
 
 - 再点击新创建的 HBAC 规则定义各规则项。
   
-  <img src="images/add-user-policy-6.png" style="width:60%">
+  <img src="images/add-user-policy-6.png" style="width:80%">
   
-  <img src="images/add-user-policy-7.png" style="width:60%">
+  <img src="images/add-user-policy-7.png" style="width:80%">
   
-  <img src="images/add-user-policy-8.png" style="width:60%">
+  <img src="images/add-user-policy-8.png" style="width:80%">
 
 - 可使用该域用户 SSH 登录设置的节点，如下所示：
   
-  <img src="images/add-user-policy-9.png" style="width:60%">
+  <img src="images/add-user-policy-9.png" style="width:80%">
 
 ## 9. 定位 FreeIPA 平台中的各类主体（principle）
 
