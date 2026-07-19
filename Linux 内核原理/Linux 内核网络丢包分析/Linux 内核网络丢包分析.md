@@ -1,7 +1,21 @@
 
-# Linux 内核网络丢包分析示例
+# 🩺 Linux 内核网络丢包分析
 
-## 设置 iptables 丢弃 ICMP 包（packets）
+## 文档说明
+
+## 文档目录
+
+- [🩺 Linux 内核网络丢包分析](#-linux-内核网络丢包分析)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [示例1：Linux 防火墙限制导致的丢包](#示例1linux-防火墙限制导致的丢包)
+    - [设置 iptables 丢弃 ICMP 包（packets）](#设置-iptables-丢弃-icmp-包packets)
+    - [ping: 从 servera 到 foundation0](#ping-从-servera-到-foundation0)
+    - [利用函数调用栈 debug 网络丢包](#利用函数调用栈-debug-网络丢包)
+
+## 示例1：Linux 防火墙限制导致的丢包
+
+### 设置 iptables 丢弃 ICMP 包（packets）
 
 ```bash
 ### kiosk@foundation0 ###
@@ -13,14 +27,14 @@ num  target     prot opt source               destination
 2    DROP       icmp --  servera.lab.example.com  anywhere
 ```  
 
-## ping: 从 servera 到 foundation0
+### ping: 从 servera 到 foundation0
 
 ```bash
 ### student@servera ###
 $ ping 172.25.250.250  #NO reponse
 ```
 
-## 从函数调用栈 debug 网络丢包
+### 利用函数调用栈 debug 网络丢包
 
 ```bash
 ### kiosk@foundation0 ###
@@ -50,8 +64,8 @@ BEGIN { @cnt = 0; }
 tracepoint:napi:napi_poll 
 {
     printf("%s\n", kstack);
-	  @cnt;
-	  if (@cnt >= 5) { exit(); }
+    @cnt;
+    if (@cnt >= 5) { exit(); }
 }'
 #Just display 5 times for tracing results
   
@@ -71,9 +85,8 @@ Attaching 2 probes...
       __x64_sys_connect+22
       do_syscall_64+91
       entry_SYSCALL_64_after_hwframe+101
-		
-	    ...
-		
+      ...
+
 $ VMLINUX=/usr/lib/debug/lib/modules/$(uname -r)/vmlinux
 $ FUNC=nf_hook_slow
 $ OFFSET=0x1
