@@ -76,7 +76,9 @@
   - [【精华】一文厘清 HTTPS 原理与应用 (RHEL7.x)](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%20(RHEL7.x).md)
   - [【精华】一文厘清 HTTPS 原理与应用 (RHEL9.x)](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8/%E4%B8%80%E6%96%87%E5%8E%98%E6%B8%85%20HTTPS%20%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%20(RHEL9.x).md)
 - **Shell 脚本**
-  - [Shell 脚本编程要点](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B.md)  
+  - [Shell 脚本编程要点](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B.md)
+- **Linux 内核原理**
+  - [【精华】Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
 
 ## 🛠 **Linux 服务与配置**
 
