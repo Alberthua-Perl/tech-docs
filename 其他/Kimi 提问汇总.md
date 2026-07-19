@@ -32,62 +32,6 @@
 - Linux 从加电启动 → start 内核 → 用户空间过程的源码分析？
 - Linux 内核模块参数设置后，没有在 parameters 中显示，是什么原因？module_param() 声明在哪里查看？
 - 如何理解 Linux 中 dmesg 命令的 ring buffer？
-- 🎉 Linux 对物理内存划分的图谱？
-
-  NUMA -> node[0,..,n] -> node[0].zone[0,..,n] ... -> node[0].zone[0,..n] -> struct page(page frame页框)
-
-  | 物理地址区间 (示例) | Zone 类型 | 内核虚拟窗口 | 主要用途 / 备注 |
-  | ----- | ----- | ----- | ----- |
-  | 0 ~ 1 MB | ZONE\_DMA | `__va(x)` 直接映射 | ISA/老式 PCI 16-bit DMA；**预留** |
-  | 1 MB ~ 896 MB | ZONE\_NORMAL | `__va(x)` 直接映射 | 内核代码、数据、slab、伙伴热页；**>90% 内核分配** |
-  | 896 MB ~ 4 GB (可选) | ZONE\_DMA32 | `__va(x)` 直接映射 | 32 位设备 DMA；64 位系统才有 |
-  | > 4 GB ~ 物理顶 | ZONE\_MOVABLE + 剩余 NORMAL | `__va(x)` 直接映射 | 用户进程、page cache、匿名页、CMA、热插拔页；**大页/巨页**也在这里 |
-  | 任意离散页框 | **无 Zone** | **vmalloc 区** (新建页表) | 模块、ioremap、大缓冲区、per-cpu、kmap\_atomic 临时映射 |
-  | 任意页框 | **无 Zone** | **vmemmap 区** (线性数组) | `struct page` 描述符仓库，一一对应物理页 |
-  | 设备 MMIO / 保留区 | ZONE\_DEVICE | **ioremap 窗口** | PCIe 寄存器、ROM、ACPI、IOMMU 窗口；**非 RAM** |
-  | 低 1 MB 预留 | **无 Zone** | **固定映射区** | APIC、IOAPIC、HPET、early ioremap；**编译期常量 VA** |
-
-  64 位 Linux 把物理内存切成 DMA → NORMAL → MOVABLE 三带，全部通过 128 TB 直接映射区实现零成本内核寻址；</br>
-  离散或设备用途再走 vmalloc/ioremap 另建页表 —— 物理地址→Zone→虚拟窗口三张地图一一对应，构成内核视角的完整物理内存图谱。
-
-- 🔥 Linux 内核如何为自己分配物理内存？如何为用户空间进程分配物理内存？
-  - 把 Linux 内核的内存分配机制拆成两条主线：
-    - “内核给自己用” —— 内核地址空间
-    - “内核给用户进程用” —— 用户地址空间
-  - 内核为自己分配内存（Kernel Space）
-  
-    | 场景 | 核心 API | 物理页来源 | 虚拟地址 | 释放/归还 |
-    | ----- | ----- | ----- | ----- | ----- |
-    | **伙伴系统** 大块连续页 | `alloc_pages(gfp_mask, order)` | 伙伴系统 2ⁿ 页框 | 固定线性映射区（直接映射）或临时 `kmap` | `__free_pages()` |
-    | **slab/slub** 小对象 | `kmalloc(size, gfp)` → 走 slab 缓存 | slab 把伙伴页切成对象 | 直接映射区 | `kfree()` |
-    | **vmalloc** 非连续大块 | `vmalloc(size)` | 每次一页，物理不连续 | vmalloc 区（直接映射之外） | `vfree()` |
-    | **per-CPU 变量** | `alloc_percpu(type)` | 每 CPU 一段 | 每 CPU 固定线性映射 | `free_percpu()` |
-    | **bootmem/memblock** 早期 | `memblock_alloc()` | 启动早期预留 | 静态映射 | 启动完成后转交伙伴系统 |
-
-- 🔥 Linux 内核自身的内存管理在物理内存上是如何组织分布的？
-  - Linux 内核在初始化阶段就把整台机器的物理 RAM 抽象成一张 “多级目录表”，随后所有分配/回收动作都在这张表里完成。
-  - “自顶向下” 的顺序：从 NUMA 节点 → 内存域（Zone）→ 页帧（Page Frame）→ 每 CPU/伙伴/Slab 三级缓存
-  - Linux 把物理 RAM 先切成 NUMA 节点，节点内再切成 Zone，Zone 里用 **伙伴系统** 管理 2^n 页块，每页对应一个 `struct page`；小对象再由 **slab** 切分，形成 “节点-域-页-对象” 四级物理内存版图。
-- 🔥 Linux 内核自身运行所在的内存与用户空间程序运行所在的内存有何区别？
-  - Linux 内核永远跑在 **高地址、特权级、固定映射** 的那一段内存里；所有用户态进程只能呆在 **低地址、非特权、按需映射** 的另一半。两边用页表+特权级完全隔离，互不干扰。
-  
-  | 维度 | 内核空间 (Kernel Space) | 用户空间 (User Space) |
-  | ----- | ----- | ----- |
-  | **虚拟地址范围** | x86_64：ffff 8000 0000 0000 以上（128 TiB 高地址）<br>x86-32：0xC000 0000 ~ 0xFFFF FFFF（高 1 GB）| x86_64：0000 0000 0000 0000 ~ 0000 7FFF FFFF FFFF（128 TiB 低地址）<br>x86-32：0x0000 0000 ~ 0xBFFF FFFF（低 3 GB）|
-  | **特权级** | Ring 0，可直接执行特权指令、访问所有硬件寄存器 | Ring 3，任何 I/O 或特权指令都会触发 #GP → 进入内核 |
-  | **页表** | 所有进程共享一份 “主内核页表”；当 CPU 运行在 Ring 0 时，页表项 PGD 高位恒映射内核 | 每个进程独立一份用户页表；切进程 ⇒ 切 CR3 ⇒ 切换用户页表，但高位内核映射不变 |
-  | **物理内存来源** | 启动早期一次性把低端物理页“线性映射”到高地址；高端内存临时用 `kmap` | 通过 `brk/mmap` 向伙伴系统申请，按需建立/撤销映射，可换出到 swap |
-  | **内存保护** | 页表始终可读可写；没有 page-fault 换出概念（swappable=No）| 页表项有 R/W/X、Dirty/Accessed、swap 位；可被换出、写保护、COW |
-  | **异常/中断** | 自己处理自己；中断向量表、IDT、TSS 都在内核段 | 任何中断/异常 CPU 自动切到 Ring 0 入口，内核保存用户寄存器后处理 |
-
-  - 32 位内核的 高端内存（HIGHMEM）是内核自己也要临时映射才能访问的 “用户可用物理页”；64 位因地址空间巨大，已取消 HIGHMEM。
-  - 用户调用 read()、malloc() 等库函数时，CPU 通过 syscall/sysenter 指令从 Ring 3 跳到 Ring 0，栈也瞬间切换到内核栈；返回时再用 sysret/iret 回到 Ring 3，继续跑用户代码。
-  - cat /proc/<pid>/maps 只能看到用户地址；sudo cat /proc/kallsyms 才能看到内核符号地址，印证了 “用户看不见内核”。
-  - 总结：
-    - 用户空间 = 低地址 + Ring 3 + 按需映射
-    - 内核空间 = 高地址 + Ring 0 + 永远映射
-    - 两边地址空间重叠但权限隔离，用户态永远触碰不到内核那半张页表。
-
 - CR3 寄存器是什么结构？
 - 从 CR3 寄存器开始的线性地址到物理地址的寻址过程？
 - Linux 用户空间的每个进程有各自的页表，那么 CR3 寄存器中的基址是如何确定的呢？CR3 寄存器中的基址是如何更新的呢？
@@ -141,9 +85,9 @@
   [Sat Jun  7 16:54:14 2025]  asm_exc_page_fault+0x22/0x30
   ```
 
-  - 以 Linux 内核 call trace 中的 do_anonymous_page+0x63/0x520 为例，请给出 addr2line 定位源代码行号的示例？
-  - 那么上述函数的长度在定位源码行数的过程中没有实际作用吗？
-  - 以上示例中，什么是函数入口地址、相对地址与绝对地址？
+  以 Linux 内核 call trace 中的 do_anonymous_page+0x63/0x520 为例，请给出 addr2line 定位源代码行号的示例？</br>
+  那么上述函数的长度在定位源码行数的过程中没有实际作用吗？</br>
+  以上示例中，什么是函数入口地址、相对地址与绝对地址？
 
 ## 2. Linux 系统编程
 
@@ -210,7 +154,6 @@ net.ipv4.conf.all.arp_announce = 2
 
 - 如何理解磁盘固件中的 S.M.A.R.T 子系统？这种固件的形式或者说源码是如何实现的？
 - Linux 中 smartctl 命令检查磁盘健康状态？
-- Linux 中 HBA 卡队列深度 (io_depth) 过小导致系统宕机，该如何解决？
 - 如何根据系统日志定位 Linux 中内存 ECC 的故障插槽，请给出具体的日志与分析过程？
 - Linux 内核中的 **内核性能计数器（Kernel Performance Counters）**是由一个专门的内核子系统实现的，这个子系统叫做 perf_events（有时也简称为 Performance Counter Subsystem 或 Linux Performance Counter Subsystem）。
 - Linux 内核的 EDAC 子系统是什么？
@@ -244,8 +187,6 @@ net.ipv4.conf.all.arp_announce = 2
   - LDAP 的实现：OpenLDAP (Community), 389ds/389-ds-base (redhat)
   - Kerberos 身份认证服务：OpenLDAP+Kerberos, 389-ds-base+Kerberos
   - 集成解决方案：FreeIPA (Community) ==> RedHat IdM (redhat)
-- HAProxy：
-  - haproxy.cfg 配置文件参数说明 (option 参数、timeout 参数、listen 段)
 
 ## 8. 系统安全
 

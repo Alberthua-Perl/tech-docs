@@ -338,37 +338,102 @@
 
 🩺 根因分析：
 
-- 1️⃣ 内核 TCP 协议栈中，每个 `struct sock` 实例包含 `socket_lock_t sk_lock` 字段（内嵌自旋锁 spinlock_t slock）。当 Go 服务端调用 accept() 陷入内核时，执行路径 sys_accept4() → inet_csk_accept() 需获取 sk->sk_lock.slock；同时，网卡收包触发的软中断路径 tcp_v4_rcv() 同样需要获取同一自旋锁。**形成内核态软中断与用户态进程的直接竞争**焰图中 _raw_spin_unlock_irqrestore 的显著宽度正是该锁频繁抢锁/解锁的累积表现。
+- 1️⃣ 内核 TCP 协议栈中，每个 `struct sock` 实例包含 `socket_lock_t sk_lock` 字段（内嵌自旋锁 spinlock_t slock）。当 Go 服务端调用 accept() 陷入内核时，执行路径 sys_accept4() → inet_csk_accept() 需获取 sk->sk_lock.slock；同时，网卡收包触发的软中断路径 tcp_v4_rcv() 同样需要获取同一自旋锁，**形成内核态软中断与用户态进程的直接竞争**。火焰图中 _raw_spin_unlock_irqrestore 的显著宽度正是该锁频繁抢锁/解锁的累积表现。
+
+  ```bash
+  # 说明：
+  #   1. 由于采样数量不足，可能无法在火焰图中观测 inet_csk_accept() 内核函数调用，可采用 bpftrace 动态采集。
+  #   2. bpftrace 确认内核函数是否被调用的方法
+  $ sudo bpftrace -e '
+  kprobe:inet_csk_accept {
+      printf("inet_csk_accept called by %s (pid %d)\n", comm, pid);
+  }
+  kprobe:_raw_spin_unlock_irqrestore {
+      printf("unlock called by %s\n", comm);
+  }
+  ' > /path/to/fun_call.log
+  ```
+
+  **锁操作的真实调用链：**
+
+  ```plaintext
+  用户态: accept()
+      │
+      ▼
+  系统调用: __x64_sys_accept4
+      │
+      ▼
+  sys_accept4()
+      │
+      ▼
+  inet_csk_accept()                    ← 火焰图可见
+      │
+      ├─ lock_sock(sk)                  ← 宏展开，火焰图不可见
+      │       │
+      │       ▼
+      │   spin_lock(&sk->sk_lock.slock)  ← 内联，火焰图不可见
+      │       │
+      │       ▼
+      │   _raw_spin_lock()              ← 可能可见（非内联）
+      │
+      ├─ reqsk_queue_remove()           ← 火焰图可见
+      │   (操作 accept_queue)
+      │
+      ├─ release_sock(sk)               ← 宏/内联，火焰图不可见
+      │       │
+      │       ▼
+      │   spin_unlock_irqrestore(&sk->sk_lock.slock, flags)
+      │       │
+      │       ▼
+      │   _raw_spin_unlock_irqrestore()  ← 火焰图可见！46%
+      │
+      ▼
+  返回用户态
+  ```
+
 - 2️⃣ ab 的 500 并发短连接导致服务端同时存在大量活跃连接。Go 调度器使用 futex 实现 M:N goroutine 调度：当 goroutine 因 I/O 阻塞（如等待 accept 返回或 read 数据）时，调度器执行 futex(FUTEX_WAIT) 挂起 OS 线程；当 epoll 通知 I/O 就绪或连接建立完成时，通过 futex(FUTEX_WAKE) 唤醒线程重新调度。高并发下，大量 goroutine 的频繁阻塞/唤醒导致 futex 系统调用激增，火焰图中 futex_wake → do_futex → sys_futex 形成宽柱。注意：futex 是 Go 调度器同步机制，与内核 accept() 的完成是异步解耦关系，非直接因果。
-- 3️⃣ Go 标准库 net/http.Server.Serve() 采用 "每个连接一个 goroutine" 模型：主 goroutine 在 for { c, err := ln.Accept() } 循环中，为每个返回的 net.Conn 启动独立 goroutine 执行 go c.serve(ctx)。该设计将并发复杂度委托给 Go 调度器，但在高并发短连接场景（如 ab 测试）下产生** goroutine 数量爆炸（连接数 = goroutine 数）。
+
+  ```plaintext
+  ab -n 10000 -c 500
+      │
+      ▼
+  ┌─────────────────┐
+  │  内核网络栈      │  ← 这里产生锁竞争（与 Go 无关）
+  │                 │
+  │  500 个 SYN 同时到达
+  │    │
+  │    ├─ 软中断: tcp_v4_rcv() → inet_csk_search_req()
+  │    │              │
+  │    │              ▼
+  │    │         sk->sk_lock.slock  ← 全局唯一！
+  │    │              │
+  │    │         完成三次握手 → 放入 accept_queue
+  │    │
+  │    └─ 所有 accept() 抢同一把锁取连接
+  │              │
+  │              ▼
+  │         _raw_spin_unlock_irqrestore() 46%
+  │         （解锁后唤醒等待的 M）
+  └─────────────────┘
+      │
+      ▼
+  ┌─────────────────┐
+  │   Go runtime    │  ← 这里放大竞争（非根因）
+  │                 │
+  │  netpoller 批量唤醒 500 个 goroutine
+  │    │
+  │    ├─ 500 个 goroutine 分配到 N 个 M
+  │    │
+  │    └─ N 个 M 同时陷入内核执行 read/write/close
+  │              │
+  │              ▼
+  │         更多线程进入锁等待队列 → 解锁时遍历更长
+  │         → _raw_spin_unlock_irqrestore 占比更高
+  └─────────────────┘
+  ```
+
+- 3️⃣ Go 标准库 net/http.Server.Serve() 采用 "每个连接一个 goroutine" 模型：主 goroutine 在 for { c, err := ln.Accept() } 循环中，为每个返回的 net.Conn 启动独立 goroutine 执行 go c.serve(ctx)。该设计将并发复杂度委托给 Go 调度器，但在高并发短连接场景（如 ab 测试）下产生 **goroutine 数量爆炸（连接数 = goroutine 数）**。
 - 4️⃣ 采用 Worker Pool（固定 goroutine 池） 是降低 futex 与 sk->sk_lock 竞争的有效策略。实现机制：预创建 N 个 worker goroutine（N 通常等于 CPU 核心数或 2*CPU），通过有缓冲 channel（chan net.Conn）分发连接任务。
-
-🪄 测试方法：
-
-```bash
-### 终端1 ###
-$ ./goSimple
-
-### 终端2 ###
-
-
-### 终端3 ###
-
-```
-
-bpftrace 确认内核函数是否被调用的方法：
-
-```bash
-$ sudo bpftrace -e '
-kprobe:inet_csk_accept {
-    printf("inet_csk_accept called by %s (pid %d)\n", comm, pid);
-}
-kprobe:_raw_spin_unlock_irqrestore {
-    printf("unlock called by %s\n", comm);
-}
-' > /path/to/fun_call.log
-```
-
 
 ### 6.2 分析示例：指定内核函数性能事件  
   
@@ -757,80 +822,4 @@ sequenceDiagram
     
     SOCK->>APP: 返回新 fd (子 socket)
     APP->>APP: read()/write() → 正常通信
-```
-
-```plaintext
-ab -n 10000 -c 500
-    │
-    ▼
-┌─────────────────┐
-│  内核网络栈      │  ← 这里产生锁竞争（与 Go 无关）
-│                 │
-│  500 个 SYN 同时到达
-│    │
-│    ├─ 软中断: tcp_v4_rcv() → inet_csk_search_req()
-│    │              │
-│    │              ▼
-│    │         listen_sock->sk_lock  ← 全局唯一！
-│    │              │
-│    │         完成三次握手 → 放入 accept_queue
-│    │
-│    └─ 所有 accept() 抢同一把锁取连接
-│              │
-│              ▼
-│         _raw_spin_unlock_irqrestore() 46%
-│         （解锁后唤醒等待的 M）
-└─────────────────┘
-    │
-    ▼
-┌─────────────────┐
-│   Go runtime     │  ← 这里放大竞争（非根因）
-│                 │
-│  netpoller 批量唤醒 500 个 goroutine
-│    │
-│    ├─ 500 个 goroutine 分配到 N 个 M
-│    │
-│    └─ N 个 M 同时陷入内核执行 read/write/close
-│              │
-│              ▼
-│         更多线程进入锁等待队列 → 解锁时遍历更长
-│         → _raw_spin_unlock_irqrestore 占比更高
-└─────────────────┘
-```
-
-```plaintext
-锁操作的真实调用链
-
-用户态: accept()
-    │
-    ▼
-系统调用: __x64_sys_accept4
-    │
-    ▼
-sys_accept4()
-    │
-    ▼
-inet_csk_accept()                    ← 火焰图可见
-    │
-    ├─ lock_sock(sk)                  ← 宏展开，火焰图不可见
-    │       │
-    │       ▼
-    │   spin_lock(&sk->sk_lock.slock)  ← 内联，火焰图不可见
-    │       │
-    │       ▼
-    │   _raw_spin_lock()              ← 可能可见（非内联）
-    │
-    ├─ reqsk_queue_remove()           ← 火焰图可见
-    │   (操作 accept_queue)
-    │
-    ├─ release_sock(sk)               ← 宏/内联，火焰图不可见
-    │       │
-    │       ▼
-    │   spin_unlock_irqrestore(&sk->sk_lock.slock, flags)
-    │       │
-    │       ▼
-    │   _raw_spin_unlock_irqrestore()  ← 火焰图可见！46%
-    │
-    ▼
-返回用户态
 ```

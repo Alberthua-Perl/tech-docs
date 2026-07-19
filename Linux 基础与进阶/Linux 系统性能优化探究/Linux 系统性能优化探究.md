@@ -55,6 +55,8 @@
 
 ## 🔬 1. Linux 用户空间进程虚拟内存布局（layout）
 
+可参考 [此链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout) 获得更多详情说明。
+
 ## 2. Linux 常用系统性能监控工具
 
 > 📜 以下命令均可使用 man 命令查询详尽的使用说明
@@ -173,15 +175,7 @@ $ top -n 1 -p 4429
 # top 命令执行 1 秒立即返回
 ```
   
-通过 ps 与 top 命令可查看进程的虚拟内存大小，除此之外也可直接计算进程在虚拟内存中的分段范围而获得其虚拟内存的大小，在 Linux 中进程的虚拟内存分段的映射位于 `/proc/<pid>/maps` 文件中，计算方法如下所示：
-  
-```bash
-$ sudo cat /proc/<pid>/maps | \
-  awk '{print $1}' | \
-  awk -F'[-]' '{ s=strtonum("0x"$1); e=strtonum("0x"$2); sum+=e-s } END { print sum/1024 }'
-# 统计指定进程的虚拟内存地址空间中的地址数量，每个地址对应 1 字节。
-# 以上命令返回的单位为 KiB
-```
+通过 ps 与 top 命令可查看进程的虚拟内存大小，除此之外也可直接计算进程在虚拟内存中的分段范围而获得其虚拟内存的大小。此方法见 [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)。
 
 ### 2.5 top 命令示例
 
