@@ -366,20 +366,20 @@
   sys_accept4()
       │
       ▼
-  inet_csk_accept()                    ← 火焰图可见
+  inet_csk_accept()                      ← 火焰图可见
       │
-      ├─ lock_sock(sk)                  ← 宏展开，火焰图不可见
+      ├─ lock_sock(sk)                   ← 宏展开，火焰图不可见
       │       │
       │       ▼
       │   spin_lock(&sk->sk_lock.slock)  ← 内联，火焰图不可见
       │       │
       │       ▼
-      │   _raw_spin_lock()              ← 可能可见（非内联）
+      │   _raw_spin_lock()               ← 可能可见（非内联）
       │
-      ├─ reqsk_queue_remove()           ← 火焰图可见
+      ├─ reqsk_queue_remove()            ← 火焰图可见
       │   (操作 accept_queue)
       │
-      ├─ release_sock(sk)               ← 宏/内联，火焰图不可见
+      ├─ release_sock(sk)                ← 宏/内联，火焰图不可见
       │       │
       │       ▼
       │   spin_unlock_irqrestore(&sk->sk_lock.slock, flags)
