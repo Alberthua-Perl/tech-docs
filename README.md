@@ -79,6 +79,7 @@
   - [Shell 脚本编程要点](https://github.com/Alberthua-Perl/tech-docs/blob/master/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/Shell%20%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B.md)
 - **Linux 内核原理**
   - [【精华】Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
+  - [【精华】Linux 内存管理全景V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AFV2.0.png)
 
 ## 🛠 **Linux 服务与配置**
 
