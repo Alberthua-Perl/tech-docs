@@ -18,16 +18,16 @@
     - [7.5 base64 命令使用](#75-base64-命令使用)
     - [7.6 read 命令使用](#76-read-命令使用)
     - [🎯 7.7 sh/source/exec 命令的区别](#-77-shsourceexec-命令的区别)
+    - [7.8 shell 获取字符串长度](#78-shell-获取字符串长度)
   - [8. Shell 数组](#8-shell-数组)
   - [9. Shell 中的正则匹配](#9-shell-中的正则匹配)
-    - [9.1](#91)
-    - [9.2](#92)
   - [10. 浮点数计算](#10-浮点数计算)
   - [11. awk 编程示例](#11-awk-编程示例)
     - [11.1 📝 awk 脚本注意要点](#111--awk-脚本注意要点)
     - [11.2 **关联数组（哈希）的使用**](#112-关联数组哈希的使用)
     - [11.3  **根据正则表达式或模式匹配输出指定内容**](#113--根据正则表达式或模式匹配输出指定内容)
     - [11.4  **通过管道格式化输出指定字段**](#114--通过管道格式化输出指定字段)
+    - [11.5 去除字符串末尾](#115-去除字符串末尾)
   - [❓待解决语法问题](#待解决语法问题)
 
 ## 1. grep 命令示例
@@ -111,10 +111,39 @@ $ grep "pattern" /path/to/file | xargs command
 
 ## 4. Shell 内部字段分隔符（Internal Field Separator）
 
+> 👉 注意：IFS 环境变量在 Bash 中完全兼容，在其他 shell 类型中可能无法发挥作用。
+
 - 字段分隔符为 `IFS`
 - IFS 默认定义为空格、制表符与换行符，若 Shell 处理数据时出现以上字符，将以其作为内部字段分隔符。
 - 默认情况下，使用 `for` 循环读取空格分隔的单行文本时，将以单词的方式输出字符串，而非单行文本。
-- ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`。
+- ✨ 此时默认以空格作为 IFS，需要重新定义 IFS 环境变量，即 `IFS=$'\n'`（**<font color=red>不能用双引号圈引 \n</font>**）。
+- IFS 环境变量示例：
+  - 示例1：**逗号**做分隔符
+
+    ```bash
+    IFS=',' read -r a b c <<< "apple,banana,cherry"    # 整行读取并按逗号分割单独变量赋值
+    echo "$a"
+    echo "$b"
+    echo "$c"
+    ```
+
+  - 示例2：**冒号**做分隔符
+  
+    ```bash
+    data="one:two:three"
+    IFS=':' read -ra arr <<< "$data"    # 整行读取并按冒号分割到数组 arr
+    for item in "${arr[@]}"; do
+      echo "$item"
+    done
+    ```
+
+  - 示例3：临时修改 IFS 环境变量
+
+    ```bash
+    OLD_IFS="$IFS"    # 保留原始 IFS 环境变量
+    while IFS=$'\n' read -r line; do printf "$line\n"; done < /etc/passwd    # 按行输出
+    IFS="$OLD_IFS"    # 恢复原始 IFS 环境变量
+    ```
 
 ## 5. Shell 脚本多行注释
 
@@ -336,13 +365,56 @@ done < /path/to/file
 | **执行结束后** | 返回父 Shell 继续执行 | 继续执行后续命令 | **当前 Shell 终止** |
 | **脚本权限** | 不需要执行权限（读即可） | 不需要执行权限 | 需要执行权限 |
 
+### 7.8 shell 获取字符串长度
+
+- 方法1：利用 **${#string}**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ echo ${#charts}
+  ```
+
+- 方法2：利用 awk 的 **length 方法**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ echo ${charts} | awk '{ print length($0) }'    # 统计字符串的长度
+  $ awk '/^git/ { len=length($0); print $0 "的长度：" len "字符" }' /etc/passwd    # 统计文件内每行字符串的长度
+  ```
+
+- 方法3：利用 awk 的 **NF 项**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ echo ${charts} | awk -F "" '{ print NF }'
+  $ awk -F "" '{ print NF }' /etc/passwd
+  ```
+
+- 方法4：利用 **wc -L 命令选项**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ echo ${charts} | wc -L    # 字符串：返回字符串的长度
+  $ wc -L /etc/services       # 文件：返回最长行的长度
+  ```
+
+- 方法5：**利用 expr 的 length 方法**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ expr length ${charts}
+  ```
+
+- 方法6：**利用 expr 的 `.*` 技巧**
+
+  ```bash
+  $ charts="HelloWorld"
+  $ expr ${charts} : ".*"    # 正则表达式匹配全部字符
+  ```
+
 ## 8. Shell 数组
 
 ## 9. Shell 中的正则匹配
-
-### 9.1
-
-### 9.2
 
 ## 10. 浮点数计算
 
@@ -492,20 +564,26 @@ tail_line
 > `%-30s`：左对齐，宽度 30 个字符。<br>
 > `%30s`：右对齐，宽度 30 个字符。
 
+### 11.5 去除字符串末尾
+
+```bash
+### 方法1 ###
+$ echo <string> | sed 's/.$//'                # 正则表达式 . 代表任意单个字符
+
+### 方法2 ###
+$ echo <string> | awk '{ sub(/.$/, "") }1'    # sub 用于替换单个字符；1 代表输出整行
+$ echo <string> | awk '{ printf $0"\b \n" }'  # $0 代表整行输出；\b 代表光标退格；空格代表使用它来覆盖退格的字符
+```
+
 ## ❓待解决语法问题
 
 - set 命令如何调整 shell 行为：`-o` 选项、`-e` 选项？
 - 如何使用 expr 命令与 bc 命令联合处理浮点数？
 - 如何使用 sed 命令删除指定行、在指定行前后插入新行？
-- awk 脚本如何引入 shell 中的变量？
-- awk 脚本中如何使用正则表达式匹配？
-- shellcheck 软件包如何检查 shell 语法？
-- shell 中如何截取字符串、统计字符串长度？
+- shell 中如何截取字符串？
 - shell 变量中包含多个字符串时匹配空行使用 `[[ $var == [[:space:]] ]]`
 - shell 中 if 条件判断如何使用正则表达式匹配？
-- while 条件判断的无限循环使用？
 - 如何定义 shell 空数组？并在数组中添加或删除元素？
-- 如何使用 shell 数组，并且循环迭代？
 - shell 中的 += 如何实现？
   - 数组追加元素：array+=(新项1 新项2 …)，带括号才是数组。
   - 字符串拼接：str+=后缀
