@@ -2,11 +2,17 @@
 
 ## 文档目录
 
-- FIO 安装
-- FIO 使用说明
-- 
+- [FIO 工具磁盘性能测试](#fio-工具磁盘性能测试)
+  - [文档目录](#文档目录)
+  - [fio 命令测试示例与解读](#fio-命令测试示例与解读)
+  - [fio 测试脚本示例](#fio-测试脚本示例)
+  - [Linux 内核故障注入框架（fail\_io）：启用前提](#linux-内核故障注入框架fail_io启用前提)
+  - [Linux 内核故障注入框架（fail\_io）：示例命令](#linux-内核故障注入框架fail_io示例命令)
+  - [参考链接](#参考链接)
 
-`fio` 命令常规测试命令如下所示：
+## fio 命令测试示例与解读
+
+`fio` 常规测试命令：
 
 ```bash
 $ time fio \
@@ -26,6 +32,8 @@ $ time fio \
 ```
 
 💥 注意：`timebase + runtime` 选项精确控制 fio 运行时间
+
+## fio 测试脚本示例
 
 fio_qps_test.sh 脚本如下：
 
@@ -101,10 +109,26 @@ echo "注意: 压测可能影响线上服务，请勿在生产库数据盘直�
 ```bash
 ./fio_qps_test.sh
 ================= 压测结果 =================
-测试场景       | 模式          | IOPS(QPS)  | 带宽
--------------------------------------------------------------
+测试场景        | 模式          | IOPS(QPS)  | 带宽
+-----------------------------------------------------
 randread       | randread      | 1520       | 6.2MB/s
 randwrite      | randwrite     | 980        | 3.9MB/s
 randrw         | randrw        | 1100       | 4.5MB/s
 =============================================
 ```
+
+## Linux 内核故障注入框架（fail_io）：启用前提
+
+## Linux 内核故障注入框架（fail_io）：示例命令
+
+Linux 内核故障注入框架（**fail_io**）的配置，用于 **人为制造块设备 I/O 错误**，通常用于测试文件系统容错、多路径切换、应用降级逻辑等场景。
+
+| 命令 | 功能 |
+| :----- | :----- |
+| `echo "8:16" > /sys/kernel/debug/fail_io/blkdevs` | **指定目标设备**：`8:16` = 主设备号 8、次设备号 16，即 `/dev/sdb`（`ls -l /dev/sdb` 可验证） |
+| `echo 2 > /sys/kernel/debug/fail_io/probability` | **故障概率 2%**：每 100 个 I/O 请求中，约 2 个会被注入失败 |
+| `echo 0 > /sys/kernel/debug/fail_io/ignore_reads` | **不忽略读请求**：读 I/O 也参与故障注入（0=不忽略，1=忽略） |
+| `echo 0 > /sys/kernel/debug/fail_io/ignore_writes` | **不忽略写请求**：写 I/O 也参与故障注入 |
+| `echo 1 > /sys/kernel/debug/fail_io/should_fail` | **总开关打开**：开始生效 |
+
+## 参考链接
