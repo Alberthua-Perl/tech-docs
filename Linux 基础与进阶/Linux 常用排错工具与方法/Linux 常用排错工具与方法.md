@@ -1,4 +1,4 @@
-# Linux 常用排错工具与实践方法
+# 🧩 Linux 常用排错工具与实践方法
 
 ## 文档说明
 
@@ -9,13 +9,13 @@
 
 ## 文档目录
 
-- [Linux 常用排错工具与实践方法](#linux-常用排错工具与实践方法)
+- [🧩 Linux 常用排错工具与实践方法](#-linux-常用排错工具与实践方法)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
   - [1. journalctl 命令](#1-journalctl-命令)
-    - [1.1 命令示例](#11-命令示例)
+    - [1.1 示例](#11-示例)
     - [1.2 参考链接](#12-参考链接)
-  - [2. sosreport 命令示例](#2-sosreport-命令示例)
+  - [2. sosreport 命令](#2-sosreport-命令)
   - [🔥 3. MBR 与 GPT 分区中的 GRUB2 再认识](#-3-mbr-与-gpt-分区中的-grub2-再认识)
     - [3.1 GRUB2 在 MBR 分区中的分布](#31-grub2-在-mbr-分区中的分布)
     - [3.2 GRUB2 在 GPT 分区中的分布](#32-grub2-在-gpt-分区中的分布)
@@ -26,27 +26,64 @@
     - [3.5 参考链接](#35-参考链接)
   - [4. systemd 单元文件的依赖性](#4-systemd-单元文件的依赖性)
   - [5. CPU 的个数、核心数、超线程的关系](#5-cpu-的个数核心数超线程的关系)
-  - [6. CPU 信息查看](#6-cpu-信息查看)
+  - [6. CPU 信息检索](#6-cpu-信息检索)
   - [7. dmidecode 命令](#7-dmidecode-命令)
-    - [7.1 SMBIOS/DMI 说明](#71-smbiosdmi-说明)
-    - [7.2 命令示例](#72-命令示例)
-    - [7.3 其他硬件相关命令](#73-其他硬件相关命令)
-  - [管理与测试硬件设备](#管理与测试硬件设备)
-  - [常见物理服务器及硬件示例](#常见物理服务器及硬件示例)
-  - [管理内核模块与 KVM 虚拟化](#管理内核模块与-kvm-虚拟化)
-  - [🔥 Linux 存储栈故障修复](#-linux-存储栈故障修复)
-  - [rpm 命令使用](#rpm-命令使用)
-  - [yum 或 dnf 命令使用](#yum-或-dnf-命令使用)
-  - [🔥 基础网络问题调试](#-基础网络问题调试)
-  - [内存泄漏与内存溢出](#内存泄漏与内存溢出)
-  - [共享库相关命令](#共享库相关命令)
-  - [🔥 系统调用与库调用](#-系统调用与库调用)
-  - [strace 与 ltrace 命令使用](#strace-与-ltrace-命令使用)
-  - [参考链接](#参考链接)
+    - [7.1 SMBIOS/DMI 标准](#71-smbiosdmi-标准)
+    - [7.2 示例](#72-示例)
+  - [8. 其他硬件命令](#8-其他硬件命令)
+  - [9. 侦测与管理硬件设备](#9-侦测与管理硬件设备)
+    - [9.1 侦测不同的磁盘驱动设备](#91-侦测不同的磁盘驱动设备)
+    - [9.2 侦测 PCI/PCIe 设备](#92-侦测-pcipcie-设备)
+    - [9.3 硬件错误报告工具](#93-硬件错误报告工具)
+  - [10. 常见物理服务器及硬件](#10-常见物理服务器及硬件)
+  - [11. 管理内核模块 \& KVM 虚拟化](#11-管理内核模块--kvm-虚拟化)
+    - [11.1 内核模块操作](#111-内核模块操作)
+    - [11.2 KVM 虚拟化命令](#112-kvm-虚拟化命令)
+    - [11.3 参考链接](#113-参考链接)
+  - [🔥 12. Linux 存储栈故障修复](#-12-linux-存储栈故障修复)
+    - [12.1 Linux 存储栈（storage stack）的三层架构](#121-linux-存储栈storage-stack的三层架构)
+    - [12.2 清理 VFS 缓存](#122-清理-vfs-缓存)
+    - [12.3 内核 devicemapper 框架](#123-内核-devicemapper-框架)
+    - [12.4 磁盘 IO 调度算法](#124-磁盘-io-调度算法)
+    - [12.5 ext2/ext3/ext4 文件系统修复](#125-ext2ext3ext4-文件系统修复)
+    - [12.6 xfs 文件系统修复](#126-xfs-文件系统修复)
+    - [12.7 LUKS 加密磁盘](#127-luks-加密磁盘)
+    - [12.8 参考链接](#128-参考链接)
+  - [13. 操作 RPM 软件包](#13-操作-rpm-软件包)
+    - [13.1 管理 RPM 软件包](#131-管理-rpm-软件包)
+    - [13.2 管理 RPM GPG 公钥](#132-管理-rpm-gpg-公钥)
+    - [13.3 rpm2cpio 命令示例](#133-rpm2cpio-命令示例)
+    - [13.4 恢复冲突的 RPM 数据库](#134-恢复冲突的-rpm-数据库)
+    - [13.5 确认 RPM 软件包文件状态](#135-确认-rpm-软件包文件状态)
+  - [14. yum 或 dnf 命令使用](#14-yum-或-dnf-命令使用)
+    - [14.1 配置 yum 软件源优先级](#141-配置-yum-软件源优先级)
+    - [14.2 yum 命令常用选项](#142-yum-命令常用选项)
+    - [14.3 yum 命令](#143-yum-命令)
+  - [🔥 15. 网络连通性 \& 网络扫描](#-15-网络连通性--网络扫描)
+    - [15.1 网络连通性测试：ping 与 ping6 命令常用选项](#151-网络连通性测试ping-与-ping6-命令常用选项)
+    - [15.2 关于 **MTU** 故障](#152-关于-mtu-故障)
+    - [15.3 **nmap** 命令](#153-nmap-命令)
+    - [15.4 **nc** 命令](#154-nc-命令)
+      - [15.4.1 nc 客户端模式](#1541-nc-客户端模式)
+      - [15.4.2 nc 服务端：监听模式](#1542-nc-服务端监听模式)
+      - [15.4.3 nc 传输文件：客户端到服务端](#1543-nc-传输文件客户端到服务端)
+      - [15.4.4 nc 传输文件：服务端到客户端](#1544-nc-传输文件服务端到客户端)
+      - [15.4.5 测试网络带宽](#1545-测试网络带宽)
+      - [15.4.6 tcpdump 命令](#1546-tcpdump-命令)
+      - [15.4.7 参考链接](#1547-参考链接)
+  - [16. 内存泄漏 \& 内存溢出](#16-内存泄漏--内存溢出)
+  - [17. 系统共享库故障排除](#17-系统共享库故障排除)
+  - [🔥 18. 系统调用 \& 库调用](#-18-系统调用--库调用)
+    - [18.1 Linux 中用户空间程序使用内核空间数据的方法](#181-linux-中用户空间程序使用内核空间数据的方法)
+    - [18.2 参考链接](#182-参考链接)
+  - [19. strace \& ltrace 命令](#19-strace--ltrace-命令)
+    - [19.1 示例](#191-示例)
+    - [19.2 参考链接](#192-参考链接)
+  - [20. 参考链接](#20-参考链接)
 
 ## 1. journalctl 命令
 
-### 1.1 命令示例
+### 1.1 示例
 
 ```bash
 $ man 7 systemd.journal-filelds
@@ -103,7 +140,7 @@ $ sudo journalctl -o verbose
 - [Chapter 10. Troubleshooting problems using log files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/assembly_troubleshooting-problems-using-log-files_configuring-basic-system-settings#masthead) 
 - [Chapter 5. Troubleshooting problems related to SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/troubleshooting-problems-related-to-selinux_using-selinux)
 
-## 2. sosreport 命令示例
+## 2. sosreport 命令
 
 ```bash
 $ sudo sosreport -l
@@ -305,7 +342,7 @@ $ sudo systemctl enable debug-shell.service
 - 逻辑 CPU 个数（processor）：
   物理 CPU 个数（physical id）x 每颗 CPU 的核心数（core id）x 每个核心的超线程数（CPU 支持的话）
 
-## 6. CPU 信息查看
+## 6. CPU 信息检索
 
 ```bash
 $ grep 'model name' /proc/cpuinfo | cut -d ':' -f 2 | uniq -c
@@ -334,12 +371,12 @@ $ grep 'flags' /proc/cpuinfo | grep 'lm' | wc -l
 
 ## 7. dmidecode 命令
 
-### 7.1 SMBIOS/DMI 说明
+### 7.1 SMBIOS/DMI 标准
 
 - `dmidecode` 允许在 Linux 系统下获取有关硬件方面的信息，其遵循 `SMBIOS`（System Management BIOS）/ `DMI`（Desktop Management Interface） 标准，该标准由 DMTF（Desktop Management Task Force）开发，其输出的信息包括 BIOS、系统、主板、处理器、内存、缓存等等。
 - `DMI` 充当了管理工具和系统层之间接口的角色。它建立了标准的可管理系统更加方便了计算机厂商和用户对系统的了解。DMI 的主要组成部分是 Management Information Format（MIF）数据库。这个数据库包括了所有有关计算机系统和配件的信息。通过 DMI，用户可以获取序列号、计算机厂商、串口信息以及其它系统配件信息。
 
-### 7.2 命令示例
+### 7.2 示例
 
 ```bash
 $ man dmidecode
@@ -382,7 +419,7 @@ $ sudo dmidecode -t 0,1
 # 同时查看两种 DMI 类型的信息（BIOS 与 processor）
 ```
 
-### 7.3 其他硬件相关命令
+## 8. 其他硬件命令
 
 - `dmesg` 命令：
   - 在 Linux 上 syslogd 或 klogd 启动前用来记录内核消息（启动阶段的消息）。
@@ -399,7 +436,7 @@ $ sudo dmidecode -t 0,1
   ```bash
   $ sudo lshw -short
   # 返回表格形式的硬件信息，包含硬件类型（Class）。
-  ```    
+  ```
 
 - `hwinfo` 命令：
   - 可提供比 lshw、dmidecode、dmesg 命令更为详细的硬件信息。
@@ -421,10 +458,11 @@ $ sudo dmidecode -t 0,1
   - [linux 下查看主板内存槽与内存信息（dmidecode）](https://blog.csdn.net/d12345678a/article/details/53908889)  
   - [dmidecode 命令详解（获取硬件信息）](http://www.linuxidc.com/Linux/2015-12/126814.htm)
 
-## 管理与测试硬件设备
+## 9. 侦测与管理硬件设备
+
+### 9.1 侦测不同的磁盘驱动设备
 
 ```bash
-### 侦测不同的磁盘驱动设备 ###
 $ hdparm -I /dev/sda
 # 查看或设置 IDE/SATA 设备的参数
 
@@ -436,8 +474,11 @@ $ lsscsi -v
   list_ndevices: scandir: /sys/class/nvme/: No such file or directory
   NVMe module may not be loaded
 # 列举 SCSI 设备与 NVMe 设备，该命令从 sysfs 文件系统中读取设备相关信息。
+```
 
-### 侦测 PCI/PCIe 设备 ###
+### 9.2 侦测 PCI/PCIe 设备
+
+```bash
 $ lspci -v
 # 查看所有 PCI/PCIe 设备的概要信息
 $ lspci -v -k -nn -s <bus>:<slot>.<function>
@@ -451,8 +492,9 @@ $ lsusb -v
 
 如上图所示，确认各类物理网卡的详细 PCIe 信息。
 
+### 9.3 硬件错误报告工具
+
 ```bash
-### 硬件错误报告工具 ###
 $ yum install -y mcelog
 # 安装 x86 平台硬件故障报告工具 mcelog 软件包，主要针对 CPU 与内存的检测。
 $ systemctl start mcelog.service
@@ -484,14 +526,15 @@ $ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 如上图所示，使用 memtest86+ 软件包在系统启动引导过程中实现内存测试。
 
-## 常见物理服务器及硬件示例
+## 10. 常见物理服务器及硬件
 
 ![general-hardware-info](images/general-hardware-info.png)
 
-## 管理内核模块与 KVM 虚拟化
+## 11. 管理内核模块 & KVM 虚拟化
+
+### 11.1 内核模块操作
 
 ```bash
-### 内核模块相关命令 ###
 $ lsmod
 # 查看当前已加载的内核模块列表
 $ modprobe -v <module_name>
@@ -539,10 +582,9 @@ $ vim /etc/modprobe.d/blacklist.conf
 $ dracut -f -v /boot/initramfs-4.18.0-348.el8.x86_64.img
 ```
 
-KVM 虚拟化相关命令使用：
+### 11.2 KVM 虚拟化命令
 
 ```bash
-### KVM 虚拟化 ###
 $ modprobe -v [kvm_intel|kvm_amd]
 # 加载 KVM 在不同 CPU 平台下的内核模块，若加载报错，说明 CPU 不支持虚拟化或在 BIOS/UEFI 中禁用虚拟化。
 # Intel CPU 支持虚拟化的 flag 为 vmx，AMD CPU 支持虚拟化的 flag 为 svm。
@@ -560,17 +602,17 @@ $ virt-xml-validate /path/to/<kvm_domain_filename>.xml
 # 判断 KVM 虚拟机 XML 定义文件的合法性（字段及标签等检查）
 ```
 
-- 参考链接：
-  - 📚 [Chapter 2. Managing kernel modules](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_monitoring_and_updating_the_kernel/managing-kernel-modules_managing-monitoring-and-updating-the-kernel#doc-wrapper)  
-  - [dracut.cmdline(7) - Linux manual page](https://man7.org/linux/man-pages/man7/dracut.cmdline.7.html)
+### 11.3 参考链接
 
-## 🔥 Linux 存储栈故障修复
+- 📚 [Chapter 2. Managing kernel modules](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_monitoring_and_updating_the_kernel/managing-kernel-modules_managing-monitoring-and-updating-the-kernel#doc-wrapper)  
+- [dracut.cmdline(7) - Linux manual page](https://man7.org/linux/man-pages/man7/dracut.cmdline.7.html)
 
-Linux 存储栈（storage stack）主要分为三层：
+## 🔥 12. Linux 存储栈故障修复
 
-- 文件系统层（filesystem layer）
-- 块层（block layer）
-- 设备层（device layer）
+### 12.1 Linux 存储栈（storage stack）的三层架构
+
+文件系统层（filesystem layer）+ 块层（block layer）+ 设备层（device layer）
+
 根据不同内核版本存储栈存在一定的区别，此处以 `4.10` 内核版本为例展示存储栈全景图：
 
 ![Linux-storage-stack-diagram_v4.10](images/Linux-storage-stack-diagram_v4.10.png)
@@ -583,8 +625,9 @@ Linux 存储栈（storage stack）主要分为三层：
 
 ![classic-io-from-disk-to-network](images/classic-io-from-disk-to-network.png)
 
+### 12.2 清理 VFS 缓存
+
 ```bash
-### 清理与 VFS 相关的缓存 ###
 # VFS also maintains several caches to improve storage I/O performance, the inode cache, dentry
 # cache, buffer cache, and page cache. Of these, the most important is the page cache. The page
 # cache is dynamically allocated from free memory on the system, and is used to cache pages of
@@ -595,8 +638,17 @@ $ man 5 proc
 $ echo 3 > /proc/sys/vm/drop_caches
 # 同时清除 page cache、dentries cache 与 inodes cache
 # 注意：以上 3 种类型的 cache 均由 VFS 虚拟文件系统管理分配至空闲物理内存中，并且清除 cache 前需提前执行 sync 操作！
+```
 
-### 内核 Device Mapper 框架 ###
+### 12.3 内核 devicemapper 框架
+
+![device-mapper-kernel-architecture-1](images/device-mapper-kernel-architecture-1.png)
+
+devicemapper 从 `2.4.x` 内核中首次提出后，在 `2.6.x` 中正式使用，目前被广泛用于 LVM、devicemapper-multipath、LUKS、Stratis、VDO 等技术中。如下 LVM 命令行输出为例，devicemapper 使用线性化的方式将不同的磁盘扇区与逻辑设备实现 1:1 映射：
+
+![dm-lvm-partition-linear-mapping](images/dm-lvm-partition-linear-mapping.png)
+
+```bash
 # Device mapper is a powerful mechanism in the kernel to create 1:1 mappings of blocks in one
 # block device to blocks in another, logical block device.
 $ dmsetup ls
@@ -620,25 +672,21 @@ $ dmsetup table /dev/mapper/myvg1-mylv1
 # 计算逻辑卷容量是否一致：(401408 sectors + 131072 sectors) * 512 byte / 1024 / 1024 = 260MiB
 ```
 
-Device Mapper 框架如下所示：
-
-![device-mapper-kernel-architecture-1](images/device-mapper-kernel-architecture-1.png)
-
-devicemapper 从 `2.4.x` 内核中首次提出后，在 `2.6.x` 中正式使用，目前被广泛用于 LVM、devicemapper-multipath、LUKS、Stratis、VDO 等技术中。以前文 LVM 命令行输出为例，devicemapper 使用线性化的方式将不同的磁盘扇区与逻辑设备实现 1:1 映射，如下所示：
-
-![dm-lvm-partition-linear-mapping](images/dm-lvm-partition-linear-mapping.png)
+### 12.4 磁盘 IO 调度算法
 
 ```bash
-### 磁盘 IO 调度算法 ###
 $ cat /sys/block/<device>/queue/scheduler
 # 查看指定磁盘设备的 IO 调度算法，一般为 deadline、cfq、noop 三种。
 $ echo deadline > /sys/block/<device>/queue/scheduler
 # 更改磁盘设备 IO 调度算法
+```
 
-### 文件系统修复 ###
+### 12.5 ext2/ext3/ext4 文件系统修复
+
+```bash
 # The data migration can be performed with various common utilities such as dd. 
 # This will provide the functional hardware foundation that is required for ﬁle system maintenance.
-### ext2/ext3/ext4 文件系统修复 ###
+
 $ e2fsck -n <filesystem>
 # 将文件系统设置为只读模式，检测文件系统故障但不进行修复。
 $ e2fsck -y <filesystem>
@@ -649,7 +697,11 @@ $ dumpe2fs <filesystem> | grep -i 'Backup superblock'
 # 查看文件系统的备份的 superblock
 $ e2fsck -n <filesystem> -b <superblock>
 # 使用备份的 superblock 恢复故障的 superblock
-### xfs 文件系统修复 ###
+```
+
+### 12.6 xfs 文件系统修复
+
+```bash
 $ xfs_repair -n <filesystem>
 # 检测 xfs 文件系统故障但不进行修复
 $ xfs_repair <filesystem>
@@ -665,8 +717,11 @@ $ diff -s <file1> <file2>
 # 判断两个文件的内容是否完全相同
 $ dd if=/dev/zero of=/tmp/datafile1 oflag=direct bs=4096 count=1000000
 # dd 命令使用直写方式，以 4KiB 为单位写入数据文件。
+```
 
-### LUKS 加密磁盘 ###
+### 12.7 LUKS 加密磁盘
+
+```bash
 $ blkid -t TYPE=crypto_LUKS -o device
 # 查看 LUKS 加密的块设备
 $ dmsetup ls --target crypt
@@ -686,26 +741,30 @@ $ cryptsetup luksOpen <device> <dm_logical_device_name>
 # 映射加密的 LUKS 设备至 devicemapper 逻辑设备
 ```
 
-- 关于 Device Mapper 框架的信息可参考如下链接：
+![luks-crypt-cmds](images/luks-crypt-cmds.png)
+
+### 12.8 参考链接
+
+- devicemapper 框架：
   - 💪 [**Device Mapper FOSDEM** *Sunday 27th February 2005* Alasdair Kergon](https://people.redhat.com/agk/talks/FOSDEM_2005/)
-- 关于磁盘 IO 调度的相关技术信息可参考如下链接：
+- 磁盘 IO 调度算法：
   - [Understanding the Deadline IO Scheduler](https://access.redhat.com/articles/425823) 
   - [Using the Deadline IO Scheduler](https://access.redhat.com/solutions/32376) 
   - [Understanding the Noop IO Scheduler](https://access.redhat.com/articles/46958) 
   - [Unable to change IO scheduler for virtio disk /dev/vda in RHEL 7.1](https://access.redhat.com/solutions/1305843)  
   - [RHEL7 Storage Docs](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.2_release_notes/storage#idp1704576)
-- 关于 LUKS 加密的相关技术信息可参考如下链接：
+- LUKS 加密：
   - [Chapter 11. Encrypting block devices using LUKS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/encrypting-block-devices-using-luks_security-hardening) 
   - [All about LUKS, cryptsetup, and dm-crypt](https://access.redhat.com/articles/193443)  
   - [What is LUKS ( Linux Unified Key Setup) disk encryption and how can it be implemented?](https://access.redhat.com/solutions/100463)  
   - [How to recover lost LUKS key or passphrase](https://access.redhat.com/solutions/1543373)
-- 关于 iSCSI 的信息可参考如下链接：
+- iSCSI：
   - [SAN 与 iSCSI 存储相关](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3/SAN%20%E4%B8%8E%20iSCSI%20%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3.md)
-- 关于 Linux 存储堆栈的信息可参考如下链接：
+- Linux 存储堆栈：
   - [Linux Storage Stack Diagram - Thomas-Krenn-Wiki-en](https://www.thomas-krenn.com/en/wiki/Linux_Storage_Stack_Diagram)  
   - 💪 [深入理解 Linux I/O 系统](https://mp.weixin.qq.com/s/ccZJaRLq2-Ns9dJILigIgw)
 
-## rpm 命令使用
+## 13. 操作 RPM 软件包
 
 - RPM GPG 公钥保存目录：`/etc/pki/rpm-gpg`
 - RPM 软件包中文件的状态标识：man rpm 命令 `-V`
@@ -733,8 +792,11 @@ rpm 命令常用选项：
   --allmatches             卸载匹配的全部软件包
   --scripts                列出软件包安装、升级与卸载过程中的所有脚本文件
   --changelog              列出软件包的更改信息
+```
 
-### 管理 RPM 软件包 ###
+### 13.1 管理 RPM 软件包
+
+```bash
 $ rpm -evh --nodeps <package_name>                           
 # 卸载指定软件包，但不卸载依赖的软件包。
 $ rpm -qpl <not_installed_package_name>                      
@@ -754,8 +816,11 @@ $ rpm -q --scripts <package_name>
 # 查看当前已安装的软件包中安装、升级与卸载过程中运行的脚本
 $ rpm -q --changelog <package_name>
 # 查看当前已安装的软件包更改信息
+```
 
-### 管理 RPM GPG 公钥 ###
+### 13.2 管理 RPM GPG 公钥
+
+```bash
 $ rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-<pubkey_name>
 # 导入软件包 GPG 公钥至 RPM 数据库中，导入的 GPG 公钥使用 ID 进行区分。
 # 注意：
@@ -771,16 +836,22 @@ $ rpm -e --allmatches gpg-pubkey-<id>
 # 从 RPM 数据库中删除相应的 GPG 公钥
 $ rpm -q --info gpg-pubkey-<id>
 # 查看相应RPM数据库中 GPG 公钥信息
+```
 
-### rpm2cpio 命令示例 ###
+### 13.3 rpm2cpio 命令示例
+
+```bash
 $ rpm2cpio <package_name>.rpm | cpio -it
 # 查看未安装的 rpm 软件包中的文件
 $ rpm2cpio <package_name>.rpm | cpio -id
 # 提取 rpm 软件包文件至当前工作目录中
 $ rpm2cpio <package_name>.rpm | cpio -id "*txt"
 # 提取 rpm 软件包中的指定文件
+```
 
-### 恢复冲突的 RPM 数据库 ###
+### 13.4 恢复冲突的 RPM 数据库
+
+```bash
 $ lsof | grep /var/lib/rpm
 # 确认 /var/lib/rpm 目录是否被进程占用
 $ rm /var/lib/rpm/__db*
@@ -802,8 +873,11 @@ $ rpm -v --rebuilddb
 # 重建 RPM 数据库的索引文件
 $ rpm -qa > /dev/null
 # 再次查询软件包确认数据库正确
+```
 
-### 确认 RPM 软件包文件状态 ###
+### 13.5 确认 RPM 软件包文件状态
+
+```bash
 $ rpm -V <package_name>
 # 查看指定软件包中文件的更改状态，若相关文件未发生更改则无返回信息，发生更改的文件具有属性更改信息返回。
 $ rpm -V openssh-server
@@ -815,140 +889,149 @@ $ rpm --setperms <package_name>
 # 恢复文件为软件包中定义的权限
 ```
 
-## yum 或 dnf 命令使用
+## 14. yum 或 dnf 命令使用
 
-- RHEL 8 中已使用 dnf 命令替换 yum 命令，为保证兼容性 yum 作为 dnf 的软链接依然可继续使用，两者的使用方法上几乎一致，下文依然使用 yum 进行说明，可自行替换为 dnf。
-- 配置 yum 软件源优先级：
-  - CentOS 7.x/RHEL 7.x 配置 yum 软件源优先级时，需安装 `yum-plugin-priorities` 软件包。
-  - yum 插件的配置文件目录：`/etc/yum/pluginconf.d/`
-  - yum 软件源优先级功能是否启用：`/etc/yum/pluginconf.d/priorities.conf`
+RHEL 8 中已使用 dnf 命令替换 yum 命令，为保证兼容性 yum 作为 dnf 的软链接依然可继续使用，两者的使用方法上几乎一致，下文依然使用 yum 进行说明，可自行替换为 dnf。
 
-    ![yum-priority-1](images/yum-priority-1.png)
-  
-  - 编辑 `/etc/yum.repos.d/*.repo` 文件：
+### 14.1 配置 yum 软件源优先级
 
-    <img src="images/yum-priority-2.png" style="zoom:80%;" />
+- CentOS 7.x/RHEL 7.x 配置 yum 软件源优先级时，需安装 `yum-plugin-priorities` 软件包。
+- yum 插件的配置文件目录：`/etc/yum/pluginconf.d/`
+- yum 软件源优先级功能是否启用：`/etc/yum/pluginconf.d/priorities.conf`
+
+  ![yum-priority-1](images/yum-priority-1.png)
   
-  - priority=*N*（取值 **`1~99`**），数值越大优先级越低。
+- 编辑 `/etc/yum.repos.d/*.repo` 文件：
+
+  <img src="images/yum-priority-2.png" style="zoom:80%;" />
   
-  ```bash
-  yum 命令常用选项：
-    --enablerepo=<repo_name>     使用一个或多个 yum 软件仓库（可使用 wildcard 通配符）
-    --disablerepo=<repo_name>    禁用一个或多个 yum 软件仓库（可使用 wildcard 通配符）
-    --showduplicates             查看软件仓库中不同版本的软件包（默认只显示最新版）
-    --nogpgcheck                 禁用 GPG 签名检查
-    --installroot=<path>         指定 rpm 软件包的安装根路径
+  priority=*N*（取值 **`1~99`**），数值越大优先级越低。
+
+### 14.2 yum 命令常用选项
+
+```plaintext
+--enablerepo=<repo_name>     使用一个或多个 yum 软件仓库（可使用 wildcard 通配符）
+--disablerepo=<repo_name>    禁用一个或多个 yum 软件仓库（可使用 wildcard 通配符）
+--showduplicates             查看软件仓库中不同版本的软件包（默认只显示最新版）
+--nogpgcheck                 禁用 GPG 签名检查
+--installroot=<path>         指定 rpm 软件包的安装根路径```
+```
+
+### 14.3 yum 命令
+
+```bash
+$ yum --disablerepo=\* --enablerepo=elrepo-kernel list available
+# 查看指定的 yum 软件仓库 elrepo-kernel 中可用的软件包
+$ yum provides <filename>
+# 查看文件由哪些包提供
+$ yum whatprovides <command>
+# 查看命令由哪些包提供
+$ yum deplist <package_name>
+# 查看安装包的依赖文件及提供软件包的信息
+# 注意：
+#   $ rpm -qR <package_name>
+#   # 查看软件包的依赖文件
   
-  $ yum --disablerepo=\* --enablerepo=elrepo-kernel list available
-  # 查看指定的 yum 软件仓库 elrepo-kernel 中可用的软件包
-  $ yum provides <filename>
-  # 查看文件由哪些包提供
-  $ yum whatprovides <command>
-  # 查看命令由哪些包提供
-  $ yum deplist <package_name>
-  # 查看安装包的依赖文件及提供软件包的信息
-  # 注意：
-  #   $ rpm -qR <package_name>
-  #   # 查看软件包的依赖文件
+$ yum list --showduplicates <package_name>
+# 查看软件源中所有可用的软件包
+$ yum list --showduplicates gitlab-ce
+# 查看 GitLab 源中所有可用的不同版本 gitlab-ce 软件包
   
-  $ yum list --showduplicates <package_name>
-  # 查看软件源中所有可用的软件包
-  $ yum list --showduplicates gitlab-ce
-  # 查看 GitLab 源中所有可用的不同版本 gitlab-ce 软件包
+$ yum reinstall -y <package_name>
+# 重新安装相关软件包
+$ yum reinstall -y kernel
+# 重新安装 kernel 软件包 
+# 使用场景：
+#   1. 若误删 vmlinuz-* 内核文件或 initramfs-* 文件，可使用该方法重新安装内核恢复。  
+#   2. 若只生成 initramfs-* 文件，可直接使用 dracut -f -v /boot/initramfs-* 命令。
   
-  $ yum reinstall -y <package_name>
-  # 重新安装相关软件包
-  $ yum reinstall -y kernel
-  # 重新安装 kernel 软件包 
-  # 使用场景：
-  #   1. 若误删 vmlinuz-* 内核文件或 initramfs-* 文件，可使用该方法重新安装内核恢复。  
-  #   2. 若只生成 initramfs-* 文件，可直接使用 dracut -f -v /boot/initramfs-* 命令。
+$ yum downgrade -y <package_name>
+# 降级指定软件包为旧版本
+# 注意：
+#   $ rpm -U --oldpackage <package_name>
+#   # 指定旧版本软件包降级
   
-  $ yum downgrade -y <package_name>
-  # 降级指定软件包为旧版本
-  # 注意：
-  #   $ rpm -U --oldpackage <package_name>
-  #   # 指定旧版本软件包降级
+$ yum install -y yum-plugin-versionlock
+# 安装 yum 版本锁定插件软件包
+# 注意：RHEL 8 中安装 python3-dnf-plugin-versionlock 以使用 versionlock 子命令
+$ yum versionlock add <package_name_wildcard>
+# 将指定的软件包进行版本锁定
+$ yum versionlock delete <package_name_wildcard>
+# 去除指定软件包的版本锁定
+$ yum versionlock clear
+# 去除所有软件包的版本锁定
+$ yum versionlock list
+# 查看版本锁定的软件包
+# 注意：指定软件包一定版本锁定，将无法进行升级与降级！
   
-  $ yum install -y yum-plugin-versionlock
-  # 安装 yum 版本锁定插件软件包
-  # 注意：RHEL 8 中安装 python3-dnf-plugin-versionlock 以使用 versionlock 子命令
-  $ yum versionlock add <package_name_wildcard>
-  # 将指定的软件包进行版本锁定
-  $ yum versionlock delete <package_name_wildcard>
-  # 去除指定软件包的版本锁定
-  $ yum versionlock clear
-  # 去除所有软件包的版本锁定
-  $ yum versionlock list
-  # 查看版本锁定的软件包
-  # 注意：指定软件包一定版本锁定，将无法进行升级与降级！
+$ yumdownloader --destdir <dest_dir> <package_name>
+# 下载软件包至指定目录中
   
-  $ yumdownloader --destdir <dest_dir> <package_name>
-  # 下载软件包至指定目录中
-  
-  $ yum grouplist
-  $ yum groupinfo "<group_name>"
-  $ yum groupinstall "<group_name>" \
-    -y --setopt=group_package_types=mandatory,default,optional
+$ yum grouplist
+$ yum groupinfo "<group_name>"
+$ yum groupinstall "<group_name>" \
+  -y --setopt=group_package_types=mandatory,default,optional
   # RHEL 7.x/8.x：根据包组中软件包的类型安装相应包组软件
   # 注意：
   #   $ yum groupinstall "Legacy UNIX Compatibility" \
   #     -y --setopt=group_package_types=mandatory,default,optional
   
-  $ yum install -y yum-plugin-verify
-  # 安装 yum-plugin-verify 软件包，用于确认软件包中文件的状态。
-  # 注意：RHEL 8 中已不再提供该软件包实现 verify 子命令
-  $ yum verify <package_name>
-  # 只确认软件包的状态，不确认软件包配置文件的状态。
-  $ yum verify-rpm <package_name>
-  # 确认软件包配置文件的状态
-  $ yum verify-rpm vsftpd
-    Loaded plugins: langpacks, search-disabled-repos, verify
-    ==================== Installed Packages ====================
-    vsftpd.x86_64 : Very Secure Ftp Daemon
-        File: /etc/vsftpd/vsftpd.conf
-        Tags: configuration
-            Problem:  checksum does not match
-            Current:  sha256:37bd013bbecaf93450ba74cbd85c9dcc60d6c47822b0c1e404d6057eba779eb3
-            Original: sha256:6e011bfb61a81c33377e78ed1aaef6d204516d390dd6a3daf973ce82ec7eadf2
+$ yum install -y yum-plugin-verify
+# 安装 yum-plugin-verify 软件包，用于确认软件包中文件的状态。
+# 注意：RHEL 8 中已不再提供该软件包实现 verify 子命令
+$ yum verify <package_name>
+# 只确认软件包的状态，不确认软件包配置文件的状态。
+$ yum verify-rpm <package_name>
+# 确认软件包配置文件的状态
+$ yum verify-rpm vsftpd
+  Loaded plugins: langpacks, search-disabled-repos, verify
+  ==================== Installed Packages ====================
+  vsftpd.x86_64 : Very Secure Ftp Daemon
+      File: /etc/vsftpd/vsftpd.conf
+      Tags: configuration
+          Problem:  checksum does not match
+          Current:  sha256:37bd013bbecaf93450ba74cbd85c9dcc60d6c47822b0c1e404d6057eba779eb3
+          Original: sha256:6e011bfb61a81c33377e78ed1aaef6d204516d390dd6a3daf973ce82ec7eadf2
                                        --------
-            Problem:  size does not match
-            Current:          5029 B
-            Original:         5030 B
+          Problem:  size does not match
+          Current:          5029 B
+          Original:         5030 B
                                        --------
-            Problem:  mtime does not match
-            Current:  Sat Jun 26 23:43:34 2021 (2154 days, 3:37:07 later)
-            Original: Mon Aug  3 20:06:27 2015
-    verify-rpm done
-  # 更改 /etc/vsftpd/vsftpd.conf 配置文件后，可被 yum verify-rpm 命令检测出更改的属性。 
-  ```
+          Problem:  mtime does not match
+          Current:  Sat Jun 26 23:43:34 2021 (2154 days, 3:37:07 later)
+          Original: Mon Aug  3 20:06:27 2015
+  verify-rpm done
+# 更改 /etc/vsftpd/vsftpd.conf 配置文件后，可被 yum verify-rpm 命令检测出更改的属性。 
+```
 
-## 🔥 基础网络问题调试
+## 🔥 15. 网络连通性 & 网络扫描
 
-- 网络连通性测试：ping 与 ping6 命令常用选项
+### 15.1 网络连通性测试：ping 与 ping6 命令常用选项
   
-  ![ping-ping6-options](images/ping-ping6-options.jpg)
+![ping-ping6-options](images/ping-ping6-options.jpg)
 
-- 关于 `MTU` 故障的说明：
-  - MTU（Maximum Transmission Unit，最大传输单元）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位）。最大传输单元这个参数通常与通信接口有关。
-  - 当 MTU 不合理时会造成如下问题：
-    - 本地 MTU 值大于网络 MTU 值时，本地传输的 "数据包" 过大导致网络会拆包后传输，不但产生额外的数据包，而且消耗了 "拆包、组包" 的时间。
-    - 本地 MTU 值小于网络 MTU 值时，本地传输的数据包可以直接传输，但是未能完全利用网络给予的数据包传输尺寸的上限值，传输能力未完全发挥。
-  - 合理的 MTU 值：
+### 15.2 关于 **MTU** 故障
+
+- MTU（Maximum Transmission Unit，最大传输单元）是指一种通信协议的某一层上面所能通过的最大数据包大小（以字节为单位）。最大传输单元这个参数通常与通信接口有关。
+- 当 MTU 不合理时会造成如下问题：
+  - 本地 MTU 值大于网络 MTU 值时，本地传输的 "数据包" 过大导致网络会拆包后传输，不但产生额外的数据包，而且消耗了 "拆包、组包" 的时间。
+  - 本地 MTU 值小于网络 MTU 值时，本地传输的数据包可以直接传输，但是未能完全利用网络给予的数据包传输尺寸的上限值，传输能力未完全发挥。
+- 合理的 MTU 值：
     所谓的合理的 MTU 值，就是让本地 MTU 值与网络的 MTU 值一致，以致于不会出现数据包的大小超过网络传输的 MTU 值，而不得不进行拆包，然后组包，再进行转发，既能完整发挥传输性能，又不让数据包拆分。
-  - 💥 数据包大小大于 MTU 的故障：
+- 💥 数据包大小大于 MTU 的故障：
 
-    ![long-message-mtu-error-1](images/long-message-mtu-error-1.png)
+  ![long-message-mtu-error-1](images/long-message-mtu-error-1.png)
 
-    ping 命令使用 ICMP 协议测试网络连通性，整个数据包包括数据净荷（字节）、ICMP 头（8 字节）、IP 头（20 字节）。因此，上图中使用 1472 字节的数据净荷，而数据包整体为 1500 字节，已达到本地最大传输单元。若禁止本地的数据包分片（`-M do`）且数据净荷超过 1472 字节，则由于数据包大小大于本地 MTU 而无法测试网络连通性；若不使用 `-M do` 选项，可通过本地数据包分片测试连通性。
+  ping 命令使用 ICMP 协议测试网络连通性，整个数据包包括数据净荷（字节）、ICMP 头（8 字节）、IP 头（20 字节）。因此，上图中使用 1472 字节的数据净荷，而数据包整体为 1500 字节，已达到本地最大传输单元。若禁止本地的数据包分片（`-M do`）且数据净荷超过 1472 字节，则由于数据包大小大于本地 MTU 而无法测试网络连通性；若不使用 `-M do` 选项，可通过本地数据包分片测试连通性。
 
-    ![long-message-mtu-error-2](images/long-message-mtu-error-2.png)
+  ![long-message-mtu-error-2](images/long-message-mtu-error-2.png)
 
-- `nmap` 命令使用示例：
-  - nmap 是功能强大的网络扫描工具，可以扫描单个主机和大型网络。
-  - 它主要用于安全审核和渗透测试。
-  - nmap 是端口扫描的首选工具，除端口扫描外，nmap 还可以检测 MAC 地址、操作系统类型、内核版本等。
-  - nmap 默认发送一个 ARP 的 ping 数据包，来探测目标主机 `1-1000` 范围内所开放的所有端口。
+### 15.3 **nmap** 命令
+
+- nmap 是功能强大的网络扫描工具，可以扫描单个主机和大型网络。
+- 它主要用于安全审核和渗透测试。
+- nmap 是端口扫描的首选工具，除端口扫描外，nmap 还可以检测 MAC 地址、操作系统类型、内核版本等。
+- nmap 默认发送一个 ARP 的 ping 数据包，来探测目标主机 `1-1000` 范围内所开放的所有端口。
   
   ```bash
   $ nmap -vv [<fqdn>|<target_ip_address>]
@@ -1041,146 +1124,175 @@ $ rpm --setperms <package_name>
   # nmap 命令万能开关：启用操作系统探测、版本探测、脚本扫描、路由追踪
   ```
 
-- nc 命令使用示例：
-  - nc 命令（netcat）具有客户端模式与服务端模式
+### 15.4 **nc** 命令
 
-    ```bash
-    $ yum install -y nmap-ncat
-    # 安装 nmap 与 ncat 软件包
-    $ ls -l /usr/bin/nc
-      lrwxrwxrwx. 1 root root 4 Jun 27 22:09 /usr/bin/nc -> ncat
-    # nc 命令为 ncat 的软链接
+nc 命令（netcat）具有客户端模式与服务端模式：
+
+```bash
+$ yum install -y nmap-ncat
+# 安装 nmap 与 ncat 软件包
+$ ls -l /usr/bin/nc
+  lrwxrwxrwx. 1 root root 4 Jun 27 22:09 /usr/bin/nc -> ncat
+# nc 命令为 ncat 的软链接
+```
+
+#### 15.4.1 nc 客户端模式
+
+```bash
+$ nc -v [<server_fqdn>|<server_ip_address>] <server_port>
+# 查看与指定服务端端口连接的详细状态
+# 可使用 -v、-vv、-vvv、-vvvv 查看更为详细的状态
+$ nc -v serverb.lab.example.com 22
+# 查看 serverb.lab.example.com 的 22 端口连接状态
+```
+
+#### 15.4.2 nc 服务端：监听模式
+
+```bash
+$ nc -l <port>
+# 防火墙指定端口放行，监听该端口的连接状态，可配合客户端实时通信。
+$ nc servera.lab.example.com 1210
+  hello servera.lab.example.com
+  quit
+  ^C
+$ nc -l 1210
+  hello servera.lab.example.com
+  quit
+  ^C
+# nc 监听模式可与客户端模式配合获取客户端发送的数据
     
-    ### nc 客户端模式 ###
-    $ nc -v [<server_fqdn>|<server_ip_address>] <server_port>
-    # 查看与指定服务端端口连接的详细状态
-    # 可使用 -v、-vv、-vvv、-vvvv 查看更为详细的状态
-    $ nc -v serverb.lab.example.com 22
-    # 查看 serverb.lab.example.com 的 22 端口连接状态
+$ nc -l 1210 -e /bin/bash
+# nc 监听模式：接收的信息由 -e 选项指定的命令执行
+$ nc servera.lab.example.com 1210
+  ls
+  anaconda-ks.cfg
+  rpmdb-20210626-1702.tar.bz2
+  pwd
+  /root
+```
+
+#### 15.4.3 nc 传输文件：客户端到服务端
+
+```bash
+servera: $ nc -l 9000 > <filename>
+# nc 监听模式：接收来自客户端模式的数据将其重定向写入文件中
+serverb: $ nc -v servera.lab.example.com 9000 < <filename>
+# nc 客户端模式：将本地文件传输至服务端
+# 注意：nc 命令传输文件或目录无需输入密码，传输完成后需验证文件 md5sum。
+```
+
+#### 15.4.4 nc 传输文件：服务端到客户端
+
+```bash
+servera: $ nc -l 9000 < <filename>
+# nc 监听模式：监听本地 9000 端口，并发送本地文件至客户端。 
+serverb: $ nc -v servera.lab.example.com 9000 > <filename>
+# nc 客户端模式：接收来自服务端的文件
     
-    ### nc 服务端：监听模式 ###
-    $ nc -l <port>
-    # 防火墙指定端口放行，监听该端口的连接状态，可配合客户端实时通信。
-    $ nc servera.lab.example.com 1210
-      hello servera.lab.example.com
-      quit
-      ^C
-    $ nc -l 1210
-      hello servera.lab.example.com
-      quit
-      ^C
-    # nc 监听模式可与客户端模式配合获取客户端发送的数据
-    
-    $ nc -l 1210 -e /bin/bash
-    # nc 监听模式：接收的信息由 -e 选项指定的命令执行
-    $ nc servera.lab.example.com 1210
-      ls
-      anaconda-ks.cfg
-      rpmdb-20210626-1702.tar.bz2
-      pwd
-      /root
-    
-    ### nc 传输文件：客户端到服务端 ###
-    servera: $ nc -l 9000 > <filename>
-    # nc 监听模式：接收来自客户端模式的数据将其重定向写入文件中
-    serverb: $ nc -v servera.lab.example.com 9000 < <filename>
-    # nc 客户端模式：将本地文件传输至服务端
-    # 注意：nc 命令传输文件或目录无需输入密码，传输完成后需验证文件 md5sum。
-    
-    ### nc 传输文件：服务端到客户端 ###
-    servera: $ nc -l 9000 < <filename>
-    # nc 监听模式：监听本地 9000 端口，并发送本地文件至客户端。 
-    serverb: $ nc -v servera.lab.example.com 9000 > <filename>
-    # nc 客户端模式：接收来自服务端的文件
-    
-    ### nc 传输目录中的多个文件 ###
-    servera: $ nc -l 9000 | tar -zxvf -
-    # nc 监听模式：接收客户端的多个文件
-    serverb: $ tar -zcvf - * | nc -v servra.lab.example.com 9000
-    # nc 客户端模式：使用 tar 命令发送多个文件至服务端
-    
-    ### 测试网络带宽 ###
-    servera: $ nc -v serverb.lab.example.com 9000 < /dev/zero
-    serverb: $ nc -l 9000 > /dev/null
-    # 测试 serverb 节点的对应 NIC 接口的网速
-    # 若需测试 servera 对应的 NIC 接口的网速可将测试命令互换
-    ```
+### nc 传输目录中的多个文件 ###
+servera: $ nc -l 9000 | tar -zxvf -
+# nc 监听模式：接收客户端的多个文件
+serverb: $ tar -zcvf - * | nc -v servra.lab.example.com 9000
+# nc 客户端模式：使用 tar 命令发送多个文件至服务端
+```
+
+#### 15.4.5 测试网络带宽
+
+```bash
+servera: $ nc -v serverb.lab.example.com 9000 < /dev/zero
+serverb: $ nc -l 9000 > /dev/null
+# 测试 serverb 节点的对应 NIC 接口的网速
+# 若需测试 servera 对应的 NIC 接口的网速可将测试命令互换
+```
   
-  - 使用 nc 命令测试网速时，可配合 `iptraf-ng` 工具可视化网络速率。
-  - iptraf-ng 命令来自 iptraf-ng 软件包。
-  - 以上 nc 测试的 iptarf-ng 如下所示：
+- 使用 nc 命令测试网速时，可配合 `iptraf-ng` 工具可视化网络速率。
+- iptraf-ng 命令来自 iptraf-ng 软件包。
+- 以上 nc 测试的 iptarf-ng 如下所示：
 
-    ![nc-iptraf-ng](images/nc-iptraf-ng.jpg)
+  ![nc-iptraf-ng](images/nc-iptraf-ng.jpg)
 
-- tcpdump 命令示例：
-  - tcpdump 可使用 `-w` 选项将抓包结果写入以 `.pcap` 结尾的文件中。
-  - 该抓包文件可通过 tcpdump 命令的 `-r` 选项进行读取，或使用 Wireshark 读取。
-  - 💥 注意：
-    - 可使用 Wireshark 抓包显示数据包中的明文密码，如 vsftpd 登录、Apache HTTPD 的用户认证（基于密码文件或 SDBM 文件型数据库的 Basic 认证的方式）。
-    - vsftpd 软件包并不安全，建议使用 sftp 进行文件传输！
+#### 15.4.6 tcpdump 命令
+
+- tcpdump 可使用 `-w` 选项将抓包结果写入以 `.pcap` 结尾的文件中。
+- 该抓包文件可通过 tcpdump 命令的 `-r` 选项进行读取，或使用 Wireshark 读取。
+- 💥 注意：
+  - 可使用 Wireshark 抓包显示数据包中的明文密码，如 vsftpd 登录、Apache HTTPD 的用户认证（基于密码文件或 SDBM 文件型数据库的 Basic 认证的方式）。
+  - vsftpd 软件包并不安全，建议使用 sftp 进行文件传输！
   
-  ```bash
-  $ man 7 pcap-filter
-  # 查看 tcpdump 的包过滤语法使用说明
-  $ man 8 tcpdump
-  # 查看 tcpdump 命令的详细使用方法
-  $ man 8 tcpslice
-  # 该命令可用于提取或合并 tcpdump 的抓包文件
-  $ man 4 wireshark-filter
-  # 查看 Wireshark 的过滤器语法使用
+```bash
+$ man 7 pcap-filter
+# 查看 tcpdump 的包过滤语法使用说明
+$ man 8 tcpdump
+# 查看 tcpdump 命令的详细使用方法
+$ man 8 tcpslice
+# 该命令可用于提取或合并 tcpdump 的抓包文件
+$ man 4 wireshark-filter
+# 查看 Wireshark 的过滤器语法使用
   
-  $ tcpdump -n -i <interface> -w <filename>.pcap 
-  # 抓取来自指定网口的流量，不转换主机的 IP 地址为 FQDN，并将抓包结果写入指定文件中。
-  $ tcpdump -n -i <interface> icmp and host <target_ip_address>
-  # 抓取来自指定网口且来自指定主机的 ICMP 流量。
-  $ tcpdump -r <filename>.pcap
-  # 查看抓包文件信息
-  # 注意：可使用 -v 或 -vv 选项显示更为详细的抓包信息
-  ```
+$ tcpdump -n -i <interface> -w <filename>.pcap 
+# 抓取来自指定网口的流量，不转换主机的 IP 地址为 FQDN，并将抓包结果写入指定文件中。
+$ tcpdump -n -i <interface> icmp and host <target_ip_address>
+# 抓取来自指定网口且来自指定主机的 ICMP 流量。
+$ tcpdump -r <filename>.pcap
+# 查看抓包文件信息
+# 注意：可使用 -v 或 -vv 选项显示更为详细的抓包信息
+```
 
-- 参考链接：
-  - [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
-  - [How to use iptraf to monitor network interface?](https://access.redhat.com/solutions/30479)
-  - [超详细的网络抓包神器 tcpdump 使用指南（米开朗基杨）](https://mp.weixin.qq.com/s/J3Rdrof9ts9b6_paJk1KJw)
-  - [Linux 网络分析必备技能：tcpdump 实战详解](https://mp.weixin.qq.com/s/vzNgYRZigR1Buay17gcfrg)
-  - [可能是目前最简单易懂且实用的 tcpdump 和 Wireshark 抓包及分析教程](https://mp.weixin.qq.com/s/9OvL5VXrGad2q-Hxf9wGRw)
-  - [最简单的 Wireshark 和 TCP 入门指南](https://mp.weixin.qq.com/s/D2jipFrVOluHGcIB9izKVQ)
+#### 15.4.7 参考链接
 
-## 内存泄漏与内存溢出
+- [Linux 网络配置与调试](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%B0%83%E8%AF%95.md)
+- [How to use iptraf to monitor network interface?](https://access.redhat.com/solutions/30479)
+- [超详细的网络抓包神器 tcpdump 使用指南（米开朗基杨）](https://mp.weixin.qq.com/s/J3Rdrof9ts9b6_paJk1KJw)
+- [Linux 网络分析必备技能：tcpdump 实战详解](https://mp.weixin.qq.com/s/vzNgYRZigR1Buay17gcfrg)
+- [可能是目前最简单易懂且实用的 tcpdump 和 Wireshark 抓包及分析教程](https://mp.weixin.qq.com/s/9OvL5VXrGad2q-Hxf9wGRw)
+- [最简单的 Wireshark 和 TCP 入门指南](https://mp.weixin.qq.com/s/D2jipFrVOluHGcIB9izKVQ)
 
-- 内存泄漏（memory leak）：
-  - 指程序在申请内存后，无法释放已申请的内存空间，导致系统无法及时回收内存并且分配给其他进程使用。
-  - 通常少次数的内存无法及时回收并不会对程序造成什么影响，但是如果在系统内存本身就比较少获取多次导致内存无法正常回收时，就会导致内存不够用，最终导致内存溢出。
-- 内存溢出（out of memory, OOM）：
-  - 指程序申请内存时，没有足够的内存供申请者使用，导致数据无法正常存储到内存中。
-  - 也就是说若需要 int 类型的存储数据大小的空间，但是却存储一个 long 类型的数据，这样就会导致内存溢出。
-- 两者的关系：
-  - 内存泄露最终会导致内存溢出，由于系统中的内存是有限的，如果过度占用资源而不及时释放，最后会导致内存不足，从而无法给所需要存储的数据提供足够的内存，从而导致内存溢出。
-  - 导致内存溢出也可能是由于在给数据分配大小时没有根据实际要求分配，最后导致分配的内存无法满足数据的需求，从而导致内存溢出。
-- 两者的区别：
-  - 内存泄露是由于 `GC` 无法及时或者无法识别可以回收的数据进行及时的回收，导致内存的浪费。
-  - 内存溢出是由于数据所需要的内存无法得到满足，导致数据无法正常存储到内存中。
-  - 内存泄露的多次表现就会导致内存溢出。
-- 内存泄漏的分类（根据发生方式分类）：
-  - 常发性内存泄漏：
-    发生内存泄漏的代码会被多次执行到，每次被执行的时候都会导致一块内存泄漏。
-  - 偶发性内存泄漏：
-    - 发生内存泄漏的代码只有在某些特定环境或操作过程下才会发生。
-    - 常发性和偶发性是相对的，对于特定的环境，偶发性的也许就变成了常发性的。
-    - 所以测试环境和测试方法对检测内存泄漏至关重要。
-  - 一次性内存泄漏：
-    - 发生内存泄漏的代码只会被执行一次，或者由于算法上的缺陷，导致总会有一块仅且一块内存发生泄漏。
-    - 比如，在类的构造函数中分配内存，在析构函数中却没有释放该内存，所以内存泄漏只会发生一次。
-  - 隐式内存泄漏：
-    - 程序在运行过程中不停的分配内存，但是直到结束的时候才释放内存。
-    - 严格的说这里并没有发生内存泄漏，因为最终程序释放了所有申请的内存。
-    - 但是对于一个服务器程序，需要运行几天，几周甚至几个月，不及时释放内存也可能导致最终耗尽系统的所有内存。
-    - 所以，我们称这类内存泄漏为隐式内存泄漏。
-  > 💥 注意：
-  > 1. 内存泄漏与内存溢出应注重从应用代码角度去解决问题。
-  > 2. 泄漏虚拟内存虽然不好，但是泄漏物理内存更加不好。
+## 16. 内存泄漏 & 内存溢出
 
-## 共享库相关命令
+1️⃣ 内存泄漏（memory leak）：
+
+- 指程序在申请内存后，无法释放已申请的内存空间，导致系统无法及时回收内存并且分配给其他进程使用。
+- 通常少次数的内存无法及时回收并不会对程序造成什么影响，但是如果在系统内存本身就比较少获取多次导致内存无法正常回收时，就会导致内存不够用，最终导致内存溢出。
+
+2️⃣ 内存泄漏的分类（根据发生方式分类）：
+
+- 常发性内存泄漏：
+  发生内存泄漏的代码会被多次执行到，每次被执行的时候都会导致一块内存泄漏。
+- 偶发性内存泄漏：
+  - 发生内存泄漏的代码只有在某些特定环境或操作过程下才会发生。
+  - 常发性和偶发性是相对的，对于特定的环境，偶发性的也许就变成了常发性的。
+  - 所以测试环境和测试方法对检测内存泄漏至关重要。
+- 一次性内存泄漏：
+  - 发生内存泄漏的代码只会被执行一次，或者由于算法上的缺陷，导致总会有一块仅且一块内存发生泄漏。
+  - 比如，在类的构造函数中分配内存，在析构函数中却没有释放该内存，所以内存泄漏只会发生一次。
+- 隐式内存泄漏：
+  - 程序在运行过程中不停的分配内存，但是直到结束的时候才释放内存。
+  - 严格的说这里并没有发生内存泄漏，因为最终程序释放了所有申请的内存。
+  - 但是对于一个服务器程序，需要运行几天，几周甚至几个月，不及时释放内存也可能导致最终耗尽系统的所有内存。
+  - 所以，我们称这类内存泄漏为隐式内存泄漏。
+
+3️⃣ 内存溢出（out of memory, OOM）：
+
+- 指程序申请内存时，没有足够的内存供申请者使用，导致数据无法正常存储到内存中。
+- 也就是说若需要 int 类型的存储数据大小的空间，但是却存储一个 long 类型的数据，这样就会导致内存溢出。
+
+4️⃣ 两者的关系：
+
+- 内存泄露最终会导致内存溢出，由于系统中的内存是有限的，如果过度占用资源而不及时释放，最后会导致内存不足，从而无法给所需要存储的数据提供足够的内存，从而导致内存溢出。
+- 导致内存溢出也可能是由于在给数据分配大小时没有根据实际要求分配，最后导致分配的内存无法满足数据的需求，从而导致内存溢出。
+
+5️⃣ 两者的区别：
+
+- 内存泄露是由于 `GC` 无法及时或者无法识别可以回收的数据进行及时的回收，导致内存的浪费。
+- 内存溢出是由于数据所需要的内存无法得到满足，导致数据无法正常存储到内存中。
+- 内存泄露的多次表现就会导致内存溢出。
+  
+> 💥 注意：
+>
+> 1. 内存泄漏与内存溢出应注重从应用代码角度去解决问题。
+> 2. 泄漏虚拟内存虽然不好，但是泄漏物理内存更加不好。
+
+## 17. 系统共享库故障排除
 
 - 共享库（shared library）的查询过程：
 
@@ -1216,78 +1328,99 @@ $ rpm --setperms <package_name>
 
 > 💥 注意：若相应应用程序缺少指定的共享库，安装共享库后，需使用 ldconfig 命令更新共享库缓存文件。
 
-## 🔥 系统调用与库调用
+- 📚 相关故障排除案例请参考[【故障排除】容器内多版本 glibc 库调用冲突](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E5%B8%B8%E7%94%A8%E6%8E%92%E9%94%99%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%96%B9%E6%B3%95/%E3%80%90%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4%E3%80%91%E5%AE%B9%E5%99%A8%E5%86%85%E5%A4%9A%E7%89%88%E6%9C%AC%20glibc%20%E5%BA%93%E8%B0%83%E7%94%A8%E5%86%B2%E7%AA%81.md)。
 
-- Linux 中用户空间程序使用内核空间数据的方法：
-  - 系统调用（system call）：
-    Linux 提供了一系列系统调用，用于用户空间程序向内核发起请求或通知，如读写文件、创建进程、申请内存等。通过这些系统调用，用户空间程序可以向内核发送请求，内核会进行相应的处理并返回结果。这些系统调用包括 `open`、`read`、`write`、`mmap`、`ioctl` 等。
-    ioctl 是一种特殊的系统调用，用于通过设备文件发送命令和控制信息给设备驱动程序。用户空间程序可以通过 ioctl 调用向设备驱动程序发送命令，设备驱动程序收到命令后进行相应的操作，比如启动设备、停止设备、修改设备配置等。
-  - 共享内存（shared memory）：
-    共享内存是一种高效的数据交换方式。在内核空间中，使用 `shmget` 系统调用来创建或获取一块共享内存区域，然后使用 `shmat` 系统调用将该共享内存区域映射到用户空间中。用户空间程序可以直接读写共享内存中的数据，无需进行系统调用，这样就能够实现用户空间和内核空间的数据交换。
-  - 内存映射（memory map）：
-    内存映射是一种将文件的一部分映射到进程地址空间的方法。用户空间程序可以通过 `mmap` 系统调用将文件映射到自己的虚拟内存中，然后直接访问内存中的数据，无需每次都通过系统调用来访问硬盘上的文件。内存映射提供了一种高效的数据交换方式，可用于大文件的读写。
-- 系统调用：
-  - 系统调用在内核空间（kernel space）中执行
-  - 系统调用可理解是操作系统为用户提供的一系列操作的接口（API），这些接口提供了对系统硬件设备功能的操作。
-- 库调用（library call）：
-  - 库调用也称为库函数调用
-  - 库函数在用户空间（user space）中执行
-  - 库函数可以理解为是对系统调用的一层封装
-  - 系统调用作为内核提供给用户空间程序的接口，它的执行效率是比较高效而精简的，但有时我们需要对获取的信息进行更复杂的处理，或更人性化的需要，我们把这些处理过程封装成一个函数再提供给程序员，便于程序编码。
-  - 库函数有可能包含有一个或多个系统调用，也可能没有系统调用，如有些操作不需要涉及内核的功能。
-  - 无论是应用程序或库函数都有可能不调用系统调用而直接运行。
+## 🔥 18. 系统调用 & 库调用
 
-    ![library-call-system-call-1](images/library-call-system-call-1.png)
-  
-  - 库调用运行示例：
+### 18.1 Linux 中用户空间程序使用内核空间数据的方法
 
-    ```c
-    // printf_libcall_demo.c
-    #include <stdio.h>
-    
-    int main(int argc, char *argv[])
-    {
-        printf("hello world!\n");
-        return 0;
-    }
-    ```
+1️⃣ 共享内存（shared memory）：
 
-    ```bash
-    $ gcc -o printf_libcall_demo printf_libcall_demo.c
-    ```
+- 共享内存是一种高效的数据交换方式。在内核空间中，使用 `shmget` 系统调用来创建或获取一块共享内存区域，然后使用 `shmat` 系统调用将该共享内存区域映射到用户空间中。用户空间程序可以直接读写共享内存中的数据，无需进行系统调用，这样就能够实现用户空间和内核空间的数据交换。
 
-    ![strace-printf-demo](images/strace-printf-demo.png)
+2️⃣ 内存映射（memory map）：
 
+- 内存映射是一种将文件的一部分映射到进程地址空间的方法。用户空间程序可以通过 `mmap` 系统调用将文件映射到自己的虚拟内存中，然后直接访问内存中的数据，无需每次都通过系统调用来访问硬盘上的文件。内存映射提供了一种高效的数据交换方式，可用于大文件的读写。
+
+3️⃣ 系统调用（system call）：
+
+- Linux 提供了一系列系统调用，它们在在内核空间（kernel space）中执行，用于用户空间程序向内核发起请求或通知，如读写文件、创建进程、申请内存等。通过这些系统调用，用户空间程序可以向内核发送请求，内核会进行相应的处理并返回结果。这些系统调用包括 `open`、`read`、`write`、`mmap`、`ioctl` 等。
 - 系统调用的意义：
-  - 避免了用户直接对底层硬件进行编程。
-  - 隐藏背后的技术细节。
-  - 保证系统的安全性和稳定性。
+  - 避免了用户直接对底层硬件进行编程
+  - 隐藏背后的技术细节
+  - 保证系统的安全性和稳定性
     用户程序不能直接操作内核地址空间，而系统调用的功能由内核实现，用户只需调用接口，无需关心细节。
-  - 方便程序的移植性。
-- ✍ 两者的区别：
-  - 所有 C 函数库是相同的，而各个操作系统的系统调用是不同的（CPU 架构的差异）。
-  > glibc 中针对不同的 CPU 架构具有不同的库函数实现，在 glibc 源码中体现。
-  - 函数库调用是调用函数库中的一个程序，而系统调用是调用系统内核的服务。
-  - 函数库调用是与用户程序相联系，而系统调用是操作系统的一个进入点。
-  - 函数库调用是在用户地址空间执行，而系统调用是在内核地址空间执行。
-  - 函数库调用的运行时间属于用户时间（`user time`），而系统调用的运行时间属于系统时间（`system time`）。
-  - 函数库调用属于过程调用，开销较小，而系统调用需要切换到内核上下文环境然后切换回来，开销较大。
-  - 在 C 函数库 **`libc`** 中大约 300 个程序，在 UNIX 中大约有 90 个系统调用。
-  - 函数库典型的 C 函数：system、fprintf、malloc
-  - 典型的系统调用：chdir、fork、write、brk
+  - 方便程序的移植性
 
-    ![library-call-system-call-2](images/library-call-system-call-2.png)
+4️⃣ 库调用（library call）：
+
+- 库调用也称为库函数调用
+- 库函数在用户空间（user space）中执行
+- 库函数可以理解为是对系统调用的一层封装
+- 系统调用作为内核提供给用户空间程序的接口，它的执行效率是比较高效而精简的，但有时我们需要对获取的信息进行更复杂的处理，或更人性化的需要，我们把这些处理过程封装成一个函数再提供给程序员，便于程序编码。
+- 库函数有可能包含有一个或多个系统调用，也可能没有系统调用，如有些操作不需要涉及内核的功能。
+- 无论是应用程序或库函数都有可能不调用系统调用而直接运行。
+
+  ![library-call-system-call-1](images/library-call-system-call-1.png)
   
-  - 参考《C 专家编程》中的附录 A.4，书中关于两者区别为函数库调用是语言或应用程序的一部分，而系统调用是操作系统的一部分。
+- 库调用运行示例：
+
+  ```c
+  // printf_libcall_demo.c
+  #include <stdio.h>
+    
+  int main(int argc, char *argv[])
+  {
+      printf("hello world!\n");
+      return 0;
+  }
+  ```
+
+  ```bash
+  $ gcc -o printf_libcall_demo printf_libcall_demo.c
+  ```
+
+  ![strace-printf-demo](images/strace-printf-demo.png)
+
+✍ 两者的区别：
+
+- 所有 C 函数库是相同的，而各个操作系统的系统调用是不同的（CPU 架构的差异）。
+
+  > glibc 中针对不同的 CPU 架构具有不同的库函数实现，在 glibc 源码中体现。
+
+- 函数库调用是调用函数库中的一个程序，而系统调用是调用系统内核的服务。
+- 函数库调用是与用户程序相联系，而系统调用是操作系统的一个进入点。
+- 函数库调用是在用户地址空间执行，而系统调用是在内核地址空间执行。
+- 函数库调用的运行时间属于用户时间（`user time`），而系统调用的运行时间属于系统时间（`system time`）。
+- 函数库调用属于过程调用，开销较小，而系统调用需要切换到内核上下文环境然后切换回来，开销较大。
+- 在 C 函数库 **`libc`** 中大约 300 个程序，在 UNIX 中大约有 90 个系统调用。
+- 函数库典型的 C 函数：system、fprintf、malloc
+- 典型的系统调用：chdir、fork、write、brk
+
+  | 对比项 | 函数库调用 | 系统调用 |
+  | ----- | ----- | ----- |
+  | **定义差别** | 在所有的 ANSI C 编译器版本中，C 库函数是相同的 | 各个操作系统的系统调用是不同的 |
+  | **调用差别** | 它调用函数库中的一段程序（或函数） | 调用系统内核的服务 |
+  | **与系统关系** | 与用户程序相联系 | 操作系统的一个入口点 |
+  | **运行空间** | 在用户地址空间执行 | 在内核地址空间执行 |
+  | **运行时间** | 它的运行时间属于 "用户时间" | 它的运行时间属于 "系统" 时间 |
+  | **开销** | 属于过程调用，开销较小 | 需要在用户空间和内核上下文环境间切换，开销较大 |
+  | **个数** | 在 C 函数库 libc 中有大约 300 个函数 | 在 Linux 中大约有 100 多个系统调用 |
+  | **典型调用** | fprintf、fread、malloc | chdir、fork、write、brk |
+
+  > 参考《C 专家编程》中的附录 A.4，书中关于两者区别为函数库调用是语言或应用程序的一部分，而系统调用是操作系统的一部分。
+
 - 库函数调用大概花费时间为半微妙，而系统调用所需要的时间大约是库函数调用的 70 倍（35 微秒），由于系统调用会有内核上下文切换的开销。
 - 纯粹从性能上考虑，应该尽可能地减少系统调用的数量，但是必须记住，许多 C 函数库中的程序通过系统调用来实现功能。
 - 以上说明的库函数调用性能远高于系统调用的前提是库函数中没有使用系统调用，再来解释下某些包含系统调用的库函数，然而其性能确实也要高于系统调用。
-- 参考链接：
-  - [Top (The GNU C Library)](https://www.gnu.org/software/libc/manual/2.28/html_node/index.html) 
-  - [The GNU C Library](https://www.gnu.org/savannah-checkouts/gnu/libc/preview/sources.html)  
-  - [glibc 源码 - Index of /gnu/libc](https://ftp.gnu.org/gnu/libc/)
 
-## strace 与 ltrace 命令使用
+### 18.2 参考链接
+
+- [Top (The GNU C Library)](https://www.gnu.org/software/libc/manual/2.28/html_node/index.html)
+- [The GNU C Library](https://www.gnu.org/savannah-checkouts/gnu/libc/preview/sources.html)  
+- [glibc 源码 - Index of /gnu/libc](https://ftp.gnu.org/gnu/libc/)
+
+## 19. strace & ltrace 命令
 
 - 系统调用与库函数调用非常相似，即它们都接受并处理参数然后返回值，唯一的区别是系统调用进入内核，而库函数调用不进入。
 - 通过使用 C 函数库（Linux 系统上又称为 `glibc`），大部分系统调用对用户隐藏。
@@ -1298,6 +1431,8 @@ $ rpm --setperms <package_name>
   a library call tracer，跟踪进程调用库函数的情况。
 - 👉 若 strace 命令没有任何输出，并不代表此时进程发生阻塞，也可能进程正在执行某些不需要与系统其它部分发生通信的事情。
 - strace 从内核接收信息，且无需以任何特殊方式来构建内核。
+
+### 19.1 示例
 
 ```bash
 $ man 2 <syscall_name>
@@ -1381,10 +1516,11 @@ $ ltrace -t -f -p <pid>
 # 跟踪已运行进程所创建的子进程/线程的 C 库函数调用
 ```
 
-- 参考链接：
-  - [Understanding system calls on Linux with strace](https://opensource.com/article/19/10/strace)
+### 19.2 参考链接
 
-## 参考链接
+- [Understanding system calls on Linux with strace](https://opensource.com/article/19/10/strace)
+
+## 20. 参考链接
 
 - [Access to 24x7 support and knowledge | Red Hat Customer Portal](https://access.redhat.com/knowledgebase/)
 - [Labs | Red Hat Customer Portal](https://access.redhat.com/labs)
