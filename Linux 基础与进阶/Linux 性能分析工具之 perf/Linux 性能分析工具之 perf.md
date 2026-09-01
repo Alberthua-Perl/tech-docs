@@ -332,9 +332,21 @@
 
 ### 6.1 分析示例：goSimpleWeb 程序在 ab 压力测试时的性能事件解析
 
+如**图示1**，未优化的 goSimpleWeb 程序，perf top 对它的实时热点函数显示：
+
 ![perf-top-pid](images/perf-top-pid.png)
 
-💡 现象显示：在实时监测 goSimpleWeb 程序的过程中，当使用 ab 命令发起多并发压力测试请求后，perf top 界面中显示图中 `_raw_spin_unlock_irqrestore` 内核函数的 CPU 开销达到 46% 左右。</br>
+如**图示2**，优化的 goSimpleWebOpt2 程序，perf record 抓取函数调用栈（用户态+内核态）：
+
+![goSimpleWebOpt2-perf](images/goSimpleWebOpt2-perf.png)
+
+如**图示3**，火焰图显示优化的 goSimpleWebOpt2 程序函数调用栈（用户态+内核态）：
+
+![flame-graph-20s-10calls](images/flame-graph-20s-10calls.png)
+
+> 注意：火焰图的生成与说明请参考下文
+
+💡 现象显示：如图示1，在实时监测 goSimpleWeb 程序的过程中，当使用 ab 命令发起多并发压力测试请求后，perf top 界面中显示图中 `_raw_spin_unlock_irqrestore` 内核函数的 CPU 开销达到 46% 左右。</br>
 
 🩺 根因分析：
 
@@ -342,7 +354,7 @@
 
   ```bash
   # 说明：
-  #   1. 由于采样数量不足，可能无法在火焰图中观测 inet_csk_accept() 内核函数调用，可采用 bpftrace 动态采集。
+  #   1. 可能由于采样数量不足，无法在图示3的火焰图中观测 inet_csk_accept() 内核函数调用，可采用 bpftrace 动态采集。
   #   2. bpftrace 确认内核函数是否被调用的方法
   $ sudo bpftrace -e '
   kprobe:inet_csk_accept {
@@ -351,12 +363,12 @@
   kprobe:_raw_spin_unlock_irqrestore {
       printf("unlock called by %s\n", comm);
   }
-  ' > /path/to/fun_call.log
+  ' > ./sk_lock_results.log
   ```
 
   **锁竞争模型：**
 
-  `sk->sk_lock.slock` 是**单一把自旋锁**，内核态软中断和用户态进程**直接竞争同一把锁**：
+  `sk->sk_lock.slock` 是 **单一把自旋锁**，内核态软中断和用户态进程 **直接竞争同一把锁**：
 
   ```plaintext
           用户态 (进程上下文)              内核态 (软中断上下文)
@@ -403,6 +415,112 @@
       │
       ▼
   返回用户态
+  ```
+
+  **<font color=red>Linux 网卡接收数据包流程</font>**：
+
+  ```mermaid
+  sequenceDiagram
+      autonumber
+    
+      participant NIC as 网卡 (NIC)
+      participant DMA as DMA 引擎
+      participant IRQ as 硬中断
+      participant SOFTIRQ as ksoftirqd (NET_RX_SOFTIRQ)
+      participant DRIVER as 网卡驱动 (e1000/vmxnet3)
+      participant NETCORE as 网络核心层
+      participant TCP as TCP 协议栈
+      participant SOCK as struct sock (sk_lock)
+      participant APP as 用户进程 (accept)
+
+      %% ========== 阶段1: 网卡收包 → 触发软中断 ==========
+      Note over NIC,SOFTIRQ: 阶段1: 网卡收包 → 触发软中断 [^193^]
+    
+      NIC->>DMA: 以太网帧到达
+      DMA->>DMA: DMA 写入 rx_ring buffer (描述符环) [^193^]
+      DMA->>IRQ: 触发硬中断 (MSI/INTx)
+    
+      IRQ->>IRQ: 关硬中断, __napi_schedule()
+      IRQ->>SOFTIRQ: 置位 NET_RX_SOFTIRQ [^193^]
+    
+      %% ========== 阶段2: 软中断轮询 → 驱动拆环 ==========
+      Note over SOFTIRQ,DRIVER: 阶段2: NAPI 轮询 → 驱动拆环 [^193^]
+    
+      SOFTIRQ->>SOFTIRQ: net_rx_action()
+      SOFTIRQ->>DRIVER: n->poll(n, weight) 即 e1000_clean() / vmxnet3_poll_rx_only()
+    
+      DRIVER->>DRIVER: e1000_clean_rx_irq() / vmxnet3_rq_rx_complete()
+      DRIVER->>DRIVER: 读 rx_desc[head] USED 位
+      DRIVER->>DRIVER: 取 rx_buffer[head] DMA 页 → 构造 skb
+      DRIVER->>DRIVER: 清描述符, 挂新空页 (ring buffer 重用) [^193^]
+      DRIVER->>NETCORE: netif_receive_skb() [^193^]
+    
+      %% ========== 阶段3: 协议栈分层处理 ==========
+      Note over NETCORE,TCP: 阶段3: 协议栈分层处理 [^193^]
+    
+      NETCORE->>NETCORE: __netif_receive_skb_core()
+      NETCORE->>NETCORE: 按 eth->h_proto 分发 → ip_rcv()
+    
+      NETCORE->>TCP: ip_rcv() → ip_rcv_finish() → dst_input()
+      TCP->>TCP: tcp_v4_rcv() [^193^]
+    
+      %% ========== 阶段4: sk_lock 竞争 → backlog 机制 ==========
+      Note over TCP,SOCK: 阶段4: sk_lock 竞争与 sk_backlog 队列 [^194^]
+    
+      alt sk_lock.owned == 0 (socket 空闲)
+          TCP->>SOCK: bh_lock_sock_nested(sk)
+          TCP->>SOCK: sock_owned_by_user(sk) == false
+          TCP->>SOCK: tcp_prequeue(sk, skb) 或 tcp_v4_do_rcv(sk, skb) [^194^]
+          SOCK->>SOCK: 直接处理, 报文入 sk_receive_queue
+      else sk_lock.owned == 1 (socket 正被用户态占用)
+          TCP->>SOCK: sk_add_backlog(sk, skb) [^194^]
+          Note right of SOCK: 用户态正在 send/recv/accept<br/>不能直接处理, 报文暂存 sk_backlog
+      end
+    
+      %% ========== 阶段5: release_sock → 处理 backlog ==========
+      Note over SOCK,APP: 阶段5: release_sock 释放锁 → 补处理 sk_backlog [^194^]
+    
+      APP->>SOCK: release_sock() (send/recv/accept 结束)
+      SOCK->>SOCK: __release_sock()
+    
+      loop sk_backlog 队列非空
+          SOCK->>SOCK: sk_backlog_rcv() → tcp_v4_do_rcv() [^194^]
+          SOCK->>SOCK: 报文移入 sk_receive_queue
+      end
+    
+      SOCK->>APP: sk_data_ready() → 唤醒等待进程
+    
+      %% ========== 阶段6: 三次握手 → SYN 队列 ==========
+      Note over TCP,SOCK: 阶段6: 三次握手与 SYN 队列 [^195^]
+    
+      APP->>SOCK: listen(fd, backlog=128)
+      SOCK->>SOCK: inet_csk_listen_start() → 初始化 inet_connection_sock [^195^]
+    
+      TCP->>SOCK: SYN 报文到达 → tcp_v4_do_rcv()
+      SOCK->>SOCK: tcp_conn_request() → 创建 req (request_sock)
+      SOCK->>SOCK: inet_csk_reqsk_queue_add() → 入 SYN 队列 (icsk_accept_queue) [^195^]
+    
+      Note right of SOCK: SYN 队列长度 = tcp_max_syn_backlog
+    
+      TCP->>SOCK: ACK (第三次握手) → tcp_check_req()
+      SOCK->>SOCK: inet_csk_complete_hashdance() → 创建子 socket (struct sock *child)
+      SOCK->>SOCK: inet_csk_reqsk_queue_moved() → 子 socket 入 accept 队列 [^195^]
+    
+      %% ========== 阶段7: accept 返回 ==========
+      Note over SOCK,APP: 阶段7: accept 阻塞返回 [^195^]
+    
+      APP->>SOCK: accept() → 阻塞等待
+      SOCK->>SOCK: inet_csk_accept() → 从 icsk_accept_queue 取子 socket [^195^]
+    
+      alt accept 队列为空
+          SOCK->>APP: sk_wait_event() → 睡眠等待 sk_data_ready 唤醒
+          SOCK->>APP: (SYN 到达后 sk_data_ready 唤醒)
+      else accept 队列非空
+          SOCK->>SOCK: reqsk_queue_get_child() → 取出已建立连接
+      end
+    
+      SOCK->>APP: 返回新 fd (子 socket)
+      APP->>APP: read()/write() → 正常通信
   ```
 
 - 2️⃣ ab 的 500 并发短连接导致服务端同时存在大量活跃连接。Go 调度器使用 futex 实现 M:N goroutine 调度：当 goroutine 因 I/O 阻塞（如等待 accept 返回或 read 数据）时，调度器执行 futex(FUTEX_WAIT) 挂起 OS 线程；当 epoll 通知 I/O 就绪或连接建立完成时，通过 futex(FUTEX_WAKE) 唤醒线程重新调度。高并发下，大量 goroutine 的频繁阻塞/唤醒导致 futex 系统调用激增，火焰图中 futex_wake → do_futex → sys_futex 形成宽柱。注意：futex 是 Go 调度器同步机制，与内核 accept() 的完成是异步解耦关系，非直接因果。
@@ -733,107 +851,3 @@ $ sudo perf script | /path/to/FlameGraph-1.0/stackcollapse-perf.pl | /path/to/Fl
 - 🎉 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)
 - [brendangregg/FlameGraph | GitHub](https://github.com/brendangregg/FlameGraph)
 - [node.js Flame Graphs on Linux | Brendan Gregg's Blog](https://www.brendangregg.com/blog/2014-09-17/node-flame-graphs-on-linux.html)
-
-```mermaid
-sequenceDiagram
-    autonumber
-    
-    participant NIC as 网卡 (NIC)
-    participant DMA as DMA 引擎
-    participant IRQ as 硬中断
-    participant SOFTIRQ as ksoftirqd (NET_RX_SOFTIRQ)
-    participant DRIVER as 网卡驱动 (e1000/vmxnet3)
-    participant NETCORE as 网络核心层
-    participant TCP as TCP 协议栈
-    participant SOCK as struct sock (sk_lock)
-    participant APP as 用户进程 (accept)
-
-    %% ========== 阶段1: 网卡收包 → 触发软中断 ==========
-    Note over NIC,SOFTIRQ: 阶段1: 网卡收包 → 触发软中断 [^193^]
-    
-    NIC->>DMA: 以太网帧到达
-    DMA->>DMA: DMA 写入 rx_ring buffer (描述符环) [^193^]
-    DMA->>IRQ: 触发硬中断 (MSI/INTx)
-    
-    IRQ->>IRQ: 关硬中断, __napi_schedule()
-    IRQ->>SOFTIRQ: 置位 NET_RX_SOFTIRQ [^193^]
-    
-    %% ========== 阶段2: 软中断轮询 → 驱动拆环 ==========
-    Note over SOFTIRQ,DRIVER: 阶段2: NAPI 轮询 → 驱动拆环 [^193^]
-    
-    SOFTIRQ->>SOFTIRQ: net_rx_action()
-    SOFTIRQ->>DRIVER: n->poll(n, weight) 即 e1000_clean() / vmxnet3_poll_rx_only()
-    
-    DRIVER->>DRIVER: e1000_clean_rx_irq() / vmxnet3_rq_rx_complete()
-    DRIVER->>DRIVER: 读 rx_desc[head] USED 位
-    DRIVER->>DRIVER: 取 rx_buffer[head] DMA 页 → 构造 skb
-    DRIVER->>DRIVER: 清描述符, 挂新空页 (ring buffer 重用) [^193^]
-    DRIVER->>NETCORE: netif_receive_skb() [^193^]
-    
-    %% ========== 阶段3: 协议栈分层处理 ==========
-    Note over NETCORE,TCP: 阶段3: 协议栈分层处理 [^193^]
-    
-    NETCORE->>NETCORE: __netif_receive_skb_core()
-    NETCORE->>NETCORE: 按 eth->h_proto 分发 → ip_rcv()
-    
-    NETCORE->>TCP: ip_rcv() → ip_rcv_finish() → dst_input()
-    TCP->>TCP: tcp_v4_rcv() [^193^]
-    
-    %% ========== 阶段4: sk_lock 竞争 → backlog 机制 ==========
-    Note over TCP,SOCK: 阶段4: sk_lock 竞争与 sk_backlog 队列 [^194^]
-    
-    alt sk_lock.owned == 0 (socket 空闲)
-        TCP->>SOCK: bh_lock_sock_nested(sk)
-        TCP->>SOCK: sock_owned_by_user(sk) == false
-        TCP->>SOCK: tcp_prequeue(sk, skb) 或 tcp_v4_do_rcv(sk, skb) [^194^]
-        SOCK->>SOCK: 直接处理, 报文入 sk_receive_queue
-    else sk_lock.owned == 1 (socket 正被用户态占用)
-        TCP->>SOCK: sk_add_backlog(sk, skb) [^194^]
-        Note right of SOCK: 用户态正在 send/recv/accept<br/>不能直接处理, 报文暂存 sk_backlog
-    end
-    
-    %% ========== 阶段5: release_sock → 处理 backlog ==========
-    Note over SOCK,APP: 阶段5: release_sock 释放锁 → 补处理 sk_backlog [^194^]
-    
-    APP->>SOCK: release_sock() (send/recv/accept 结束)
-    SOCK->>SOCK: __release_sock()
-    
-    loop sk_backlog 队列非空
-        SOCK->>SOCK: sk_backlog_rcv() → tcp_v4_do_rcv() [^194^]
-        SOCK->>SOCK: 报文移入 sk_receive_queue
-    end
-    
-    SOCK->>APP: sk_data_ready() → 唤醒等待进程
-    
-    %% ========== 阶段6: 三次握手 → SYN 队列 ==========
-    Note over TCP,SOCK: 阶段6: 三次握手与 SYN 队列 [^195^]
-    
-    APP->>SOCK: listen(fd, backlog=128)
-    SOCK->>SOCK: inet_csk_listen_start() → 初始化 inet_connection_sock [^195^]
-    
-    TCP->>SOCK: SYN 报文到达 → tcp_v4_do_rcv()
-    SOCK->>SOCK: tcp_conn_request() → 创建 req (request_sock)
-    SOCK->>SOCK: inet_csk_reqsk_queue_add() → 入 SYN 队列 (icsk_accept_queue) [^195^]
-    
-    Note right of SOCK: SYN 队列长度 = tcp_max_syn_backlog
-    
-    TCP->>SOCK: ACK (第三次握手) → tcp_check_req()
-    SOCK->>SOCK: inet_csk_complete_hashdance() → 创建子 socket (struct sock *child)
-    SOCK->>SOCK: inet_csk_reqsk_queue_moved() → 子 socket 入 accept 队列 [^195^]
-    
-    %% ========== 阶段7: accept 返回 ==========
-    Note over SOCK,APP: 阶段7: accept 阻塞返回 [^195^]
-    
-    APP->>SOCK: accept() → 阻塞等待
-    SOCK->>SOCK: inet_csk_accept() → 从 icsk_accept_queue 取子 socket [^195^]
-    
-    alt accept 队列为空
-        SOCK->>APP: sk_wait_event() → 睡眠等待 sk_data_ready 唤醒
-        SOCK->>APP: (SYN 到达后 sk_data_ready 唤醒)
-    else accept 队列非空
-        SOCK->>SOCK: reqsk_queue_get_child() → 取出已建立连接
-    end
-    
-    SOCK->>APP: 返回新 fd (子 socket)
-    APP->>APP: read()/write() → 正常通信
-```

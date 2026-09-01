@@ -36,7 +36,7 @@
       - [2.8.5 📢 讨论：是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？](#285--讨论是否可以自定义只需要的性能指标并且采集的时间间隔能指定吗)
       - [2.8.6 PCP 参考文档说明](#286-pcp-参考文档说明)
   - [🔥 3. Linux 系统资源限制 CGroup](#-3-linux-系统资源限制-cgroup)
-  - [🔥 4. Linux 性能计数器 Perf](#-4-linux-性能计数器-perf)
+  - [🔥 4. Linux 性能分析工具之 Perf](#-4-linux-性能分析工具之-perf)
   - [5. kernel 相关软件包下载](#5-kernel-相关软件包下载)
   - [6. 进程的调度与优先级](#6-进程的调度与优先级)
   - [7. CPU 三大架构：SMP、NUMA 与 MPP](#7-cpu-三大架构smpnuma-与-mpp)
@@ -866,9 +866,7 @@ Log this group? [y] y
 
 ## 🔥 3. [Linux 系统资源限制 CGroup](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
 
-## 🔥 4. Linux 性能计数器 Perf
-
-此部分内容请参看 [此链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf.md)。
+## 🔥 4. [Linux 性能分析工具之 Perf](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf.md)
 
 ## 5. kernel 相关软件包下载
 
