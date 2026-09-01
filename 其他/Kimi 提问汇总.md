@@ -25,6 +25,7 @@
   - [17. Transformer](#17-transformer)
   - [18. 大模型基础](#18-大模型基础)
   - [19. vLLM 推理](#19-vllm-推理)
+  - [20. AI Agent 开发与治理](#20-ai-agent-开发与治理)
 
 ## 1. Linux 内核原理
 
@@ -851,3 +852,8 @@ selected: List[SequenceGroup] = scheduler.select_batch()
         
   关系：max_num_batched_tokens > max_model_len ✓ 也可行
 ```
+
+## 20. AI Agent 开发与治理
+
+- agent 智能体如何管理长程多轮对话以及长上下文管理？
+- 什么是 RedHat OKP 与 OKP MCP？

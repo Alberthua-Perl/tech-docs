@@ -29,10 +29,12 @@
       - [2.7.3 pidstat 命令示例](#273-pidstat-命令示例)
       - [2.7.4 sar 命令示例](#274-sar-命令示例)
     - [2.8 Performance Co-Pilot (PCP) 组件使用](#28-performance-co-pilot-pcp-组件使用)
-      - [2.8.1 PCP 相关命令示例](#281-pcp-相关命令示例)
-      - [2.8.2 PCP 参考文档说明](#282-pcp-参考文档说明)
-      - [2.8.3 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？](#283--讨论linux-中-pcp-的-pmlogger-默认是采集-pcp-所有的性能指标吗)
-      - [2.8.4 📢 讨论：是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？](#284--讨论是否可以自定义只需要的性能指标并且采集的时间间隔能指定吗)
+      - [2.8.1 PCP 实时性能监测](#281-pcp-实时性能监测)
+      - [2.8.2 PCP 性能指标查询](#282-pcp-性能指标查询)
+      - [2.8.3 PCP 图形实用程序绘制性能指标](#283-pcp-图形实用程序绘制性能指标)
+      - [2.8.4 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？](#284--讨论linux-中-pcp-的-pmlogger-默认是采集-pcp-所有的性能指标吗)
+      - [2.8.5 📢 讨论：是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？](#285--讨论是否可以自定义只需要的性能指标并且采集的时间间隔能指定吗)
+      - [2.8.6 PCP 参考文档说明](#286-pcp-参考文档说明)
   - [🔥 3. Linux 系统资源限制 CGroup](#-3-linux-系统资源限制-cgroup)
   - [🔥 4. Linux 性能计数器 Perf](#-4-linux-性能计数器-perf)
   - [5. kernel 相关软件包下载](#5-kernel-相关软件包下载)
@@ -342,9 +344,42 @@ Swap:          8062         321        7741
   
 - vmstat 命令 VM 模式输出的详细说明，如下所示：
 
-<center><img src="images/vmstat-header-info.jpg" style="width:80%"></center>
+  | 类别 | 统计数据 | 定义 |
+  | :----- | :----- | :----- |
+  | **process** | r     | 等待运⾏时的进程数。 |
+  |             | b     | **不可中断睡眠状态中的进程数。** |
+  | **memory**  | swpd  | 交换空间中当前使⽤的内存量。 |
+  |             | free  | 空闲（⽴即可⽤）内存量。 |
+  |             | buff  | ⽤作缓冲区的内存量。 |
+  |             | cache | ⽤作缓存区的内存量。 |
+  | **swap**    | si    | 每秒换入的内存⻚数。 |
+  |             | so    | 每秒换出的内存⻚数。 |
+  | **io**      | bi    | 每秒从块设备接收的块数。 |
+  |             | bo    | 每秒发送⾄块设备的块数。 |
+  | **system**  | in    | **每秒引发的中断数。** |
+  |             | cs    | **每秒上下⽂切换次数。** |
+  | **cpu**     | us    | 运⾏⽤⼾空间代码所⽤时间占⽐。 |
+  |             | sy    | 运⾏内核空间代码所⽤时间占⽐。 |
+  |             | id    | 空闲时间占⽐。 |
+  |             | wa    | **<font color=orange>等待 I/O 完成时被阻⽌的时间占⽐。</font>** |
+  |             | st    | CPU 有⼀个进程准备运⾏，但 CPU 时间被⽀持相应虚拟机的虚拟机监控程序占⽤，该值代表占⽤时间百分⽐（通常因为 CPU 正被另⼀外来虚拟机占⽤）。 |
 
-<center><img src="images/linux-process-schedule.jpg" style="width:80%"></center>
+  > 📄 关于 steal 指标的说明：
+  >
+  > - steal 表示 “被偷走” 的时间，即物理机上的虚拟机（VM）已经准备好运行，但物理 CPU 被 hypervisor 拿去给其他虚拟机或自身任务使用的时间百分比，其中 hypervisor 可以是 KVM/QEMU、VMware ESX/vSphere、Xen、VirtualBox 等。可理解为，VM 需要 CPU 运行负载，但是物理机 CPU 被其他任务抢走了。
+  > - steal 指标只在虚拟环境中才有意义，物理宿主机中该指标通常始终为 0，而在 VM 中才可能出现该指标。
+  > - steal 高时，即使 us（用户态）和 sy（内核态）不高、id（空闲）看起来也不低，VM 中应用依然会觉得 “卡顿”，因为 CPU 时间片已被切走。
+  > - steal 时间不算在空闲（id）里。如果 steal 是 10%，意味着你的 VM 损失了 10% 本该用于执行任务的 CPU 时间。
+  > - **需要注意的是**：us=30, sy=10，表明 VM 实际在用 40% 的 CPU；id=50，表明还有一半空闲；但 st=10，表明有 10% 的时间 VM 被挂起，等着物理 CPU。VM 的实际有效 CPU 利用率 = 30 + 10 = 40%，而理论可用时间只有 90%（因为 10% 被偷了）。如果负载继续上升，性能会急剧恶化。
+  > - **常见的引发 steal 指标升高的原因：**</br>
+  > &emsp;&emsp;1. 超售（Oversubscription）：宿主机上开了太多 VM，vCPU 总数超过物理 CPU 核心数</br>
+  > &emsp;&emsp;2. 邻居吵闹（Noisy Neighbor）：同一宿主机的其他 VM 突发高负载</br>
+  > &emsp;&emsp;3. 宿主机自身负载高：hypervisor 或宿主机上的管理进程占用过多 CPU</br>
+  > &emsp;&emsp;4. 云厂商的突发型实例：如 AWS T 系列、阿里云突发性能实例，CPU 积分耗尽后被限制
+
+  深度睡眠不可中断进程示意，如下图所示：
+
+  <center><img src="images/linux-process-schedule.jpg" style="width:80%"></center>
 
 ### 2.7 sysstat 软件包相关命令
 
@@ -370,7 +405,7 @@ $ sudo mpstat -P 1 -N 0 -o JSON 2 5 > mpstat-dump.json
 # 结果输出为指定 JSON 文件。
 ```
 
-<center><img src="images/mpstat-demo.png" style="width:80%"></center>
+![mpstat-demo](images/mpstat-demo.png)
 
 若需启用实时输出的高亮显示，可设置 `S_COLORS` 环境变量为 `always` 或 `auto`。
   
@@ -396,7 +431,7 @@ $ sudo mpstat -P 1 -N 0 -o JSON 2 5 > mpstat-dump.json
   # 输出中的 tps 事务数又称为 IOPS
   ```
 
-  <center><img src="images/iostat-demo.png" style="width:80%"></center>
+  ![iostat-demo](images/iostat-demo.png)
 
   ```bash
   $ sudo iostat -dtxyz --human 1 5
@@ -450,16 +485,39 @@ $ sudo mpstat -P 1 -N 0 -o JSON 2 5 > mpstat-dump.json
   - -d 选项：报告磁盘统计情况
   - -w 选项：报告任务切换活动（进程的上下文切换）
 
-```bash
-$ sudo pidstat -p <pid> -t -u -r <interval> <count>
-# 查看进程的状态统计信息
+- 全局视角：快速定位候选进程
 
-$ sudo pidstat -p <pid> -w <interval> <count>
-# 查看指定进程的自愿与非自愿上下文切换的状态，指定时间间隔（秒）与采集数量。
-# 重要指标：
-#   1. cswch/s：每秒进程的自愿上下文切换（voluntary context switch）的总数。当一个任务因需要某种不可用的资源而受阻时，就会发生一种自愿的切换操作。
-#   2. nvcswch/s：每秒进程的非自愿上下文切换（involuntary context switch）的总数。当一个任务在其所占用的时间片内完成执行后，却被迫放弃处理器时，就会发生一种非自愿的切换情况。
-```
+  ```bash
+  ### 命令格式 ###
+  $ pidstat <interval> <count>
+
+  ### 示例 ###
+  $ cores=$(lscpu | awk '/^CPU\(s\)/ { print $NF }')    # 正则表达式中 \ 表示括号本身（不是捕获分组）
+  $ pidstat 1 5 | tail -n +2 | grep -Ev 'Average|Command' | sort -k9 -nr | awk -v cores="$cores" 'BEGIN{ print "%CPU  Command" }{ if ($9>cores) print $9"  "$NF }'
+  %CPU  Command
+  4.95  qemu-kvm
+  4.85  qemu-kvm
+  # 语法点：
+  #   tail -n +2：从开头第二行开始显示
+  #   sort -k9 -nr：根据第9列，按照数值大小反向排序（从大到小）
+  #   -v cores="$cores"：bash 中的变量传递
+  ```
+
+- 进程视角：进程的 CPU、内存、磁盘状态统计
+
+  ```bash
+  ### 命令格式 ###
+  $ pidstat -p <pid> -t -u -r -d <interval> <count>
+
+  $ pidstat -p <pid> -w <interval> <count>
+  # 查看指定进程的自愿与非自愿上下文切换的状态，指定时间间隔（秒）与采集数量。
+  # 重要指标：
+  #   1. cswch/s：每秒进程的自愿上下文切换（voluntary context switch）的总数。当一个任务因需要某种不可用的资源而受阻时，就会发生一种自愿的切换操作。
+  #   2. nvcswch/s：每秒进程的非自愿上下文切换（involuntary context switch）的总数。当一个任务在其所占用的时间片内完成执行后，却被迫放弃处理器时，就会发生一种非自愿的切换情况。
+
+  ### 示例 ###
+  $ pidstat -p $(pidof prometheus) -turd 1 5
+  ```
   
 #### 2.7.4 sar 命令示例
 
@@ -567,7 +625,7 @@ $ sudo pidstat -p <pid> -w <interval> <count>
 
 ### 2.8 Performance Co-Pilot (PCP) 组件使用
 
-#### 2.8.1 PCP 相关命令示例
+#### 2.8.1 PCP 实时性能监测
 
 安装 PCP 组件：
 
@@ -579,18 +637,24 @@ $ sudo systemctl enable --now pmcd.service pmlogger.service
 # pmlogger 服务将指标日志存储于 /var/log/pcp/pmlogger/<hostname>/ 目录中
 ```
 
-PCP 命令行性能采集工具：pcp-system-tools 软件包安装于 `/usr/libexec/pcp/bin/` 目录中
+PCP 命令行性能采集工具：pcp-system-tools 软件包安装于 `/usr/libexec/pcp/bin/` 目录中：
 
 ```bash
 $ export PATH=/usr/libexec/pcp/bin:$PATH
+```
 
-### 等价于 pcp free -m 或 free -m ###
+**pcp-free 命令**：等价于 pcp free -m 或 free -m
+
+```bash
 $ sudo pcp-free -m 
                 total        used        free      shared  buff/cache   available
   Mem:           7741        2621        1949         318        3169        4493
   Swap            511           0         511
+```
 
-### 等价于 dstat 命令 ###
+**pcp-dstat 命令**：等价于 pcp dstat 或 dstat
+
+```bash
 $ sudo pcp-dstat [--time|--sys|--cpu|--page|--disk|--net] <delay> <count>
 # 指定间隔时间（秒）与采集样本数进行指标采集
 $ sudo pcp-dstat --time --sys --cpu --page --disk --net 1 5
@@ -602,8 +666,20 @@ $ sudo pcp-dstat --time --sys --cpu --page --disk --net 1 5
 20-12 23:47:47| 190   317 |  0   0  99   0   0|   0     0 |   0     0 |  64B  331B
 20-12 23:47:48| 372   379 |  2   1  96   0   0|   0     0 |   0    16k|  64B  332B
 20-12 23:47:49| 214   323 |  1   0  99   0   0|   0     0 |   0     0 |  64B  339B
+```
 
-### 等价于 vmstat 命令 ###
+**pcp-atop 命令**：等价于 atop 命令
+
+```bash
+$ pcp-atop
+# 实时刷新系统资源使用信息
+```
+
+![pcp-atop-demo](images/pcp-atop-demo.png)
+
+**pmstat 命令**：等价于 vmstat 命令
+
+```bash
 $ pmstat -t <interval>[seconds|minutes] -s <count>
 # 高层次的系统性能查看工具，在指定的时间间隔内（默认 5 秒刷新一次）。
 $ pmstat -t 2s -s 5
@@ -616,19 +692,29 @@ $ pmstat -t 2s -s 5
     0.07      0  4041m   6176  1374m    0    0    0    0  229  350   0   1  99
     0.39      0  4041m   6176  1374m    0    0    0    3  215  340   0   0  99
 # 指定 2 秒，采集 5 次样本。
-
-### 等价于 atop 命令 ###
-$ pcp-atop
-# 实时刷新系统资源使用信息
 ```
 
-<center><img src="images/pcp-atop-demo.png" style="width:90%"></center>
+**pmcollectl 命令**：Python 程序性能统计接口
 
-pmval 命令行查询性能指标归档日志：
+```bash
+$ pmcollectl -c 5 -i 2    # 间隔2秒，统计5次。
+#<--------CPU--------><----------Disks-----------><----------Network---------->
+#cpu sys inter  ctxsw KBRead  Reads KBWrit Writes KBIn  PktIn  KBOut  PktOut
+   3   2   470    609     0      0      0      0   19     30     17     20
+   2   1   453    578     0      0      0      0   35    139     20    126
+   3   2   437    583     0      0      0      0   15     19     15     17
+   3   2   367    527     0      0    113     12    0      2      0      2
+   2   1   398    521     0      0      0      0    6     74      6     74
+```
+
+#### 2.8.2 PCP 性能指标查询
+
+pmval 命令查询性能指标归档日志：
 
 ```bash
 $ pminfo
 # 查看 Co-Pilot 数据库中的性能指标的类型，可通过 pmval 命令列出数据库中的数据。
+
 $ pminfo -dt <metrics_type>
 # 查看指定指标类型的说明
 $ pminfo -dt kernel.percpu.cpu.idle
@@ -646,6 +732,7 @@ $ pmval -s 5 -t 2 proc.nprocs
           111
           111
 # 实时刷新时间间隔 2 秒，共统计 5 次的瞬时进程数。
+
 $ pmval -a /var/log/pcp/pmlogger/servera.lab.example.com/20210609.14.52.0 \
   -S '@ Wed Jun 09 08:10:00 2021' -T '@ Wed Jun 09 22:19:00 2021' \
   kernel.all.load
@@ -654,20 +741,56 @@ $ pmval -a /var/log/pcp/pmlogger/servera.lab.example.com/20210609.14.52.0 \
 # -a 选项指定性能指标的归档日志
 ```
 
-#### 2.8.2 PCP 参考文档说明
+#### 2.8.3 PCP 图形实用程序绘制性能指标
 
-- PCP 软件包除提供命令行模式的性能指标输出外，还提供 `GUI` 图形化界面及 Web 图形化界面，并可与 `Grafana` 集成显示。
-- 该软件包提供强大而丰富的系统性能监控指标与参数，关于 PCP 软件包及相关命令的使用方法，可参考如下 `Red Hat Access` 链接获取更为详细的技术指导：
-  - [RHEL 7 性能监控之 PCP](http://www.361way.com/rhel7-pcp/5149.html)  
-  - [How do I install Performance Co-Pilot (PCP) on my RHEL server to capture performance logs](https://access.redhat.com/solutions/1137023) 
-  - 💪 [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953) 
-  - [Interactive web interface for Performance Co-Pilot](https://access.redhat.com/articles/1378113) 
-  - [Introduction to storage performance analysis with PCP](https://access.redhat.com/articles/2450251)
-  - 📊 [Chapter 10. Setting up graphical representation of PCP metrics](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-up-graphical-representation-of-pcp-metrics_monitoring-and-managing-system-status-and-performance#doc-wrapper)
-  - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 1)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-1)
-  - 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 2)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-2)
+PCP 图形实用程序 pmchart可根据日志归档文件查询历史性能指标，以及实时性能指标。pmchart 查询历史性能指标需要提前定义查询配置文件，用以配置图形界面显示格式，如下所示：
 
-#### 2.8.3 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？
+方式 1️⃣：统计 CPU 相关性能指标，文件名 cpu-util.conf。
+
+```plaintext
+#kmchart
+version 1
+
+chart title "CPU Utilization" style stacking
+    plot legend "User" color #2ca02c metric kernel.all.cpu.user
+    plot legend "System" color #ff7f0e metric kernel.all.cpu.sys
+    plot legend "Idle" color #1f77b4 metric kernel.all.cpu.idle
+    plot legend "Process" color #ff0404 metric kernel.all.nprocs
+```
+
+方式 2️⃣：统计网络与磁盘的 I/O 吞吐，文件名 net-disk-usage.conf。
+
+```plaintext
+#kmchart
+version 1
+
+chart title "Disk Read" style stacking    #柱状图表示
+#chart title "Disk Read" style plot    #折线图表示
+    plot legend "sda" color #1f77b4 metric disk.dev.read_bytes instance "sda"
+    plot legend "sdb" color #ff7f0e metric disk.dev.read_bytes instance "sdb"
+
+chart title "Disk Write" style stacking    #柱状图表示
+#chart title "Disk Write" style plot    #折线图表示
+    plot legend "sda" color #1f77b4 metric disk.dev.write_bytes instance "sda"
+    plot legend "sdb" color #ff7f0e metric disk.dev.write_bytes instance "sdb"
+
+#chart title "Network RX by Interface" style plot
+chart title "Network RX by Interface" style stacking
+    plot legend "eth0" color #1f77b4 metric network.interface.in.bytes instance "eth0"
+    plot legend "eth1" color #ff7f0e metric network.interface.in.bytes instance "eth1"
+    plot legend "lo"   color #2ca02c metric network.interface.in.bytes instance "lo"
+```
+
+> 💥 注意：需要根据实际主机节点上的情况替换对应字段，如 sda、sdb、eth0、eth1 等。
+
+```bash
+$ pmchart -a /var/log/pcp/pmlogger/foundation0.ilt.example.com/20260830.00.10.0 -c pcp-view-examples/net-disk-usage.conf &
+# GUI 模式：根据归档的性能指标日志文件与 pmchart 配置文件绘制图像
+```
+
+![pmchart-net-disk-io](images/pmchart-net-disk-io.png)
+
+#### 2.8.4 📢 讨论：Linux 中 PCP 的 pmlogger 默认是采集 PCP 所有的性能指标吗？
 
 pmlogger 启动后只在 `/var/lib/pcp/config/pmlogger/config.default`（pmlogger 自动生成）中预先定义的一组 “默认指标”，并非采集 `pminfo` 命令返回的所有性能指标。
 
@@ -725,13 +848,23 @@ Log this group? [y] y
 # 交互式指定所需的性能指标组
 ```
 
-#### 2.8.4 📢 讨论：是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
+#### 2.8.5 📢 讨论：是否可以自定义只需要的性能指标，并且采集的时间间隔能指定吗？
 
-- 调整采样的时间间隔依然可在 `/etc/pcp/pmlogger/control.d/local` 文件中调整
+调整采样的时间间隔依然可在 `/etc/pcp/pmlogger/control.d/local` 文件中调整
 
-## 🔥 3. Linux 系统资源限制 CGroup
+#### 2.8.6 PCP 参考文档说明
 
-此部分内容请参看 [此链接](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)。
+- 💪 [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953)
+- ☺️ [Performance Co-Pilot (PCP) Data Sheet](https://access.redhat.com/articles/3119481)
+- [How do I install Performance Co-Pilot (PCP) on my RHEL server to capture performance logs](https://access.redhat.com/solutions/1137023)
+- [Side-by-side comparison of PCP tools with legacy tools](https://access.redhat.com/articles/2372811)
+- [Interactive web interface for Performance Co-Pilot](https://access.redhat.com/articles/1378113)
+- 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 1)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-1)
+- 📊 [Visualizing system performance with RHEL 8 using Performance Co-Pilot (PCP) and Grafana (Part 2)](https://www.redhat.com/en/blog/visualizing-system-performance-rhel-8-using-performance-co-pilot-pcp-and-grafana-part-2)
+- [Chapter 10. Setting up graphical representation of PCP metrics](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-up-graphical-representation-of-pcp-metrics_monitoring-and-managing-system-status-and-performance#doc-wrapper)
+- [Introduction to storage performance analysis with PCP](https://access.redhat.com/articles/2450251)
+
+## 🔥 3. [Linux 系统资源限制 CGroup](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
 
 ## 🔥 4. Linux 性能计数器 Perf
 

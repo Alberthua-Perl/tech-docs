@@ -28,6 +28,7 @@
     - [11.3  **根据正则表达式或模式匹配输出指定内容**](#113--根据正则表达式或模式匹配输出指定内容)
     - [11.4  **通过管道格式化输出指定字段**](#114--通过管道格式化输出指定字段)
     - [11.5 去除字符串末尾](#115-去除字符串末尾)
+    - [11.6 awk 脚本引用外部变量](#116-awk-脚本引用外部变量)
   - [❓待解决语法问题](#待解决语法问题)
 
 ## 1. grep 命令示例
@@ -472,7 +473,7 @@ F30   1
 
 # 方法1：直接索引指定值的数量
 $ awk 'BEGIN { print "--- 统计第二列数字出现的次数 ---" }
-       { count[$2]++}
+       { count[$2]++ }
        END { print "0 的数量：", count[0]; print "1 的数量：", count[1]; print "--- 结束统计 ---" }' results.txt
 0 的数量： 1
 1 的数量： 2
@@ -573,6 +574,33 @@ $ echo <string> | sed 's/.$//'                # 正则表达式 . 代表任意�
 ### 方法2 ###
 $ echo <string> | awk '{ sub(/.$/, "") }1'    # sub 用于替换单个字符；1 代表输出整行
 $ echo <string> | awk '{ printf $0"\b \n" }'  # $0 代表整行输出；\b 代表光标退格；空格代表使用它来覆盖退格的字符
+```
+
+### 11.6 awk 脚本引用外部变量
+
+方法1：使用 -v 选项传参，awk 中的变量不能使用 `$` 引用
+
+```bash
+$ cores=$(lscpu | awk '/^CPU\(s\)/ { print $NF }')    # 正则表达式中 \ 表示括号本身（不是捕获分组）
+$ pidstat 1 5 | tail -n +2 | grep -Ev 'Average|Command' | sort -k9 -nr | awk -v cores="$cores" 'BEGIN{ print "%CPU  Command" }{ if ($9>cores) print $9"  "$NF }'
+%CPU  Command
+4.95  qemu-kvm
+4.85  qemu-kvm
+# 语法点：
+#   tail -n +2：从开头第二行开始显示
+#   sort -k9 -nr：根据第9列，按照数值大小反向排序（从大到小）
+#   -v cores="$cores"：bash 中的变量传递
+```
+
+方法2：直接使用单引号圈引
+
+```bash
+$ cores=$(lscpu | awk '/^CPU\(s\)/ { print $NF }')
+$ pidstat 1 5 | tail -n +2 | grep -Ev 'Average|Command' | sort -k9 -nr | awk 'BEGIN{ print "%CPU  Command" }{ if ($9>'"$cores"') print $9"  "$NF }'
+%CPU  Command
+4.95  qemu-kvm
+4.85  qemu-kvm
+# 语法点：'"$cores"' 单引号圈引 bash 中的变量
 ```
 
 ## ❓待解决语法问题
