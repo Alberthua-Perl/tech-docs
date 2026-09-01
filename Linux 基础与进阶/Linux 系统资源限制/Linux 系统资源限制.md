@@ -332,7 +332,10 @@ $ sudo cat /proc/cgroups
 
 #### 👏 4.5.2 完整的 CGroup 限制进程的生命周期
 
-请注意，使用 systemd 管理的进程切勿直接使用 libcgroup-tools 工具，因为 systemd 在 cgroup v1 中作为单独的 subsystem 管理，而直接采用 libcgroup-tools 工具会将进程单独置于其他 subsystem 中，两者产生冲突。
+**请注意：**
+
+- 使用 systemd 管理的进程切勿直接使用 libcgroup-tools 工具，因为 systemd 在 cgroup v1 中作为单独的 subsystem 管理，而直接采用 libcgroup-tools 工具会将进程单独置于其他 subsystem 中，两者产生冲突。
+- libcgroup-tools 工具集不能管理 cgroup v2，已被移除，即在 RHEL9 与 RHEL10 中不再使用！
 
 ```bash
 # ========== 创建 ==========
