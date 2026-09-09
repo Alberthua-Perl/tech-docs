@@ -9,23 +9,24 @@
 - [Linux 磁盘性能测试](#linux-磁盘性能测试)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [FIO 性能测试](#fio-性能测试)
-    - [fio 命令性能测试示例与解读](#fio-命令性能测试示例与解读)
-    - [fio 命令行参数释义](#fio-命令行参数释义)
-    - [fio 并发数与内存使用量说明](#fio-并发数与内存使用量说明)
-      - [I/O 并发数计算](#io-并发数计算)
-      - [内存使用量估算](#内存使用量估算)
-    - [fio 测试脚本示例](#fio-测试脚本示例)
-  - [smartctl 磁盘健康检查](#smartctl-磁盘健康检查)
-  - [Linux 内核故障注入框架（fail\_io）：启用前提](#linux-内核故障注入框架fail_io启用前提)
-  - [Linux 内核故障注入框架（fail\_io）：示例命令](#linux-内核故障注入框架fail_io示例命令)
+  - [1. fio 命令性能测试示例与解读](#1-fio-命令性能测试示例与解读)
+    - [1.1 裸盘性能测试：**命令行参数方式**](#11-裸盘性能测试命令行参数方式)
+    - [1.2 文件系统性能测试：**fio 配置文件方式**](#12-文件系统性能测试fio-配置文件方式)
+    - [1.3 fio 命令行参数释义](#13-fio-命令行参数释义)
+  - [2. fio 并发数与虚拟内存使用量说明](#2-fio-并发数与虚拟内存使用量说明)
+    - [2.1 I/O 并发数计算](#21-io-并发数计算)
+    - [2.2 虚拟内存使用量估算](#22-虚拟内存使用量估算)
+    - [2.3 fio 运行导致的 OOM 问题分析](#23-fio-运行导致的-oom-问题分析)
+  - [2.4 fio 测试脚本示例](#24-fio-测试脚本示例)
+  - [3. smartctl 磁盘健康检查脚本示例](#3-smartctl-磁盘健康检查脚本示例)
+  - [4. Linux 内核故障注入框架（fail\_io）](#4-linux-内核故障注入框架fail_io)
+    - [4.1 启用前提](#41-启用前提)
+    - [4.2 示例命令](#42-示例命令)
   - [参考链接](#参考链接)
 
-## FIO 性能测试
+## 1. fio 命令性能测试示例与解读
 
-### fio 命令性能测试示例与解读
-
-1️⃣ 裸盘性能测试：**命令行参数方式**
+### 1.1 裸盘性能测试：**命令行参数方式**
 
 ```bash
 $ time fio --name=128K_write_4.result --filename=/dev/nvme0n1 --size=1T \
@@ -36,7 +37,7 @@ $ time fio --name=128K_write_4.result --filename=/dev/nvme0n1 --size=1T \
   --output=./128K_write_4_6.result
 ```
 
-2️⃣ 文件系统性能测试：**fio 配置文件方式**
+### 1.2 文件系统性能测试：**fio 配置文件方式**
 
 fio 配置文件名：fio-xfs.job
 
@@ -256,7 +257,7 @@ Disk stats (read/write):
   vda: ios=25728489/15106312, merge=156463/102053, ticks=44147604/36693398, in_queue=61054857, util=82.29%
 ```
 
-### fio 命令行参数释义
+### 1.3 fio 命令行参数释义
 
 | 参数 | 值 | 含义 | 影响 |
 | :----- | :----- | :----- | :----- |
@@ -276,14 +277,14 @@ Disk stats (read/write):
 | `--output` | ./128K_write_4_6.result | **结果输出到文件** | 便于后续分析和存档 |
 | `--stonewall` | （无值） | **每个 job 类型中 job 之间的隔离屏障** | 有它则 job 串行，无它则 job 并行 |
 
-### fio 并发数与内存使用量说明
+## 2. fio 并发数与虚拟内存使用量说明
 
-#### I/O 并发数计算
+### 2.1 I/O 并发数计算
 
 - 每个 job 类型中 I/O 并发数 = numjobs x iodepth
 - 整体总 I/O 并发数 = 各个 job 类型的 I/O 并发数总和
 
-#### 内存使用量估算
+### 2.2 虚拟内存使用量估算
 
 | 组件 | 估算 | 说明 |
 | :----- | :----- | :----- |
@@ -292,13 +293,70 @@ Disk stats (read/write):
 | fio 内部状态 | `numjobs × ~64KB` | 每 job 上下文 |
 | 文件映射（非 direct） | `size` 或 `filesize` | page cache |
 
-1️⃣ direct 模式（direct=1），以 randread 类型为例：
+1️⃣ direct 模式：
 
-数据缓冲
+```bash
+--numjobs=4 --iodepth=128 --bs=4k --direct=1
+```
 
-2️⃣ 非 direct 模式，文件系统缓存（direct=0），以 randwrite 类型为例：
+- 数据缓冲 = 4 x 128 x 4K = 2MB
+- 完成事件 = 4 x 128 x 16B = 8KB
+- 内部状态 = 4 x 64K = 256KB
+- **总计 ≈ 2.26MB**
 
-### fio 测试脚本示例
+2️⃣ 非 direct 模式：使用 **文件系统页缓存**
+
+```bash
+--numjobs=4 --iodepth=32 --bs=1M --direct=0 --size=100G
+```
+
+- 数据缓冲 = 4 x 32 x 1M = 128MB
+- page cache = 100G（文件映射至内存）
+- **总计 ≈ 128MB + 100GB（若总共 2G 内存将耗光内存，触发 OOM）**
+
+**<font color=red>注意：direct=1 时使用 1️⃣ 计算，direct=0 时由 size 决定内存。</font>**
+
+### 2.3 fio 运行导致的 OOM 问题分析
+
+笔者实验环境中系统物理内存为 2GiB，
+
+```bash
+# 背景1：当前系统可用的物理内存 1526MiB（1.49GiB）
+[root@servera ~]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1828         187        1574          16          67        1526
+Swap:             0           0           0
+
+# 背景2：fio 命令测试运行片刻后，进程被杀死。
+[root@servera ~]# fio --name=128K_write_4.result --filename=/dev/vdb1 --size=1G --direct=1 --iodepth=4096 --numjobs=8 --bs=128K --rw=write --thread --ioengine=libaio --time_based --runtime=120 --group_reporting --output=./128K_write_4_6.result
+Killed8 (f=0): [W(8)][5.5%][r=0KiB/s,w=0KiB/s][r=0,w=0 IOPS][eta 02m:00s]
+
+# 背景3：fio 执行过程中的内存分配情况
+[root@servera ~]# tail -n 4 /var/log/messages
+Sep  9 21:12:12 servera kernel: [ 7996]     0  7996  1479058   395002  3629056        0             0 fio
+Sep  9 21:12:12 servera kernel: Out of memory: Kill process 7996 (fio) score 845 or sacrifice child
+Sep  9 21:12:12 servera kernel: Killed process 7996 (fio) total-vm:5916232kB, anon-rss:1172516kB, file-rss:0kB, shmem-rss:407492kB
+Sep  9 21:12:12 servera kernel: oom_reaper: reaped process 7996 (fio), now anon-rss:0kB, file-rss:0kB, shmem-rss:407496kB
+
+# 背景4：
+[root@servera ~]# grep Commit /proc/meminfo
+CommitLimit:      936444 kB
+Committed_AS:     425784 kB
+
+# 分析：估算 fio 虚拟内存使用量
+[root@servera ~]# bc
+bc 1.07.1
+Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type `warranty'.
+4096*8*128    # fio 数据缓存的虚拟内存：4194304kB < total-vm:5916232kB
+4194304
+scale=3; (1172516+407496)/2^20    # 根因：fio 已用物理内存 anon-rss:1172516kB + shmem-rss:407492kB = 1.506G > available:1.49G 直接导致 OOM！
+1.506
+quit
+```
+
+## 2.4 fio 测试脚本示例
 
 测试脚本文件名 fio_qps_test.sh：
 
@@ -382,7 +440,7 @@ randrw         | randrw        | 1100       | 4.5MB/s
 =============================================
 ```
 
-## smartctl 磁盘健康检查
+## 3. smartctl 磁盘健康检查脚本示例
 
 ```bash
 #!/bin/bash
@@ -408,9 +466,11 @@ else  # SATA/SAS
 fi
 ```
 
-## Linux 内核故障注入框架（fail_io）：启用前提
+## 4. Linux 内核故障注入框架（fail_io）
 
-## Linux 内核故障注入框架（fail_io）：示例命令
+### 4.1 启用前提
+
+### 4.2 示例命令
 
 Linux 内核故障注入框架（**fail_io**）的配置，用于 **人为制造块设备 I/O 错误**，通常用于测试文件系统容错、多路径切换、应用降级逻辑等场景。
 
