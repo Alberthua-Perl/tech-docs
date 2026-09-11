@@ -318,7 +318,7 @@ Disk stats (read/write):
 
 ### 2.3 fio 运行导致的 OOM 问题分析
 
-笔者实验环境中系统物理内存为 2GiB，
+笔者实验环境中系统物理内存为 2GiB，在执行 fio 测试命令时该进程被 Killed，现场状态如下所示：
 
 ```bash
 # 背景1：当前系统可用的物理内存 1526MiB（1.49GiB）
@@ -338,20 +338,20 @@ Sep  9 21:12:12 servera kernel: Out of memory: Kill process 7996 (fio) score 845
 Sep  9 21:12:12 servera kernel: Killed process 7996 (fio) total-vm:5916232kB, anon-rss:1172516kB, file-rss:0kB, shmem-rss:407492kB
 Sep  9 21:12:12 servera kernel: oom_reaper: reaped process 7996 (fio), now anon-rss:0kB, file-rss:0kB, shmem-rss:407496kB
 
-# 背景4：
+# 背景4：CommitLimit > Committed_AS 属于正常状态
 [root@servera ~]# grep Commit /proc/meminfo
 CommitLimit:      936444 kB
 Committed_AS:     425784 kB
 
-# 分析：估算 fio 虚拟内存使用量
+# 分析：估算 fio 虚拟内存使用量（异常！）
 [root@servera ~]# bc
 bc 1.07.1
 Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
 This is free software with ABSOLUTELY NO WARRANTY.
 For details type `warranty'.
-4096*8*128    # fio 数据缓存的虚拟内存：4194304kB < total-vm:5916232kB
+4096*8*128                      # fio 数据缓存的虚拟内存：4194304kB < total-vm:5916232kB
 4194304
-scale=3; (1172516+407496)/2^20    # 根因：fio 已用物理内存 anon-rss:1172516kB + shmem-rss:407492kB = 1.506G > available:1.49G 直接导致 OOM！
+scale=3; (1172516+407496)/2^20  # 根因：fio 已用物理内存 anon-rss:1172516kB + shmem-rss:407492kB = 1.506G > available:1.49G 直接导致 OOM！
 1.506
 quit
 ```
