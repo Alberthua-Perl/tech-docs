@@ -1,4 +1,4 @@
-# ⚗️ Linux 系统性能优化探究
+# ⚗️ Linux 系统性能优化白皮书
 
 ## 文档说明
 
@@ -8,7 +8,7 @@
 
 ## 文档目录
 
-- [⚗️ Linux 系统性能优化探究](#️-linux-系统性能优化探究)
+- [⚗️ Linux 系统性能优化白皮书](#️-linux-系统性能优化白皮书)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
   - [🔬 1. Linux 用户空间进程虚拟内存布局（layout）](#-1-linux-用户空间进程虚拟内存布局layout)
@@ -33,7 +33,7 @@
   - [🧬 14. eBPF 的 BCC 工具集运行示例](#-14-ebpf-的-bcc-工具集运行示例)
     - [14.1 BPF 编译器集合简介](#141-bpf-编译器集合简介)
     - [14.2 常见 BCC 工具](#142-常见-bcc-工具)
-  - [�‍⚕️ 15. Linux 磁盘性能测试：FIO \& smartctl](#️-15-linux-磁盘性能测试fio--smartctl)
+  - [⚕️ 15. Linux 磁盘性能测试：FIO \& smartctl](#️-15-linux-磁盘性能测试fio--smartctl)
   - [📚 参考链接](#-参考链接)
 
 ## 🔬 1. [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
@@ -363,7 +363,7 @@ $ sudo ls /usr/share/bcc/tools
 - `cachestat`：
 - `gethostlatency`：
 
-## 👨‍⚕️ 15. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
+## ⚕️ 15. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
 
 ## 📚 参考链接
 
