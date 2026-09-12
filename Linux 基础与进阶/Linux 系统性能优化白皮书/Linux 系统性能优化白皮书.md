@@ -29,6 +29,8 @@
   - [📼 10. CPU Cache 缓存架构](#-10-cpu-cache-缓存架构)
   - [🏆 11. Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-11-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
   - [🥳 12. Linux 内存管理汇总](#-12-linux-内存管理汇总)
+    - [🔥 12.1 Linux 内核内存管理集锦](#-121-linux-内核内存管理集锦)
+    - [💪 12.2 Linux 内存管理全景图V2.0](#-122-linux-内存管理全景图v20)
   - [🆒 13. 基于 systemd 的系统性能优化示例](#-13-基于-systemd-的系统性能优化示例)
   - [🧬 14. eBPF 的 BCC 工具集运行示例](#-14-ebpf-的-bcc-工具集运行示例)
     - [14.1 BPF 编译器集合简介](#141-bpf-编译器集合简介)
@@ -331,8 +333,9 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 ## 🥳 12. Linux 内存管理汇总
 
-- 🔥 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
-- 💪 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
+### 🔥 12.1 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
+
+### 💪 12.2 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
 
 ## 🆒 13. 基于 systemd 的系统性能优化示例
 
