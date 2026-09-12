@@ -15,7 +15,7 @@
   - [🛠️ 2. Linux 常用系统性能监控工具](#️-2-linux-常用系统性能监控工具)
     - [2.1 Linux 性能观测性工具图谱](#21-linux-性能观测性工具图谱)
     - [2.2 Linux 静态性能工具图谱](#22-linux-静态性能工具图谱)
-    - [2.3 📐 Linux 系统性能优化探究：命令集锦](#23--linux-系统性能优化探究命令集锦)
+    - [2.3 Linux 系统性能优化探究：命令集锦](#23-linux-系统性能优化探究命令集锦)
   - [🚧 3. Linux 系统资源限制 CGroup](#-3-linux-系统资源限制-cgroup)
   - [🚀 4. Linux 性能分析工具之 Perf](#-4-linux-性能分析工具之-perf)
   - [🌰 5. kernel 相关软件包下载](#-5-kernel-相关软件包下载)
@@ -49,7 +49,7 @@
 
 <center><img src="images/linux-static-performance-tools.jpg" style="width:80%"></center>
 
-### 2.3 [📐 Linux 系统性能优化探究：命令集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6%20%E2%80%94%E2%80%94%20%E5%91%BD%E4%BB%A4%E9%9B%86%E9%94%A6.md)
+### 2.3 [Linux 系统性能优化探究：命令集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6%EF%BC%9A%E5%91%BD%E4%BB%A4%E9%9B%86%E9%94%A6.md)
 
 ## 🚧 3. [Linux 系统资源限制 CGroup](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
 
