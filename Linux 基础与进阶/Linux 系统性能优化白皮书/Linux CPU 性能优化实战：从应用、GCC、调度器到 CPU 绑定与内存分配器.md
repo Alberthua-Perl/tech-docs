@@ -1,4 +1,4 @@
-# Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器
+# 🏆 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器
 
 ## 文档说明
 
@@ -10,12 +10,17 @@ CPU 很少只是“不够快”，更多时候是缓存失效、锁竞争、上�
 
 ## 文档目录
 
-- [1. Application 调优：收益最大的优化](#1-application-调优收益最大的优化)
-- [2. GCC 编译器优化](#2-gcc-编译器优化)
-- [3. Linux Scheduler 调优](#3-linux-scheduler-调优)
-- [4. CPU Binding vs CPU Set](#4-cpu-binding-vs-cpu-set)
-- [5. Memory Allocator 优化](#5-memory-allocator-优化)
-- [总结与推荐检查清单](#总结与推荐检查清单)
+- [🏆 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
+  - [文档说明](#文档说明)
+  - [文档目录](#文档目录)
+  - [1. Application 调优：收益最大的优化](#1-application-调优收益最大的优化)
+  - [2. GCC 编译器优化](#2-gcc-编译器优化)
+  - [3. Linux Scheduler 调优](#3-linux-scheduler-调优)
+  - [4. CPU Binding vs CPU Set](#4-cpu-binding-vs-cpu-set)
+    - [CPU Binding（CPU Affinity）](#cpu-bindingcpu-affinity)
+    - [CPU Set（cpuset）](#cpu-setcpuset)
+  - [5. Memory Allocator 优化](#5-memory-allocator-优化)
+  - [总结与推荐检查清单](#总结与推荐检查清单)
 
 ## 1. Application 调优：收益最大的优化
 
