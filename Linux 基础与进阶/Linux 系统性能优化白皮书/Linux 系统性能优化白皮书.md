@@ -11,7 +11,6 @@
 - [⚗️ Linux 系统性能优化白皮书](#️-linux-系统性能优化白皮书)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [🔬 1. Linux 用户空间进程虚拟内存布局（layout）](#-1-linux-用户空间进程虚拟内存布局layout)
   - [🛠️ 2. Linux 常用系统性能监控工具](#️-2-linux-常用系统性能监控工具)
     - [2.1 Linux 性能观测性工具图谱](#21-linux-性能观测性工具图谱)
     - [2.2 Linux 静态性能工具图谱](#22-linux-静态性能工具图谱)
@@ -32,20 +31,19 @@
       - [6.4.3 Linux 进程调度优先级的分类](#643-linux-进程调度优先级的分类)
       - [6.4.4 Linux 中的上下文切换（context switch）](#644-linux-中的上下文切换context-switch)
       - [6.4.5 设置进程的调度选项](#645-设置进程的调度选项)
-      - [6.4.6 /proc 中的进程调度程序统计信息](#646-proc-中的进程调度程序统计信息)
     - [📼 6.5 CPU Cache 缓存架构](#-65-cpu-cache-缓存架构)
     - [🏆 6.6 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-66-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
   - [🪛 12. Linux 内存管理汇总](#-12-linux-内存管理汇总)
-    - [🔥 12.1 Linux 内核内存管理集锦](#-121-linux-内核内存管理集锦)
-    - [💪 12.2 Linux 内存管理全景图V2.0](#-122-linux-内存管理全景图v20)
+    - [🔬 12.1 Linux 用户空间进程虚拟内存布局（layout）](#-121-linux-用户空间进程虚拟内存布局layout)
+    - [🔥 12.2 Linux 内核内存管理集锦](#-122-linux-内核内存管理集锦)
+    - [💪 12.3 Linux 内存管理全景图V2.0](#-123-linux-内存管理全景图v20)
+  - [/proc 伪文件系统释义](#proc-伪文件系统释义)
   - [🆒 13. systemd drop-in 文件系统性能设置](#-13-systemd-drop-in-文件系统性能设置)
   - [🧬 14. eBPF 的 BCC 工具集运行示例](#-14-ebpf-的-bcc-工具集运行示例)
     - [14.1 BPF 编译器集合简介](#141-bpf-编译器集合简介)
     - [14.2 常见 BCC 工具](#142-常见-bcc-工具)
   - [⚕️ 15. Linux 磁盘性能测试：FIO \& smartctl](#️-15-linux-磁盘性能测试fio--smartctl)
   - [📚 参考链接](#-参考链接)
-
-## 🔬 1. [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
 
 ## 🛠️ 2. Linux 常用系统性能监控工具
 
@@ -256,12 +254,6 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 级。sched_setscheduler (2) man page 提供有关 sched_setscheduler() 和 sched_getscheduler() 系统调⽤的信息。
 - RHEL 为管理员提供了两种不同⽅法来配置和观察 **进程调度程序配置**： **`chrt`** 命令和 **`tuna`** 接⼝
 
-#### 6.4.6 /proc 中的进程调度程序统计信息
-
-/proc/sched_debug：包含所有内核可调项的当前值，它们会影响任务调度程序的⾏为、统计信息，以及与所有可⽤处理器上各种调度策略相关的运⾏队列信息。
-/proc/schedstat：显⽰与运⾏队列相关的统计信息。
-/proc/PID/sched：显⽰进程的调度信息，其中 PID 是进程 ID。
-
 ### 📼 6.5 CPU Cache 缓存架构
 
 所谓程序局部性原理，分两条：时间局部性（刚用过的数据很快还会再用）和空间局部性（用了某个地址，它旁边的地址大概率也会被用到）。正因为这两条规律，缓存这种"小而快"的设计才玩得转——把热数据留在上层，CPU 大多数时候都能命中，不必老跑主存。
@@ -375,9 +367,13 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 ## 🪛 12. Linux 内存管理汇总
 
-### 🔥 12.1 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
+### 🔬 12.1 [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
 
-### 💪 12.2 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
+### 🔥 12.2 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
+
+### 💪 12.3 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
+
+## [/proc 伪文件系统释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/proc%20%E4%BC%AA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E8%B7%AF%E5%BE%84%E8%AF%B4%E6%98%8E.md)
 
 ## 🆒 13. systemd drop-in 文件系统性能设置
 

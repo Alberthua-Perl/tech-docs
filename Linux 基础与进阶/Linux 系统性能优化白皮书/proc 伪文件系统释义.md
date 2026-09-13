@@ -1,20 +1,20 @@
-# /proc 伪文件系统路径说明
+# /proc 伪文件系统释义
 
 ## 文档目录
 
-- [/proc 伪文件系统路径说明](#proc-伪文件系统路径说明)
+- [/proc 伪文件系统释义](#proc-伪文件系统释义)
   - [文档目录](#文档目录)
-  - [Linux 内核参数帮助文档](#linux-内核参数帮助文档)
-  - [/proc 伪文件系统说明](#proc-伪文件系统说明)
-  - [sysctl 命令的常用方式](#sysctl-命令的常用方式)
-  - [/proc 中常用的子目录与子文件](#proc-中常用的子目录与子文件)
+  - [1. Linux 内核参数帮助文档](#1-linux-内核参数帮助文档)
+  - [2. /proc 伪文件系统说明](#2-proc-伪文件系统说明)
+  - [3. sysctl 命令的常用方式](#3-sysctl-命令的常用方式)
+  - [4. /proc 中常用的子目录与子文件](#4-proc-中常用的子目录与子文件)
 
-## Linux 内核参数帮助文档
+## 1. Linux 内核参数帮助文档
 
 - 内核源码参考：`linux-<version>/Documentation/sysctl`
 - 查看内核参数详细说明：`man 5 proc`
 
-## /proc 伪文件系统说明
+## 2. /proc 伪文件系统说明
 
 - 在内核启动过程中 proc 伪文件系统被挂载至 /proc。
 - 当加载静态内核，或后续加载动态内核模块或驱动程序时，会在 /proc 目录下自动创建文件。
@@ -34,7 +34,7 @@
         /etc/sysctl.conf
   ```
 
-## sysctl 命令的常用方式
+## 3. sysctl 命令的常用方式
 
 ```bash
 $ sudo sysctl -a
@@ -50,7 +50,7 @@ $ sudo sysctl -p /path/to/sysctl-conf
 # 加载指定的 sysctl 配置文件使内核参数永久生效。
 ```
 
-## /proc 中常用的子目录与子文件
+## 4. /proc 中常用的子目录与子文件
 
 | 路径 | 说明 |
 | ----- | ----- |
@@ -72,6 +72,9 @@ $ sudo sysctl -p /path/to/sysctl-conf
 | /proc/sys/kernel/osrelease | 查看系统发行版类型 |
 | /proc/sys/kernel/threads-max | 查看系统上支持的最大线程数量 |
 | /proc/filesystems | 查看系统已加载的文件系统类型 |
+| /proc/sched_debug | 包含所有内核可调项的当前值，它们会影响任务调度程序的⾏为、统计信息，以及与所有可⽤处理器上各种调度策略相关的运⾏队列信息。 |
+| /proc/schedstat | 显⽰与运⾏队列相关的统计信息。 |
+| /proc/*pid*/sched | 显⽰进程的调度信息，其中 PID 是进程 ID。 |
 
 ```bash
 $ sudo cat /etc/filesystems
