@@ -19,19 +19,26 @@
   - [🚧 3. Linux 系统资源限制 CGroup](#-3-linux-系统资源限制-cgroup)
   - [🚀 4. Linux 性能分析工具之 Perf](#-4-linux-性能分析工具之-perf)
   - [🌰 5. kernel 相关软件包下载](#-5-kernel-相关软件包下载)
-  - [⏱️ 6. 进程的调度与优先级](#️-6-进程的调度与优先级)
-  - [🧩 7. CPU 三大架构：SMP、NUMA 与 MPP](#-7-cpu-三大架构smpnuma-与-mpp)
-  - [⏳ 8. CPU 时钟周期、机器周期、指令周期的关系](#-8-cpu-时钟周期机器周期指令周期的关系)
-  - [💾 9. x86\_64 架构的常用寄存器示例](#-9-x86_64-架构的常用寄存器示例)
-    - [9.1 通用寄存器（General-Purpose Registers）](#91-通用寄存器general-purpose-registers)
-    - [9.2 程序计数器（Program Counter Registers, PC）](#92-程序计数器program-counter-registers-pc)
-    - [9.3 标志寄存器（Flags Registers）](#93-标志寄存器flags-registers)
-  - [📼 10. CPU Cache 缓存架构](#-10-cpu-cache-缓存架构)
-  - [🏆 11. Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-11-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
-  - [🥳 12. Linux 内存管理汇总](#-12-linux-内存管理汇总)
+  - [6. 优化 CPU 利用](#6-优化-cpu-利用)
+    - [🧩 6.1 CPU 三大架构：SMP、NUMA 与 MPP](#-61-cpu-三大架构smpnuma-与-mpp)
+    - [⏳ 6.2 CPU 时钟周期、机器周期、指令周期的关系](#-62-cpu-时钟周期机器周期指令周期的关系)
+    - [💾 6.3 x86\_64 架构的常用寄存器示例](#-63-x86_64-架构的常用寄存器示例)
+      - [6.3.1 通用寄存器（General-Purpose Registers）](#631-通用寄存器general-purpose-registers)
+      - [6.3.2 程序计数器（Program Counter Registers, PC）](#632-程序计数器program-counter-registers-pc)
+      - [6.3.3 标志寄存器（Flags Registers）](#633-标志寄存器flags-registers)
+    - [⏱️ 6.4 进程的调度与优先级](#️-64-进程的调度与优先级)
+      - [6.4.1 常用 CPU 调度 man 手册](#641-常用-cpu-调度-man-手册)
+      - [6.4.2 Linux 中的进程调度策略](#642-linux-中的进程调度策略)
+      - [6.4.3 Linux 进程调度优先级的分类](#643-linux-进程调度优先级的分类)
+      - [6.4.4 Linux 中的上下文切换（context switch）](#644-linux-中的上下文切换context-switch)
+      - [6.4.5 设置进程的调度选项](#645-设置进程的调度选项)
+      - [6.4.6 /proc 中的进程调度程序统计信息](#646-proc-中的进程调度程序统计信息)
+    - [📼 6.5 CPU Cache 缓存架构](#-65-cpu-cache-缓存架构)
+    - [🏆 6.6 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-66-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
+  - [🪛 12. Linux 内存管理汇总](#-12-linux-内存管理汇总)
     - [🔥 12.1 Linux 内核内存管理集锦](#-121-linux-内核内存管理集锦)
     - [💪 12.2 Linux 内存管理全景图V2.0](#-122-linux-内存管理全景图v20)
-  - [🆒 13. 基于 systemd 的系统性能优化示例](#-13-基于-systemd-的系统性能优化示例)
+  - [🆒 13. systemd drop-in 文件系统性能设置](#-13-systemd-drop-in-文件系统性能设置)
   - [🧬 14. eBPF 的 BCC 工具集运行示例](#-14-ebpf-的-bcc-工具集运行示例)
     - [14.1 BPF 编译器集合简介](#141-bpf-编译器集合简介)
     - [14.2 常见 BCC 工具](#142-常见-bcc-工具)
@@ -63,88 +70,9 @@
 - 与系统诊断与优化的部分工具依赖内核的版本，如 perf、SystemTap 等，因此在使用此类工具时需安装内核相关的软件包，并且其版本必须与当前系统内核完全一致。
 - 相关的内核软件包安装可参考 [How can I download or install kernel debuginfo packages for RHEL systems?](https://access.redhat.com/solutions/9907#masthead)
 
-## ⏱️ 6. 进程的调度与优先级
+## 6. 优化 CPU 利用
 
-- `man 7 sched` 命令查看进程调度的策略与系统调用
-- Linux 中的进程调度策略：  
-  - 实时调度策略（real-time scheduling policy）
-    - 由实时调度策略调度的进程需在限制的时间内完成任务，常见的策略有 `FF`。
-    - 实时调度的进程比非实时调度的进程获得更多的 CPU 使用时间，由于其需要在有限的时间内完成并返回。  
-  - 非实时调度策略（non-real-time scheduling policy）
-    常见的策略有 `TS`
-- Linux 进程调度优先级的分类：
-  
-  <center><img src="images/linux-process-priorities.jpg" style="width:80%"></center>
-  
-  - 系统优先级（system priority）  
-  - 实时优先级（real-time priority）  
-  - 过时的优先级（obsolete priority）：`/ˈɒbsəliːt/`
-    该优先级类型为 `BSD` 风格类型，使用 ps 命令的 `l` 选项查看，其优先级的值与 `pri` 选项不同。
-- Linux 中的上下文切换（context switch）：
-  - 上下文切换的过程：
-
-    <center><img src="images/linux-context-switch-1.png" style="width:80%"></center>
-
-    <center><img src="images/linux-context-switch-2.png" style="width:80%"></center>
-
-    - 当一个程序正在执行的过程中，中断（interrupt）或系统调用（system call）发生可以使得 CPU 的控制权从当前进程转移到操作系统内核。
-    - 操作系统内核负责保存进程 $P_1$ 在 CPU 中的上下文到 $PCB_1$（PCB 即为进程的 `task_struct` 结构体）中。
-    - 从 $PCB_2$ 取出进程 $P_2$ 的 CPU 上下文，将 CPU 控制权转移给进程 $P_2$， 开始执行进程 $P_2$ 的指令。  
-  - 发生上下文切换的 3 中场景：
-    - 1️⃣ 进程无法运行下去：
-      如等待 io 完成，或者等待某个资源、某个事件等。
-    - 2️⃣ 进程仍在运行，但内核不让它继续使用 CPU：
-      如进程的时间片用完，或者优先级更高的进程抢占，因此该进程必须交出 CPU 的使用权。
-    - 3️⃣ 进程还可运行，但其自身的算法决定主动交出 CPU 于别的进程：
-      用户程序可以通过系统调用 `sched_yield()` 来交出 CPU，内核则可以通过函数 `cond_resched()` 或者 `yield()` 来做到。
-  - 上下文切换又可分为：
-    - 自愿上下文切换（voluntary /ˈvɒləntri/）
-    - 非自愿上下文切换（involuntary）或强制切换 
-  > 自愿上下文切换时进程不再处于运行状态，而非自愿上下文切换时进程仍处于运行状态。
-  - 以上场景 1️⃣ 属于自愿上下文切换，而场景 2️⃣ 与 3️⃣ 属于非自愿上下文切换。
-- ps 命令常用参数示例：
-  
-  ```bash
-  $ sudo ps axo pid,pri,rtprio,ni,cls,cputime,psr,comm
-      PID PRI RTPRio  NI CLS     TIME PSR COMMAND
-        1  19      -   0  TS 00:00:10   0 systemd
-        2  19      -   0  TS 00:00:00   1 kthreadd
-        3  39      - -20  TS 00:00:00   0 rcu_gp
-        4  39      - -20  TS 00:00:00   0 rcu_par_gp
-        6  39      - -20  TS 00:00:00   0 kworker/0:0H-kblockd
-        8  39      - -20  TS 00:00:00   0 mm_percpu_wq
-        9  19      -   0  TS 00:00:00   0 ksoftirqd/0
-       10  19      -   0  TS 00:00:01   1 rcu_sched
-       11 139     99   -  FF 00:00:00   0 migration/0
-       12 139     99   -  FF 00:00:00   0 watchdog/0
-       13  19      -   0  TS 00:00:00   0 cpuhp/0
-       14  19      -   0  TS 00:00:00   1 cpuhp/1
-       15 139     99   -  FF 00:00:00   1 watchdog/1
-       16 139     99   -  FF 00:00:00   1 migration/1 
-       ...
-       1677  19      -   0  TS 00:00:00   1 nginx
-       1678  19      -   0  TS 00:00:00   0 nginx
-       1679  19      -   0  TS 00:00:00   1 nginx
-       ...
-  # 查看系统所有进程的 PID、系统优先级、实时优先级、nice 值、cls 调度策略、
-  # CPU 实际使用时间（realtime）、进程当前被分配的逻辑 CPU 与对应的命令
-  
-  $ cat /proc/<pid>/status
-    ...
-    voluntary_ctxt_switches:        1  # 自愿上下文切换数目
-    nonvoluntary_ctxt_switches:     4  # 非自愿上下文切换数目
-  # voluntary_ctxt_switches, nonvoluntary_ctxt_switches: since Linux 2.6.23
-  # 以上数目是进程被调度运行后的累加值
-  # 注意：
-  #   自愿上下文切换数目占多数说明进程相对 CPU 的资源需求不高，而非自愿上下文切换数目较多
-  #   的话，需考虑其对 CPU 的资源需求可能存在瓶颈，被内核强制调度切换。
-  ```
-  
-  从上述 ps 命令的输出中可知：  
-  - CLS 调度策略为 TS（SCHED_NORMAL）的进程不具有实时优先级（RTPRio）
-  - ✨ 进程具有最高的实时优先级（99）而具有最低的系统优先级（139）彼此间不矛盾，因为实时优先级是进程在限定时间内需完成的任务可，需抢占 CPU 资源快速完成任务，而任务完成后不再占用 CPU 资源具有较低的系统的优先级，此类进程通常为内核进程。
-
-## 🧩 7. CPU 三大架构：SMP、NUMA 与 MPP
+### 🧩 6.1 CPU 三大架构：SMP、NUMA 与 MPP
 
 - `SMP`（Symmetric /sɪˈmetrɪk/ Multiprocessing，对称多处理器），顾名思义, 在 SMP 中所有的处理器都是对等的, 它们通过总线连接共享同一块物理内存，这也就导致了系统中所有资源（CPU、内存、io 等）都是共享的。当打开服务器的背板盖，如果发现有多个 CPU 的槽位，但是却连接到同一个内存插槽的位置，那一般就是 SMP 架构的服务器。日常中常见的 PC、笔记本、手机还有一些老旧的服务器都是此架构，其架构简单，但是拓展性能较差。SMP 架构在 Linux 中如下所示：
 
@@ -158,7 +86,7 @@
 
 - `MPP`（Massive Parallel Processing），这个可以理解为刀片服务器，每个刀扇里的都是一台独立的 SMP 架构服务器，且每个刀扇之间均有高性能的网络设备进行交互，保证 SMP 服务器之间的数据传输性能。相比 NUMA 来说更适合大规模的计算，唯一不足的是，当其中的 SMP 节点增多的情况下，与之对应的计算管理系统也需要相对应的提高。
 
-## ⏳ 8. CPU 时钟周期、机器周期、指令周期的关系
+### ⏳ 6.2 CPU 时钟周期、机器周期、指令周期的关系
 
 > 注意：以下描述对 8/16 位经典 CPU（8085/8051/8086）准确，但对现代 x86-64/ARM 已过时；现代 CPU 只有 **时钟周期** 是固定基准，指令延迟高度可变，"机器周期" 概念被 **流水线阶段 + 乱序调度** 取代。
 
@@ -193,11 +121,11 @@
   
   <center><img src="images/three-cycle-relationship.jpg" style="width:80%"></center>
 
-## 💾 9. x86_64 架构的常用寄存器示例
+### 💾 6.3 x86_64 架构的常用寄存器示例
 
 x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本不同的寄存器。
 
-### 9.1 通用寄存器（General-Purpose Registers）
+#### 6.3.1 通用寄存器（General-Purpose Registers）
   
 | 名称 | 功能 |
 | ----- | ----- |
@@ -211,13 +139,13 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 | **<font color=orange>RSP</font>** (Stack Pointer Register) | **栈指针寄存器**。始终指向当前栈顶，用于函数调用、参数传递、局部变量分配等。 |
 | **R8–R15** | 新增的 8 个通用寄存器。没有特殊用途，主要用于存放通用数据，减少寄存器压力，提高性能。 |
 
-### 9.2 程序计数器（Program Counter Registers, PC）
+#### 6.3.2 程序计数器（Program Counter Registers, PC）
 
 | 名称 | 功能 |
 | ----- | ----- |
 | **<font color=orange>RIP</font>** (Instruction Pointer Register) | 下一条指令的虚拟内存地址 |
 
-### 9.3 标志寄存器（Flags Registers）
+#### 6.3.3 标志寄存器（Flags Registers）
 
 - RFlags (Flags Register)：存储 CPU 状态的二进制标志，包含了 x86_32 架构中的 EFlags 寄存器。  
 - 控制寄存器 (Control Registers)：
@@ -228,22 +156,128 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
   - CR8 (Control Register 8)：用于控制中断的优先级。
 - 在 x86_64 架构中，32 位的寄存器名称的前缀由 E 改为 R，如，RAX、RBX、RCX 等。此外，x86_64 架构还引入了 8 个新增的通用寄存器 R8-R15。这些寄存器的作用和 32 位的通用寄存器一样，可以用于存储数据和进行各种运算。
 
-## 📼 10. CPU Cache 缓存架构
+### ⏱️ 6.4 进程的调度与优先级
+
+#### 6.4.1 常用 CPU 调度 man 手册
+
+- **`sched (7)`**：查看 CPU 调度总览（含系统调用、调度策略等）
+- `sched_setscheduler (2)`：设置与获取调度策略与参数
+- `systemd.exec (5)`：systemd 执行环境配置文档
+- `chrt (1)`：操作进程实时调度属性
+- `tuna (8)`：更改应用与内核线程属性
+
+#### 6.4.2 Linux 中的进程调度策略
+
+| 类别 | 内核源代码 | 策略 |
+| ----- | ----- | ----- |
+| 实时调度程序 | `linux/kernel/sched/rt.c` | SCHED_FIFO <br> SCHED_RR |
+| 完全公平调度程序（CFS） | `linux/kernel/sched/fair.c` | SCHED_NORMAL（也称为 SCHED_OTHER）<br> SCHED_BATCH <br> SCHED_IDLE |
+| 截⽌时间调度程序 | `linux/kernel/sched/deadline.c` | SCHED_DEADLINE |
+
+实时调度策略（real-time scheduling policy）：
+
+- 由实时调度策略调度的进程需在限制的时间内完成任务，常见的策略有 **`FF`**。
+- 实时调度的进程比非实时调度的进程获得更多的 CPU 使用时间，由于其需要在有限的时间内完成并返回。
+
+非实时调度策略（non-real-time scheduling policy）：常见的策略有 **`TS`**
+
+#### 6.4.3 Linux 进程调度优先级的分类
+  
+<center><img src="images/linux-process-priorities.jpg" style="width:80%"></center>
+  
+- 系统优先级（system priority）  
+- 实时优先级（real-time priority）  
+- 过时的优先级（obsolete priority）：`/ˈɒbsəliːt/`，该优先级类型为 `BSD` 风格类型，使用 ps 命令的 `l` 选项查看，其优先级的值与 `pri` 选项不同。
+
+#### 6.4.4 Linux 中的上下文切换（context switch）
+
+- 上下文切换的过程：
+
+  <center><img src="images/linux-context-switch-1.png" style="width:80%"></center>
+
+  <center><img src="images/linux-context-switch-2.png" style="width:80%"></center>
+
+  - 当一个程序正在执行的过程中，中断（interrupt）或系统调用（system call）发生可以使得 CPU 的控制权从当前进程转移到操作系统内核。
+  - 操作系统内核负责保存进程 $P_1$ 在 CPU 中的上下文到 $PCB_1$（PCB 即为进程的 `task_struct` 结构体）中。
+  - 从 $PCB_2$ 取出进程 $P_2$ 的 CPU 上下文，将 CPU 控制权转移给进程 $P_2$， 开始执行进程 $P_2$ 的指令。  
+- 发生上下文切换的 3 中场景：
+  - 1️⃣ 进程无法运行下去：如等待 io 完成，或者等待某个资源、某个事件等。
+  - 2️⃣ 进程仍在运行，但内核不让它继续使用 CPU：如进程的时间片用完，或者优先级更高的进程抢占，因此该进程必须交出 CPU 的使用权。
+  - 3️⃣ 进程还可运行，但其自身的算法决定主动交出 CPU 于别的进程：用户程序可以通过系统调用 `sched_yield()` 来交出 CPU，内核则可以通过函数 `cond_resched()` 或者 `yield()` 来做到。
+- 上下文切换又可分为：
+  - 自愿上下文切换（voluntary /ˈvɒləntri/）
+  - 非自愿上下文切换（involuntary）或强制切换：自愿上下文切换时进程不再处于运行状态，而非自愿上下文切换时进程仍处于运行状态。
+  - 以上场景 1️⃣ 属于自愿上下文切换，而场景 2️⃣ 与 3️⃣ 属于非自愿上下文切换。
+  
+    ```bash
+    $ sudo ps axo pid,pri,rtprio,ni,cls,cputime,psr,comm
+      PID PRI RTPRio  NI CLS     TIME PSR COMMAND
+        1  19      -   0  TS 00:00:10   0 systemd
+        2  19      -   0  TS 00:00:00   1 kthreadd
+        3  39      - -20  TS 00:00:00   0 rcu_gp
+        4  39      - -20  TS 00:00:00   0 rcu_par_gp
+        6  39      - -20  TS 00:00:00   0 kworker/0:0H-kblockd
+        8  39      - -20  TS 00:00:00   0 mm_percpu_wq
+        9  19      -   0  TS 00:00:00   0 ksoftirqd/0
+       10  19      -   0  TS 00:00:01   1 rcu_sched
+       11 139     99   -  FF 00:00:00   0 migration/0
+       12 139     99   -  FF 00:00:00   0 watchdog/0
+       13  19      -   0  TS 00:00:00   0 cpuhp/0
+       14  19      -   0  TS 00:00:00   1 cpuhp/1
+       15 139     99   -  FF 00:00:00   1 watchdog/1
+       16 139     99   -  FF 00:00:00   1 migration/1 
+       ...
+       1677  19      -   0  TS 00:00:00   1 nginx
+       1678  19      -   0  TS 00:00:00   0 nginx
+       1679  19      -   0  TS 00:00:00   1 nginx
+       ...
+    # 查看系统所有进程的 PID、系统优先级、实时优先级、nice 值、cls 调度策略、
+    # CPU 实际使用时间（realtime）、进程当前被分配的逻辑 CPU 与对应的命令
+
+    $ cat /proc/<pid>/status
+      ...
+      voluntary_ctxt_switches:        1  # 自愿上下文切换数目
+      nonvoluntary_ctxt_switches:     4  # 非自愿上下文切换数目
+    # voluntary_ctxt_switches, nonvoluntary_ctxt_switches: since Linux 2.6.23
+    # 以上数目是进程被调度运行后的累加值
+    # 注意：
+    #   自愿上下文切换数目占多数说明进程相对 CPU 的资源需求不高，而非自愿上下文切换数目较多
+    #   的话，需考虑其对 CPU 的资源需求可能存在瓶颈，被内核强制调度切换。
+    ```
+  
+  从上述 ps 命令的输出中可知：  
+  - CLS 调度策略为 TS（SCHED_NORMAL）的进程不具有实时优先级（RTPRio）
+  - ✨ 进程具有最高的实时优先级（99）而具有最低的系统优先级（139）彼此间不矛盾，因为实时优先级是进程在限定时间内需完成的任务可，需抢占 CPU 资源快速完成任务，而任务完成后不再占用 CPU 资源具有较低的系统的优先级，此类进程通常为内核进程。
+
+#### 6.4.5 设置进程的调度选项
+
+- Linux 为管理调度程序参数提供了⼀系列系统调⽤，其允许操作进程优先级、调度策略和处理器关联，从⽽将处理器让给其他任务。
+- 应⽤以编程⽅式使⽤  **`sched_setscheduler()`** 和 **`sched_getscheduler()`** 系统调⽤来设置和获取指定调度策略和进程的实时优先
+级。sched_setscheduler (2) man page 提供有关 sched_setscheduler() 和 sched_getscheduler() 系统调⽤的信息。
+- RHEL 为管理员提供了两种不同⽅法来配置和观察 **进程调度程序配置**： **`chrt`** 命令和 **`tuna`** 接⼝
+
+#### 6.4.6 /proc 中的进程调度程序统计信息
+
+/proc/sched_debug：包含所有内核可调项的当前值，它们会影响任务调度程序的⾏为、统计信息，以及与所有可⽤处理器上各种调度策略相关的运⾏队列信息。
+/proc/schedstat：显⽰与运⾏队列相关的统计信息。
+/proc/PID/sched：显⽰进程的调度信息，其中 PID 是进程 ID。
+
+### 📼 6.5 CPU Cache 缓存架构
 
 所谓程序局部性原理，分两条：时间局部性（刚用过的数据很快还会再用）和空间局部性（用了某个地址，它旁边的地址大概率也会被用到）。正因为这两条规律，缓存这种"小而快"的设计才玩得转——把热数据留在上层，CPU 大多数时候都能命中，不必老跑主存。
 
 - 计算机存储体系整体分层示意：
   
-  <center><img src="images/compute-storage-arch.jpg" style="width:80%"></center>
+  <center><img src="images/compute-storage-arch.jpg" style="width:60%"></center>
 
 - CPU Cache 缓存架构拓扑示例：  
   使用 `lstopo` 命令以获取如下拓扑，分别来自于 Intel Core i5 与 i7 处理器。
   
-  <center><img src="images/foundation0-cpu-topo.png" style="width:80%"></center>
+  <center><img src="images/foundation0-cpu-topo.png" style="width:60%"></center>
   
-  <center><img src="images/lenovo-t580-cpu-cache-topo.png" style="width:80%"></center>
+  <center><img src="images/lenovo-t580-cpu-cache-topo.png" style="width:60%"></center>
   
-  <center><img src="images/dell-poweredge-r720-cpu-topo.png" style="width:80%"></center>
+  <center><img src="images/dell-poweredge-r720-cpu-topo.png" style="width:60%"></center>
   
   ```bash
   $ sudo yum install -y hwloc-gui
@@ -329,15 +363,23 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
   
   从测试结果可知 cache1 的 L1 数据写缓存未命中率（6.2%）明显低于 cache2 的（100.0%），其原因在于 CPU Cache 缓存以缓存行（Cache line）的方式进行存储，先定义行再以列进行递增的效率更高。
 
-## 🏆 11. [Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8.md)
+- perf 命令测试程序的 CPU 缓存命中率：
+  
+  ```bash
+  $ sudo perf stat -e instructions,cycles, \
+    L1-dcache-loads,L1-dcache-load-misses,LLC-load-misses,LLC-loads \
+    <application_name>
+  ```
 
-## 🥳 12. Linux 内存管理汇总
+### 🏆 6.6 [Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8.md)
+
+## 🪛 12. Linux 内存管理汇总
 
 ### 🔥 12.1 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
 
 ### 💪 12.2 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
 
-## 🆒 13. 基于 systemd 的系统性能优化示例
+## 🆒 13. systemd drop-in 文件系统性能设置
 
 - CGgroup 资源控制
 - 进程调度策略与优先级设置
@@ -378,4 +420,5 @@ $ sudo ls /usr/share/bcc/tools
 - ❤️ [Linux kernel profiling with perf](https://perf.wiki.kernel.org/index.php/Tutorial)
 - [Linux 性能分析工具 Perf 简介](https://segmentfault.com/a/1190000021465563)
 - [进程切换：自愿 (voluntary) 与强制 (involuntary)](http://linuxperf.com/?p=209)
+- [Deadline scheduling part 1 — overview and theory | LWN.net](https://lwn.net/Articles/743740/)
 - 🐝 [什么是 eBPF ？| eBPF 文档](https://ebpf.io/zh-hans/what-is-ebpf/)
