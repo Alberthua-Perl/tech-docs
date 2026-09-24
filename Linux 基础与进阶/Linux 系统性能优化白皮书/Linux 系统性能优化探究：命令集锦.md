@@ -175,6 +175,18 @@ $ top -p pid1,pid2,...
 - `Shift + N`：根据 `PID` 从大到小排序
 - `Shift + T`：根据 `TIME+` 的 CPU 使用时间从大到小排序
 - 💥 交互模式中的 `F` 键可选择更多的显示选项并用于排序
+- top 命令返回参数释义：
+
+  | 类型 | 具体含义 |
+  | ----- | ----- |
+  | us | User，用户态 CPU 时间，不包括低优先级进程的用户态时间（nice 值 1-19） |
+  | sys | System，内核态 CPU 时间 |
+  | ni | Nice，nice 值 1-19 的进程用户态 CPU 时间 |
+  | id | Idle，系统空闲 CPU 时间 |
+  | wa | IO Wait，系统等待 I/O 的 CPU 时间，这个时间不计入进程 CPU 时间 |
+  | hi | Hardware IRQ，处理硬中断的时间，这个时间不计入进程 CPU 时间 |
+  | si | Soft IRQ，处理软中断的时间，这个时间不计入进程 CPU 时间 |
+  | st | Steal，表示同一个宿主机上的其他虚拟机抢走的 CPU 时间 |
 
 ### 3.2 非交互模式
 
@@ -808,6 +820,7 @@ pmlogger 启动后只在 `/var/lib/pcp/config/pmlogger/config.default`（pmlogge
 
 ### 8.6 PCP 参考文档说明
 
+- [PCP Quick Reference Guide](https://pcp.readthedocs.io/en/latest/QG/QuickReferenceGuide.html)
 - 💪 [Index of Performance Co-Pilot (PCP) articles, solutions, tutorials and white papers](https://access.redhat.com/articles/1145953)
 - ☺️ [Performance Co-Pilot (PCP) Data Sheet](https://access.redhat.com/articles/3119481)
 - [How do I install Performance Co-Pilot (PCP) on my RHEL server to capture performance logs](https://access.redhat.com/solutions/1137023)

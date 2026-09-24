@@ -3,74 +3,73 @@
 ## 文档说明
 
 - 以下示例均在 RHEL 8 中验证实现，若针对其他 Linux 发行版请自行测试。
-- 该文档用于描述 Linux 中常用的系统监控与性能优化工具的功能与使用场景。
-- 此文档在实践过程中将不断丰富及改进。
+- 此文档用于描述 Linux 中常用的系统监控与性能优化工具的功能与使用场景。
 
 ## 文档目录
 
 - [⚗️ Linux 系统性能优化白皮书](#️-linux-系统性能优化白皮书)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
-  - [🛠️ 2. Linux 常用系统性能监控工具](#️-2-linux-常用系统性能监控工具)
-    - [2.1 Linux 性能观测性工具图谱](#21-linux-性能观测性工具图谱)
-    - [2.2 Linux 静态性能工具图谱](#22-linux-静态性能工具图谱)
-    - [📐 2.3 Linux 系统性能优化探究：命令集锦](#-23-linux-系统性能优化探究命令集锦)
-  - [🚧 3. Linux 系统资源限制 CGroup](#-3-linux-系统资源限制-cgroup)
-  - [🚀 4. Linux 性能分析工具之 Perf](#-4-linux-性能分析工具之-perf)
-  - [🌰 5. kernel 相关软件包下载](#-5-kernel-相关软件包下载)
-  - [6. 优化 CPU 利用](#6-优化-cpu-利用)
-    - [🧩 6.1 CPU 三大架构：SMP、NUMA 与 MPP](#-61-cpu-三大架构smpnuma-与-mpp)
-    - [⏳ 6.2 CPU 时钟周期、机器周期、指令周期的关系](#-62-cpu-时钟周期机器周期指令周期的关系)
-    - [💾 6.3 x86\_64 架构的常用寄存器示例](#-63-x86_64-架构的常用寄存器示例)
-      - [6.3.1 通用寄存器（General-Purpose Registers）](#631-通用寄存器general-purpose-registers)
-      - [6.3.2 程序计数器（Program Counter Registers, PC）](#632-程序计数器program-counter-registers-pc)
-      - [6.3.3 标志寄存器（Flags Registers）](#633-标志寄存器flags-registers)
-    - [⏱️ 6.4 进程的调度与优先级](#️-64-进程的调度与优先级)
-      - [6.4.1 常用 CPU 调度 man 手册](#641-常用-cpu-调度-man-手册)
-      - [6.4.2 Linux 中的进程调度策略](#642-linux-中的进程调度策略)
-      - [6.4.3 Linux 进程调度优先级的分类](#643-linux-进程调度优先级的分类)
-      - [6.4.4 Linux 中的上下文切换（context switch）](#644-linux-中的上下文切换context-switch)
-      - [6.4.5 设置进程的调度选项](#645-设置进程的调度选项)
-    - [📼 6.5 CPU Cache 缓存架构](#-65-cpu-cache-缓存架构)
-    - [🏆 6.6 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-66-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
-  - [🪛 12. Linux 内存管理汇总](#-12-linux-内存管理汇总)
-    - [🔬 12.1 Linux 用户空间进程虚拟内存布局（layout）](#-121-linux-用户空间进程虚拟内存布局layout)
-    - [🔥 12.2 Linux 内核内存管理集锦](#-122-linux-内核内存管理集锦)
-    - [💪 12.3 Linux 内存管理全景图V2.0](#-123-linux-内存管理全景图v20)
-  - [/proc 伪文件系统释义](#proc-伪文件系统释义)
-  - [🆒 13. systemd drop-in 文件系统性能设置](#-13-systemd-drop-in-文件系统性能设置)
-  - [🧬 14. eBPF 的 BCC 工具集运行示例](#-14-ebpf-的-bcc-工具集运行示例)
-    - [14.1 BPF 编译器集合简介](#141-bpf-编译器集合简介)
-    - [14.2 常见 BCC 工具](#142-常见-bcc-工具)
-  - [⚕️ 15. Linux 磁盘性能测试：FIO \& smartctl](#️-15-linux-磁盘性能测试fio--smartctl)
+  - [🛠️ 1. Linux 常用系统性能监控工具](#️-1-linux-常用系统性能监控工具)
+    - [1.1 Linux 性能观测性工具图谱](#11-linux-性能观测性工具图谱)
+    - [1.2 Linux 静态性能工具图谱](#12-linux-静态性能工具图谱)
+    - [📐 1.3 Linux 系统性能优化探究：命令集锦](#-13-linux-系统性能优化探究命令集锦)
+  - [🚧 2. Linux 系统资源限制 CGroup](#-2-linux-系统资源限制-cgroup)
+  - [🚀 3. Linux 性能分析工具之 Perf](#-3-linux-性能分析工具之-perf)
+  - [🌰 4. kernel 相关软件包下载](#-4-kernel-相关软件包下载)
+  - [5. 优化 CPU 利用](#5-优化-cpu-利用)
+    - [🧩 5.1 CPU 三大架构：SMP、NUMA 与 MPP](#-51-cpu-三大架构smpnuma-与-mpp)
+    - [⏳ 5.2 CPU 时钟周期、机器周期、指令周期的关系](#-52-cpu-时钟周期机器周期指令周期的关系)
+    - [💾 5.3 x86\_64 架构的常用寄存器示例](#-53-x86_64-架构的常用寄存器示例)
+      - [5.3.1 通用寄存器（General-Purpose Registers）](#531-通用寄存器general-purpose-registers)
+      - [5.3.2 程序计数器（Program Counter Registers, PC）](#532-程序计数器program-counter-registers-pc)
+      - [5.3.3 标志寄存器（Flags Registers）](#533-标志寄存器flags-registers)
+    - [⏱️ 5.4 进程的调度与优先级](#️-54-进程的调度与优先级)
+      - [5.4.1 常用 CPU 调度 man 手册](#541-常用-cpu-调度-man-手册)
+      - [5.4.2 Linux 中的进程调度策略](#542-linux-中的进程调度策略)
+      - [5.4.3 Linux 进程调度优先级的分类](#543-linux-进程调度优先级的分类)
+      - [5.4.4 Linux 中的上下文切换（context switch）](#544-linux-中的上下文切换context-switch)
+      - [5.4.5 设置进程的调度选项](#545-设置进程的调度选项)
+    - [📼 5.5 CPU Cache 缓存架构](#-55-cpu-cache-缓存架构)
+    - [🏆 5.6 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-56-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
+  - [🪛 6. 调优内存使用](#-6-调优内存使用)
+    - [🔬 6.1 Linux 用户空间进程虚拟内存布局（layout）](#-61-linux-用户空间进程虚拟内存布局layout)
+    - [🔥 6.2 Linux 内核内存管理集锦](#-62-linux-内核内存管理集锦)
+    - [💪 6.3 Linux 内存管理全景图V2.0](#-63-linux-内存管理全景图v20)
+  - [💡 7. /proc 伪文件系统释义](#-7-proc-伪文件系统释义)
+  - [🆒 8. systemd drop-in 文件系统性能设置](#-8-systemd-drop-in-文件系统性能设置)
+  - [🧬 9. eBPF 的 BCC 工具集运行示例](#-9-ebpf-的-bcc-工具集运行示例)
+    - [9.1 BPF 编译器集合简介](#91-bpf-编译器集合简介)
+    - [9.2 常见 BCC 工具](#92-常见-bcc-工具)
+  - [⚕️ 10. Linux 磁盘性能测试：FIO \& smartctl](#️-10-linux-磁盘性能测试fio--smartctl)
   - [📚 参考链接](#-参考链接)
 
-## 🛠️ 2. Linux 常用系统性能监控工具
+## 🛠️ 1. Linux 常用系统性能监控工具
 
 > 📜 以下命令均可使用 man 命令查询详尽的使用说明
 
-### 2.1 Linux 性能观测性工具图谱
+### 1.1 Linux 性能观测性工具图谱
 
 <center><img src="images/linux-performance-observability.jpg" style="width:80%"></center>
 
-### 2.2 Linux 静态性能工具图谱
+### 1.2 Linux 静态性能工具图谱
 
 <center><img src="images/linux-static-performance-tools.jpg" style="width:80%"></center>
 
-### 📐 2.3 [Linux 系统性能优化探究：命令集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6%EF%BC%9A%E5%91%BD%E4%BB%A4%E9%9B%86%E9%94%A6.md)
+### 📐 1.3 [Linux 系统性能优化探究：命令集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%8E%A2%E7%A9%B6%EF%BC%9A%E5%91%BD%E4%BB%A4%E9%9B%86%E9%94%A6.md)
 
-## 🚧 3. [Linux 系统资源限制 CGroup](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
+## 🚧 2. [Linux 系统资源限制 CGroup](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6/Linux%20%E7%B3%BB%E7%BB%9F%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6.md)
 
-## 🚀 4. [Linux 性能分析工具之 Perf](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf.md)
+## 🚀 3. [Linux 性能分析工具之 Perf](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf/Linux%20%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B9%8B%20perf.md)
 
-## 🌰 5. kernel 相关软件包下载
+## 🌰 4. kernel 相关软件包下载
 
 - 与系统诊断与优化的部分工具依赖内核的版本，如 perf、SystemTap 等，因此在使用此类工具时需安装内核相关的软件包，并且其版本必须与当前系统内核完全一致。
 - 相关的内核软件包安装可参考 [How can I download or install kernel debuginfo packages for RHEL systems?](https://access.redhat.com/solutions/9907#masthead)
 
-## 6. 优化 CPU 利用
+## 5. 优化 CPU 利用
 
-### 🧩 6.1 CPU 三大架构：SMP、NUMA 与 MPP
+### 🧩 5.1 CPU 三大架构：SMP、NUMA 与 MPP
 
 - `SMP`（Symmetric /sɪˈmetrɪk/ Multiprocessing，对称多处理器），顾名思义, 在 SMP 中所有的处理器都是对等的, 它们通过总线连接共享同一块物理内存，这也就导致了系统中所有资源（CPU、内存、io 等）都是共享的。当打开服务器的背板盖，如果发现有多个 CPU 的槽位，但是却连接到同一个内存插槽的位置，那一般就是 SMP 架构的服务器。日常中常见的 PC、笔记本、手机还有一些老旧的服务器都是此架构，其架构简单，但是拓展性能较差。SMP 架构在 Linux 中如下所示：
 
@@ -84,7 +83,7 @@
 
 - `MPP`（Massive Parallel Processing），这个可以理解为刀片服务器，每个刀扇里的都是一台独立的 SMP 架构服务器，且每个刀扇之间均有高性能的网络设备进行交互，保证 SMP 服务器之间的数据传输性能。相比 NUMA 来说更适合大规模的计算，唯一不足的是，当其中的 SMP 节点增多的情况下，与之对应的计算管理系统也需要相对应的提高。
 
-### ⏳ 6.2 CPU 时钟周期、机器周期、指令周期的关系
+### ⏳ 5.2 CPU 时钟周期、机器周期、指令周期的关系
 
 > 注意：以下描述对 8/16 位经典 CPU（8085/8051/8086）准确，但对现代 x86-64/ARM 已过时；现代 CPU 只有 **时钟周期** 是固定基准，指令延迟高度可变，"机器周期" 概念被 **流水线阶段 + 乱序调度** 取代。
 
@@ -119,11 +118,11 @@
   
   <center><img src="images/three-cycle-relationship.jpg" style="width:80%"></center>
 
-### 💾 6.3 x86_64 架构的常用寄存器示例
+### 💾 5.3 x86_64 架构的常用寄存器示例
 
 x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本不同的寄存器。
 
-#### 6.3.1 通用寄存器（General-Purpose Registers）
+#### 5.3.1 通用寄存器（General-Purpose Registers）
   
 | 名称 | 功能 |
 | ----- | ----- |
@@ -137,13 +136,13 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 | **<font color=orange>RSP</font>** (Stack Pointer Register) | **栈指针寄存器**。始终指向当前栈顶，用于函数调用、参数传递、局部变量分配等。 |
 | **R8–R15** | 新增的 8 个通用寄存器。没有特殊用途，主要用于存放通用数据，减少寄存器压力，提高性能。 |
 
-#### 6.3.2 程序计数器（Program Counter Registers, PC）
+#### 5.3.2 程序计数器（Program Counter Registers, PC）
 
 | 名称 | 功能 |
 | ----- | ----- |
 | **<font color=orange>RIP</font>** (Instruction Pointer Register) | 下一条指令的虚拟内存地址 |
 
-#### 6.3.3 标志寄存器（Flags Registers）
+#### 5.3.3 标志寄存器（Flags Registers）
 
 - RFlags (Flags Register)：存储 CPU 状态的二进制标志，包含了 x86_32 架构中的 EFlags 寄存器。  
 - 控制寄存器 (Control Registers)：
@@ -154,9 +153,9 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
   - CR8 (Control Register 8)：用于控制中断的优先级。
 - 在 x86_64 架构中，32 位的寄存器名称的前缀由 E 改为 R，如，RAX、RBX、RCX 等。此外，x86_64 架构还引入了 8 个新增的通用寄存器 R8-R15。这些寄存器的作用和 32 位的通用寄存器一样，可以用于存储数据和进行各种运算。
 
-### ⏱️ 6.4 进程的调度与优先级
+### ⏱️ 5.4 进程的调度与优先级
 
-#### 6.4.1 常用 CPU 调度 man 手册
+#### 5.4.1 常用 CPU 调度 man 手册
 
 - **`sched (7)`**：查看 CPU 调度总览（含系统调用、调度策略等）
 - `sched_setscheduler (2)`：设置与获取调度策略与参数
@@ -164,7 +163,7 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 - `chrt (1)`：操作进程实时调度属性
 - `tuna (8)`：更改应用与内核线程属性
 
-#### 6.4.2 Linux 中的进程调度策略
+#### 5.4.2 Linux 中的进程调度策略
 
 | 类别 | 内核源代码 | 策略 |
 | ----- | ----- | ----- |
@@ -179,7 +178,7 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 非实时调度策略（non-real-time scheduling policy）：常见的策略有 **`TS`**
 
-#### 6.4.3 Linux 进程调度优先级的分类
+#### 5.4.3 Linux 进程调度优先级的分类
   
 <center><img src="images/linux-process-priorities.jpg" style="width:80%"></center>
   
@@ -187,7 +186,7 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 - 实时优先级（real-time priority）  
 - 过时的优先级（obsolete priority）：`/ˈɒbsəliːt/`，该优先级类型为 `BSD` 风格类型，使用 ps 命令的 `l` 选项查看，其优先级的值与 `pri` 选项不同。
 
-#### 6.4.4 Linux 中的上下文切换（context switch）
+#### 5.4.4 Linux 中的上下文切换（context switch）
 
 - 上下文切换的过程：
 
@@ -247,14 +246,14 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
   - CLS 调度策略为 TS（SCHED_NORMAL）的进程不具有实时优先级（RTPRio）
   - ✨ 进程具有最高的实时优先级（99）而具有最低的系统优先级（139）彼此间不矛盾，因为实时优先级是进程在限定时间内需完成的任务可，需抢占 CPU 资源快速完成任务，而任务完成后不再占用 CPU 资源具有较低的系统的优先级，此类进程通常为内核进程。
 
-#### 6.4.5 设置进程的调度选项
+#### 5.4.5 设置进程的调度选项
 
 - Linux 为管理调度程序参数提供了⼀系列系统调⽤，其允许操作进程优先级、调度策略和处理器关联，从⽽将处理器让给其他任务。
 - 应⽤以编程⽅式使⽤  **`sched_setscheduler()`** 和 **`sched_getscheduler()`** 系统调⽤来设置和获取指定调度策略和进程的实时优先
 级。sched_setscheduler (2) man page 提供有关 sched_setscheduler() 和 sched_getscheduler() 系统调⽤的信息。
 - RHEL 为管理员提供了两种不同⽅法来配置和观察 **进程调度程序配置**： **`chrt`** 命令和 **`tuna`** 接⼝
 
-### 📼 6.5 CPU Cache 缓存架构
+### 📼 5.5 CPU Cache 缓存架构
 
 所谓程序局部性原理，分两条：时间局部性（刚用过的数据很快还会再用）和空间局部性（用了某个地址，它旁边的地址大概率也会被用到）。正因为这两条规律，缓存这种"小而快"的设计才玩得转——把热数据留在上层，CPU 大多数时候都能命中，不必老跑主存。
 
@@ -355,36 +354,67 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
   
   从测试结果可知 cache1 的 L1 数据写缓存未命中率（6.2%）明显低于 cache2 的（100.0%），其原因在于 CPU Cache 缓存以缓存行（Cache line）的方式进行存储，先定义行再以列进行递增的效率更高。
 
-- perf 命令测试程序的 CPU 缓存命中率：
-  
-  ```bash
-  $ sudo perf stat -e instructions,cycles, \
-    L1-dcache-loads,L1-dcache-load-misses,LLC-load-misses,LLC-loads \
-    <application_name>
-  ```
+### 🏆 5.6 [Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8.md)
 
-### 🏆 6.6 [Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8.md)
+## 🪛 6. 调优内存使用
 
-## 🪛 12. Linux 内存管理汇总
+### 🔬 6.1 [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
 
-### 🔬 12.1 [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
+### 🔥 6.2 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
 
-### 🔥 12.2 [Linux 内核内存管理集锦](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md)
+- 为了使⽤⼤⻚⾯，进程必须使⽤ **`mmap()`** 系统调⽤或 **`shmat()`** 和 **`shmget()`** 系统调⽤来请求⼤⻚⾯。
+- 如果进程使⽤ mmap() 系统调⽤，那么需要挂载 **`hugetlbfs`** ⽂件系统。
+- NUMA 系统上的大页面数量定义：`/sys/devices/system/node/nodeX/hugepages/hugepages-2048kB/nr_hugepages`
+- NUMA 系统中 /proc/meminfo 中的大页内存是各个 node 内存节点的整体效应
 
-### 💪 12.3 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
+### 💪 6.3 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
 
-## [/proc 伪文件系统释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/proc%20%E4%BC%AA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E8%B7%AF%E5%BE%84%E8%AF%B4%E6%98%8E.md)
+## 💡 7. [/proc 伪文件系统释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/proc%20%E4%BC%AA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E9%87%8A%E4%B9%89.md)
 
-## 🆒 13. systemd drop-in 文件系统性能设置
+## 🆒 8. systemd drop-in 文件系统性能设置
 
-- CGgroup 资源控制
-- 进程调度策略与优先级设置
-- CPU 亲和性配置
-- OOM 分数调整
+以 HAProxy 守护进程为例，演示可通过 drop-in 文件实现的设置：
 
-## 🧬 14. eBPF 的 BCC 工具集运行示例
+```ini
+$ sudo vim /etc/systemd/system/haproxy.slice
+[Unit]
+Description=HAProxy Slice
 
-### 14.1 BPF 编译器集合简介
+[Slice]
+### CPU 使用时间与亲和性
+CPUAccounting=yes
+CPUQuota=50%
+LimitCPU=120
+CPUAffinity=0-1
+LimitNOFILE=32
+
+### 内存容量限制
+MemoryAccounting=yes
+MemoryLimit=104857600
+
+### 进程调度调整
+#Nice=
+# 设置服务的默认 nice 级别
+# 将 nice 级别设置为介于 -20（最⾼优先级）⾄ 19（最低优先级）之间的⼀个数值
+
+CPUSchedulingPolicy=rr
+# 设置服务的 CPU 调度策略
+# 将策略设置为以下其中⼀个值：other、batch、idle、fifo 和 rr
+
+CPUSchedulingPriority=10
+# 设置此服务的 CPU 调度优先级，优先级范围取决于所选的调度策略。
+# 对于实时调度策略，可将此值设置为介于 1（最低优先级）和 99（最⾼优先级）之间的数值。
+# 注意：Nice、CPUSchedulingPolicy 和 CPUSchedulingPriority 指令不能通过 systemctl set-property 动态更改。
+
+### OOM-Killer 调整值
+OOMScoreAdjust=-1000
+# OOM-Killer 终止进程倾向性，取值介于 -1000（最低优先级）和 1000（最高优先级）之间的数值
+# 数值越高越容易被杀死
+```
+
+## 🧬 9. eBPF 的 BCC 工具集运行示例
+
+### 9.1 BPF 编译器集合简介
 
 编写 eBPF 程序需要从内核源编译和链接到 eBPF 库。这对于内核开发⼈员⽽⾔⾮常友好，但对于其他⽤⼾（例如在⽣产系统上⼯作的⼈员），使⽤预先存在的程序可能是更实际的⽅法。BCC 由编写程序所需的组件组成，也提供了⽰例程序以及⽤于调试和诊断性能问题的预先存在的⼯具。安装方法如下：
 
@@ -394,7 +424,7 @@ $ sudo ls /usr/share/bcc/tools
 # 安装 bcc-tools 工具集
 ```
 
-### 14.2 常见 BCC 工具
+### 9.2 常见 BCC 工具
 
 - `execsnoop`：只捕获执行了新程序的进程，即调用了 `execve()`，而不捕获单纯 fork 出来的子进程。。比如，execsnoop 跟踪 execve() 系统调⽤并显⽰参数和返回值的详细信息。它将采集 `fork->exec` 序列中的新进程，但不包括只 fork() 不 exec() 的应⽤，如⼯作器进程。
 - `opensnoop`：跟踪系统范围内的 open() 系统调⽤，并显⽰进程名称和路径名称详细信息。opensnoop 对于在应⽤启动期间发现配置和⽇志⽂件⾮常有⽤。
@@ -404,7 +434,7 @@ $ sudo ls /usr/share/bcc/tools
 - `cachestat`：
 - `gethostlatency`：
 
-## ⚕️ 15. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
+## ⚕️ 10. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
 
 ## 📚 参考链接
 

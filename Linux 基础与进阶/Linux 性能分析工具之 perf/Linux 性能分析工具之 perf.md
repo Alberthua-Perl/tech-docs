@@ -21,7 +21,9 @@
     - [10.3 采集程序性能数据](#103-采集程序性能数据)
     - [10.4 生成火焰图](#104-生成火焰图)
     - [10.5 火焰图解读](#105-火焰图解读)
-  - [11. 参考链接](#11-参考链接)
+  - [11. Linux Perf 内核子系统参数](#11-linux-perf-内核子系统参数)
+  - [12. 其他函数级 CPU 与内存分析工具](#12-其他函数级-cpu-与内存分析工具)
+  - [12. 参考链接](#12-参考链接)
 
 ## 1. Perf 介绍与说明
 
@@ -29,15 +31,14 @@
 - Linux 内核可提供 `perf_event` 接口，它是一个用于在应用程序和内核之间传递性能数据的接口。
 - 使用 PCL 和 perf_event 接口可以帮助应用程序更好地监视处理器性能，并提高系统的性能。
 
-  > 说明：
+  > 说明：<br>
   > 在编译内核时，需要开启 `CONFIG_PERF_EVENTS` 选项，才能使用 perf 工具！
   > 具体来说，应用程序可以使用以下步骤来使用 PCL 和 perf_event 接口：
-  > 1. 使用 `pcl_register_event` 函数注册 PCL 事件
-  > 2. 打开 `perf_event_device` 文件
-  > 3. 使用 `perf_event_mmap` 函数将 `perf_event_device` 文件的内存映射到应用程序的内存中
-  > 4. 使用 `perf_event_read` 函数从 `perf_event_device` 文件中读取事件数据
+  > 1. 使用 `perf_event_open` 函数注册 PCL 事件
+  > 2. 打开 `perf_event_device` 文件：内核创建 perf_event 内核对象，返回 fd。
+  > 3. 使用 `perf_event_mmap` 函数将 `perf_event_device` 文件的内存映射到应用程序的内存中：建立用户态与内核 ring buffer 的共享内存映射。
+  > 4. 使用 `perf_event_read` 函数从 `perf_event_device` 文件中读取事件数据：读取溢出计数或批量样本数据。
   > 5. 将事件数据转换为 perf_event 数据结构，并将它们传递给应用程序的 `perf_event_buffer`。
-  > 以上 pcl_register_event 函数、perf_event_mmap 函数、perf_event_read 函数均为系统调用。
 
 - perf 可定义一组常用性事件，并提供工具来列出事件或在报告中记录下来，供日后分析报告数据。
 - 🚀 perf 框架参考 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)，此文档中对追踪系统（tracing system）具有较为整体的阐述。
@@ -296,6 +297,15 @@
     -e cycles,instructions,cache-references,cache-misses,bus-cycles \
     -a sleep 10s
   # -a 选项指定来自所有 CPU 的系统全局范围，-e 选项指定事件，在 10s 后完成性能事件的收集。
+
+  $ sudo perf stat -e instructions,cycles, \
+    L1-dcache-loads,L1-dcache-load-misses,LLC-load-misses,LLC-loads \
+    /path/to/programme
+  # 测试程序的 CPU 缓存命中率
+
+  $ sudo perf stat -e minor-faults,major-faults,dTLB-load-misses \
+    /path/to/programme
+  # 测试程序的缺页异常、swap 换入情况、TLB 缓存丢失率等
   ```
 
 ## 6. perf top 子命令
@@ -344,13 +354,52 @@
 
 ![flame-graph-20s-10calls](images/flame-graph-20s-10calls.png)
 
-> 注意：火焰图的生成与说明请参考下文
+> 注意：火焰图的生成与说明请参考 "10. 火焰图原理与应用"
 
 💡 现象显示：如图示1，在实时监测 goSimpleWeb 程序的过程中，当使用 ab 命令发起多并发压力测试请求后，perf top 界面中显示图中 `_raw_spin_unlock_irqrestore` 内核函数的 CPU 开销达到 46% 左右。</br>
 
 🩺 根因分析：
 
-- 1️⃣ 内核 TCP 协议栈中，每个 `struct sock` 实例包含 `socket_lock_t sk_lock` 字段（内嵌自旋锁 spinlock_t slock）。当 Go 服务端调用 accept() 陷入内核时，执行路径 sys_accept4() → inet_csk_accept() 需获取 sk->sk_lock.slock；同时，网卡收包触发的软中断路径 tcp_v4_rcv() 同样需要获取同一自旋锁，**形成内核态软中断与用户态进程的直接竞争**。火焰图中 _raw_spin_unlock_irqrestore 的显著宽度正是该锁频繁抢锁/解锁的累积表现。
+- 1️⃣ 同一节点上运行 ab 的 500 并发短连接导致服务端同时存在大量活跃连接。Go 调度器使用 **`futex`** 实现 M:N goroutine 调度：当 goroutine 因 I/O 阻塞（如等待 accept 返回或 read 数据）时，调度器执行 futex(FUTEX_WAIT) 挂起 OS 线程；当 epoll 通知 I/O 就绪或连接建立完成时，通过 futex(FUTEX_WAKE) 唤醒线程重新调度。高并发下，大量 goroutine 的频繁阻塞/唤醒导致 futex 系统调用激增，火焰图中 **__x64_sys_futex → do_futex → futex_wake** 形成宽柱。注意：futex 是 Go 调度器同步机制，与内核 accept() 的完成是异步解耦关系，非直接因果。
+
+  ```plaintext
+  ab -n 10000 -c 500
+      │
+      ▼
+    内核网络栈       ← 这里产生锁竞争（与 Go 无关）
+
+    500 个 SYN 同时到达
+      │
+      ├─ 软中断: tcp_v4_rcv() → inet_csk_search_req()
+      │              │
+      │              ▼
+      │         sk->sk_lock.slock  ← 全局唯一！
+      │              │
+      │         完成三次握手 → 放入 accept_queue
+      │
+      └─ 所有 accept() 抢同一把锁取连接
+                │
+                ▼
+           _raw_spin_unlock_irqrestore() 46%
+           （解锁后唤醒等待的 M）
+      │
+      ▼
+     Go runtime      ← 这里放大竞争（非根因）
+
+    netpoller 批量唤醒 500 个 goroutine
+      │
+      ├─ 500 个 goroutine 分配到 N 个 M
+      │
+      └─ N 个 M 同时陷入内核执行 read/write/close
+                │
+                ▼
+           更多线程进入锁等待队列 → 解锁时遍历更长
+           → _raw_spin_unlock_irqrestore 占比更高
+  ```
+
+- 2️⃣ Go 标准库 net/http.Server.Serve() 采用 "每个连接一个 goroutine" 模型：主 goroutine 在 for { c, err := ln.Accept() } 循环中，为每个返回的 net.Conn 启动独立 goroutine 执行 go c.serve(ctx)。该设计将并发复杂度委托给 Go 调度器，但在高并发短连接场景（如 ab 测试）下产生 **goroutine 数量爆炸（连接数 = goroutine 数）**。
+- 3️⃣ 采用 Worker Pool（固定 goroutine 池） 是降低 futex 与 sk->sk_lock 竞争的有效策略。实现机制：预创建 N 个 worker goroutine（N 通常等于 CPU 核心数或 2*CPU），通过有缓冲 channel（chan net.Conn）分发连接任务。
+- 4️⃣ 内核 TCP 协议栈中，每个 `struct sock` 实例包含 **`socket_lock_t sk_lock`** 字段（内嵌自旋锁 spinlock_t slock）。当 Go 服务端调用 accept() 陷入内核时，执行路径 sys_accept4() → inet_csk_accept() 需获取 sk->sk_lock.slock；同时，网卡收包触发的软中断路径 tcp_v4_rcv() 同样需要获取同一自旋锁，**形成内核态软中断与用户态进程的直接竞争**。火焰图中 _raw_spin_unlock_irqrestore 的显著宽度正是该锁频繁抢锁/解锁的累积表现。
 
   ```bash
   # 说明：
@@ -522,50 +571,6 @@
       SOCK->>APP: 返回新 fd (子 socket)
       APP->>APP: read()/write() → 正常通信
   ```
-
-- 2️⃣ ab 的 500 并发短连接导致服务端同时存在大量活跃连接。Go 调度器使用 futex 实现 M:N goroutine 调度：当 goroutine 因 I/O 阻塞（如等待 accept 返回或 read 数据）时，调度器执行 futex(FUTEX_WAIT) 挂起 OS 线程；当 epoll 通知 I/O 就绪或连接建立完成时，通过 futex(FUTEX_WAKE) 唤醒线程重新调度。高并发下，大量 goroutine 的频繁阻塞/唤醒导致 futex 系统调用激增，火焰图中 futex_wake → do_futex → sys_futex 形成宽柱。注意：futex 是 Go 调度器同步机制，与内核 accept() 的完成是异步解耦关系，非直接因果。
-
-  ```plaintext
-  ab -n 10000 -c 500
-      │
-      ▼
-  ┌─────────────────┐
-  │  内核网络栈      │  ← 这里产生锁竞争（与 Go 无关）
-  │                 │
-  │  500 个 SYN 同时到达
-  │    │
-  │    ├─ 软中断: tcp_v4_rcv() → inet_csk_search_req()
-  │    │              │
-  │    │              ▼
-  │    │         sk->sk_lock.slock  ← 全局唯一！
-  │    │              │
-  │    │         完成三次握手 → 放入 accept_queue
-  │    │
-  │    └─ 所有 accept() 抢同一把锁取连接
-  │              │
-  │              ▼
-  │         _raw_spin_unlock_irqrestore() 46%
-  │         （解锁后唤醒等待的 M）
-  └─────────────────┘
-      │
-      ▼
-  ┌─────────────────┐
-  │   Go runtime    │  ← 这里放大竞争（非根因）
-  │                 │
-  │  netpoller 批量唤醒 500 个 goroutine
-  │    │
-  │    ├─ 500 个 goroutine 分配到 N 个 M
-  │    │
-  │    └─ N 个 M 同时陷入内核执行 read/write/close
-  │              │
-  │              ▼
-  │         更多线程进入锁等待队列 → 解锁时遍历更长
-  │         → _raw_spin_unlock_irqrestore 占比更高
-  └─────────────────┘
-  ```
-
-- 3️⃣ Go 标准库 net/http.Server.Serve() 采用 "每个连接一个 goroutine" 模型：主 goroutine 在 for { c, err := ln.Accept() } 循环中，为每个返回的 net.Conn 启动独立 goroutine 执行 go c.serve(ctx)。该设计将并发复杂度委托给 Go 调度器，但在高并发短连接场景（如 ab 测试）下产生 **goroutine 数量爆炸（连接数 = goroutine 数）**。
-- 4️⃣ 采用 Worker Pool（固定 goroutine 池） 是降低 futex 与 sk->sk_lock 竞争的有效策略。实现机制：预创建 N 个 worker goroutine（N 通常等于 CPU 核心数或 2*CPU），通过有缓冲 channel（chan net.Conn）分发连接任务。
 
 ### 6.2 分析示例：指定内核函数性能事件  
   
@@ -841,7 +846,65 @@ $ sudo perf script | /path/to/FlameGraph-1.0/stackcollapse-perf.pl | /path/to/Fl
   - 优化算法：对于耗时较长的大函数，检查是否有更高效的算法或数据结构可以替代。
   - 并行化：如果某些函数可以并行执行，考虑使用多线程或多进程来提高效率。
 
-## 11. 参考链接
+## 11. Linux Perf 内核子系统参数
+
+- 默认情况下，perf 采用每秒 99 次的频率进行采样（99Hz），而内核 perf 子系统中的参数 `kernel.perf_event_max_sample_rate = 100000` 设置采样上限。
+- 若用户显示使用 `perf record -F <freq>` 命令指定采样频率：
+  - 1️⃣ freq <= kernel.perf_event_max_sample_rate：采样频率小于等于内核上限，可执行采样。
+  - 2️⃣ freq > kernel.perf_event_max_sample_rate：采样频率大于内核上限，perf 运行报错。
+- 系统日志报错如下：
+
+  ```plaintext
+  ...
+  [    8月 31 09:29:12 2021] EDAC MC0: Giving out device to 'skx_edac.c' 'Skylake Socket#0 IMC#0': DEV 0000:5e:0a.0
+  [    8月 31 09:29:12 2021] EDAC MC1: Giving out device to 'skx_edac.c' 'Skylake Socket#0 IMC#1': DEV 0000:2e:0c.0
+  [    8月 31 09:29:12 2021] EDAC MC2: Giving out device to 'skx_edac.c' 'Skylake Socket#1 IMC#0': DEV 0000:ae:0a.0
+  [    8月 31 09:29:12 2021] EDAC MC3: Giving out device to 'skx_edac.c' 'Skylake Socket#1 IMC#1': DEV 0000:ae:0c.0
+  [    8月 31 09:29:12 2021] XFS (sda2): Mounting V5 Filesystem
+  [    8月 31 09:29:12 2021] Adding 32702460k swap on /dev/mapper/centos-swap.  Priority:-2 extents:1 across:32702460k FS
+  [    8月 31 09:29:12 2021] XFS (sda2): Starting recovery (logdev: internal)
+  [    8月 31 09:29:12 2021] XFS (sda2): Ending recovery (logdev: internal)
+  [    8月 31 09:29:12 2021] FAT-fs (sda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+  [    8月 31 09:29:14 2021] XFS (dm-2): Mounting V5 Filesystem
+  [    8月 31 09:29:15 2021] XFS (dm-2): Starting recovery (logdev: internal)
+  [    8月 31 09:29:16 2021] XFS (dm-2): Ending recovery (logdev: internal)
+  [    8月 31 09:29:16 2021] type=1305 audit(1630373356.957:3): audit_pid=16548 old=0 auid=4294967295 ses=4294967295 res=1
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno1: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno1: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_CHANGE): eno1: link becomes ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno2: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno2: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno3: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno3: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno4: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): eno4: link is not ready
+  [    8月 31 09:29:16 2021] IPv6: ADDRCONF(NETDEV_UP): enp0s20f0u1u6: link is not ready
+  [    8月 31 09:51:54 2021] perf: interrupt took too long (2559 > 2500), lowering kernel.perf_event_max_sample_rate to 78000
+  # perf 采样中断耗时 2559 us，超过阈值 2500 us，自动将采样频率从默认设置 100000 次/秒降低至 78000 次/秒。
+  [    8月 31 09:52:39 2021] perf: interrupt took too long (3226 > 3198), lowering kernel.perf_event_max_sample_rate to 62000
+  [    8月 31 09:53:26 2021] perf: interrupt took too long (4148 > 4032), lowering kernel.perf_event_max_sample_rate to 48000
+  [    8月 31 09:57:07 2021] perf: interrupt took too long (5198 > 5185), lowering kernel.perf_event_max_sample_rate to 38000
+  [    8月 31 09:58:28 2021] perf: interrupt took too long (6631 > 6497), lowering kernel.perf_event_max_sample_rate to 30000
+  [    8月 31 10:00:49 2021] perf: interrupt took too long (8398 > 8288), lowering kernel.perf_event_max_sample_rate to 23000
+  [    8月 31 10:03:23 2021] perf: interrupt took too long (10542 > 10497), lowering kernel.perf_event_max_sample_rate to 18000
+  [    8月 31 10:07:17 2021] perf: interrupt took too long (13178 > 13177), lowering kernel.perf_event_max_sample_rate to 15000
+  [    8月 31 10:15:55 2021] perf: interrupt took too long (16518 > 16472), lowering kernel.perf_event_max_sample_rate to 12000
+  [    8月 31 10:47:44 2021] perf: interrupt took too long (20706 > 20647), lowering kernel.perf_event_max_sample_rate to 9000
+  # perf 采样中断耗时持续增加，采样率从 78000 → 9000 逐级下降。
+  (END)
+
+  ### 原因分析 ###
+  # 1. 采样频率过高：perf_event_max_sample_rate 初始值太高，PMU 中断风暴，CPU 大量时间处理中断。
+  # 2. 中断处理过重：每次采样做完整栈回溯（callchain）
+  ```
+
+## 12. 其他函数级 CPU 与内存分析工具
+
+1️⃣ **valgrind + massif** 可以查看内存使用<br>
+2️⃣ **gprof** 可查看函数的 CPU 使用<br>
+3️⃣ [Google Performance Tools (gperftools)](https://github.com/gperftools/gperftools) 包含多个性能分析工具库，包含 **TCMalloc**、**Heap Profiler**、**CPU Profiler** 与 **pprof** 可以用于分析 CPU 与内存使用情况。
+
+## 12. 参考链接
 
 - 📚 [kernel doc](https://www.kernel.org/doc/html/)
 - 📚 [kernel doc: sysctl](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
@@ -851,3 +914,4 @@ $ sudo perf script | /path/to/FlameGraph-1.0/stackcollapse-perf.pl | /path/to/Fl
 - 🎉 [Exploring USDT Probes on Linux](https://leezhenghui.github.io/linux/2019/03/05/exploring-usdt-on-linux.html)
 - [brendangregg/FlameGraph | GitHub](https://github.com/brendangregg/FlameGraph)
 - [node.js Flame Graphs on Linux | Brendan Gregg's Blog](https://www.brendangregg.com/blog/2014-09-17/node-flame-graphs-on-linux.html)
+- [gperftools | GitHub](https://github.com/gperftools/gperftools)

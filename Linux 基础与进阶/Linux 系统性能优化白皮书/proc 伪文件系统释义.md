@@ -75,6 +75,7 @@ $ sudo sysctl -p /path/to/sysctl-conf
 | /proc/sched_debug | 包含所有内核可调项的当前值，它们会影响任务调度程序的⾏为、统计信息，以及与所有可⽤处理器上各种调度策略相关的运⾏队列信息。 |
 | /proc/schedstat | 显⽰与运⾏队列相关的统计信息。 |
 | /proc/*pid*/sched | 显⽰进程的调度信息，其中 PID 是进程 ID。 |
+| /proc/*pid*/oom_score_adj | OOM-Killer 杀死进程的调整参数 |
 
 ```bash
 $ sudo cat /etc/filesystems
