@@ -136,7 +136,7 @@
   - [【Lab】Kubernetes 中部署 Rocket.Chat 与 MongoDB 实时交流平台](https://github.com/Alberthua-Perl/go-kubernetes-learn-path/tree/hotfixes/rocketchat-mongo-statefulset-app)
   - [【精华】解析 Kubernetes Operator 工作原理](https://github.com/Alberthua-Perl/tech-docs/blob/master/Kubernetes/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E8%A7%A3%E6%9E%90%20Kubernetes%20Operator%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.md)
 
-## ⭕️ **RedHat OpenShift 云原生平台**
+## ⭕️ **RedHat OpenShift 容器云平台**
 
 - [【精华】Fedora CoreOS 与 RHCOS 概述与应用](https://github.com/Alberthua-Perl/tech-docs/blob/master/RedHat%20OpenShift%20Container%20Platform/Fedora%20CoreOS%20%E4%B8%8E%20RHCOS%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%BA%94%E7%94%A8/Fedora%20CoreOS%20%E4%B8%8E%20RHCOS%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%BA%94%E7%94%A8.md)
 - **OpenShift 单节点开发环境部署**
@@ -144,6 +144,7 @@
   - [【精华】Red Hat OpenShift Local (CRC) v2.35 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/Red%20Hat%20OpenShift%20Local%20(CRC)%20v2.35%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
   - [【精华】基于 RHEL9.3 的 Red Hat MicroShift v4.15 部署与管理](https://github.com/Alberthua-Perl/tech-docs/blob/master/RedHat%20OpenShift%20Container%20Platform/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86/%E5%9F%BA%E4%BA%8E%20RHEL9.3%20%E7%9A%84%20Red%20Hat%20MicroShift%20v4.15%20%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%A1%E7%90%86.md)
 - **基础架构原理 & 应用构建发布**
+  - [DO285 Learning Notes (by Sreejith)](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/DO285%20Learning%20Notes%20(by%20Sreejith).md) 
   - [【精华】Red Hat OpenShift 基础架构与原理详解](https://github.com/Alberthua-Perl/tech-docs/blob/master/RedHat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3.md)
   - [【精华】Red Hat OpenShift 应用构建与部署详解](https://github.com/Alberthua-Perl/tech-docs/blob/master/RedHat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2%E8%AF%A6%E8%A7%A3/Red%20Hat%20OpenShift%20%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2%E8%AF%A6%E8%A7%A3.md)
   - [【精华】S2I 基本原理与应用构建部署示例](https://github.com/Alberthua-Perl/tech-docs/blob/master/RedHat%20OpenShift%20Container%20Platform/S2I%20%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA%E9%83%A8%E7%BD%B2%E7%A4%BA%E4%BE%8B/S2I%20%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E6%9E%84%E5%BB%BA%E9%83%A8%E7%BD%B2%E7%A4%BA%E4%BE%8B.md)
