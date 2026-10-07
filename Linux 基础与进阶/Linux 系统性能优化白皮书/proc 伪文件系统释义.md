@@ -8,6 +8,7 @@
   - [2. /proc 伪文件系统说明](#2-proc-伪文件系统说明)
   - [3. sysctl 命令的常用方式](#3-sysctl-命令的常用方式)
   - [4. /proc 中常用的子目录与子文件](#4-proc-中常用的子目录与子文件)
+  - [5. 示例：Java 与 Oracle 高并发架构中生产级内核参数](#5-示例java-与-oracle-高并发架构中生产级内核参数)
 
 ## 1. Linux 内核参数帮助文档
 
@@ -90,3 +91,60 @@ $ sudo ls -ld /lib/modules/$(uname -r)/kernel/fs/
 - 修改 /proc/sys/ 中的文件会导致正在运行的系统立即发生变化。
 - 优化目的是改善系统性能，但修改 /proc/sys/ 也可能对其他子系统产生不利影响。
 - 所有 /proc/sys/ 文件更改均直接写入内存中的内核，因此所作更改无法在重启后保持。
+
+## 5. 示例：Java 与 Oracle 高并发架构中生产级内核参数
+
+各个内核参数的具体释义可参看 https://github.com/Alberthua-Perl/tech-docs 中的 **系统性能优化** 部分。
+
+```bash
+$ sudo vim /etc/sysctl.d/10-highperf.conf
+# Java 应用与 Oracle 数据库混布的高并发场景
+# 来源：银行/证券系统
+
+kernel.sysrq=1
+kernel.shmmax=0x80000000
+kernel.shmmni=4096
+
+kernel.sem=250 32000 100 128
+kernel.core_uses_pid=1
+kernel.core_pattern='core.%e.%p'
+kernel.threads-max=31863
+
+vm.dirty_expire_centisecs=1500
+vm.dirty_writeback_centisecs=200
+vm.dirty_background_ratio=5
+vm.swappiness=10
+vm.min_free_kbytes=409600
+vm.vfs_cache_pressure=200
+vm.dirty_ratio = 10
+
+net.core.netdev_max_backlog=1000
+net.core.somaxconn=512
+net.ipv4.tcp_tw_reuse=1
+net.ipv4.tcp_tw_recycle=1
+net.ipv4.tcp_fin_timeout=30
+net.ipv4.tcp_keepalive_time=7200
+
+net.core.rmem_default=262144
+net.core.rmem_max=4194304
+# Receive socket buffer size
+
+net.core.wmem_default=262144
+net.core.wmem_max=4194304
+# Send socket buffer size
+
+net.ipv4.tcp_rmem=4096 16384 4194304
+net.ipv4.tcp_wmem=4096 16384 4194304
+# TCP socket buffer size
+
+net.ipv4.ip_local_port_range=50000   65000
+# Network port range 65000
+
+fs.file-max=655350
+net.ipv4.tcp_keepalive_time=30
+net.ipv4.tcp_keepalive_probes=3
+net.ipv4.tcp_keepalive_intvl=10
+net.ipv4.tcp_timestamps=0
+kernel.unknown_nmi_panic=1
+kernel.softlockup_panic=1
+```
