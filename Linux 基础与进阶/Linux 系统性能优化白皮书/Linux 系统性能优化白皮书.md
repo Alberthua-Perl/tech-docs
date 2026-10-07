@@ -37,7 +37,7 @@
     - [🔥 6.2 Linux 内核内存管理集锦](#-62-linux-内核内存管理集锦)
     - [💪 6.3 Linux 内存管理全景图V2.0](#-63-linux-内存管理全景图v20)
   - [💡 7. /proc 伪文件系统释义](#-7-proc-伪文件系统释义)
-  - [🆒 8. systemd drop-in 文件系统性能设置](#-8-systemd-drop-in-文件系统性能设置)
+  - [🆒 8. 如何使用 systemd drop-in 文件调整系统性能？](#-8-如何使用-systemd-drop-in-文件调整系统性能)
   - [🧬 9. eBPF 的 BCC 工具集运行示例](#-9-ebpf-的-bcc-工具集运行示例)
     - [9.1 BPF 编译器集合简介](#91-bpf-编译器集合简介)
     - [9.2 常见 BCC 工具](#92-常见-bcc-工具)
@@ -371,9 +371,9 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 ## 💡 7. [/proc 伪文件系统释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/proc%20%E4%BC%AA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E9%87%8A%E4%B9%89.md)
 
-## 🆒 8. systemd drop-in 文件系统性能设置
+## 🆒 8. 如何使用 systemd drop-in 文件调整系统性能？
 
-以 HAProxy 守护进程为例，演示可通过 drop-in 文件实现的设置：
+以 HAProxy 服务为例通过 **drop-in** 文件实现的设置：
 
 ```ini
 $ sudo vim /etc/systemd/system/haproxy.slice
@@ -382,15 +382,15 @@ Description=HAProxy Slice
 
 [Slice]
 ### CPU 使用时间与亲和性
-CPUAccounting=yes
-CPUQuota=50%
-LimitCPU=120
-CPUAffinity=0-1
-LimitNOFILE=32
+CPUAccounting=yes    # 启用 CPU 记账 
+CPUQuota=50%         # 设置 CPU 绝对使用时间
+LimitCPU=120         # 限制 CPU 使用时间（秒数）
+CPUAffinity=0-1      # 设置 CPU 亲和性
+LimitNOFILE=32       # 设置进程打开的文件句柄数量
 
 ### 内存容量限制
-MemoryAccounting=yes
-MemoryLimit=104857600
+MemoryAccounting=yes      # 启用内存记账
+MemoryLimit=104857600     # 限制内存使用容量（字节）
 
 ### 进程调度调整
 #Nice=
@@ -400,7 +400,6 @@ MemoryLimit=104857600
 CPUSchedulingPolicy=rr
 # 设置服务的 CPU 调度策略
 # 将策略设置为以下其中⼀个值：other、batch、idle、fifo 和 rr
-
 CPUSchedulingPriority=10
 # 设置此服务的 CPU 调度优先级，优先级范围取决于所选的调度策略。
 # 对于实时调度策略，可将此值设置为介于 1（最低优先级）和 99（最⾼优先级）之间的数值。
@@ -410,6 +409,15 @@ CPUSchedulingPriority=10
 OOMScoreAdjust=-1000
 # OOM-Killer 终止进程倾向性，取值介于 -1000（最低优先级）和 1000（最高优先级）之间的数值
 # 数值越高越容易被杀死
+
+$ sudo mkdir /etc/systemd/system/haproxy.service.d/
+$ sudo vim /etc/systemd/system/haproxy.service.d/10-settings.conf
+[Service]
+Slice=haproxy.slice
+
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable --now haproxy.service
+# 启动 HAProxy 服务生效 drop-in 文件设置
 ```
 
 ## 🧬 9. eBPF 的 BCC 工具集运行示例
@@ -429,10 +437,10 @@ $ sudo ls /usr/share/bcc/tools
 - `execsnoop`：只捕获执行了新程序的进程，即调用了 `execve()`，而不捕获单纯 fork 出来的子进程。。比如，execsnoop 跟踪 execve() 系统调⽤并显⽰参数和返回值的详细信息。它将采集 `fork->exec` 序列中的新进程，但不包括只 fork() 不 exec() 的应⽤，如⼯作器进程。
 - `opensnoop`：跟踪系统范围内的 open() 系统调⽤，并显⽰进程名称和路径名称详细信息。opensnoop 对于在应⽤启动期间发现配置和⽇志⽂件⾮常有⽤。
 - `xfsslower`：显示 XFS 读取、写⼊、打开和 fsync，⽐ 10 ms 的默认阈值要慢。
-- `biolatency`：
-- `biosnoop`：
-- `cachestat`：
-- `gethostlatency`：
+- `biolatency`
+- `biosnoop`
+- `cachestat`
+- `gethostlatency`
 
 ## ⚕️ 10. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
 

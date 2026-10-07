@@ -23,7 +23,7 @@
     - [10.5 火焰图解读](#105-火焰图解读)
   - [11. Linux Perf 内核子系统参数](#11-linux-perf-内核子系统参数)
   - [12. 其他函数级 CPU 与内存分析工具](#12-其他函数级-cpu-与内存分析工具)
-  - [12. 参考链接](#12-参考链接)
+  - [13. 参考链接](#13-参考链接)
 
 ## 1. Perf 介绍与说明
 
@@ -904,7 +904,7 @@ $ sudo perf script | /path/to/FlameGraph-1.0/stackcollapse-perf.pl | /path/to/Fl
 2️⃣ **gprof** 可查看函数的 CPU 使用<br>
 3️⃣ [Google Performance Tools (gperftools)](https://github.com/gperftools/gperftools) 包含多个性能分析工具库，包含 **TCMalloc**、**Heap Profiler**、**CPU Profiler** 与 **pprof** 可以用于分析 CPU 与内存使用情况。
 
-## 12. 参考链接
+## 13. 参考链接
 
 - 📚 [kernel doc](https://www.kernel.org/doc/html/)
 - 📚 [kernel doc: sysctl](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
