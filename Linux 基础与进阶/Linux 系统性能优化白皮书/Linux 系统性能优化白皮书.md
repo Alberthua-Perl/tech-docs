@@ -32,16 +32,20 @@
       - [5.4.5 设置进程的调度选项](#545-设置进程的调度选项)
     - [📼 5.5 CPU Cache 缓存架构](#-55-cpu-cache-缓存架构)
     - [🏆 5.6 Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](#-56-linux-cpu-性能优化实战从应用gcc调度器到-cpu-绑定与内存分配器)
+    - [5.7 Linux 内核参数释义：CPU 篇](#57-linux-内核参数释义cpu-篇)
   - [🪛 6. 调优内存使用](#-6-调优内存使用)
     - [🔬 6.1 Linux 用户空间进程虚拟内存布局（layout）](#-61-linux-用户空间进程虚拟内存布局layout)
     - [🔥 6.2 Linux 内核内存管理集锦](#-62-linux-内核内存管理集锦)
     - [💪 6.3 Linux 内存管理全景图V2.0](#-63-linux-内存管理全景图v20)
+    - [🎉 6.4 Linux 内核参数释义：内存篇](#-64-linux-内核参数释义内存篇)
   - [💡 7. /proc 伪文件系统释义](#-7-proc-伪文件系统释义)
-  - [🆒 8. 如何使用 systemd drop-in 文件调整系统性能？](#-8-如何使用-systemd-drop-in-文件调整系统性能)
-  - [🧬 9. eBPF 的 BCC 工具集运行示例](#-9-ebpf-的-bcc-工具集运行示例)
-    - [9.1 BPF 编译器集合简介](#91-bpf-编译器集合简介)
-    - [9.2 常见 BCC 工具](#92-常见-bcc-工具)
-  - [⚕️ 10. Linux 磁盘性能测试：FIO \& smartctl](#️-10-linux-磁盘性能测试fio--smartctl)
+  - [🌐 8. Linux 内核参数释义：网络篇](#-8-linux-内核参数释义网络篇)
+  - [📔 9. Linux 内核参数释义：文件系统篇](#-9-linux-内核参数释义文件系统篇)
+  - [🆒 10. 如何使用 systemd drop-in 文件调整系统性能？](#-10-如何使用-systemd-drop-in-文件调整系统性能)
+  - [🧬 11. eBPF 的 BCC 工具集运行示例](#-11-ebpf-的-bcc-工具集运行示例)
+    - [11.1 BPF 编译器集合简介](#111-bpf-编译器集合简介)
+    - [11.2 常见 BCC 工具](#112-常见-bcc-工具)
+  - [⚕️ 12. Linux 磁盘性能测试：FIO \& smartctl](#️-12-linux-磁盘性能测试fio--smartctl)
   - [📚 参考链接](#-参考链接)
 
 ## 🛠️ 1. Linux 常用系统性能监控工具
@@ -356,6 +360,8 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 ### 🏆 5.6 [Linux CPU 性能优化实战：从应用、GCC、调度器到 CPU 绑定与内存分配器](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8/Linux%20CPU%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%EF%BC%9A%E4%BB%8E%E5%BA%94%E7%94%A8%E3%80%81GCC%E3%80%81%E8%B0%83%E5%BA%A6%E5%99%A8%E5%88%B0%20CPU%20%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%99%A8.md)
 
+### 5.7 [Linux 内核参数释义：CPU 篇](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_CPU.png)
+
 ## 🪛 6. 调优内存使用
 
 ### 🔬 6.1 [Linux 用户空间进程虚拟内存布局（layout）](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6.md#-linux-%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80layout)
@@ -369,9 +375,15 @@ x86_64 架构是 x86 架构的 64 位扩展，它包括了一些与 32 位版本
 
 ### 💪 6.3 [Linux 内存管理全景图V2.0](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86/Linux%20%E5%86%85%E6%A0%B8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E9%9B%86%E9%94%A6/images/Linux%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%85%A8%E6%99%AF%E5%9B%BEV2.0.png)
 
+### 🎉 6.4 [Linux 内核参数释义：内存篇](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_Memory.png)
+
 ## 💡 7. [/proc 伪文件系统释义](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/proc%20%E4%BC%AA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E9%87%8A%E4%B9%89.md)
 
-## 🆒 8. 如何使用 systemd drop-in 文件调整系统性能？
+## 🌐 8. [Linux 内核参数释义：网络篇](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_Network.png)
+
+## 📔 9. [Linux 内核参数释义：文件系统篇](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%99%BD%E7%9A%AE%E4%B9%A6/Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E9%87%8A%E4%B9%89_Filesystem.png)
+
+## 🆒 10. 如何使用 systemd drop-in 文件调整系统性能？
 
 以 HAProxy 服务为例通过 **drop-in** 文件实现的设置：
 
@@ -420,9 +432,9 @@ $ sudo systemctl enable --now haproxy.service
 # 启动 HAProxy 服务生效 drop-in 文件设置
 ```
 
-## 🧬 9. eBPF 的 BCC 工具集运行示例
+## 🧬 11. eBPF 的 BCC 工具集运行示例
 
-### 9.1 BPF 编译器集合简介
+### 11.1 BPF 编译器集合简介
 
 编写 eBPF 程序需要从内核源编译和链接到 eBPF 库。这对于内核开发⼈员⽽⾔⾮常友好，但对于其他⽤⼾（例如在⽣产系统上⼯作的⼈员），使⽤预先存在的程序可能是更实际的⽅法。BCC 由编写程序所需的组件组成，也提供了⽰例程序以及⽤于调试和诊断性能问题的预先存在的⼯具。安装方法如下：
 
@@ -432,7 +444,7 @@ $ sudo ls /usr/share/bcc/tools
 # 安装 bcc-tools 工具集
 ```
 
-### 9.2 常见 BCC 工具
+### 11.2 常见 BCC 工具
 
 - `execsnoop`：只捕获执行了新程序的进程，即调用了 `execve()`，而不捕获单纯 fork 出来的子进程。。比如，execsnoop 跟踪 execve() 系统调⽤并显⽰参数和返回值的详细信息。它将采集 `fork->exec` 序列中的新进程，但不包括只 fork() 不 exec() 的应⽤，如⼯作器进程。
 - `opensnoop`：跟踪系统范围内的 open() 系统调⽤，并显⽰进程名称和路径名称详细信息。opensnoop 对于在应⽤启动期间发现配置和⽇志⽂件⾮常有⽤。
@@ -442,7 +454,7 @@ $ sudo ls /usr/share/bcc/tools
 - `cachestat`
 - `gethostlatency`
 
-## ⚕️ 10. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
+## ⚕️ 12. [Linux 磁盘性能测试：FIO & smartctl](https://github.com/Alberthua-Perl/tech-docs/blob/master/Linux%20%E5%9F%BA%E7%A1%80%E4%B8%8E%E8%BF%9B%E9%98%B6/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/Linux%20%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.md)
 
 ## 📚 参考链接
 
