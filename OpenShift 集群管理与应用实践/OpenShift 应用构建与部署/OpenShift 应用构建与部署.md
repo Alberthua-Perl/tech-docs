@@ -1,18 +1,17 @@
-# 🚀 OpenShift 应用构建与部署详解
+# 🧪 OpenShift 应用构建与部署
 
 ## 文档目录
 
-- [🚀 OpenShift 应用构建与部署详解](#-openshift-应用构建与部署详解)
+- [🧪 OpenShift 应用构建与部署](#-openshift-应用构建与部署)
   - [文档目录](#文档目录)
-  - [OCP Project 相关命令](#ocp-project-相关命令)
-  - [使用 `容器镜像` 创建应用 Pod 流程](#使用-容器镜像-创建应用-pod-流程)
-  - [使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 Pod](#使用-containerfile-或-dockerfile-构建应用容器镜像并创建-pod)
-  - [使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 Pod](#使用-应用源代码-以-s2i-的方式注入构建镜像创建应用-pod)
-  - [使用 `template` 模板定义文件创建各应用资源](#使用-template-模板定义文件创建各应用资源)
-  - [Helm 常用命令汇总](#helm-常用命令汇总)
-  - [参考链接](#参考链接)
+  - [1. OCP Project 相关命令](#1-ocp-project-相关命令)
+  - [2. 使用 **容器镜像** 创建应用 Pod 流程](#2-使用-容器镜像-创建应用-pod-流程)
+  - [3. 使用 **`**Containerfile**`** 或 **Dockerfile** 构建应用容器镜像并创建 Pod](#3-使用-containerfile-或-dockerfile-构建应用容器镜像并创建-pod)
+  - [4. 使用 **源代码** 以 **S2I** 的方式注入构建镜像创建应用 Pod](#4-使用-源代码-以-s2i-的方式注入构建镜像创建应用-pod)
+  - [5. 使用 **template** 模板定义文件创建各应用资源](#5-使用-template-模板定义文件创建各应用资源)
+  - [6. Helm 常用命令汇总](#6-helm-常用命令汇总)
 
-## OCP Project 相关命令
+## 1. OCP Project 相关命令
   
 ```bash
 $ oc projects
@@ -33,7 +32,7 @@ $ oc status -v
 # 查看当前所在项目的详细状态，包括 bc 与 dc 状态等。
 ```
 
-## 使用 `容器镜像` 创建应用 Pod 流程
+## 2. 使用 **容器镜像** 创建应用 Pod 流程
   
 ```bash
 $ oc new-app --list
@@ -57,7 +56,7 @@ $ oc new-app \
   
   - 而 OCP 3.x 未集成 deployment 资源，使用以上选项构建应用时依然使用 `deploymentconfig` 资源实现。
 
-## 使用 `Containerfile` 或 `Dockerfile` 构建应用容器镜像并创建 Pod
+## 3. 使用 **`**Containerfile**`** 或 **Dockerfile** 构建应用容器镜像并创建 Pod
   
 ```bash
 $ oc new-app \
@@ -73,7 +72,7 @@ $ oc new-app \
 #        --insecure-registry http://services.lab.example.com/rhel7-echo
 ```
 
-## 使用 `应用源代码` 以 `S2I` 的方式注入构建镜像创建应用 Pod
+## 4. 使用 **源代码** 以 **S2I** 的方式注入构建镜像创建应用 Pod
   
 - 📌 方式 1：
   
@@ -192,7 +191,7 @@ $ oc new-app \
   
   ![s2i-application-build](images/s2i-application-build.jpg)
 
-## 使用 `template` 模板定义文件创建各应用资源
+## 5. 使用 **template** 模板定义文件创建各应用资源
 
 - 该方法常用于部署构建多应用的项目中，需处理好多个应用之间的服务发现问题。
 - oc new-app 命令行中可指定应用的名称（`--name` 选项）、模板名称（`--template` 选项）与命令行参数（`--param`, -p 选项）。
@@ -271,7 +270,7 @@ $ oc new-app \
 
     ![ocp4-template-php-mysql-ephemeral-3](images/ocp4-template-php-mysql-ephemeral-3.jpg)
 
-## Helm 常用命令汇总
+## 6. Helm 常用命令汇总
 
 ```bash
 ### Helm Chart Repository 相关操作 ###
@@ -324,7 +323,3 @@ $ helm list
 $ helm history <release_name>
 # 查看指定应用 release 的历史版本
 ```
-
-## 参考链接
-
-- [⭕ Red Hat OpenShift 基础架构与原理详解](https://github.com/Alberthua-Perl/tech-docs/blob/master/Red%20Hat%20OpenShift%20Container%20Platform/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3/Red%20Hat%20OpenShift%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3.md)
