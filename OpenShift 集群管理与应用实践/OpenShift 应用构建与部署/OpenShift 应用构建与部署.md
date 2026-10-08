@@ -6,7 +6,7 @@
   - [文档目录](#文档目录)
   - [1. OCP Project 相关命令](#1-ocp-project-相关命令)
   - [2. 使用 **容器镜像** 创建应用 Pod 流程](#2-使用-容器镜像-创建应用-pod-流程)
-  - [3. 使用 **`**Containerfile**`** 或 **Dockerfile** 构建应用容器镜像并创建 Pod](#3-使用-containerfile-或-dockerfile-构建应用容器镜像并创建-pod)
+  - [3. 使用 **Containerfile** 或 **Dockerfile** 构建应用容器镜像并创建 Pod](#3-使用-containerfile-或-dockerfile-构建应用容器镜像并创建-pod)
   - [4. 使用 **源代码** 以 **S2I** 的方式注入构建镜像创建应用 Pod](#4-使用-源代码-以-s2i-的方式注入构建镜像创建应用-pod)
   - [5. 使用 **template** 模板定义文件创建各应用资源](#5-使用-template-模板定义文件创建各应用资源)
   - [6. Helm 常用命令汇总](#6-helm-常用命令汇总)
@@ -56,7 +56,7 @@ $ oc new-app \
   
   - 而 OCP 3.x 未集成 deployment 资源，使用以上选项构建应用时依然使用 `deploymentconfig` 资源实现。
 
-## 3. 使用 **`**Containerfile**`** 或 **Dockerfile** 构建应用容器镜像并创建 Pod
+## 3. 使用 **Containerfile** 或 **Dockerfile** 构建应用容器镜像并创建 Pod
   
 ```bash
 $ oc new-app \
