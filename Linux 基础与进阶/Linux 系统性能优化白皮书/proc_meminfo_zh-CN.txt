@@ -1,5 +1,4 @@
------ Linux Programmer's Manual -----
-# 关于 man 手册中 /proc/meminfo 的翻译与讨论
+# man 手册：/proc/meminfo
 
   /proc/meminfo
          This file reports statistics about memory usage on the system.  It is used by free(1) to
