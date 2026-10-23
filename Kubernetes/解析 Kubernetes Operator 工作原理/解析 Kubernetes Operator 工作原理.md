@@ -1,5 +1,15 @@
 # 解析 Kubernetes Operator 工作原理
 
+## 文档目录
+
+- [解析 Kubernetes Operator 工作原理](#解析-kubernetes-operator-工作原理)
+  - [文档目录](#文档目录)
+  - [1. 概述](#1-概述)
+  - [2. Kubernetes Operator 的工作原理](#2-kubernetes-operator-的工作原理)
+  - [3. 用 Kubernetes Operator 实现状态调整](#3-用-kubernetes-operator-实现状态调整)
+  - [4. Operator 的常规结构与功能总结](#4-operator-的常规结构与功能总结)
+  - [参考链接](#参考链接)
+
 ## 1. 概述
 
 在以 Kubernetes 为事实标准的云原生环境中，Kubernetes Operator 是强有力的工具，籍此，Kubernetes 集群得以充分扩展功能。基于以下两图，本文简述了 Operator、Controller 和 Custom Resources 的协同工作机制。
