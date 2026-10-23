@@ -2,12 +2,12 @@
 
 ## 环境说明
 
-| 主机名 | IPv4 地址 | Linux 发行版 | vCPU | 内存 |
-| ----- | ----- | ----- | ----- | ----- |
-| nodea.private.example.com | 192.168.0.11/24 | RHEL8.3 | 2 | 2GiB |
-| nodeb.private.example.com | 192.168.0.12/24 | RHEL8.3 | 2 | 2GiB |
-| nodec.private.example.com | 192.168.0.13/24 | RHEL8.3 | 2 | 2GiB |
-| noded.private.example.com | 192.168.0.14/24 | RHEL8.3 | 2 | 2GiB |
+| 主机名                    | IPv4 地址       | Linux 发行版 | vCPU | 内存 |
+| ------------------------- | --------------- | ------------ | ---- | ---- |
+| nodea.private.example.com | 192.168.0.11/24 | RHEL8.3      | 2    | 2GiB |
+| nodeb.private.example.com | 192.168.0.12/24 | RHEL8.3      | 2    | 2GiB |
+| nodec.private.example.com | 192.168.0.13/24 | RHEL8.3      | 2    | 2GiB |
+| noded.private.example.com | 192.168.0.14/24 | RHEL8.3      | 2    | 2GiB |
 
 以上 192.168.0.101~104 地址为支持 IPMI 协议的带外管理口 IPv4 地址。
 
@@ -16,6 +16,7 @@
 - [Pacemaker 高可用集群原理与实践](#pacemaker-高可用集群原理与实践)
   - [环境说明](#环境说明)
   - [文档目录](#文档目录)
+  - [Pacemaker 核心架构与组成](#pacemaker-核心架构与组成)
   - [部署配置 Pacemaker 集群](#部署配置-pacemaker-集群)
     - [放行三节点高可用防火墙](#放行三节点高可用防火墙)
     - [启用订阅频道、安装 Pacemaker 与 Fence 代理软件包](#启用订阅频道安装-pacemaker-与-fence-代理软件包)
@@ -33,7 +34,28 @@
     - [仲裁计算选项详解](#仲裁计算选项详解)
     - [仲裁计算选项设置](#仲裁计算选项设置)
   - [隔离集群故障节点](#隔离集群故障节点)
+    - [获取 fence 代理状态](#获取-fence-代理状态)
+    - [管理 fence 设备](#管理-fence-设备)
+  - [Pacemaker 集群的资源与资源组](#pacemaker-集群的资源与资源组)
   - [参考链接](#参考链接)
+
+## Pacemaker 核心架构与组成
+
+Pacemaker 和 Corosync 组成了 Linux 上的标准开源高可用性（HA）集群堆栈。
+
+核心职责：
+
+- Pacemaker：作为集群资源管理器（CRM）运行，位于 Corosync 之上，用于监控服务、启动和停止资源，并在节点宕机时执行故障转移。
+- Corosync 集群引擎：作为组通信系统（GCS）运行，负责处理节点成员资格、可靠的消息传递以及对多数表决的跟踪，以确定哪些节点处于活动状态。
+- PCS / pcsd：主要工具，可通过命令行或网页界面配置、控制和监控 Pacemaker 和 Corosync。
+
+关键组件与要求：
+
+- STONITH / Fencing：对于生产环境设置至关重要。它会在重启其他位置的服务前关闭已失效或被分区的节点，防止数据分裂损坏。
+- 配置文件：
+  - Corosync 的配置文件存储在 `/etc/corosync/corosync.conf` 中。
+  - Pacemaker 将其状态保存在 Cluster Information Base（CIB）XML 文件中，路径为 `/var/lib/pacemaker/cib/cib.xml`（通过 pcs 或 crm 等工具管理，绝不能直接编辑）。
+- 网络端口：通常使用 TCP 2224（pcsd）、TCP 3121 以及 UDP/TCP 5404–5405 进行 Corosync 消息传递。
 
 ## 部署配置 Pacemaker 集群
 
@@ -114,16 +136,16 @@ nodec.private.example.com: Cluster Enabled
 [root@nodea ~]# pcs stonith create fence_nodec fence_ipmilan pcmk_host_list=nodec.private.example.com ip=192.168.0.103 username=admin password=password lanplus=1 power_timeout=180
 ```
 
-| 参数 | 值 | 含义 |
-| ----- | ----- | ----- |
-| `fence_nodea` | — | stonith 资源在 Pacemaker 中的 **自定义名字** |
-| `fence_ipmilan` | — | 使用的 **fence agent**（隔离代理程序），通过 IPMI-over-LAN 协议操作服务器的 BMC（如 iDRAC/iLO/iBMC 等带外管理控制器）。 |
-| `pcmk_host_list` | `nodea.private.example.com` | 指定 **该设备负责隔离哪些节点**。Pacemaker 决定隔离 nodea 时，只会调用配置了它名字的 fence 设备。名字必须与 `corosync.conf` / `pcs status` 中显示的节点名一致，否则隔离时会报 "not found"。 |
-| `ip` | `192.168.0.101` | nodea 的 **BMC/带外管理口 IP 地址**（不是业务网卡 IP）。fence agent 通过这个地址连接 IPMI 服务执行电源操作 |
-| `username` | `admin` | **BMC 带外管理口的登录用户名**，不是操作系统账号。 |
-| `password` | `password` | **BMC 的登录密码**（示例中是弱口令，生产环境应改强密码并注意该密码会以明文存于集群配置库 CIB 中，权限要控制好）。 |
-| `lanplus=1` | — | 使用 **IPMI v2.0（RMCP+ / LANplus）**，加密且支持更长的密码。现代 BMC 基本必须开；若设为 0 则走 IPMI v1.5，很多新硬件会直接连不上。 |
-| `power_timeout=180` | 180 秒 | **电源操作超时时间**。执行 power off/reset 后，agent 会轮询确认节点电源状态，180 秒内未确认操作生效就判定失败，返回错误给 Pacemaker。 |
+| 参数                  | 值                            | 含义                                                                                                                                                                                                  |
+| --------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fence_nodea`       | —                            | stonith 资源在 Pacemaker 中的 **自定义名字**                                                                                                                                                    |
+| `fence_ipmilan`     | —                            | 使用的 **fence agent**（隔离代理程序），通过 IPMI-over-LAN 协议操作服务器的 BMC（如 iDRAC/iLO/iBMC 等带外管理控制器）。                                                                         |
+| `pcmk_host_list`    | `nodea.private.example.com` | 指定 **该设备负责隔离哪些节点**。Pacemaker 决定隔离 nodea 时，只会调用配置了它名字的 fence 设备。名字必须与 `corosync.conf` / `pcs status` 中显示的节点名一致，否则隔离时会报 "not found"。 |
+| `ip`                | `192.168.0.101`             | nodea 的 **BMC/带外管理口 IP 地址**（不是业务网卡 IP）。fence agent 通过这个地址连接 IPMI 服务执行电源操作                                                                                      |
+| `username`          | `admin`                     | **BMC 带外管理口的登录用户名**，不是操作系统账号。                                                                                                                                              |
+| `password`          | `password`                  | **BMC 的登录密码**（示例中是弱口令，生产环境应改强密码并注意该密码会以明文存于集群配置库 CIB 中，权限要控制好）。                                                                               |
+| `lanplus=1`         | —                            | 使用 **IPMI v2.0（RMCP+ / LANplus）**，加密且支持更长的密码。现代 BMC 基本必须开；若设为 0 则走 IPMI v1.5，很多新硬件会直接连不上。                                                             |
+| `power_timeout=180` | 180 秒                        | **电源操作超时时间**。执行 power off/reset 后，agent 会轮询确认节点电源状态，180 秒内未确认操作生效就判定失败，返回错误给 Pacemaker。                                                           |
 
 ### 查看 stonith 资源状态
 
@@ -201,20 +223,20 @@ $ pcs status corosync
 
 ## Corosync 仲裁 vs Ceph 仲裁对比
 
-| 对比维度 | Corosync 仲裁（votequorum） | Ceph 仲裁 |
-| ----- | ----- | ----- |
-| **解决的问题** | 集群节点故障时，**谁有权继续运行资源/服务**（防止脑裂） | 分布式存储中，**哪份数据视图/写入是权威的**（保证数据一致性） |
-| **所在层** | 集群资源管理层（Pacemaker 的基础设施） | 存储系统内部，贯穿 MON、OSD、MDS |
-| **算法基础** | 多数派投票（majority，> n/2 票数） | Monitor 用 **Paxos**（基于法定人数共识）；OSD 副本组用**过半数副本确认** |
-| **投票主体** | 每个集群节点 1 票（可配置权重） | Monitor 集群成员（通常 3 或 5 个 MON）；OSD 则是每个副本（replica）1 票 |
-| **仲裁单位** | 整个集群一个 quorum | 多层独立仲裁：**MON 层**（集群地图 monmap）+ **PG 层**（每个 PG 副本组独立选 acting set） |
-| **典型规模** | 2~32 节点的小型 HA 集群 | 可达上千 OSD、少量 MON（3/5 个） |
-| **脑裂防护** | 失去 quorum 的分区**自我下线/拒绝服务** | 失去多数副本的 PG 进入 **incomplete/error，拒绝 I/O**；双分区时只有有 majority 的一边可写 |
-| **特殊机制** | **QDevice**：2 节点集群引入第三方投票避免平局；last man standing | **tiebreaker MON**：恰好 2 个 MON 时对 monmap 变更起决胜作用；**stretch mode** 跨站点仲裁（tiebreaker site） |
-| **MON 选举** | 无（quorum 达成后由 Pacemaker 再选 DC） | 有，Paxos 选举 leader（leader 持有 paxos.lease，处理 monmap/osdmap 变更） |
-| **数据一致性含义** | 不涉及数据，只决定 "资源在哪运行" | 强相关：PG 日志（pg\_log）以 majority 副本为准做 peering，保证副本间日志收敛 |
-| **失去仲裁的表现** | 节点停资源、集群拒绝启动新资源；有 fence 时触发 stonith | MON 失去 quorum → 集群管理面冻结；PG 失去 majority → 该 PG 的 I/O 阻塞（inactive） |
-| **恢复方式** | 节点重新加入，票数恢复过半即自动恢复 quorum | MON 恢复多数后自动恢复；OSD 副本修复（recovery/backfill）使 PG 回到 active+clean |
+| 对比维度                 | Corosync 仲裁（votequorum）                                            | Ceph 仲裁                                                                                                                |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **解决的问题**     | 集群节点故障时，**谁有权继续运行资源/服务**（防止脑裂）          | 分布式存储中，**哪份数据视图/写入是权威的**（保证数据一致性）                                                      |
+| **所在层**         | 集群资源管理层（Pacemaker 的基础设施）                                 | 存储系统内部，贯穿 MON、OSD、MDS                                                                                         |
+| **算法基础**       | 多数派投票（majority，> n/2 票数）                                     | Monitor 用 **Paxos**（基于法定人数共识）；OSD 副本组用**过半数副本确认**                                     |
+| **投票主体**       | 每个集群节点 1 票（可配置权重）                                        | Monitor 集群成员（通常 3 或 5 个 MON）；OSD 则是每个副本（replica）1 票                                                  |
+| **仲裁单位**       | 整个集群一个 quorum                                                    | 多层独立仲裁：**MON 层**（集群地图 monmap）+ **PG 层**（每个 PG 副本组独立选 acting set）                    |
+| **典型规模**       | 2~32 节点的小型 HA 集群                                                | 可达上千 OSD、少量 MON（3/5 个）                                                                                         |
+| **脑裂防护**       | 失去 quorum 的分区**自我下线/拒绝服务**                          | 失去多数副本的 PG 进入 **incomplete/error，拒绝 I/O**；双分区时只有有 majority 的一边可写                          |
+| **特殊机制**       | **QDevice**：2 节点集群引入第三方投票避免平局；last man standing | **tiebreaker MON**：恰好 2 个 MON 时对 monmap 变更起决胜作用；**stretch mode** 跨站点仲裁（tiebreaker site） |
+| **MON 选举**       | 无（quorum 达成后由 Pacemaker 再选 DC）                                | 有，Paxos 选举 leader（leader 持有 paxos.lease，处理 monmap/osdmap 变更）                                                |
+| **数据一致性含义** | 不涉及数据，只决定 "资源在哪运行"                                      | 强相关：PG 日志（pg\_log）以 majority 副本为准做 peering，保证副本间日志收敛                                             |
+| **失去仲裁的表现** | 节点停资源、集群拒绝启动新资源；有 fence 时触发 stonith                | MON 失去 quorum → 集群管理面冻结；PG 失去 majority → 该 PG 的 I/O 阻塞（inactive）                                     |
+| **恢复方式**       | 节点重新加入，票数恢复过半即自动恢复 quorum                            | MON 恢复多数后自动恢复；OSD 副本修复（recovery/backfill）使 PG 回到 active+clean                                         |
 
 - Corosync 仲裁："谁能干活" —— 票数过半的一方才有权调度资源，服务于防脑裂。
 - Ceph 仲裁："哪份数据算数" —— MON 用 Paxos 维护集群地图，每个 PG 用副本过半决定权威日志，服务于数据一致性。
@@ -239,18 +261,21 @@ quorum = floor(expected_votes / 2 + 1)
 - /etc/corosync/corosync.conf 配置文件扩展模式选项：
   - `two_node: 1`：2 节点集群要求 2 票全到才给 quorum（特例）
   - `wait_for_all: 1`：
+
     - 集群冷启动时必须等所有节点都加入过一次才授予 quorum，防止启动脑裂（split-brain）。
     - 此设置可有效防止集群启动时发生 **围栏竞态**（fence race）。
     - 若未启用此设置，一旦达到 quorum，所有未加入集群或已正常关闭的节点将被自动围栏隔离。
 
-    > **fence race（围栏竞态）**：集群发生脑裂/通信中断时，两个节点同时互相执行 fence（隔离/踢掉对方），谁先下手谁 "赢"，甚至出现双方都成功的局面。</br>
-    > **典型场景**：以 2 节点集群为例，心跳网络中断后，双方都看不到对方，都认为对方死了，双方各自启动 fence 流程，即 A 去 fence B，B 同时去 fence A，结果取决于 fence 设备（IPMI/iLO 等）哪个指令先生效 —— 这是个**时间竞态**。</br>
+    > **fence race（围栏竞态）**：集群发生脑裂/通信中断时，两个节点同时互相执行 fence（隔离/踢掉对方），谁先下手谁 "赢"，甚至出现双方都成功的局面。
+    > **典型场景**：以 2 节点集群为例，心跳网络中断后，双方都看不到对方，都认为对方死了，双方各自启动 fence 流程，即 A 去 fence B，B 同时去 fence A，结果取决于 fence 设备（IPMI/iLO 等）哪个指令先生效 —— 这是个**时间竞态**。
     > **具体危害**：最坏情况是双方都 fence 成功，两台同时被断电重启，整个集群服务全停，即使只有一方成功，"赢" 的判定也是碰运气，不可预测。fence 动作本身有延迟（IPMI 几秒到几十秒），竞态窗口很真实。
-
+    >
   - `auto_tie_breaker: 1`：
+
     - 仅需集群节点的 50% 处于在线状态，即可达到就绪条件，而无需默认的 50% 加 1 票。
     - 在出现 50% 对 50% 脑裂的情况时，**最低节点 ID** 的主机将获得就绪权。
   - `last_man_standing: 1`：**LMS**
+
     - 系统默认每 10 秒重新计算一次预期的投票数（expected_votes），重新计算的时间间隔由 last_man_standing_window 选项设置，默认设置为 10000 毫秒（即 10 秒）。
     - 设置此选项后，节点逐个离开时动态下调 quorum，允许最后剩下的少数节点保留 quorum。
     - 这使系统管理员能够逐个断开集群节点，直到仅剩两个节点在集群中活跃参与。
@@ -332,11 +357,13 @@ $ pcs quorum status
 
   $ corosync-cfgtool -s
   #查看 corosync 环（ring）状态和各节点通信是否正常
-  ```
+```
 
 ## 隔离集群故障节点
 
 STONITH（全称 Shoot The Other Node In the Head）fence 隔离故障节点依赖 fence 设备与 fence 代理。
+
+### 获取 fence 代理状态
 
 ```bash
 $ pcs stonith list
@@ -359,6 +386,8 @@ Stonith options:
   ...
 #查看名为 fence_ipmilan 代理的具体参数
 ```
+
+### 管理 fence 设备
 
 ```bash
 ### 创建 fence 设备 ###
@@ -390,6 +419,26 @@ pcs stonith config fence_custom
   Attributes: ip=192.168.0.100 password=password pcmk_host_map=nodea.private.example.com:1;nodeb.private.example.com:2;nodec.private.example.com:3 power_timeout=180 username=admin
   Operations: monitor interval=60s (fence_custom-monitor-interval-60s)
 #查看 stonith fence 设备的具体配置信息
+```
+
+## Pacemaker 集群的资源与资源组
+
+高可用性附加组件（High-Availability Add-On）为集群资源提供了广泛的支持。集群资源由被称作代理的脚本（resource agents）进行管理。
+
+- LSB：位于 `/etc/init.d/` 中的、与 Linux 标准基础（Linux Standard Base）兼容的 init 脚本。
+- OCF：与 Open Cluster Framework 兼容的脚本，是扩展自 LSB 初始化脚本的，可处理额外的输入参数，以提供对集群资源的更多控制，这些脚本位于 `/usr/lib/ocf/resource.d/provider` 目录下。Red Hat 提供的大多数代理使用 **heartbeat** 作为提供程序。
+- Systemd：Systemd 单元文件是 Red Hat Enterprise Linux 8 上定义和管理服务的标准方式。
+
+```bash
+$ pcs status resources
+#查看集群全部资源
+
+$ pcs resource list
+#查看集群所有资源代理
+
+$ pcs resource describe <resource_name>
+$ pcs resource describe Filesystem
+#查看指定资源代理的详细参数信息
 ```
 
 ## 参考链接

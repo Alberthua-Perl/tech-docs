@@ -44,11 +44,64 @@ CNI 只是一份接口规范（ADD / DEL / CHECK 命令 + JSON 网络配置 + IP
 
 CNI 通过容器引擎（如 CRI-O 或 Containerd）与 CNI 插件之间的交互来运行。容器引擎并不直接管理网络，而是当 Pod 被创建或删除时，调用 CNI 插件。
 
-CNI 请求的生命周期遵循特定的顺序：
+### CNI 请求的生命周期遵循特定的顺序
 
 - 1️⃣ 容器引擎为 Pod 创建一个网络命名空间。
 - 2️⃣ 引擎在 `/etc/cni/net.d/` 目录中识别 CNI 配置文件。
 - 3️⃣ 引擎会调用 CNI 插件，并传递特定的环境变量和 JSON 配置。
+
+### 🧬 **CRI、CNI 与 CNI 插件之间的调用时序图**
+
+| 组件 | 代码归属（谁写的） | 运行时位置（在哪执行） |
+| ----- | ----- | ----- |
+| **skel** | CNI 官方库（`containernetworking/cni/pkg/skel`） | **编译进插件二进制**，随插件进程启动 |
+| **cmdAdd** | 插件作者自己写的 | 插件进程内，被 skel 分发调用 |
+
+关键点：Go 库没有独立进程。skel 是静态链接进 /opt/cni/bin/xxx 的 —— 所以用户看到的 "插件进程" 里其实跑着两部分代码：CNI 库提供的框架（skel）+ 插件自己的业务（cmdAdd）。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant K as kubelet
+    participant C as CRI (containerd + libcni)
+    box rgb(235, 242, 250) 插件进程（一个二进制，含两套代码）
+        participant S as skel 框架<br/>[代码归属: CNI库]
+        participant P as cmdAdd 回调<br/>[代码归属: 插件]
+    end
+    participant I as IPAM 插件 (独立二进制)
+
+    K->>C: RunPodSandbox(PodConfig)
+    C->>C: 创建 netns，选择 /etc/cni/net.d/*.conflist
+
+    Note over C,S: libcni 现拼 env（CNI_COMMAND=ADD）+ stdin JSON
+    C->>S: execve fork 插件进程
+    activate S
+
+    rect rgb(255, 235, 235)
+        Note over S: skel 阶段<br/>getCmdArgsFromEnv() 解析 env<br/>解析 stdin JSON + 版本协商<br/>（CNI 库代码，在插件进程内执行）
+    end
+
+    S->>P: 按 CNI_COMMAND 分发调用
+    activate P
+
+    rect rgb(235, 250, 235)
+        Note over P: cmdAdd 阶段<br/>调 IPAM、建 veth、配接口<br/>（插件自己写的代码）
+    end
+    P->>I: ExecAdd（再次 fork，CNI 协议嵌套）
+    I-->>P: IP 分配结果
+    P-->>S: return types.Result
+    deactivate P
+
+    S-->>C: stdout 输出 result JSON
+    deactivate S
+    C-->>K: Sandbox Ready
+```
+
+## OVN-Kubernetes CNI 组件状态
+
+```bash
+$ oc get clusteroperators network
+```
 
 ## 参考链接
 

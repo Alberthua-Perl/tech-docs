@@ -444,6 +444,8 @@ $ sudo ls /usr/share/bcc/tools
 # 安装 bcc-tools 工具集
 ```
 
+<center><img src="images/eBPF-all-frontends.png" style="width:60%"></center>
+
 ### 11.2 常见 BCC 工具
 
 - `execsnoop`：只捕获执行了新程序的进程，即调用了 `execve()`，而不捕获单纯 fork 出来的子进程。。比如，execsnoop 跟踪 execve() 系统调⽤并显⽰参数和返回值的详细信息。它将采集 `fork->exec` 序列中的新进程，但不包括只 fork() 不 exec() 的应⽤，如⼯作器进程。
