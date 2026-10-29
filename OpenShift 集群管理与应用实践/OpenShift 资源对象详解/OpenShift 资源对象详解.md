@@ -4,33 +4,27 @@
 
 - [⭕ OpenShift 资源对象详解](#-openshift-资源对象详解)
   - [文档目录](#文档目录)
+  - [0. 总论：OCP 资源间的关系与工作流程](#0-总论ocp-资源间的关系与工作流程)
   - [1. Master 类型节点](#1-master-类型节点)
   - [2. Worker 类型节点](#2-worker-类型节点)
   - [3. Project 资源对象](#3-project-资源对象)
-  - [📦 4. ImageStream (is) 与 ImageStreamTag (istag) 资源对象](#-4-imagestream-is-与-imagestreamtag-istag-资源对象)
+  - [4. ImageStream (is) 与 ImageStreamTag (istag) 资源对象](#4-imagestream-is-与-imagestreamtag-istag-资源对象)
     - [4.1 基础概念](#41-基础概念)
-    - [👨‍💻 4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**](#-42-示例从-ocp-external-registry-导入外部容器镜像至-ocp-集群)
+    - [4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**](#42-示例从-ocp-external-registry-导入外部容器镜像至-ocp-集群)
     - [4.3 OCP internal registry 镜像缓存说明](#43-ocp-internal-registry-镜像缓存说明)
     - [4.4 image stream 资源使用](#44-image-stream-资源使用)
-    - [💎 4.5 OCP4 internal registry 说明](#-45-ocp4-internal-registry-说明)
+    - [4.5 OCP4 internal registry 说明](#45-ocp4-internal-registry-说明)
     - [4.6 image stream 使用报错示例](#46-image-stream-使用报错示例)
-  - [⚙️ 5. BuildConfig (bc) 与 Build 资源对象](#️-5-buildconfig-bc-与-build-资源对象)
+  - [5. BuildConfig (bc) 与 Build 资源对象](#5-buildconfig-bc-与-build-资源对象)
     - [5.1 基础概念](#51-基础概念)
     - [5.2 构建触发器（build trigger）类型](#52-构建触发器build-trigger类型)
     - [5.3 build 构建与 S2I 说明](#53-build-构建与-s2i-说明)
     - [6. DeploymentConfig (dc) 与 Deploy 资源对象](#6-deploymentconfig-dc-与-deploy-资源对象)
-  - [💎 7. Deployment 资源对象](#-7-deployment-资源对象)
+  - [7. Deployment 资源对象](#7-deployment-资源对象)
   - [8. ReplicationController (rc) 与 ReplicaSet 资源对象](#8-replicationcontroller-rc-与-replicaset-资源对象)
   - [9. Pod 资源对象](#9-pod-资源对象)
   - [10. Label 资源对象](#10-label-资源对象)
-  - [🔥 11. Service (svc) 资源对象](#-11-service-svc-资源对象)
-    - [🚀 11.1 OCP3 \& OCP4 的网络模型类型](#-111-ocp3--ocp4-的网络模型类型)
-    - [11.2 service 资源对象处理的场景](#112-service-资源对象处理的场景)
-    - [11.3 service 在 Kubernetes 中的实现方式](#113-service-在-kubernetes-中的实现方式)
-    - [11.4 service 的类型](#114-service-的类型)
-    - [11.5 service 与 pod 的关联方式](#115-service-与-pod-的关联方式)
-    - [11.6 service 与服务发现](#116-service-与服务发现)
-    - [11.7 service 与实现跨节点通信的 CNI 插件的关系](#117-service-与实现跨节点通信的-cni-插件的关系)
+  - [11. Service 资源对象](#11-service-资源对象)
   - [12. Route 资源对象](#12-route-资源对象)
   - [13. PersistentVolume (pv) 资源对象](#13-persistentvolume-pv-资源对象)
   - [14. PersistentVolumeClaim (pvc) 资源对象](#14-persistentvolumeclaim-pvc-资源对象)
@@ -38,11 +32,15 @@
     - [15.1 基础概念](#151-基础概念)
     - [15.2 创建与使用 secret 资源对象](#152-创建与使用-secret-资源对象)
     - [15.3 提取与更新 secret](#153-提取与更新-secret)
-    - [👨‍💻 **15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**](#-154-示例ocp-46-中使用-secret-拉取外部私有容器镜像)
+    - [**15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**](#154-示例ocp-46-中使用-secret-拉取外部私有容器镜像)
     - [15.5 serviceaccount 与 secret 的关联](#155-serviceaccount-与-secret-的关联)
   - [16. ConfigureMap (cm) 资源对象](#16-configuremap-cm-资源对象)
     - [16.1 基础概念](#161-基础概念)
     - [16.2 创建与使用 configmap 资源](#162-创建与使用-configmap-资源)
+
+## 0. 总论：OCP 资源间的关系与工作流程
+  
+<center><img src="images/OCP3-resource-workflow.jpg" style="width:80%"></center>
 
 ## 1. Master 类型节点
 
@@ -61,9 +59,9 @@
   - `data-store`：
     `etcd` 分布式键值型数据库，用于服务配置发现，OCP 集群中的数据存储与核心。
 
-    ![ocp3-master-pod](images/ocp3-master-pod.jpg)
+    ![OCP3-master-pod](images/OCP3-master-pod.jpg)
 
-    ![ocp3-master-etcd](images/ocp3-master-etcd.jpg)
+    ![OCP3-master-etcd](images/OCP3-master-etcd.jpg)
 
 ## 2. Worker 类型节点
 
@@ -82,7 +80,7 @@
 - 若未将 `self-provisioner` 角色从指定用户去除，使用指定用户创建的项目，该用户即为项目的项目管理员。
 - default 项目与 openshift 项目能被所有用户使用，但只能由 `system:admin` 用户或具有 `cluster-admin` 角色的用户管理。
 
-## 📦 4. ImageStream (is) 与 ImageStreamTag (istag) 资源对象
+## 4. ImageStream (is) 与 ImageStreamTag (istag) 资源对象
 
 ### 4.1 基础概念
 
@@ -125,7 +123,7 @@
 
   > ✅ external 与 internal 相对于 OCP 集群内外而言
   
-### 👨‍💻 4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**
+### 4.2 **示例：从 OCP external registry 导入外部容器镜像至 OCP 集群**
 
 - 1️⃣ 方式 1：</br>
   `skopeo` 命令拷贝已从 OCP external registry 中拷贝的 `OCI` 格式目录至 OCP internal registry 中成为指定项目的 image stream，该 image stream 在项目中会自动创建（见如下补充中的示例）。
@@ -231,7 +229,7 @@
 
   > ✅ 注意：可为 service account 添加 scc 与 role，也可将相关的 secret 链接至 service account。
   
-### 💎 4.5 OCP4 internal registry 说明
+### 4.5 OCP4 internal registry 说明
 
 - OCP internal registry 只存储由 `S2I` 构建或 `Dockerfile/Containerfile` 构建的应用镜像，以实现一次构建多次部署。
 - OpenShift 安装程序将 internal registry 配置为仅仅集群内部可被集群管理员、各项目用户或各个组件等访问。
@@ -300,7 +298,7 @@
 
   ![imagestream-error-3](images/imagestream-error-3.jpg)
 
-## ⚙️ 5. BuildConfig (bc) 与 Build 资源对象
+## 5. BuildConfig (bc) 与 Build 资源对象
 
 ### 5.1 基础概念
 
@@ -368,9 +366,9 @@
 
         - 💥 `oc start-build` 构建报错示例：
 
-          ![ocp3-start-build-error-1](images/ocp3-start-build-error-1.jpg)
+          ![OCP3-start-build-error-1](images/OCP3-start-build-error-1.jpg)
 
-          ![ocp3-start-build-error-2](images/ocp3-start-build-error-2.jpg)
+          ![OCP3-start-build-error-2](images/OCP3-start-build-error-2.jpg)
 
       - 2️⃣ GitHub：
         - 配置 GitHub 的 webhook 功能可在代码更新时向 OpenShift 推送代码以 `自动` 触发构建。
@@ -504,7 +502,7 @@
 - 由于 buildconfig 中 imagestreamtag 的改变，deploymentconfig 或 deployment 中可探测到 imagestreamtag 的改变针对新构建应用镜像的自动重新部署。
   - 👉 OCP3 中 deploymentconfig 的 `imagestreamtag trigger`：
 
-    ![ocp3-imagestreamtag-trigger-dc-deploy](images/ocp3-imagestreamtag-trigger-dc-deploy.jpg)
+    ![OCP3-imagestreamtag-trigger-dc-deploy](images/OCP3-imagestreamtag-trigger-dc-deploy.jpg)
 
   - 👉 OCP4 中 deployment 的 `imagestreamtag trigger`：
 
@@ -519,7 +517,7 @@
 - 若新部署的 pod 无法正确运行，删除 deploy pod 后，将自动删除正在由 deploy pod 部署的其他 pod。
 - 🔎 关于 deploymentconfig 资源 deprecated 状态的说明，可参考 [DeploymentConfig API is being deprecated in Red Hat OpenShift Container Platform 4.14](https://access.redhat.com/articles/7041372)。
 
-## 💎 7. Deployment 资源对象
+## 7. Deployment 资源对象
 
 - OCP4 中建议使用 Deployment 以代替 DeploymentConfig，而此资源对象为保证兼容性依然得以保留。
 - OCP4 中 deploymentconfig 集成 replication controller，该控制器支持基于等值类型的标签选择器（`equality-based selector`），而 deployment 中集成 `replicaset`，该控制器支持基于集合类型的标签选择器（`set-based selector`），两者均通过与 pod 的特定标签与 pod 进行关联，实现 pod 副本数的高可用。
@@ -579,159 +577,9 @@ $ oc rollout restart deployment <deployment_name>
 - 类型：基于等值类型的标签 + 基于集合类型的标签（OCP4 已支持）
 - OCP 集群中的各种资源使用 label 标签进行匹配
 
-## 🔥 11. Service (svc) 资源对象
-
-### 🚀 11.1 OCP3 & OCP4 的网络模型类型
-
-- 1️⃣ 高耦合的 pod 内部容器间（container-to-container）的通信
-- 2️⃣ pod 与 pod 间（pod-to-pod）的通信（同节点或跨节点）：`CNI plugins`
-- 3️⃣ pod 与 service 间（pod-to-service）的通信：`iptables`、`ipvs`、`OpenFlow rules`、`Cillium eBPF`
-- 4️⃣ 集群外部与 service 间（external-to-service）的通信：`openshift route`、`ingress`
-- OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件：
-
-  ```bash
-  $ oc get deployment/network-operator -n openshift-network-operator
-  # 查看 CNO 部署的 deployment 与 pod
-  ```
-
-  ![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
-
-- OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
-
-  ```bash
-  $ oc get network.config.openshift.io cluster -o yaml
-  $ oc get network.config/cluster -o yaml
-  # 以上命令等效
-  ```
-
-  ![ocp4-pod-service-subnet](images/ocp4-pod-service-subnet.png)
-
-### 11.2 service 资源对象处理的场景
-
-- 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
-- service 为 pod 提供统一的入口 IP 地址，该入口地址默认为 service 的虚拟 IP 地址（`ClusterIP`）。
-- service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。  
-
-### 11.3 service 在 Kubernetes 中的实现方式
-
-- service 提供三种代理模式：
-  - `userspace`：
-    - 早期的代理模式，由于性能较差该模式已废弃不再使用。
-  - `iptables`：
-    - OpenShift 当前默认的代理模式
-    - 但是，该模式只能支持简单的负载均衡能力，若需实现复杂的负载均衡算法需引入其他方式。
-  - `ipvs`：
-    - 该模式自 `Kubernetes v1.11` 版本开始已达到 GA（一般可用性）水平，并在之后的版本中成为默认的 service 代理模式。
-    - Kubernetes 既可使用 iptables 实现流量的转发规则，也可使用 ipvs 实现流量的负载均衡能力。
-- service 资源由 `kube-proxy` 组件实现，其虚拟 IP 地址存在于每个节点的 iptables NAT 表中，使用 `iptables -t nat -nvL` 命令即可查看指定的 ClusterIP。
-- 使用原生 `kube-proxy` 实现的 service 与自研的 service 解决方案的响应对比：
-
-  ![service-performance](images/service-performance.jpg)
-
-- 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
-- OCP3 中的 service 网段与 pod 网段的定义示意：
-
-  ![ocp3-network-plugin](images/ocp3-network-plugin.jpg)
-
-### 11.4 service 的类型
-
-- 4大类型：
-  - 1️⃣ `ClusterIP`
-  - 2️⃣ `NodePort`
-  - 3️⃣ `LoadBalancer`：这种类型构建在 NodePort 类型之上，其通过 cloud provider 提供的负载均衡器将服务暴露到集群外部，因此 LoadBalancer 一样具有 NodePort 和 ClusterIP。
-  - 4️⃣ `ExternalIPs`
-
-![K8s-service-type](images/K8s-service-type.jpg)
-
-- 💥 使用 NodePort 类型 service 的资源定义文件更改后再创建 ClusterIP 类型 service 时，需删除其中的 `spec.externalTrafficPolicy` 字段，否则创建失败！
-  
-  ![change-service-type-error](images/change-service-type-error.jpg)
-
-### 11.5 service 与 pod 的关联方式
-
-service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 ReplicationController (OCP3) 或 Deployment (OCP4) 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
-
-![ocp-service-selector-match-pod-label](images/ocp-service-selector-match-pod-label.jpg)
-
-> 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
-
-### 11.6 service 与服务发现
-
-- service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。
-- 服务发现的实现方式：
-  - 1️⃣ service 环境变量：
-    - 前端应用 pod 使用后端应用的 `service 环境变量` 来发现后端应用 pod
-    - 对于项目内的每个 service，将自动定义环境变量，并注入到同一项目中的所有 pod 中。
-    - service 环境变量的服务发现方式：
-      - *svc_name*_SERVICE_HOST：service 的 IP 地址
-      - *svc_name*_SERVICE_PORT：service 的 TCP 端口号
-
-    > 💥 使用 service 环境变量实现服务发现时，必须先创建后端 service，再创建启动前端 pod，才能实现后端 service 环境变量的注入。
-
-  - 2️⃣ SkyDNS（OCP4 中已淘汰）：
-    - OCP3 中通过 `SkyDNS` 的 `SRV 记录` 实现前端应用对后端应用的服务发现。
-    - `SkyDNS` 服务发现方式：
-      - SkyDNS 进程集成于 OpenShift master 与 node 进程中，无需进一步额外配置。
-      - SkyDNS 将每个 service 动态分配一个 `FQDN` 格式的 `SRV 记录`：*svc_name*.*project_name*.svc.cluster.local
-
-    > ✅ 在 pod 中使用 DNS 查询来实现服务发现，可在 pod 启动后再查找相应的 service。
-
-  - 3️⃣ CoreDNS：
-    - OCP4 中通过名为 dns 的 `ClusterOperator` 部署 `CoreDNS`，CoreDNS 是 CNCF 毕业的成熟的云原生领域域名解析系统。
-    - 集群中各个 pod 可通过其 `/etc/resolv.conf` 中的 nameserver 实现服务发现，其中 nameserver 的 IP 地址为 CoreDNS pod 的 `service IP`。
-    - 每个 pod 都可通过 CoreDNS 查询动态分配的 service 与 `FQDN` 格式的 `SRV 记录`，每条 SRV 记录中的 FQDN 对应一条 A 记录，而 A 记录中的 IP 地址即为一组 pod 的 service IP。其中 SRV 记录的 FQDN 格式为 *svc_name*.*project_name*.svc.cluster.local。通过这种方式不同 pod 间可发现其他 pod 中的服务。以下示例为 web-server pod 可通过 DNS 查询发现 gcw 应用的 service IP：
-
-    ![ocp4-coredns-service-discovery-demo](images/ocp4-coredns-service-discovery-demo.png)
-
-    ![coredns-pod-resolv-2](images/coredns-pod-resolv-2.png)
-
-### 11.7 service 与实现跨节点通信的 CNI 插件的关系
-
-- service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源进行暴露。
-- OCP3 中建议将 service 整合入 DeploymentConfig 中，而 Kubernetes 中建议将 service 定义在 Deployment 中。
-- 💥 service 从逻辑层面解决了 service 与 pod 间的网络通信问题，而 pod 与 pod 间的跨节点间通信必须使用 CNI 插件加以解决。
-- OCP3 中默认使用 `OVS` 作为 SDN 插件，其共有 3 种工作类型，包括 `ovs-subnet`、`ovs-multitenent` 与 `ovs-networkpolicy`。
-- 💎 补充：
-  - OCP4 中依然默认使用 `openshift-sdn` 插件（OVS 插件）的 `ovs-networkpolicy`，以实现更加细粒度的网络资源隔离，可基于 `namespace` 级别以及 `pod` 级别。
-  - ovs-subnet 将所有项目的 pod 置于扁平化（flat）网络中，彼此之间均能通信。
-  - ovs-multitenant 使用 `VNID` 实现不同项目间的 pod 二层隔离，其使用 VXLAN 隧道打通 pod 间在各节点之间的联系。
-  - OCP4 也可以使用 `OVN-Kubernetes` 作为 SDN 插件，但需要在集群规划与部署前确定具体使用哪个 SDN 插件，一旦部署完成不可更改，并且可同时使用 `Multus CNI` 调用其他 CNI 插件使单 pod 同时具备 2 个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
-    - 可参考官方文档 [Understanding multiple networks](https://docs.openshift.com/container-platform/4.6/networking/multiple_networks/understanding-multiple-networks.html)
-
-- 🚀 OCP3 OVS 网络拓扑示意：
-
-  ![ocp3-ovs-1](images/ocp3-ovs-1.png)
-
-  ![ocp3-ovs-2](images/ocp3-ovs-2.png)
-  
-- OCP3 同一节点上 pod 间的通信示意：
-
-  ![ocp3-ovs-3](images/ocp3-ovs-3.png)
-
-- 🚀 OCP3 OVS 流表分析示意：
-
-  ![ocp3-ovs-openflow-1](images/ocp3-ovs-openflow-1.jpg)
-  
-- 🚀 OCP3 中访问使用 `NodePort` service 类型的 pod 跨节点流量分析：
-  以下为 iptables NAT 表与 OVS 流表部分条目，并且 OCP3 集群使用 ovs-subnet SDN 插件，无 `networkpolicy` 策略存在。
-
-  ![NodePort-service-iptables-nat-ovs-analyze](images/NodePort-service-iptables-nat-ovs-analyze.jpg)
+## 11. Service 资源对象
 
 ## 12. Route 资源对象
-  
-- 中文名称：路由
-- 可借助 service 实现 OCP 集群内前后端 pod 间的通信，而 OCP 集群外部对内部 pod 的访问默认需要使用 default 项目的 `router pod` 来实现。
-- OCP 集群外部通过泛域名解析（wildcard）指向特定 `infra` 节点（前端可加负载均衡与高可用），router pod 需指定在该 infra 节点上运行，其 IP 地址与 infra 节点绑定。
-- router pod 以 `HAProxy` 的方式实现。
-- 默认情况下，OCP 集群中的所有项目的 route 规则都将注入到 default 项目中的 router pod 中。
-- router pod 可将外部流量直接转发到 OCP 集群中的应用 pod 上。
-- router pod 只使用相应的 service 在 `etcd` 中查询对应 pod 的 `endpoint`，直接转发流量至 pod。
-- router 路由原理架构示例：
-
-  ![ocp3-route-infra](images/ocp3-route-infra.jpg)
-
-- 💎 补充：
-  - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 ingress controller 与 ingress，而在 OpenShift 中 ingress controller 对应为 HAProxy router pod，而 ingress 对应为 route。
 
 ## 13. PersistentVolume (pv) 资源对象
 
@@ -777,13 +625,13 @@ service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 
 - 更改 dc 或 pod 资源定义的 `persistentVolumeClaim.claimName` 属性值以创建 pod 资源
 - OCP 部署过程中定义 NFS 存储作为 OCP internal registry 的存储后端：
 
-  ![ocp3-internal-registry-pvc-1](images/ocp3-internal-registry-pvc-1.jpg)
+  ![OCP3-internal-registry-pvc-1](images/OCP3-internal-registry-pvc-1.jpg)
   
 - OCP 集群 default 项目中定义的 pv 与 pvc 的关系：
 
-  ![ocp3-internal-registry-pvc-2](images/ocp3-internal-registry-pvc-2.jpg)
+  ![OCP3-internal-registry-pvc-2](images/OCP3-internal-registry-pvc-2.jpg)
 
-  ![ocp3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
+  ![OCP3-internal-registry-pvc-3](images/OCP3-internal-registry-pvc-3.jpg)
 
 ## 15. Secret 资源对象
 
@@ -888,7 +736,7 @@ $ oc get pods -w -n openshift-authentication
 # authentication ClusterOperator (OAuth operator) 在上述 secret 更新后将重新部署名为 oauth-openshift 的 pod
 ```
 
-### 👨‍💻 **15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**
+### **15.4 示例：OCP 4.6 中使用 secret 拉取外部私有容器镜像**
 
 由于需在 OpenShift 集群中使用 Quay.io 中的私有镜像 `quay.io/alberthua/ubi-sleep:1.0`，若不使用登录用户认证将导致应用部署失败，如下所示：
 
@@ -1014,6 +862,3 @@ $ oc rollback
 
 - OCP 中特有的资源对象：BuildConfig、DeploymentConfig、Route、Template
 - 外部访问 OCP 集群内应用的方式：NodePort、Route、Ingress（OCP4 已支持）、port-forward
-- OCP 资源之间的关系与工作流程：
-  
-  ![ocp3-resource-workflow](images/ocp3-resource-workflow.jpg)

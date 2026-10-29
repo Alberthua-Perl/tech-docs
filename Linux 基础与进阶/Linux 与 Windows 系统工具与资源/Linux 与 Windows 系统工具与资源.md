@@ -58,7 +58,7 @@
     - [18.1 OpenClaw 客户端安装与设置](#181-openclaw-客户端安装与设置)
     - [18.2 Kimi Code 客户端安装与设置](#182-kimi-code-客户端安装与设置)
     - [18.3 部署 Claude Code 客户端并集成各类大模型后端](#183-部署-claude-code-客户端并集成各类大模型后端)
-  - [19. 参考链接](#19-参考链接)
+  - [参考链接](#参考链接)
 
 ## 1. 常用公共服务器
 
@@ -1026,7 +1026,7 @@ $ claude
 
 <img src="images/claude-code-install.png" style="width:80%">
 
-## 19. 参考链接
+## 参考链接
 
 - [1.7. 为所有用户禁用 Wayland | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/proc_disabling-wayland-for-all-users_assembly_overview-of-gnome-environments)
 - [7.2. 可用的输入法引擎 | RedHat Doc](https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/9/html/getting_started_with_the_gnome_desktop_environment/ref_available-input-method-engines_assembly_enabling-chinese-japanese-or-korean-text-input)
