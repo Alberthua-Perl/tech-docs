@@ -210,17 +210,17 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 - ovs-multitenant 使用 `VNID` 实现不同项目间的 pod 二层隔离，其使用 VXLAN 隧道打通 pod 间在各节点之间的联系。
 - 🚀 OCP3 OVS 网络拓扑示意：
 
-  ![OCP3-ovs-1](images/OCP3-ovs-1.png)
+  ![OCP3-ovs-1](images/ocp3-ovs-1.png)
 
-  ![OCP3-ovs-2](images/OCP3-ovs-2.png)
+  ![OCP3-ovs-2](images/ocp3-ovs-2.png)
   
 - OCP3 同一节点上 pod 间的通信示意：
 
-  ![OCP3-ovs-3](images/OCP3-ovs-3.png)
+  ![OCP3-ovs-3](images/ocp3-ovs-3.png)
 
 - 🚀 OCP3 OVS 流表分析示意：
 
-  ![OCP3-ovs-openflow-1](images/OCP3-ovs-openflow-1.jpg)
+  ![OCP3-ovs-openflow-1](images/ocp3-ovs-openflow-1.jpg)
   
 - 🚀 OCP3 中访问使用 `NodePort` service 类型的 pod 跨节点流量分析：
   以下为 iptables NAT 表与 OVS 流表部分条目，并且 OCP3 集群使用 ovs-subnet SDN 插件，无 `networkpolicy` 策略存在。
