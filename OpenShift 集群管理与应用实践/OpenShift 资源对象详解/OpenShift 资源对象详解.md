@@ -577,9 +577,9 @@ $ oc rollout restart deployment <deployment_name>
 - 类型：基于等值类型的标签 + 基于集合类型的标签（OCP4 已支持）
 - OCP 集群中的各种资源使用 label 标签进行匹配
 
-## 11. Service 资源对象
+## 11. [Service 资源对象](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/OpenShift%20%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E4%B8%8E%E8%BF%90%E7%BB%B4/OpenShift%20%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E4%B8%8E%E8%BF%90%E7%BB%B4.md)
 
-## 12. Route 资源对象
+## 12. [Route 资源对象](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/OpenShift%20%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E4%B8%8E%E8%BF%90%E7%BB%B4/OpenShift%20%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E4%B8%8E%E8%BF%90%E7%BB%B4.md)
 
 ## 13. PersistentVolume (pv) 资源对象
 
