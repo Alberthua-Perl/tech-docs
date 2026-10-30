@@ -1,46 +1,57 @@
 # 🌐 OpenShift 网络原理与运维
 
-## 文档说明
-
 ## 文档目录
 
-## 1. Service (svc) 资源对象
+- [🌐 OpenShift 网络原理与运维](#-openshift-网络原理与运维)
+  - [文档目录](#文档目录)
+  - [1. 文档说明](#1-文档说明)
+  - [2. Service (svc) 资源对象](#2-service-svc-资源对象)
+    - [2.2 service 资源对象的特性](#22-service-资源对象的特性)
+    - [2.3 service 在 Kubernetes 中的底层实现](#23-service-在-kubernetes-中的底层实现)
+    - [2.4 service 的 4 大类型](#24-service-的-4-大类型)
+      - [2.4.1 **ClusterIP** 类型](#241-clusterip-类型)
+      - [2.4.2 **NodePort** 类型](#242-nodeport-类型)
+      - [2.4.3 **LoadBalancer** 类型](#243-loadbalancer-类型)
+      - [2.4.4 **ExternalIPs** 类型](#244-externalips-类型)
+    - [2.5 service 与 pod 的关联方式](#25-service-与-pod-的关联方式)
+    - [2.6 service 与服务发现](#26-service-与服务发现)
+    - [2.7 service 与实现跨节点通信的 CNI 插件的关系](#27-service-与实现跨节点通信的-cni-插件的关系)
+      - [2.7.1 OCP3 中的实现方法](#271-ocp3-中的实现方法)
+      - [2.7.2 OCP4 中的实现方法](#272-ocp4-中的实现方法)
+  - [3. Route 资源对象](#3-route-资源对象)
+    - [3.1 流量转发原理](#31-流量转发原理)
+    - [3.2 Route 与 MetalLB 支持的流量类型](#32-route-与-metallb-支持的流量类型)
+    - [3.3 Route 与 Ingress 的大一统](#33-route-与-ingress-的大一统)
+      - [3.3.1 核心差异对比](#331-核心差异对比)
+      - [3.3.2 选型决策说明](#332-选型决策说明)
+      - [3.3.3 关键细节](#333-关键细节)
+  - [4. 容器网络接口规范（CNI specification）](#4-容器网络接口规范cni-specification)
+    - [4.1 CNI 规范本身解决的核心问题](#41-cni-规范本身解决的核心问题)
+    - [4.2 跨节点通信是 CNI 插件的实现层问题](#42-跨节点通信是-cni-插件的实现层问题)
+  - [5. CNI 如何工作？](#5-cni-如何工作)
+    - [5.1 CNI 请求的生命周期遵循特定的顺序](#51-cni-请求的生命周期遵循特定的顺序)
+    - [🧬 5.2 **CRI、CNI 与 CNI 插件之间的调用时序图**](#-52-cricni-与-cni-插件之间的调用时序图)
+    - [⚗️ 5.3 **OVN-Kubernetes 调用时序说明**](#️-53-ovn-kubernetes-调用时序说明)
+  - [6. OVN-Kubernetes CNI 组件状态](#6-ovn-kubernetes-cni-组件状态)
+  - [7. Multus CNI 插件 \& 其他 CNI 插件](#7-multus-cni-插件--其他-cni-插件)
+    - [7.1 基础概述](#71-基础概述)
+    - [🔥 7.2 OpenShift 集群网络类型](#-72-openshift-集群网络类型)
+  - [参考链接](#参考链接)
+  - [待完善问题](#待完善问题)
 
-### 1.1 OCP 中的网络模型类型
+## 1. 文档说明
 
-| 网络类型 | 底层实现 |
-| ----- | ----- |
-| 1️⃣ 高耦合 Pod 内部容器间的通信：Container-to-Container | 内核网络命名空间 |
-| 2️⃣ Pod 网络 —— 同节点或跨节点的 Pod 与 Pod 间的通信：Pod-to-Pod | CNI 插件 |
-| 3️⃣ Service 网络 —— Service 与 Pod 间的通信：Service-to-Pod | 1. iptables <br> 2. ipvs <br> 3. OpenFlow rules <br> 4. Cillium eBPF |
-| 4️⃣ 外部与 Service 间的通信：External-to-Service | 1. Route + OpenShift Router <br> 2. Ingress + Ingress Controller |
+此文档基于 OpenShift 4.18 集群撰写及测试
 
-OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件：
+## 2. Service (svc) 资源对象
 
-```bash
-$ oc get deployment/network-operator -n openshift-network-operator
-# 查看 CNO 部署的 deployment 与 pod
-```
-
-![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
-
-OCP4 中使用如下命令获取全局 pod 的子网与全局 service 的子网：
-
-```bash
-$ oc get network.config.openshift.io cluster -o yaml
-$ oc get network.config/cluster -o yaml
-# 以上命令等效
-```
-
-![ocp4-pod-service-subnet](images/ocp4-pod-service-subnet.png)
-
-### 1.2 service 资源对象的特性
+### 2.2 service 资源对象的特性
 
 - 由于 pod 经常因某些故障而重启，每次重启后其 IP 地址都将改变，因此使用 service 将一个或一组相同的 pod 进行关联。
 - service 为 pod 提供统一的入口 IP 地址，该入口地址默认为 service 的虚拟 IP 地址（`ClusterIP`）。
 - service 提供反向代理与负载均衡的功能，默认以 `Round Robin` 轮询的方式将流量转发至 pod。  
 
-### 1.3 service 在 Kubernetes 中的底层实现
+### 2.3 service 在 Kubernetes 中的底层实现
 
 - service 提供三种代理模式：
   - **userspace：**
@@ -63,13 +74,13 @@ $ oc get network.config/cluster -o yaml
 
   ![service-and-pod-sdn](images/service-and-pod-sdn.png)
 
-### 1.4 service 的 4 大类型
+### 2.4 service 的 4 大类型
 
-#### 1.4.1 ClusterIP
+#### 2.4.1 **ClusterIP** 类型
 
 为 service 分配⼀个内部 IP 地址，且该地址只能从集群内部访问。
 
-#### 1.4.2 NodePort
+#### 2.4.2 **NodePort** 类型
 
 在节点 IP 地址的端⼝上公开服务，端⼝在所有集群节点上公开，每个节点将流量重定向到服务的端点（pod）。
 
@@ -106,7 +117,7 @@ spec:
   
 ![change-service-type-error](images/change-service-type-error.jpg)
 
-#### 1.4.3 LoadBalancer
+#### 2.4.3 **LoadBalancer** 类型
 
 指示 Kubernetes 与运⾏集群的云提供程序交互，置备负载平衡器，并为应⽤提供可从外部访问的 IP 地址。这种类型构建在 NodePort 类型之上，其通过云供应商提供的负载均衡器将服务暴露到集群外部，因此 LoadBalancer 一样具有 NodePort 和 ClusterIP。而在裸金属环境中使用 **MetalLB Operator** 来实现这种服务类型。<br>
 
@@ -150,13 +161,13 @@ MetalLB 的使用示例：SSH over LoadBalancer 实现外部登录虚拟机 + �
 
 ![metallb-svc-and-ssh-over-loadbalancer](images/metallb-svc-and-ssh-over-loadbalancer.png)
 
-#### 1.4.4 ExternalIPs
+#### 2.4.4 **ExternalIPs** 类型
 
 将服务映射到 DNS 名称
 
 ![K8s-service-type](images/K8s-service-type.jpg)
 
-### 1.5 service 与 pod 的关联方式
+### 2.5 service 与 pod 的关联方式
 
 service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 IP 地址与 pod 解耦，提高 pod 部署的灵活性，OCP 可根据 scheduler 调度器将 pod 部署至不同的 node 节点上，根据 ReplicationController (OCP3) 或 Deployment (OCP4) 部署相应副本数量的 pod，保证 pod 的服务高可用，此类 pod 应用一般为无状态类型服务。
 
@@ -164,7 +175,7 @@ service 通过 `selector` 与具有相同 `label` 的 pod 关联，将固定的 
 
 > 💥 无论 OCP 集群使用 `ovs-subnet` 或 `ovs-multitenent` 类型的 SDN 插件，同一项目的 pod 间可直接通信，无需使用 service！
 
-### 1.6 service 与服务发现
+### 2.6 service 与服务发现
 
 service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。服务发现的实现方式如下：
 
@@ -197,11 +208,11 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 
   ![coredns-pod-resolv-2](images/coredns-pod-resolv-2.png)
 
-### 1.7 service 与实现跨节点通信的 CNI 插件的关系
+### 2.7 service 与实现跨节点通信的 CNI 插件的关系
 
 - service 的虚拟 IP 地址与 pod 的 IP 地址面向 OCP 集群内部，OCP 集群外部不可访问，若使外部能够访问，需要使用 `route` 资源进行暴露。
 
-#### 1.7.1 OCP3 中的实现方法
+#### 2.7.1 OCP3 中的实现方法
 
 - OCP3 中建议将 service 整合入 DeploymentConfig 中，而 Kubernetes 中建议将 service 定义在 Deployment 中。
 - 💥 service 从逻辑层面解决了 service 与 pod 间的网络通信问题，而 pod 与 pod 间的跨节点间通信必须使用 CNI 插件加以解决。
@@ -227,7 +238,7 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 
   ![NodePort-service-iptables-nat-ovs-analyze](images/NodePort-service-iptables-nat-ovs-analyze.jpg)
 
-#### 1.7.2 OCP4 中的实现方法
+#### 2.7.2 OCP4 中的实现方法
 
 - OCP4 中的 SDN 插件版本演进关键时间线：
   - OpenShift 4.11 默认地位确立：从 4.11 版本开始，OVN-Kubernetes 成为新安装集群的默认网络插件。
@@ -237,9 +248,9 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 - OCP4 中可同时使用 `Multus CNI` 元插件调用其他 CNI 插件使单 pod 同时具备多个网口，以同时满足集群的网络流量与需要较高网络性能的业务流量。
 - 可参考官方文档 [Understanding multiple networks](https://docs.openshift.com/container-platform/4.6/networking/multiple_networks/understanding-multiple-networks.html)
 
-## 2. Route 资源对象
+## 3. Route 资源对象
 
-### 2.1 流量转发原理
+### 3.1 流量转发原理
   
 - 中文名称：路由
 - Service 除了可将流量负载转发至端点（endpoint）Pod 内，还能实现前后端多个不同 Pod 间的通信。
@@ -250,9 +261,9 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 
   ![route-service-pod-to internal](images/route-service-pod-to-internal.png)
 
-  ![OCP3-route-infra](images/OCP3-route-infra.jpg)
+  ![ocp-route-infra](images/ocp-route-infra.jpg)
 
-### 2.2 Route 与 MetalLB 支持的流量类型
+### 3.2 Route 与 MetalLB 支持的流量类型
 
 OpenShift 默认的 Route / Ingress（HAProxy router）支持的流量类型：
 
@@ -284,12 +295,12 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 | TLS 协议（带 SNI，非 HTTP）| Passthrough Route | router 只看 SNI，不解密，加密流直传 Pod |
 | 普通 TCP、UDP，无 SNI（MySQL/Redis 等）| LoadBalancer + MetalLB | 四层直通，独立 VIP，裸机首选 |
 
-### 2.3 Route 与 Ingress 的大一统
+### 3.3 Route 与 Ingress 的大一统
 
 - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 Ingress Controller 与 Ingress，而在 OpenShift 中 Ingress Controller 对应为 HAProxy Router Pod，而 Ingress 对应为 Route。
 - 在 OpenShift 中，Route 和 Ingress 共享同一个底层数据平面（基于 HAProxy 的 Ingress Controller），但 Route 是 OpenShift 原生的、功能更丰富的选择，而 Ingress 则是为了跨 Kubernetes 平台的可移植性而存在的。
 
-#### 2.3.1 核心差异对比
+#### 3.3.1 核心差异对比
 
 | 维度 | OpenShift Route | Kubernetes Ingress |
 | ----- | ----- | ----- |
@@ -299,7 +310,7 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 | 流量管理 | 通过 haproxy.router.openshift.io/* 注解，支持加权后端（金丝雀发布）、超时、连接数限制等高级功能 | 功能相对基础，复杂的流量管理通常需依赖 Ingress Controller 的特定注解，标准API支持有限。 |
 | 路径路由 | 每个 Route 对象默认仅支持一个路径前缀，灵活性受限 | 原生支持基于路径的多规则路由，更为灵活。 |
 
-#### 2.3.2 选型决策说明
+#### 3.3.2 选型决策说明
 
 优先选择 OpenShift Route 的场景：
 
@@ -314,15 +325,15 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 - 使用的Helm Chart 或 Operator 自动生成 Ingress 资源，为避免修改上游 Chart，直接使用 Ingress 更为便捷。
 - 路由规则非常复杂，需要原生支持基于路径的多规则路由（尽管 OpenShift 的 Ingress 最终会转换为多个 Route，但编写时更符合标准）。
 
-#### 2.3.3 关键细节
+#### 3.3.3 关键细节
 
 在 OpenShift 中创建 Ingress 对象时，它并不会被直接处理。OpenShift 的 ingress-to-route 控制器会自动将其转换成一个或多个 Route 对象。这意味着，使用 Ingress 相当于在 Route 之上增加了一层 “翻译”，这将继承 Route 的所有限制，并额外承担这层转换带来的开销。因此，除非有明确的可移植性需求，否则在 OpenShift 上直接使用 Route 是更直接、更高效的选择。
 
-## 容器网络接口规范（CNI specification）说明
+## 4. 容器网络接口规范（CNI specification）
 
 CNI 真正解决的核心问题：如何把一个容器（pod）"插" 进网络里。
 
-### CNI 规范本身解决的核心问题
+### 4.1 CNI 规范本身解决的核心问题
   
 CNI 只是一份接口规范（ADD / DEL / CHECK 命令 + JSON 网络配置 + IPAM 插件协议），它定义的是 runtime（kubelet/containerd）与网络插件之间的契约，而 **不规定网络如何实现**。对应的核心职责：
 
@@ -332,7 +343,7 @@ CNI 只是一份接口规范（ADD / DEL / CHECK 命令 + JSON 网络配置 + IP
 
 跨节点通信不在 CNI 规范强制范围内 —— 规范只要求插件返回结果（interfaces、IPs、routes、dns），至于 pod 在 node2 上怎么找到 node1 上的 pod，是具体 CNI 插件的实现选型。
 
-### 跨节点通信是 CNI 插件的实现层问题
+### 4.2 跨节点通信是 CNI 插件的实现层问题
 
 **首先**，CNI 的重要职责是 IPAM、veth 接入、本机网桥/流表。
 
@@ -357,17 +368,17 @@ CNI 只是一份接口规范（ADD / DEL / CHECK 命令 + JSON 网络配置 + IP
 - **跨节点层**：OVN 控制器在每个节点建 Geneve 隧道，逻辑流量经隧道到目标节点，完全覆盖物理拓扑。
 - **策略层**：NetworkPolicy 由 OVN ACL 实现 —— 这也是 CNI 之上附加的能力，同样不属于 CNI 规范。
 
-## CNI 如何工作？
+## 5. CNI 如何工作？
 
 CNI 通过容器引擎（如 CRI-O 或 Containerd）与 CNI 插件之间的交互来运行。容器引擎并不直接管理网络，而是当 Pod 被创建或删除时，调用 CNI 插件。
 
-### CNI 请求的生命周期遵循特定的顺序
+### 5.1 CNI 请求的生命周期遵循特定的顺序
 
 1️⃣ 容器引擎为 Pod 创建一个网络命名空间。<br>
 2️⃣ 引擎在 `/etc/cni/net.d/` 目录中识别 CNI 配置文件。<br>
 3️⃣ 引擎会调用 CNI 插件，并传递特定的环境变量和 JSON 配置。<br>
 
-### 🧬 CRI、CNI 与 CNI 插件之间的调用时序图
+### 🧬 5.2 **CRI、CNI 与 CNI 插件之间的调用时序图**
 
 | 组件 | 代码归属（谁写的） | 运行时位置（在哪执行） |
 | ----- | ----- | ----- |
@@ -414,7 +425,7 @@ sequenceDiagram
     C-->>K: Sandbox Ready
 ```
 
-### OVN-Kubernetes 调用时序说明
+### ⚗️ 5.3 **OVN-Kubernetes 调用时序说明**
 
 OVN-Kubernetes 有个重要特点：**CNI 插件二进制（ovn-k8s-cni-overlay）本身不干活，它只是客户端** —— 解析 ADD 后通过 Unix socket 把请求转发给常驻的 ovnkube-node pod 里的 CNI Server（ovnkube-node 主进程里的一个 *goroutine*），它内部包含的 `setupInterface()` 与 `ConfigureOVS()` 均运行在特权模式中。`setupInterface()` 可创建 veth 对及配置 pod 网络命名空间；`ConfigureOVS()` 使用 external_ids 将主机侧 veth 接口添加到 br-int 集成网桥上，在特权模式中以 libovsdb 实现。
 
@@ -468,13 +479,24 @@ sequenceDiagram
     Note over K,N: ADD 语义落点总结：<br/>env 解析在 skel | 动词常量在 ocicni<br/>业务实现在 ovnkube-node（长进程），插件二进制只是代理
 ```
 
-## OVN-Kubernetes CNI 组件状态
+## 6. OVN-Kubernetes CNI 组件状态
+
+与集群网络相关的 Operator：OCP4 集群提供 `Cluster Network Operator (CNO)` 配置集群网络，通过 CNO 加载与配置 CNI 插件。
+
+```bash
+$ oc get deployment/network-operator -n openshift-network-operator
+#查看 CNO 部署的 deployment 与 pod
+```
+
+![ocp4-network-dns-ingress-operator](images/ocp4-network-dns-ingress-operator.png)
 
 ```bash
 $ oc get clusteroperators network
 #查看 network operator 状态
 
-$ oc get network/cluster -o yaml
+$ oc get network.config.openshift.io cluster -o yaml
+$ oc get network.config/cluster -o yaml
+# 以上命令等效
 #查看集群部署的 pod SDN 与 service SDN 的网段范围
 
 $ oc get node master01 -o yaml | grep node-subnets
@@ -491,9 +513,9 @@ ovnkube-node-zj56j            8/8      Running  ...
 #查看 OVN-Kubernetes 组件部署 Pod 状态
 ```
 
-### Multus CNI 插件 & 其他 CNI 插件
+## 7. Multus CNI 插件 & 其他 CNI 插件
 
-#### 基础概述
+### 7.1 基础概述
 
 在没有 Multus CNI 插件的场景中，集群中的 Pod 只能支持单个网络接口的 Pod 网络，集群管理流量与数据流量均使用此接口。而在一些对数据吞吐和延迟要求较高的场景中，这种方式不能满足需求。因此，可考虑在 Pod 上单独添加独立的网络接口以满足高性能、低延迟的要求，Multus CNI 插件（元插件）即可解决这种问题。
 
@@ -518,7 +540,7 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 #查询各个 network CRD 的所属资源
 ```
 
-#### OpenShift 集群网络类型
+### 🔥 7.2 OpenShift 集群网络类型
 
 | 网络类型 | 默认集成 | 实现方式 | 关键资源 / 配置 | 外部访问方式 |
 | ----- | ----- | ----- | ----- | ----- |
