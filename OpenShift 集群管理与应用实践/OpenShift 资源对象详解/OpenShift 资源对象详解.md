@@ -40,7 +40,7 @@
 
 ## 0. 总论：OCP 资源间的关系与工作流程
   
-<center><img src="images/OCP3-resource-workflow.jpg" style="width:80%"></center>
+<center><img src="images/ocp3-resource-workflow.jpg" style="width:80%"></center>
 
 ## 1. Master 类型节点
 
