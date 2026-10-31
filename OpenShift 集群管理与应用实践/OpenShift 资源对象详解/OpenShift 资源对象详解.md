@@ -19,7 +19,7 @@
     - [5.1 基础概念](#51-基础概念)
     - [5.2 构建触发器（build trigger）类型](#52-构建触发器build-trigger类型)
     - [5.3 build 构建与 S2I 说明](#53-build-构建与-s2i-说明)
-    - [6. DeploymentConfig (dc) 与 Deploy 资源对象](#6-deploymentconfig-dc-与-deploy-资源对象)
+  - [6. DeploymentConfig (dc) 与 Deploy 资源对象](#6-deploymentconfig-dc-与-deploy-资源对象)
   - [7. Deployment 资源对象](#7-deployment-资源对象)
   - [8. ReplicationController (rc) 与 ReplicaSet 资源对象](#8-replicationcontroller-rc-与-replicaset-资源对象)
   - [9. Pod 资源对象](#9-pod-资源对象)
@@ -59,9 +59,9 @@
   - `data-store`：
     `etcd` 分布式键值型数据库，用于服务配置发现，OCP 集群中的数据存储与核心。
 
-    ![OCP3-master-pod](images/OCP3-master-pod.jpg)
+    ![ocp3-master-pod](images/ocp3-master-pod.jpg)
 
-    ![OCP3-master-etcd](images/OCP3-master-etcd.jpg)
+    ![ocp3-master-etcd](images/ocp3-master-etcd.jpg)
 
 ## 2. Worker 类型节点
 
@@ -495,7 +495,7 @@
     - 使用 shell 脚本模式：
       使用 `/bin/sh -ic` 命令配合脚本来实现所有的功能，如参数扩展、重定向等，并且 build pod 必须可提供 `sh` 的 shell 解释器。
 
-### 6. DeploymentConfig (dc) 与 Deploy 资源对象
+## 6. DeploymentConfig (dc) 与 Deploy 资源对象
 
 - 中文名称：部署配置、部署
 - 在 Kubernetes 1.0 中并不像现在如此方便可快速部署应用，而是需要繁复的手动配置才能满足要求，而在 OpenShift 3.0 中 Red Hat 开发了 `deploymentconfig`，以提供参数化部署输入、执行滚动部署、启用回滚至先前部署状态，以及通过触发器（`trigger`）以驱动自动部署等（buildconfig 构建配置完成后触发 deploymentconfig）。  
