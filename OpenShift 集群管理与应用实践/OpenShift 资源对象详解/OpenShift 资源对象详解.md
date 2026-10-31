@@ -366,9 +366,9 @@
 
         - 💥 `oc start-build` 构建报错示例：
 
-          ![OCP3-start-build-error-1](images/OCP3-start-build-error-1.jpg)
+          ![OCP3-start-build-error-1](images/ocp3-start-build-error-1.jpg)
 
-          ![OCP3-start-build-error-2](images/OCP3-start-build-error-2.jpg)
+          ![OCP3-start-build-error-2](images/ocp3-start-build-error-2.jpg)
 
       - 2️⃣ GitHub：
         - 配置 GitHub 的 webhook 功能可在代码更新时向 OpenShift 推送代码以 `自动` 触发构建。
@@ -502,7 +502,7 @@
 - 由于 buildconfig 中 imagestreamtag 的改变，deploymentconfig 或 deployment 中可探测到 imagestreamtag 的改变针对新构建应用镜像的自动重新部署。
   - 👉 OCP3 中 deploymentconfig 的 `imagestreamtag trigger`：
 
-    ![OCP3-imagestreamtag-trigger-dc-deploy](images/OCP3-imagestreamtag-trigger-dc-deploy.jpg)
+    ![OCP3-imagestreamtag-trigger-dc-deploy](images/ocp3-imagestreamtag-trigger-dc-deploy.jpg)
 
   - 👉 OCP4 中 deployment 的 `imagestreamtag trigger`：
 
@@ -625,13 +625,13 @@ $ oc rollout restart deployment <deployment_name>
 - 更改 dc 或 pod 资源定义的 `persistentVolumeClaim.claimName` 属性值以创建 pod 资源
 - OCP 部署过程中定义 NFS 存储作为 OCP internal registry 的存储后端：
 
-  ![OCP3-internal-registry-pvc-1](images/OCP3-internal-registry-pvc-1.jpg)
+  ![OCP3-internal-registry-pvc-1](images/ocp3-internal-registry-pvc-1.jpg)
   
 - OCP 集群 default 项目中定义的 pv 与 pvc 的关系：
 
-  ![OCP3-internal-registry-pvc-2](images/OCP3-internal-registry-pvc-2.jpg)
+  ![OCP3-internal-registry-pvc-2](images/ocp3-internal-registry-pvc-2.jpg)
 
-  ![OCP3-internal-registry-pvc-3](images/OCP3-internal-registry-pvc-3.jpg)
+  ![OCP3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
 
 ## 15. Secret 资源对象
 
