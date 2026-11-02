@@ -1,38 +1,31 @@
-## OVN 实践：配置 OVN 逻辑路由器
+# OVN 实践：配置 OVN 逻辑路由器
 
-### 文档说明：
+## 文档说明
 
 前一篇文档（配置 OVN 逻辑交换机）中部署与配置了 `overlay` 二层网络，基于该实验环境添加三层网络基本功能至 OVN 中，并且添加 OVN 原生的 **`DHCP`** 功能，自动分配 namespace 的 IP 地址。
 
-### 重构 OVN 逻辑组件：
+## 1. 重构 OVN 逻辑组件
 
-1. OVN 逻辑网络概要如下所示：
+OVN 逻辑网络概要如下所示：
 
-   1）2 台 OVN 逻辑交换机：dmz、inside
+- 2 台 OVN 逻辑交换机：dmz、inside
+- 1 台 OVN 逻辑路由器：tenant1（用于连接两台逻辑交换机）
+- dmz 所在的 IP 地址段：20.0.0.0/24
+- inside 所在的 IP 地址段：10.0.0.0/24
+- 每个逻辑交换机上均对接 2 个 Linux network namespace（用以模拟虚拟机）
 
-   2）1 台 OVN 逻辑路由器：tenant1（用于连接两台逻辑交换机）
+此次创建的 OVN 逻辑网络拓扑：
 
-   3）dmz 所在的 IP 地址段：20.0.0.0/24
+- 其中 vm1~4 namespace 的 IP 地址通过 OVN 原生的 `DHCP` 功能获得。
+- OVN 成对逻辑端口间的 **`MAC`** 地址需相同。
 
-   4）inside 所在的 IP 地址段：10.0.0.0/24
+![OVN-router-fig-1](images/OVN-router-fig-1.png)
 
-   5）每个逻辑交换机上均对接 2 个 Linux network namespace（用以模拟虚拟机）
-2. 此次创建的 OVN 逻辑网络拓扑：
-
-   > **注意**：
-   >
-   > a. 其中 vm1~4 namespace 的 IP 地址通过 OVN 原生的 `DHCP` 功能获得。
-   >
-   > b. OVN 成对逻辑端口间的 **`MAC`** 地址需相同。
-   >
-
-   <img src="https://github.com/Alberthua-Perl/sc-col/blob/master/ovn-arch/images/ovn-logical-router-demo/OVN-router-fig-1.png" style="zoom:67%;" />
-
-### 理解 OVN 逻辑路由器：
+## 2. 理解 OVN 逻辑路由器
 
 此次实验中将创建 OVN 逻辑路由器，即分布式逻辑路由器（distributed logical router, **`DLR`**），DLR 不同于传统的路由器，由于其不是传统的物理设备，而是一种分布于各东西向节点上的逻辑设备，依赖各节点的 OVS 流规则实现，换言之，每个东西向节点上的 OVS 实例在 overlay 网络转发流量之前在本地模拟出 L3 的 OVN 逻辑路由器。
 
-### 创建 OVN 逻辑交换机与逻辑路由器：
+### 2.1 创建 OVN 逻辑交换机与逻辑路由器
 
 在 ovn-central 节点上创建 OVN 逻辑交换机与路由器：
 
@@ -44,7 +37,7 @@ $ sudo ovn-nbctl ls-add dmz
 $ sudo ovn-nbctl lr-add tenant1
 ```
 
-### 创建 OVN 逻辑路由器端口：
+### 2.2 创建 OVN 逻辑路由器端口
 
 ```bash
 $ sudo ovn-nbctl lrp-add tenant1 tenant1-dmz 02:d4:1d:8c:d9:9f 20.0.0.1/24
@@ -84,7 +77,7 @@ router 2d930814-6bcc-4eea-a160-1a962b926476 (tenant1)
         networks: ["10.0.0.1/24"]
 ```
 
-### 创建 OVN 逻辑交换机端口：
+### 2.3 创建 OVN 逻辑交换机端口
 
 ```bash
 $ sudo ovn-nbctl lsp-add dmz dmz-vm1
@@ -135,7 +128,7 @@ router 2d930814-6bcc-4eea-a160-1a962b926476 (tenant1)
         networks: ["10.0.0.1/24"]
 ```
 
-### 设置 OVN 逻辑网络 DHCP：
+### 2.4 设置 OVN 逻辑网络 DHCP
 
 ```bash
 $ sudo ovn-nbctl create DHCP_Options cidr=20.0.0.0/24 \
@@ -170,7 +163,7 @@ $ sudo ovn-nbctl lsp-set-dhcpv4-options inside-vm3 6c3eb6cb-3185-45f3-bdff-8ae1f
 $ sudo ovn-nbctl lsp-set-dhcpv4-options inside-vm4 6c3eb6cb-3185-45f3-bdff-8ae1f5d618c5
 ```
 
-### 创建 namespace 以模拟虚拟机：
+### 2.5 创建 namespace 以模拟虚拟机
 
 在 ovn-node1 节点上创建 vm1~2 namespace：
 
@@ -258,7 +251,7 @@ $ sudo ip netns exec vm4 dhclient vm4
 $ sudo ip netns exec vm4 ip a s
 ```
 
-### 测试 OVN 逻辑网络连通性：
+### 2.6 测试 OVN 逻辑网络连通性
 
 在 ovn-node1 节点的 vm1 上测试 OVN overlay 网络：
 
@@ -307,7 +300,7 @@ PING 10.0.0.20 (10.0.0.20) 56(84) bytes of data.
 rtt min/avg/max/mdev = 1.031/1.224/1.410/0.154 ms
 ```
 
-### 参考链接：
+## 3. 参考链接
 
-- OVN 学习（二）：https://www.cnblogs.com/silvermagic/p/7666117.html
-- 如何配置 OVN 路由器：https://www.sdnlab.com/19200.html
+- [OVN 学习（二）](https://www.cnblogs.com/silvermagic/p/7666117.html)
+- [如何配置 OVN 路由器](https://www.sdnlab.com/19200.html)
