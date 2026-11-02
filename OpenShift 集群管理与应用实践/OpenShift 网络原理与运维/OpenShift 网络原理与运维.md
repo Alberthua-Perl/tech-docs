@@ -20,11 +20,12 @@
       - [2.7.2 OCP4 中的实现方法](#272-ocp4-中的实现方法)
   - [3. Route 资源对象](#3-route-资源对象)
     - [3.1 流量转发原理](#31-流量转发原理)
-    - [3.2 Route 与 MetalLB 支持的流量类型](#32-route-与-metallb-支持的流量类型)
-    - [3.3 Route 与 Ingress 的大一统](#33-route-与-ingress-的大一统)
-      - [3.3.1 核心差异对比](#331-核心差异对比)
-      - [3.3.2 选型决策说明](#332-选型决策说明)
-      - [3.3.3 关键细节](#333-关键细节)
+    - [3.2 HAProxy 支持的流量类型](#32-haproxy-支持的流量类型)
+    - [3.3 Route 与 MetalLB 支持的流量类型](#33-route-与-metallb-支持的流量类型)
+    - [3.4 Route 与 Ingress 的大一统](#34-route-与-ingress-的大一统)
+      - [3.4.1 核心差异对比](#341-核心差异对比)
+      - [3.4.2 选型决策说明](#342-选型决策说明)
+      - [3.4.3 关键细节](#343-关键细节)
   - [4. 容器网络接口规范（CNI specification）](#4-容器网络接口规范cni-specification)
     - [4.1 CNI 规范本身解决的核心问题](#41-cni-规范本身解决的核心问题)
     - [4.2 跨节点通信是 CNI 插件的实现层问题](#42-跨节点通信是-cni-插件的实现层问题)
@@ -33,9 +34,12 @@
     - [🧬 5.2 **CRI、CNI 与 CNI 插件之间的调用时序图**](#-52-cricni-与-cni-插件之间的调用时序图)
     - [⚗️ 5.3 **OVN-Kubernetes 调用时序说明**](#️-53-ovn-kubernetes-调用时序说明)
   - [6. OVN-Kubernetes CNI 组件状态](#6-ovn-kubernetes-cni-组件状态)
-  - [7. Multus CNI 插件 \& 其他 CNI 插件](#7-multus-cni-插件--其他-cni-插件)
-    - [7.1 基础概述](#71-基础概述)
-    - [🔥 7.2 OpenShift 集群网络类型](#-72-openshift-集群网络类型)
+  - [7. Pod 或 KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件](#7-pod-或-kubevirt-虚拟机多网口实现multus-cni-元插件--cni-插件)
+    - [7.1 Multus CNI 基础概述](#71-multus-cni-基础概述)
+    - [7.2 CNI 插件剪影：Macvlan 与 IPvlan 原理对比](#72-cni-插件剪影macvlan-与-ipvlan-原理对比)
+    - [7.3 Kubernetes NMstate Operator](#73-kubernetes-nmstate-operator)
+    - [7.4 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#74-networkattachmentdefinition-nad-资源网络附加定义)
+  - [🔥 结语：OpenShift 集群网络类型](#-结语openshift-集群网络类型)
   - [参考链接](#参考链接)
   - [待完善问题](#待完善问题)
 
@@ -66,7 +70,7 @@
 - 因此，目前开源社区使用 `eBPF` 技术为基础，开发的 `Cilium` CNI 插件可不使用 service 以实现其功能，在流量转发方面性能得到极大的提升。
 - OCP3 中的 service 网段与 pod 网段的定义示意：
 
-  ![OCP3-network-plugin](images/OCP3-network-plugin.jpg)
+  ![OCP3-network-plugin](images/ocp3-network-plugin.jpg)
 
 - OCP4 中的 service 网段与 pod 网段的定义示意：使用 **OVN-Kubernetes** 插件
 
@@ -257,27 +261,45 @@ service 作为前端 pod 访问后端 pod 的入口点，实现服务发现。�
 - **在 OpenShift 的 Route 转发过程中，Router Pod（底层为 HAProxy）中的 Controller 逻辑进程（openshift-router 进程）会直接监听 Route 和 Service 的 Endpoints/EndpointSlices。它会将后端 Pod 的 IP 和端口动态写入 HAProxy 的配置文件，然后直接向 Pod IP 发起连接。流量完全绕过了 Service 的 ClusterIP。Service 在这里仅作为 Route 关联后端 Pod 集合的逻辑标签和声明式绑定（通过 Endpoints 提供真实的 Pod 列表），不参与实际的数据转发。**
 - OCP3 集群外部对内部 pod 的访问默认需要使用 default 项目的 Router Pod 来实现；OCP4 集群使用 openshift-ingress 项目的 router-default-xxxx Pod 来实现。
 - OCP3 或 OCP4 集群外部通过泛域名解析（wildcard）指向特定 Router Pod 所在节点（比如 infra 节点），这些 Pod 与 infra 节点使用相同网络命名空间。在整个集群前端可加负载均衡与高可用系统。
-- Router 路由原理架构示例：
+- **Router 路由原理架构示例：**
 
   ![route-service-pod-to internal](images/route-service-pod-to-internal.png)
 
-  ![ocp-route-infra](images/ocp-route-infra.jpg)
+  ![ocp-ingress-controller-arch](images/ocp-ingress-controller-arch.png)
 
-### 3.2 Route 与 MetalLB 支持的流量类型
+### 3.2 HAProxy 支持的流量类型
 
-OpenShift 默认的 Route / Ingress（HAProxy router）支持的流量类型：
+- HAProxy 是双模负载均衡器，模式决定它工作在哪一层。
+- HAProxy **同时支持 L4（TCP）模式 和 L7（HTTP/HTTPS）模式**。
+- **mode tcp** 做四层转发：
+  - **不解析应用层协议，只看 TCP 流。**
+  - 可以转发任意 TCP 流量：数据库、Redis、SSH、自定义私有 TCP 协议
+  - 搭配 `tcp-request inspect-delay` + `ssl-fetch-sni` 就可以实现 **SNI 透传（SNI 路由）**
+  - 👉 HAProxy 只读取 TLS 握手包里面明文的 SNI 字段，**不做 TLS 解密**，然后把整条 TCP 流原封不动转发给后端，这就是四层 SNI passthrough。
+- **mode http** 做七层 HTTP 解析：
+  - 解析 HTTP 协议：Host、Path、Header、Cookie
+  - 只能处理 HTTP/HTTPS（TLS 之后的 HTTP）
+  - 这就是 OpenShift Route 默认使用的模式，对应 `haproxy` 里的 7 层规则，读取 Host，转发到后端 Pod IP。
+  - ✅ 可以做 Edge TLS 终结（在 HAProxy/router 上解密证书）
 
-- HTTP/HTTPS
-- 非 HTTP 流量：采用 Route 的 `passthrough` 模式
-  - SNI TLS：带 SNI 的 TLS 加密流量
-  - 流量是 **TLS 加密流（有 SNI）**，Router 不解密，直接四层透传给后端 Pod。
-  - ✅ 适用：自定义 TLS 协议（比如自建 TLS 加密的私有 TCP 协议）
-  - ❌ 限制：**必须带 SNI**；纯 TCP、UDP、无 SNI 的加密流量，Route 无能为力，HAProxy router 是 L7 网关，没法通用四层转发。
+### 3.3 Route 与 MetalLB 支持的流量类型
 
-  > 总结如下：<br>
-  > 1️⃣ HTTP/HTTPS → Route / Ingress<br>
-  > 2️⃣ 带 SNI 的 TLS 协议 → Route Passthrough<br>
-  > 3️⃣ 剩下所有普通 TCP/UDP、无 SNI 协议 → LoadBalancer（MetalLB） / NodePort / ExternalIP<br>
+OpenShift 中 Route / Ingress（HAProxy router）支持的类型：
+
+- [x] **Edge 边缘加密**：mode http，HAProxy 在本机解密 TLS（L7），后端明文 HTTP。
+- [x] **Reencrypt 重加密**：mode http，HAProxy 解密 + 再加密转发给后端 HTTPS（L7）。
+- [x] **Passthrough 透传**：**mode tcp + SNI 匹配**，HAProxy 不解密 TLS，原始 TCP 流直接转给 Pod（L4）。
+
+  > ✅ 适用：Passthrough Route 就是用 HAProxy 的 TCP 模式实现的，专门给非 HTTP 的 TLS 流量，或者需要端到端加密的场景。
+  > ❌ 限制：**必须带 SNI**；纯 TCP、UDP、无 SNI 的加密流量，Route 无能为力，HAProxy router 是 L7 网关，没法通用四层转发。
+
+Route 资源本身 **只设计给 HTTP/HTTPS**，所以 Passthrough Route 虽然走 TLS TCP，但它依然是 Route 对象；**完全无 TLS 的裸 TCP 流量，不能用 Route，这时候才用 Service + MetalLB/NodePort**。
+
+三种类型总结如下：
+
+- [x] 1️⃣ HTTP/HTTPS → Route / Ingress
+- [x] 2️⃣ 带 SNI 的 TLS 协议 → Route Passthrough
+- [x] 3️⃣ 剩下所有普通 TCP/UDP、无 SNI 协议 → LoadBalancer（MetalLB） / NodePort / ExternalIP
 
 MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 IP 分配器 + 宣告器**：
 
@@ -295,12 +317,12 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 | TLS 协议（带 SNI，非 HTTP）| Passthrough Route | router 只看 SNI，不解密，加密流直传 Pod |
 | 普通 TCP、UDP，无 SNI（MySQL/Redis 等）| LoadBalancer + MetalLB | 四层直通，独立 VIP，裸机首选 |
 
-### 3.3 Route 与 Ingress 的大一统
+### 3.4 Route 与 Ingress 的大一统
 
 - OCP4 中名为 `ingress` 的 ClusterOperator 提供 `ingress controller`。Kubernetes 中的 Ingress 包含两个重要组件，分别为 Ingress Controller 与 Ingress，而在 OpenShift 中 Ingress Controller 对应为 HAProxy Router Pod，而 Ingress 对应为 Route。
 - 在 OpenShift 中，Route 和 Ingress 共享同一个底层数据平面（基于 HAProxy 的 Ingress Controller），但 Route 是 OpenShift 原生的、功能更丰富的选择，而 Ingress 则是为了跨 Kubernetes 平台的可移植性而存在的。
 
-#### 3.3.1 核心差异对比
+#### 3.4.1 核心差异对比
 
 | 维度 | OpenShift Route | Kubernetes Ingress |
 | ----- | ----- | ----- |
@@ -310,7 +332,7 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 | 流量管理 | 通过 haproxy.router.openshift.io/* 注解，支持加权后端（金丝雀发布）、超时、连接数限制等高级功能 | 功能相对基础，复杂的流量管理通常需依赖 Ingress Controller 的特定注解，标准API支持有限。 |
 | 路径路由 | 每个 Route 对象默认仅支持一个路径前缀，灵活性受限 | 原生支持基于路径的多规则路由，更为灵活。 |
 
-#### 3.3.2 选型决策说明
+#### 3.4.2 选型决策说明
 
 优先选择 OpenShift Route 的场景：
 
@@ -325,7 +347,7 @@ MetalLB **不是网关 / 代理**，它只是 **LoadBalancer 类型 Service 的 
 - 使用的Helm Chart 或 Operator 自动生成 Ingress 资源，为避免修改上游 Chart，直接使用 Ingress 更为便捷。
 - 路由规则非常复杂，需要原生支持基于路径的多规则路由（尽管 OpenShift 的 Ingress 最终会转换为多个 Route，但编写时更符合标准）。
 
-#### 3.3.3 关键细节
+#### 3.4.3 关键细节
 
 在 OpenShift 中创建 Ingress 对象时，它并不会被直接处理。OpenShift 的 ingress-to-route 控制器会自动将其转换成一个或多个 Route 对象。这意味着，使用 Ingress 相当于在 Route 之上增加了一层 “翻译”，这将继承 Route 的所有限制，并额外承担这层转换带来的开销。因此，除非有明确的可移植性需求，否则在 OpenShift 上直接使用 Route 是更直接、更高效的选择。
 
@@ -513,9 +535,9 @@ ovnkube-node-zj56j            8/8      Running  ...
 #查看 OVN-Kubernetes 组件部署 Pod 状态
 ```
 
-## 7. Multus CNI 插件 & 其他 CNI 插件
+## 7. Pod 或 KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件
 
-### 7.1 基础概述
+### 7.1 Multus CNI 基础概述
 
 在没有 Multus CNI 插件的场景中，集群中的 Pod 只能支持单个网络接口的 Pod 网络，集群管理流量与数据流量均使用此接口。而在一些对数据吞吐和延迟要求较高的场景中，这种方式不能满足需求。因此，可考虑在 Pod 上单独添加独立的网络接口以满足高性能、低延迟的要求，Multus CNI 插件（元插件）即可解决这种问题。
 
@@ -540,7 +562,137 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 #查询各个 network CRD 的所属资源
 ```
 
-### 🔥 7.2 OpenShift 集群网络类型
+### 7.2 CNI 插件剪影：Macvlan 与 IPvlan 原理对比
+
+**总体架构对比图：**
+
+![macvlan-ipvlan-contrast-1](images/macvlan-ipvlan-contrast-1.png)
+
+**数据流向对比图：**
+
+![macvlan-ipvlan-contrast-2](images/macvlan-ipvlan-contrast-2.png)
+
+**两者特性对比图：**
+
+![macvlan-ipvlan-contrast-3](images/macvlan-ipvlan-contrast-3.png)
+
+**选型决策对比：**
+
+<center><img src="images/macvlan-ipvlan-contrast-4.png" style="width:50%"></center>
+
+### 7.3 Kubernetes NMstate Operator
+
+- **Kubernetes NMstate Operator** 在 OpenShift 集群中提供⼀个集中的声明式主机⽹络配置⼯具。此 operator 可以通过 `NodeNetworkConfigurationPolicy` (NNCP) 与 `NodeNetworkConfigurationEnactment` (NNCE) 资源报告集群中每个节点⽹络配置，验证配置语法，并在不重新启动节点的情况下应⽤⽹络配置更改。借助 NMState Operator，集群管理员可以配置额外的节点⽹络设备（如 Linux ⽹桥），并在⽹络附加定义中使⽤它们。NNCP 可直接定义创建指定的节点网络设备，无需手动提前创建。
+- NMstate Operator 安装完毕后，集群管理员必须使⽤ **nmstate 名称** 来创建⼀个 NMState 实例，以在所有 OpenShift 节点上部署 NMState 控制器。
+- NMState operator 提供了三个 API 资源来管理⽹络配置：
+  - **NodeNetworkState**：
+    - 节点网络状态（NNS）
+    - 每个集群节点上都存在⼀个节点⽹络状态（NNS）资源，该资源会定期更新以包含该节点的⽹络状态。
+  
+      ```bash
+      $ oc get nns/<node-name> -o yaml
+      # 检查特定节点的当前网络状态
+      ```
+
+  - **NodeNetworkConfigurationPolicy**：
+    - 节点网络配置策略（NNCP）
+
+      ```bash
+      $ oc get nncp <nncp-name> -o yaml
+      #查看指定 NNCP 资源的详细信息
+      ```
+
+    - 描述了 OpenShift 节点的预期⽹络配置。集群管理员可以使⽤ NNCP 来创建和管理节点⽹络接⼝，例如声明 Linux ⽹桥、OVS 网桥等。
+    - 默认情况下，NNCP 资源应⽤到集群中的所有节点。但是，可以在通过 NNCP 中包含具有相应标签的节点选择器（nodeSelector）来指定要将策略应⽤到哪些节点，例如仅应⽤到计算节点。
+    - 1️⃣ 示例：在节点 ens4 网络接口上配置 OVS ⽹桥的 NNCP
+
+      ```yaml
+      apiVersion: nmstate.io/v1
+      kind: NodeNetworkConfigurationPolicy
+      metadata:
+        name: br0-ovs-bridge-policy 
+      spec:
+        nodeSelector:
+          node-role.kubernetes.io/worker: "" 
+        desiredState:
+          interfaces:
+          - name: br0 
+            bridge:
+              options: {}
+              port:
+              - name: ens4 
+            ipv4:
+              dhcp: "true"
+              enabled: "true"
+            state: up
+            type: ovs-bridge 
+          ovn:
+            bridge-mappings:           #将 localnet 定义的逻辑网络（br0-network）映射至 OVS br0 逻辑网桥上的 ens4 物理网口
+            - bridge: br0
+              localnet: br0-network    #网络名称标识，必须与 NAD 中的定义 spec.config.name 匹配！
+              state: present
+      ```
+
+    - 2️⃣ 示例：在节点 ens4 ⽹络接⼝上定义 Linux ⽹桥的 NNCP
+
+      ```yaml
+      apiVersion: nmstate.io/v1
+      kind: NodeNetworkConfigurationPolicy
+      metadata:
+        name: br1-policy 
+      spec:
+        nodeSelector:
+          node-role.kubernetes.io/worker: ""
+          #nodeSelector 指定将此策略应⽤到集群中的所有计算节点。如果未包含 nodeSelector 参数，策略会应⽤到集群中的所有节点。
+        desiredState:
+          interfaces:
+          - name: br1 
+            description: Linux bridge with ens4 as a port 
+            type: linux-bridge 
+            state: up
+            ipv4:
+              dhcp: true
+              enabled: true
+            bridge:
+              options:
+                stp:
+                  enabled: false
+              port:
+              - name: ens4         
+      ```
+
+    - 要从节点删除接⼝，必须修改或创建 NNCP，在 state 参数下将接⼝指定为 `absent`。接⼝状态设为 absent 时， 通过⽹桥或绑定接⼝配置的⽹络接⼝将置于 down 状态， 并且连接会丢失。
+    - 如果删除⽹桥或绑定接⼝，则集群中之前附加或从属于该⽹桥或绑定接⼝的 **任何节点⽹络接⼝卡** 都将处于 down 状态，且⽆法访问。为避免失去与节点⽹络接⼝卡的连接，在同⼀策略中将节点⽹络接⼝卡配置为 up 状态，并配置 DHCP 或静态 IP 地址。此配置可确保在删除⽹桥或绑定接⼝后，节点⽹络接⼝卡仍然可以访问。
+
+  - **NodeNetworkConfigurationEnactment**：
+    - 节点网络配置实施（NNCE）
+
+      ```bash
+      $ oc get nnce <nnce-name> -o yaml
+      #查看指定 NNCE 资源的详细信息
+      ```
+
+    - 将节点⽹络配置策略应⽤到集群时，NMState Operator 会为策略影响的 **每个集群节点** ⽣成⼀个 NodeNetworkConfigurationEnactment（NNCE）对象。NNCE 对象报告所应⽤策略的执⾏状态，并且包含由策略在各个节点上实施的定义设置。如果发⽣故障，节点将回滚到其之前的配置，⽽且 NNCE 提供了回溯数据来⽤于故障排除。
+
+NMState operator 管理 OpenShift 集群中主机节点的⽹络配置。Multus CNI 管理 Kubernetes 集群中 Pod 的⽹络配置。Multus 可以与 NMState operator 搭配使⽤，后者提供了在集群节点上配置这些⽹络设备的声明⽅式。
+
+### 7.4 NetworkAttachmentDefinition (NAD) 资源：网络附加定义
+
+Pod 或虚拟机添加辅助网络接口的流程：
+
+- 定义 NNCP 资源并创建宿主机节点的逻辑网络设备
+- NAD 定义与 NNCP 中的资源需要对应匹配
+- Multus CNI 插件使用 NAD 中的资源定义创建辅助网络接口
+
+```bash
+### OpenShift 内置 Multus CNI 插件 ###
+$ oc get net-attach-def -n <vm-namespace>
+#查看指定虚拟机项目中的网络附加定义状态
+```
+
+默认 Pod ⽹络上的虚拟机具有⼀个临时（ephemeral）IP 地址，该地址 **⽆法静态分配**。如果虚拟机需要静态或动态 IP 地址，必须在虚拟机上附加⼀个 **辅助⽹络接⼝**。该辅助接⼝必须连接⾄⼀个⽹桥⽹络。⽹桥⽹络上必须有可⽤的 DHCP 服务器，从⽽为虚拟机提供动态 IP 地址。
+
+## 🔥 结语：OpenShift 集群网络类型
 
 | 网络类型 | 默认集成 | 实现方式 | 关键资源 / 配置 | 外部访问方式 |
 | ----- | ----- | ----- | ----- | ----- |
@@ -551,18 +703,30 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 
 ## 参考链接
 
-- [CNI Website](https://www.cni.dev/)
+- [Headless Services | Kubernetes Docs](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
+- [DNS records | KubeVirt user guide](https://kubevirt.io/user-guide/network/dns/)
+- [CNI](https://www.cni.dev/)
 - [CNI - the Container Network Interface | GitHub](https://github.com/containernetworking/cni)
 - 🧬 [**Container Network Interface (CNI) Specification | GitHub**](https://github.com/containernetworking/cni/blob/spec-v1.0.0/SPEC.md)
+- [Multus-CNI | GitHub](https://github.com/k8snetworkplumbingwg/multus-cni)
 - 📚 [OVN-Kubernetes network plugin | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/ovn-kubernetes_network_plugin/index)
 - [OpenShift 资源对象详解：Service | GitHub](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3.md#-11-service-svc-%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1)
 - 🧪 [**Pod Creation Workflow | OVN-Kubernetes Docs**](https://ovn-kubernetes.io/master/design/pod-creation-workflow/)
+- [Networking overview | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/networking_overview/index)
+- [Multiple networks | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/multiple_networks/index)
 
 ## 待完善问题
 
-- Route 架构拓扑图绘制
-- 在集群默认 Pod 网络中（OVN-Kubernetes CNI 插件实现），跨节点间 Pod 与 Pod 通信流量路径分析：
-  - 如何确认 pod 上的网口与 br-int 集成网桥的对应关系？
-  - OpenFlow 流表中 service 如何实现 endpoint 的负载均衡？
+- 默认 Pod 网络中（OVN-Kubernetes CNI 插件实现）：
+  - 跨节点间 Pod 与 Pod 通信流量路径分析？
+  - 如何确认 Pod 上的网口与 br-int 集成网桥的对应关系？
+  - OpenFlow 流表中 Service 如何实现 Endpoint 的负载均衡？
   - internal 类型的 ovn-k8s-mp0 接口如何跨内核空间与用户空间的 OVS br-int 网桥？OVS 中的代码如何实现？
-- **UDN 作为主网络 + 独立 Pod 管理网络** 的双路径配置模式图
+- UDN 网络：
+  - **UDN 作为 Primary 网络 + 独立 Pod 管理网络** 的双路径配置模式图？
+  - **UDN 作为 Secondary 网络 + VM 默认主网络 + 独立 Pod 管理网络** 的路径配置模式图？
+  - ovn-k8s-mpX 网口的功能？
+- Multus CNI + NNCP + NAD (ovn-k8s-cni-overlay CNI) 辅助网络：
+  - VM 默认主网络：OVN-Kubernetes
+  - 辅助网络流量：VM enp3s0 -> br-int (patch-port-to-br0) -> br0 (patch-port-to-br-int) -> ens3 (ovn-mappings: br0-network:ens3)
+- OVS 中的 system/internal/patch 类型功能与内核的关系？
