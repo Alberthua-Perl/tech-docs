@@ -21,9 +21,11 @@ OpenShift 虚拟化基于 CNCF 项目 [KubeVirt](https://kubevirt.io/) 构建，
     - [Web 控制台：更改虚拟机实例类型](#web-控制台更改虚拟机实例类型)
   - [virtctl 命令行使用](#virtctl-命令行使用)
   - [OpenShift 虚拟化的存储](#openshift-虚拟化的存储)
-    - [StorageClass 与 VolumeSnapshotClass](#storageclass-与-volumesnapshotclass)
-    - [对象存储使用](#对象存储使用)
+    - [NooBaa 对象存储调用](#noobaa-对象存储调用)
   - [OADP 备份 KubeVirt 虚拟机](#oadp-备份-kubevirt-虚拟机)
+    - [核心概念解析](#核心概念解析)
+    - [资源间的关系与协作流程](#资源间的关系与协作流程)
+    - [OADP 备份关键概念](#oadp-备份关键概念)
   - [参考文档](#参考文档)
 
 ## OpenShift Virtualization 相关的 Operator
@@ -228,11 +230,7 @@ $ oc run udn-test -it --rm \
 
 ## OpenShift 虚拟化的存储
 
-### StorageClass 与 VolumeSnapshotClass
-
-
-
-### 对象存储使用
+### NooBaa 对象存储调用
 
 OpenShift 数据基础（ODF）提供两种对象存储服务：多云对象⽹关（NooBaa MCG）和 Ceph RADOS 对象⽹关（Ceph RGW）。这两种服务均通过 aws 提供程序插件与 OADP 完全兼容。
 
@@ -291,9 +289,39 @@ sequenceDiagram
 
 ## OADP 备份 KubeVirt 虚拟机
 
-<center><image src="images/OADP-arch.png" style="width:80%"></center>
+<center><img src="images/OADP-arch.png" style="width:80%"></center>
 
-图示：基于 Velero 的 OADP（OpenShift API for Data Protection）备份框架
+<center>图示：基于 Velero 的 OADP（OpenShift API for Data Protection）备份框架</center>
+
+<center><img src="images/OADP-backup-progress.png" style="width:80%"></center>
+
+<center>图示：OADP 备份 OpenShift 应⽤的流程</center>
+
+
+
+### 核心概念解析
+
+| 资源名称 | 含义解析 | 类比对象 |
+| ----- | ----- | ----- |
+| **`StorageClass`** | 它是集群管理员定义的 “存储类别”，描述了某种存储的供给方式。当用户创建 PVC 时，通过指定 StorageClass，系统才知道用哪种后端（如 ODF 的 Ceph RBD/CephFS）和参数来动态创建 PV。它只负责 “卷” 的创建，不直接参与快照的创建过程。 | —— |
+| **`Provision`**（动态供给） | 严格来说，Provision 不是一个独立的 Kubernetes 资源对象，而是一个动作/过程。它指的是当 PVC 被创建时，CSI 驱动根据 StorageClass 的定义，在存储后端自动创建实际卷并生成对应 PV 的过程。在 ODF 中，这意味着 Ceph 集群里实际创建了一个块设备或文件系统。 | —— |
+| **`VolumeSnapshot`** | 这是用户/开发者发起的快照请求，类似于 PVC。它是命名空间级资源，通过它告诉集群：“我想给某个 PVC 拍个快照”。它本身不存储数据，只是一个 “订单”。 | PVC（命名空间级资源） |
+| **`VolumeSnapshotContent`** | 集群级资源，类似于 PV。它代表存储后端上真实存在的快照数据。它记录了快照的 CSI 驱动、后端快照句柄（Handle）以及它绑定到了哪个 VolumeSnapshot。它由集群管理员（预置备）或快照控制器（动态制备）创建。 | PV（集群级资源） |
+| **`VolumeSnapshotClass`** | 它是快照的 “类别” 定义，类似于 StorageClass 之于卷。它告诉 CSI 驱动（如 ODF 的 openshift-storage.rbd.csi.ceph.com）在创建快照时使用什么参数（例如是否使用特定池）以及删除策略（DeletionPolicy）：是 Delete（删快照时连底层数据一起删）还是 Retain（保留底层数据）。 | StorageClass（集群级资源） |
+
+### 资源间的关系与协作流程
+
+它们的关系可以通过一个 **动态快照** 的完整流程来理解：
+
+- 准备阶段：管理员已定义好 StorageClass（用于创建源卷）和 VolumeSnapshotClass（用于定义快照属性）。
+- 用户请求：用户创建 VolumeSnapshot 对象，并在其中指定 source（要备份的 PVC）和 VolumeSnapshotClassName。
+- 控制器介入：OpenShift 内置的 **CSI Snapshot Controller** 监听到这个 VolumeSnapshot 请求。它根据指定的 VolumeSnapshotClass，去调用对应的 CSI 驱动（如 ODF 的驱动）。
+- 底层执行：CSI 驱动在存储后端（Ceph）执行真正的快照操作。
+- 绑定结果：控制器创建出 VolumeSnapshotContent 对象，并将它与用户的 VolumeSnapshot 进行一对一绑定。此时，VolumeSnapshot 的 status 会显示 readyToUse: true，并指向那个 Content。
+
+### OADP 备份关键概念
+
+如果虚拟机在备份创建前处于运⾏状态，Backup 资源会⾃动创建 pre 备份 hook，以在备份创建前冻结虚拟机；并创建 post 备份 hook，以在备份完成后解冻虚拟机。
 
 ## 参考文档
 
@@ -305,3 +333,5 @@ sequenceDiagram
 - [OpenShift Virtualization - Example Architectures](https://access.redhat.com/articles/7067871)
 - [MetalLB on OpenShift OCP | MetalLB Docs](https://metallb.universe.tf/installation/clouds/#metallb-on-openshift-ocp)
 - [Configuration | MetalLB Docs](https://metallb.universe.tf/configuration/)
+- [KOPIA](https://kopia.io/)
+- [VELERO](https://velero.io/)

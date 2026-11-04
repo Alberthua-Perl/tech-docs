@@ -40,11 +40,10 @@
     - [7.3 CNI 插件：OVN-Kubernetes](#73-cni-插件ovn-kubernetes)
     - [7.4 Kubernetes NMstate Operator](#74-kubernetes-nmstate-operator)
     - [7.5 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#75-networkattachmentdefinition-nad-资源网络附加定义)
-    - [7.6 Localnet 辅助网络组网方式示例：使用 NNCP 与 NAD 资源构建](#76-localnet-辅助网络组网方式示例使用-nncp-与-nad-资源构建)
-  - [KubeVirt 虚拟机的虚拟化网络](#kubevirt-虚拟机的虚拟化网络)
-  - [UserDefinedNetwork (UDN) 资源：用户定义网络](#userdefinednetwork-udn-资源用户定义网络)
-  - [🎉 KubeVirt 虚拟机组网方式](#-kubevirt-虚拟机组网方式)
-  - [🔥 OpenShift 集群网络类型](#-openshift-集群网络类型)
+    - [7.6 KubeVirt 虚拟机的网络模式](#76-kubevirt-虚拟机的网络模式)
+    - [7.7 UserDefinedNetwork (UDN) 资源：用户定义网络](#77-userdefinednetwork-udn-资源用户定义网络)
+    - [⚗️ 7.8 KubeVirt 虚拟机组网方式分析](#️-78-kubevirt-虚拟机组网方式分析)
+  - [🔥 8. OpenShift 集群网络类型](#-8-openshift-集群网络类型)
   - [参考链接](#参考链接)
   - [待完善问题](#待完善问题)
 
@@ -731,21 +730,15 @@ NMState operator 管理 OpenShift 集群中主机节点的⽹络配置。Multus 
   }'
   ```
 
-### 7.6 Localnet 辅助网络组网方式示例：使用 NNCP 与 NAD 资源构建
+  ```bash
+  $ oc apply -f ovs-br0-network-nncp.yaml
+  $ oc apply -f ovs-br0-network-nad.yaml
 
-默认 OVN-Kubernetes CNI 网络 + OVN-Kubernetes Localnet 辅助网络拓扑示意：
+  $ oc get net-attach-def -n <vm-namespace>
+  #查看指定项目中的网络附加定义状态
+  ```
 
-<img src="images/multus-nmstate-nncp-nad-arch.png" style="width:80%">
-
-```bash
-$ oc apply -f ovs-br0-network-nncp.yaml
-$ oc apply -f ovs-br0-network-nad.yaml
-
-$ oc get net-attach-def -n <vm-namespace>
-#查看指定项目中的网络附加定义状态
-```
-
-## KubeVirt 虚拟机的虚拟化网络
+### 7.6 KubeVirt 虚拟机的网络模式
 
 在 OpenShift 虚拟化中，虚拟机在 `virt-launcher pod` 内运⾏。由于虚拟机在 pod 内， 因此它们默认位于 pod ⽹络中。virt-launcher pod 从 pod ⽹络获取 IP 地址，管理虚拟机的⽹络流量，将⼊站流量重定向到虚拟机，并路由来⾃虚拟机的出站流量。这种集成意味着虚拟机之间以及虚拟机与容器集之间的通信均通过集群 SDN 实现。
 
@@ -755,7 +748,7 @@ $ oc get net-attach-def -n <vm-namespace>
 
 ![virt-launcher-vmi-vm-service](images/virt-launcher-vmi-vm-service.png)
 
-## UserDefinedNetwork (UDN) 资源：用户定义网络
+### 7.7 UserDefinedNetwork (UDN) 资源：用户定义网络
 
 UDN 所在命名空间的要求：
 
@@ -772,9 +765,122 @@ UDN 实现主要网络接口：
 - ✅ 创建 UDN 后，OpenShift 会在命名空间中创建所有 Pod，并将 UDN 作为主要⽹络接⼝，⽽不是集群 Pod ⽹络。
 - ✅ 使⽤ YAML 定义创建虚拟机时，必须将 **l2bridge 绑定插件** ⽤于虚拟机的⽹络接⼝，以将 UDN ⽤作主要⽹络接⼝。
 
-## 🎉 KubeVirt 虚拟机组网方式
+### ⚗️ 7.8 KubeVirt 虚拟机组网方式分析
 
-## 🔥 OpenShift 集群网络类型
+1️⃣ VM 视角下 3 种组网模式可供选择：
+
+| **模式** | **guest 网卡** | **经过 NAD/Multus** | **外部可访问？** |
+| ----- | ----- | ----- | ----- |
+| 1. 默认网络 | eth0 = pod 默认网络（masquerade/bridge binding） | ❌（主 CNI 直供） | ✅ 经 Service/Route |
+| 2. UDN Primary | eth0 = UDN（仅支持 primary，L2/L3 overlay 拓扑） | ✅（UDN 自动生成 NAD →  Multus） | ❌ Geneve overlay，集群内逻辑网 |
+| 3. 双网卡 | eth0 = 默认网络 + eth1 = 普通 NAD 附加网络（macvlan/bridge/host-device/SR-IOV/**localnet** 等） | ✅（仅 eth1） | ✅ eth0 经 Service/Route；eth1 直连外部 |
+
+2️⃣ 模式 3 中附加网卡类型可采用以下多种方式：
+
+| 附加网卡类型 | VM 支持 | 外部可访问？ | 性能 | 原理 |
+| ----- | ----- | ----- | ----- | ----- |
+| **host-device** | ✅ | ✅ | 最高（接近裸机） | 整个物理接口/VF 直通进 VM |
+| **Linux bridge** | ✅ | ✅ | 中 | 传统 Linux 网桥，二层直连外部 |
+| **macvlan / ipvlan** | ✅ | ✅ | 高 | 共享节点物理接口的 MAC/VLAN，直接接入物理网络 |
+| **SR-IOV**（需额外装 operator） | ✅ | ✅ | 最高 | VF 直通，绕过内核网络栈 |
+| **localnet（NNCP + NAD）** | ✅ | ✅ | 高 | NNCP 在节点上配好承载桥（如 br0-ovs + ens4），NAD 声明 networkName=physnet 匹配 ovn-bridge-mappings="physnet:br0-ovs"，OVS 逻辑 localnet 端口映射到物理 underlay |
+| overlay 型 secondary UDN（Geneve） | ❌ | —— | 中 | 仅普通 pod 可用 |
+
+3️⃣ 模式3的网络流量路径，如下所示：
+
+```plaintext
+guest eth0（默认 pod 网络）→ 集群内 Service/Route 访问（管理面、普通业务面）
+guest eth1（macvlan/host-device/SR-IOV/localnet）→ 直连物理外部网络（大流量、低时延、独立安全域）
+```
+
+4️⃣ 模式3的默认 Pod 网络 + OVN-Kubernetes localnet 附加网络 **拓扑示意**：
+
+<img src="images/multus-nmstate-nncp-nad-arch.png" style="width:100%">
+
+5️⃣ 模式3的默认 Pod 网络 + OVN-Kubernetes localnet 附加网络 **网络接口示意**：可参考上图中的网络接口名称
+
+```mermaid
+graph TB
+    subgraph GUEST["虚拟机 Guest OS（rhel10-external）"]
+        GETH0["guest eth0（默认网络）<br/>masquerade：10.0.2.x/24，网关 10.0.2.1"]
+        GETH1["guest eth1（外部网络）<br/>外部网络 IP，直连物理网"]
+    end
+
+    subgraph PODNS["virt-launcher pod netns"]
+        subgraph DEFNET["默认网络链路（masquerade）"]
+            TAP0["tap0 → k6t-eth0 (bridge)<br/>10.0.2.1/24"]
+            NAT["nftables MASQUERADE<br/>10.0.2.0/24 → eth0"]
+        end
+        ETH0["eth0@if91<br/>10.10.0.5/23"]
+
+        subgraph EXTNET["Multus 外部网络链路"]
+            TAP1["tap4009f3a67ff → k6t-4009f3a67ff (bridge)"]
+            NIC["4009f3a67ff-nic@if92<br/>veth pod 端"]
+            DUMMY["pod4009f3a67ff<br/>dummy 占位（DOWN）"]
+        end
+    end
+
+    subgraph HOST["宿主机"]
+        VETH91["veth 对端@if91<br/>iface-id 绑定默认网络逻辑端口"]
+        VETH92["veth 对端@if92<br/>iface-id 绑定外部网络逻辑端口"]
+        BRINT["br-int (OVS)<br/>OVN 逻辑管道<br/>（两条逻辑链路的共同入口）"]
+
+        subgraph EXIT1["出口 1：默认网络"]
+            P1["patch 口<br/>patch-br-int ↔ phy-br-ex"]
+            BREX["br-ex (OVS)<br/>默认网络承载桥<br/>（网关 NAT / EgressIP）"]
+            ENS3["ens3 物理网卡<br/>（节点主网络）"]
+        end
+
+        subgraph EXIT2["出口 2：Multus 外部网络"]
+            P2["patch 口<br/>patch-br-int ↔ phy-br0-ovs"]
+            BR0["br0-ovs (OVS)<br/>physnet 承载桥<br/>ovn-bridge-mappings"]
+            ENS4["ens4 物理网卡"]
+        end
+    end
+
+    EXT3["外部网络 A<br/>（集群东西向流量）"]
+    EXT4["外部网络 B<br/>（localnet 物理网）"]
+
+    %% ===== 链路 1：默认网络 =====
+    GETH0 --> TAP0
+    TAP0 --> NAT
+    NAT --> ETH0
+    ETH0 -. "@if91" .- VETH91
+    VETH91 --> BRINT
+    BRINT --- P1
+    P1 --- BREX
+    BREX --- ENS3
+    ENS3 --> EXT3
+
+    %% ===== 链路 2：外部网络 =====
+    GETH1 --> TAP1
+    TAP1 --- NIC
+    NIC -. "veth pair" .- VETH92
+    VETH92 --> BRINT
+    BRINT --- P2
+    P2 --- BR0
+    BR0 --- ENS4
+    ENS4 --> EXT4
+
+    DUMMY -. "仅登记地址" .- NIC
+
+    classDef defnet fill:#d4f7d4,stroke:#333;
+    classDef extnet fill:#fff2cc,stroke:#333;
+    classDef phys fill:#dbe9f9,stroke:#333;
+    classDef idle fill:#f0f0f0,stroke:#999,stroke-dasharray:5 5;
+    class GETH0,TAP0,NAT,ETH0,VETH91,BRINT defnet;
+    class GETH1,TAP1,NIC,VETH92 extnet;
+    class P1,BREX,ENS3,P2,BR0,ENS4,EXT3,EXT4 phys;
+    class DUMMY idle;
+```
+
+virt-launcher pod 的网络命名空间中通过 nftable 的 masquerade 完成了内部虚拟机地址至 pod 默认网络接口的地址转换。但在 OpenShift 中的 pod 内无 root 执行权限，无法直接在 pod 中执行 nft 查询命令。因此，直接找到此 pod，并通过底层进入其网络命名空间，再执行 nft 查询命令进行验证：
+
+![virt-launcher-pod-masquerade-1](images/virt-launcher-pod-masquerade-1.png)
+
+![virt-launcher-pod-masquerade-2](images/virt-launcher-pod-masquerade-2.png)
+
+## 🔥 8. OpenShift 集群网络类型
 
 | 网络类型 | 默认集成 | 实现方式 | 关键资源 / 配置 | 外部访问方式 |
 | ----- | ----- | ----- | ----- | ----- |
@@ -796,6 +902,7 @@ UDN 实现主要网络接口：
 - 🧪 [**Pod Creation Workflow | OVN-Kubernetes Docs**](https://ovn-kubernetes.io/master/design/pod-creation-workflow/)
 - [Networking overview | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/networking_overview/index)
 - [Multiple networks | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/multiple_networks/index)
+- [Network Policies | Kubernetes Docs](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
 ## 待完善问题
 
