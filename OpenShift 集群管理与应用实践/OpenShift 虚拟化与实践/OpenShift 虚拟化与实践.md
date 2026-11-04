@@ -9,19 +9,37 @@ OpenShift 虚拟化基于 CNCF 项目 [KubeVirt](https://kubevirt.io/) 构建，
 - [🦃 OpenShift 虚拟化与实践](#-openshift-虚拟化与实践)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
+  - [OpenShift Virtualization 相关的 Operator](#openshift-virtualization-相关的-operator)
   - [OpenShift Virtualization Operator 组件](#openshift-virtualization-operator-组件)
     - [Operator 安装：组件间的时序调用](#operator-安装组件间的时序调用)
     - [Operator 安装：HyperConverged 设计原理](#operator-安装hyperconverged-设计原理)
     - [Operator 安装：组件与资源间关系](#operator-安装组件与资源间关系)
-  - [Operator 功能：KubeVirt 虚拟机管理组件](#operator-功能kubevirt-虚拟机管理组件)
+  - [KubeVirt 顶层视角](#kubevirt-顶层视角)
   - [OpenShift 虚拟化资源管理](#openshift-虚拟化资源管理)
     - [虚拟机实例类型 \& 虚拟机偏好设置](#虚拟机实例类型--虚拟机偏好设置)
     - [Web 控制台：热插拔的 CPU 与内存](#web-控制台热插拔的-cpu-与内存)
     - [Web 控制台：更改虚拟机实例类型](#web-控制台更改虚拟机实例类型)
   - [virtctl 命令行使用](#virtctl-命令行使用)
-  - [OpenShift 虚拟机的虚拟化网络](#openshift-虚拟机的虚拟化网络)
-    - [UserDefinedNetwork (UDN) 资源：用户定义网络](#userdefinednetwork-udn-资源用户定义网络)
+  - [OpenShift 虚拟化的存储](#openshift-虚拟化的存储)
+    - [StorageClass 与 VolumeSnapshotClass](#storageclass-与-volumesnapshotclass)
+    - [对象存储使用](#对象存储使用)
+  - [OADP 备份 KubeVirt 虚拟机](#oadp-备份-kubevirt-虚拟机)
   - [参考文档](#参考文档)
+
+## OpenShift Virtualization 相关的 Operator
+
+| Operator | 核心功能 | 主要管理对象 / CR | 命名空间 | 关键特点 |
+| ----- | ----- | ----- | ----- | ----- |
+| **Network Operator** (Cluster Network Operator) | 部署和管理集群的 CNI 网络插件（如 OVN-Kubernetes），控制 Pod 网络、IPsec 加密、MTU 等核心网络配置 | 集群网络配置（Network CR） | openshift-network-operator | 控制面组件，负责 “集群默认网络” 的搭建与运维 |
+| **NMState Operator** | 对集群节点进行声明式的网络状态配置，支持创建网桥、绑定（bond）、VLAN 等，并定期上报节点网络状态 | NodeNetworkConfigurationPolicy (NNCP) <br> NodeNetworkConfigurationEnactment (NNCE) <br> NodeNetworkState (NNS) | openshift-nmstate | 面向节点主机的网络配置，常用于准备 Multus 二级网络或调整物理网卡设置 |
+| **MTV Operator** (Migration Toolkit for Virtualization) | 将虚拟机从源环境（如 VMware vSphere）迁移到 OpenShift 虚拟化平台 | Provider <br> NetworkMapping <br> StorageMapping <br> Plan <br> Migration | openshift-mtv | 管理迁移工作流：定义连接、映射网络/存储、制定计划并执行 |
+| **OADP Operator** (OpenShift API for Data Protection) | 为工作负载（包括虚拟机）提供备份与恢复能力，基于 Velero 实现，可备份应用资源、PV 和镜像 | DataProtectionApplication (DPA) <br> BackupStorageLocation <br> VolumeSnapshotLocation <br> Backup <br> Restore <br> Schedule <br> BackupRepository <br> Hooks | openshift-adp | 面向数据保护，需配置后端对象存储；支持 KubeVirt 插件以备份 VM |
+
+**注意**：
+
+openshift-network-operator (管理者)：这是 **Cluster Network Operator (CNO)** 所在的命名空间。CNO 是 OpenShift 的核心控制组件，负责在集群安装和运行期间，部署和管理底层的 CNI 网络插件（如 OVN-Kubernetes）及其相关组件。
+
+openshift-ovn-kubernetes (运行组件)：这是 OVN-Kubernetes 网络插件本身运行的地方。CNO 将 OVN-Kubernetes 所需的 ovnkube-master、ovnkube-node 等核心 Pod 部署在这个命名空间中，由它们实际负责 Pod 网络的创建、路由和策略执行。
 
 ## OpenShift Virtualization Operator 组件
 
@@ -122,17 +140,23 @@ OLM (CSV/Subscription, OpenShift Virtualization Operator 的安装记录)
 Operator 中可根据上游 CR 实例可通过 reconcile 创建出下游 CR，如下所示：<br>
 HyperConverged CR ──hco-operator──► KubeVirt CR ──virt-operator──► (virt-api 等 Deployment)
 
-图示：HyperConverged 实例、hco-operator Pod、reconcile 之间的关系
-
 ![hco-operator-reconcile](images/hco-operator-reconcile.png)
 
-图示：通过 OpenShift Virtualization Operator 中的 CSV 资源获取此清单中可部署的 Deployment 资源
+图示：HyperConverged 实例、hco-operator Pod、reconcile 之间的关系
 
 ![openshift-virtualization-csv](images/openshift-virtualization-csv.png)
 
-## Operator 功能：KubeVirt 虚拟机管理组件
+图示：通过 OpenShift Virtualization Operator 中的 CSV 资源获取此清单中可部署的 Deployment 资源
+
+## KubeVirt 顶层视角
+
+<center><image src="images/k8s-kubevirt-arch-view.png" style="width:80%"></center>
+
+<center>图示：Kubernetes 与 KubeVirt 的协作关系</center>
 
 <center><image src="images/virt-associated-components.png" style="width:80%"></center>
+
+<center>图示：KubeVirt 各组件协同关系</center>
 
 ## OpenShift 虚拟化资源管理
 
@@ -202,32 +226,74 @@ $ oc run udn-test -it --rm \
   --image=image-registry.openshift-image-registry.svc:5000/openshift/tools
 ```
 
-## OpenShift 虚拟机的虚拟化网络
+## OpenShift 虚拟化的存储
 
-在 OpenShift 虚拟化中，虚拟机在 `virt-launcher pod` 内运⾏。由于虚拟机在 pod 内， 因此它们默认位于 pod ⽹络中。virt-launcher pod 从 pod ⽹络获取 IP 地址，管理虚拟机的⽹络流量，将⼊站流量重定向到虚拟机，并路由来⾃虚拟机的出站流量。这种集成意味着虚拟机之间以及虚拟机与容器集之间的通信均通过集群 SDN 实现。
+### StorageClass 与 VolumeSnapshotClass
 
-在 OpenShift 虚拟化中，虚拟机默认连接到 pod ⽹络。因此，虚拟机可以与集群中的任何其他虚拟机或 pod 通信，即使它们位于不同的命名空间中也是如此。
 
-图示：virt-launcher pod、VM service、endpoint 之间的关系
 
-![virt-launcher-vmi-vm-service](images/virt-launcher-vmi-vm-service.png)
+### 对象存储使用
 
-### UserDefinedNetwork (UDN) 资源：用户定义网络
+OpenShift 数据基础（ODF）提供两种对象存储服务：多云对象⽹关（NooBaa MCG）和 Ceph RADOS 对象⽹关（Ceph RGW）。这两种服务均通过 aws 提供程序插件与 OADP 完全兼容。
 
-UDN 所在命名空间的要求：
+ODF 的 NooBaa Operator 中 Provisioner（置备器）、StorageClass、BucketClass、ObjectBucketClass 之间的调用时序关系：
 
-- 要使⽤⼾能够在其命名空间中创建 UDN，必须先为 UDN 准备好相应的命名空间。
-- 此命名空间必须存在 `k8s.ovn.org/primary-user-defined-network` 标签（label）才能用于创建 UDN。
-- ⽆法将 UDN 标签添加到现有命名空间，OpenShift 管理员必须创建⼀个带有标签的命名空间。如果⽬标命名空间没有 UDN 标签，则创建 UDN 的操作将失败。
+```mermaid
+sequenceDiagram
+    autonumber
+    
+    actor User as 用户/应用
+    participant K8s as Kubernetes API
+    participant SC as StorageClass (openshift-storage.noobaa.io)
+    participant OBC as ObjectBucketClaim (OBC)
+    participant Prov as NooBaa Provisioner
+    participant BC as BucketClass
+    participant MCG as NooBaa MCG (底层资源)
+    participant SecretCM as Secret & ConfigMap
 
-UDN 实现主要网络接口：
+    Note over User, K8s: 1. 预备阶段
+    Note right of SC: 已由 Operator 预先创建并注册 Provisioner
 
-- 从 Web 控制台，只能为每个命名空间创建⼀个 UDN，OpenShift 会将该 UDN ⽤作 Pod 和虚拟机的 **主要⽹络接⼝**（primary）。
-- 当命名空间上设置 UDN 标签时，必须创建相应的 UDN。在创建 UDN 之前，OpenShift ⽆法在命名空间中创建任何 Pod 或虚拟机。
-- 创建带有 UDN 标签的命名空间后，该命名空间中的 Pod 和虚拟机不再使⽤集群 Pod ⽹络，⽽是使⽤该命名空间中的 UDN。如果命名空间中不存在 UDN，则 OpenShift ⽆法在该命名空间中启动任何 Pod。
-- ✅ 从 OpenShift 虚拟化 4.18 开始，只能创建 UDN 作为虚拟机的 **主要⽹络接⼝**。此外，只能使⽤ **第 2 层拓扑** 来创建 UDN。
-- ✅ 创建 UDN 后，OpenShift 会在命名空间中创建所有 Pod，并将 UDN 作为主要⽹络接⼝，⽽不是集群 Pod ⽹络。
-- ✅ 使⽤ YAML 定义创建虚拟机时，必须将 **l2bridge 绑定插件** ⽤于虚拟机的⽹络接⼝，以将 UDN ⽤作主要⽹络接⼝。
+    User->>K8s: 创建 OBC (指定 storageClassName)
+    K8s->>OBC: 持久化 OBC 资源
+    
+    Note over OBC, SC: 2. 绑定与触发阶段
+    OBC->>K8s: 触发动态供应 (Dynamic Provisioning)
+    K8s->>SC: 查询 StorageClass 配置
+    SC-->>K8s: 返回 Provisioner 名称 (noobaa.io/obc)
+    K8s->>Prov: 调用 Provisioner 执行 Provision()
+
+    Note over Prov, BC: 3. 策略解析阶段
+    Prov->>OBC: 读取 OBC 配置
+    alt OBC 指定了 BucketClass
+        Prov->>BC: 读取放置策略 (Placement Policy)
+        BC-->>Prov: 返回 BackingStore / NamespaceStore 映射
+    else OBC 未指定 BucketClass
+        Prov->>Prov: 使用默认存储策略 (Default BackingStore)
+    end
+
+    Note over Prov, MCG: 4. 资源创建阶段
+    Prov->>MCG: 创建底层 Bucket
+    MCG-->>Prov: 返回 Bucket 名称及连接信息
+    Prov->>MCG: 创建访问凭证 (Access Key / Secret Key)
+    MCG-->>Prov: 返回凭证信息
+
+    Note over Prov, K8s: 5. 资源回写与完成阶段
+    Prov->>K8s: 创建 ObjectBucket (OB) 资源
+    Prov->>K8s: 在当前命名空间生成 Secret 和 ConfigMap
+    K8s->>SecretCM: 持久化凭证与连接信息
+    K8s-->>OBC: 更新 OBC 状态为 Bound (已绑定)
+    
+    Note over User, SecretCM: 6. 应用使用阶段
+    User->>SecretCM: 获取 Secret 和 ConfigMap
+    User->>MCG: 通过 S3 API 读写数据
+```
+
+## OADP 备份 KubeVirt 虚拟机
+
+<center><image src="images/OADP-arch.png" style="width:80%"></center>
+
+图示：基于 Velero 的 OADP（OpenShift API for Data Protection）备份框架
 
 ## 参考文档
 

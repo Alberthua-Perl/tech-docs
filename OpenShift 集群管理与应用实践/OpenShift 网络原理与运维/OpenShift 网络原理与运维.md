@@ -36,16 +36,22 @@
   - [6. OVN-Kubernetes CNI 组件状态](#6-ovn-kubernetes-cni-组件状态)
   - [7. Pod 或 KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件](#7-pod-或-kubevirt-虚拟机多网口实现multus-cni-元插件--cni-插件)
     - [7.1 Multus CNI 基础概述](#71-multus-cni-基础概述)
-    - [7.2 CNI 插件剪影：Macvlan 与 IPvlan 原理对比](#72-cni-插件剪影macvlan-与-ipvlan-原理对比)
-    - [7.3 Kubernetes NMstate Operator](#73-kubernetes-nmstate-operator)
-    - [7.4 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#74-networkattachmentdefinition-nad-资源网络附加定义)
-  - [🔥 结语：OpenShift 集群网络类型](#-结语openshift-集群网络类型)
+    - [7.2 CNI 插件：Macvlan 与 IPvlan 原理对比](#72-cni-插件macvlan-与-ipvlan-原理对比)
+    - [7.3 CNI 插件：OVN-Kubernetes](#73-cni-插件ovn-kubernetes)
+    - [7.4 Kubernetes NMstate Operator](#74-kubernetes-nmstate-operator)
+    - [7.5 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#75-networkattachmentdefinition-nad-资源网络附加定义)
+    - [7.6 Localnet 辅助网络组网方式示例：使用 NNCP 与 NAD 资源构建](#76-localnet-辅助网络组网方式示例使用-nncp-与-nad-资源构建)
+  - [KubeVirt 虚拟机的虚拟化网络](#kubevirt-虚拟机的虚拟化网络)
+  - [UserDefinedNetwork (UDN) 资源：用户定义网络](#userdefinednetwork-udn-资源用户定义网络)
+  - [🎉 KubeVirt 虚拟机组网方式](#-kubevirt-虚拟机组网方式)
+  - [🔥 OpenShift 集群网络类型](#-openshift-集群网络类型)
   - [参考链接](#参考链接)
   - [待完善问题](#待完善问题)
 
 ## 1. 文档说明
 
-此文档基于 OpenShift 4.18 集群撰写及测试
+- 此文档基于 OpenShift 4.18 集群撰写及测试
+- 此文档包含 Pod 网络模式，也包含 KubeVirt 虚拟机的网络模式（后文简称 “虚拟机”）
 
 ## 2. Service (svc) 资源对象
 
@@ -562,7 +568,7 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 #查询各个 network CRD 的所属资源
 ```
 
-### 7.2 CNI 插件剪影：Macvlan 与 IPvlan 原理对比
+### 7.2 CNI 插件：Macvlan 与 IPvlan 原理对比
 
 **总体架构对比图：**
 
@@ -580,7 +586,18 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 
 <center><img src="images/macvlan-ipvlan-contrast-4.png" style="width:50%"></center>
 
-### 7.3 Kubernetes NMstate Operator
+### 7.3 CNI 插件：OVN-Kubernetes
+
+- 默认集群 Pod 网络：大二层覆盖网络
+  - OVN ⽀持多个覆盖⽹络的概念，即虚拟 L2 ⽹络。Pod 和 Service ⽹络是 OVN 覆盖⽹络。可以创建覆盖⽹络，将 Pod 连接到其他⽹络。
+  - **OVN-Kubernetes 的 L2 覆盖⽹络仅⽀持东西流量，这些⽹络上的 NIC ⽆法与集群外部通信。**
+- 辅助⽹络的 Localnet 拓扑：
+  - OVN-Kubernetes 还⽀持 **辅助⽹络的 localnet 拓扑**。此拓扑将辅助⽹络连接到物理⽹络，使 Pod 和虚拟机能够与集群外部的设备通信。但是，它需要在集群节点上对底层 Open vSwitch 系统进⾏额外配置。
+  - 可以创建 Multus ⽹络附加定义（NAD）资源（后文介绍），⽤于创建额外的 OVN 覆盖⽹络，并将 Pod 和虚拟机连接⾄这些覆盖⽹络作为辅助⽹络。
+  - localnet 拓扑需要⼀个⽹桥映射，将节点上的 OVS ⽹桥连接到物理⽹络接⼝。集群管理员可以使⽤ `NodeNetworkConfigurationPolicy` 资源来配置此⽹桥和映射。附加到 localnet ⽹络的虚拟机可以直接与物理⽹络上的外部设备通信。
+  - **OVN-Kubernetes localnet 拓扑既⽀持东西向集群流量，也⽀持访问集群外部运⾏的服务。**
+
+### 7.4 Kubernetes NMstate Operator
 
 - **Kubernetes NMstate Operator** 在 OpenShift 集群中提供⼀个集中的声明式主机⽹络配置⼯具。此 operator 可以通过 `NodeNetworkConfigurationPolicy` (NNCP) 与 `NodeNetworkConfigurationEnactment` (NNCE) 资源报告集群中每个节点⽹络配置，验证配置语法，并在不重新启动节点的情况下应⽤⽹络配置更改。借助 NMState Operator，集群管理员可以配置额外的节点⽹络设备（如 Linux ⽹桥），并在⽹络附加定义中使⽤它们。NNCP 可直接定义创建指定的节点网络设备，无需手动提前创建。
 - NMstate Operator 安装完毕后，集群管理员必须使⽤ **nmstate 名称** 来创建⼀个 NMState 实例，以在所有 OpenShift 节点上部署 NMState 控制器。
@@ -604,9 +621,10 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 
     - 描述了 OpenShift 节点的预期⽹络配置。集群管理员可以使⽤ NNCP 来创建和管理节点⽹络接⼝，例如声明 Linux ⽹桥、OVS 网桥等。
     - 默认情况下，NNCP 资源应⽤到集群中的所有节点。但是，可以在通过 NNCP 中包含具有相应标签的节点选择器（nodeSelector）来指定要将策略应⽤到哪些节点，例如仅应⽤到计算节点。
-    - 1️⃣ 示例：在节点 ens4 网络接口上配置 OVS ⽹桥的 NNCP
+    - 1️⃣ 示例：**在节点 ens4 网络接口上配置 OVS ⽹桥的 NNCP**
 
       ```yaml
+      # file: ovs-br0-network-nncp.yaml
       apiVersion: nmstate.io/v1
       kind: NodeNetworkConfigurationPolicy
       metadata:
@@ -616,24 +634,28 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
           node-role.kubernetes.io/worker: "" 
         desiredState:
           interfaces:
-          - name: br0 
+          - name: br0-ovs
+            description: OVS bridge with ens4 as a port
+            type: ovs-bridge
+            state: up
             bridge:
-              options: {}
+              #options: {}
+              options:
+                stp: true
               port:
               - name: ens4 
             ipv4:
-              dhcp: "true"
-              enabled: "true"
-            state: up
-            type: ovs-bridge 
+              dhcp: true
+              enabled: true
+
           ovn:
             bridge-mappings:           #将 localnet 定义的逻辑网络（br0-network）映射至 OVS br0 逻辑网桥上的 ens4 物理网口
-            - bridge: br0
+            - bridge: br0-ovs
               localnet: br0-network    #网络名称标识，必须与 NAD 中的定义 spec.config.name 匹配！
               state: present
       ```
 
-    - 2️⃣ 示例：在节点 ens4 ⽹络接⼝上定义 Linux ⽹桥的 NNCP
+    - 2️⃣ 示例：**在节点 ens4 ⽹络接⼝上定义 Linux ⽹桥的 NNCP**
 
       ```yaml
       apiVersion: nmstate.io/v1
@@ -661,6 +683,13 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
               - name: ens4         
       ```
 
+      ```bash
+      ### 验证 NNCP 构建的 OVN 逻辑网络 ###
+      [root@master01 ~]# ovs-vsctl get open_vswitch . external_ids:ovn-bridge-mappings    #OVS 侧：映射本身
+      "br0-network:br0-ovs,physnet:br-ex"
+      
+      ```
+
     - 要从节点删除接⼝，必须修改或创建 NNCP，在 state 参数下将接⼝指定为 `absent`。接⼝状态设为 absent 时， 通过⽹桥或绑定接⼝配置的⽹络接⼝将置于 down 状态， 并且连接会丢失。
     - 如果删除⽹桥或绑定接⼝，则集群中之前附加或从属于该⽹桥或绑定接⼝的 **任何节点⽹络接⼝卡** 都将处于 down 状态，且⽆法访问。为避免失去与节点⽹络接⼝卡的连接，在同⼀策略中将节点⽹络接⼝卡配置为 up 状态，并配置 DHCP 或静态 IP 地址。此配置可确保在删除⽹桥或绑定接⼝后，节点⽹络接⼝卡仍然可以访问。
 
@@ -676,23 +705,76 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 
 NMState operator 管理 OpenShift 集群中主机节点的⽹络配置。Multus CNI 管理 Kubernetes 集群中 Pod 的⽹络配置。Multus 可以与 NMState operator 搭配使⽤，后者提供了在集群节点上配置这些⽹络设备的声明⽅式。
 
-### 7.4 NetworkAttachmentDefinition (NAD) 资源：网络附加定义
+### 7.5 NetworkAttachmentDefinition (NAD) 资源：网络附加定义
 
-Pod 或虚拟机添加辅助网络接口的流程：
+- 可以将虚拟机附加到同⼀命名空间中的任何 NAD。在 default 命名空间中创建的任何 NAD 都可供集群中的所有虚拟机使⽤。
+- Pod 或虚拟机添加辅助网络接口的流程：
+  - 定义 NNCP 资源，用以创建宿主机节点的逻辑网络设备。
+  - NAD 定义与 NNCP 中的资源需要对应匹配
+  - Multus CNI 插件使用 NAD 中的资源定义创建辅助网络接口
+- 🧪 NAD 示例：**使⽤ OVN CNI 插件将虚拟机连接到 OVN-Kubernetes localnet 辅助⽹络**
 
-- 定义 NNCP 资源并创建宿主机节点的逻辑网络设备
-- NAD 定义与 NNCP 中的资源需要对应匹配
-- Multus CNI 插件使用 NAD 中的资源定义创建辅助网络接口
+  ```yaml
+  # file: ovs-br0-network-nad.yaml
+  apiVersion: k8s.cni.cncf.io/v1
+  kind: NetworkAttachmentDefinition
+  metadata:
+    name: br0-network
+    namespace: myvms
+  spec:
+    config: '{
+      "cniVersion": "0.4.0",
+      "name": "br0-network", 
+      "type": "ovn-k8s-cni-overlay", 
+      "netAttachDefName": "myvms/br0-network", 
+      "topology": "localnet" 
+  }'
+  ```
+
+### 7.6 Localnet 辅助网络组网方式示例：使用 NNCP 与 NAD 资源构建
+
+默认 OVN-Kubernetes CNI 网络 + OVN-Kubernetes Localnet 辅助网络拓扑示意：
+
+<img src="images/multus-nmstate-nncp-nad-arch.png" style="width:80%">
 
 ```bash
-### OpenShift 内置 Multus CNI 插件 ###
+$ oc apply -f ovs-br0-network-nncp.yaml
+$ oc apply -f ovs-br0-network-nad.yaml
+
 $ oc get net-attach-def -n <vm-namespace>
-#查看指定虚拟机项目中的网络附加定义状态
+#查看指定项目中的网络附加定义状态
 ```
 
-默认 Pod ⽹络上的虚拟机具有⼀个临时（ephemeral）IP 地址，该地址 **⽆法静态分配**。如果虚拟机需要静态或动态 IP 地址，必须在虚拟机上附加⼀个 **辅助⽹络接⼝**。该辅助接⼝必须连接⾄⼀个⽹桥⽹络。⽹桥⽹络上必须有可⽤的 DHCP 服务器，从⽽为虚拟机提供动态 IP 地址。
+## KubeVirt 虚拟机的虚拟化网络
 
-## 🔥 结语：OpenShift 集群网络类型
+在 OpenShift 虚拟化中，虚拟机在 `virt-launcher pod` 内运⾏。由于虚拟机在 pod 内， 因此它们默认位于 pod ⽹络中。virt-launcher pod 从 pod ⽹络获取 IP 地址，管理虚拟机的⽹络流量，将⼊站流量重定向到虚拟机，并路由来⾃虚拟机的出站流量。这种集成意味着虚拟机之间以及虚拟机与容器集之间的通信均通过集群 SDN 实现。
+
+在 OpenShift 虚拟化中，虚拟机默认连接到 pod ⽹络。因此，虚拟机可以与集群中的任何其他虚拟机或 pod 通信，即使它们位于不同的命名空间中也是如此。
+
+图示：virt-launcher pod、VM service、endpoint 之间的关系
+
+![virt-launcher-vmi-vm-service](images/virt-launcher-vmi-vm-service.png)
+
+## UserDefinedNetwork (UDN) 资源：用户定义网络
+
+UDN 所在命名空间的要求：
+
+- 要使⽤⼾能够在其命名空间中创建 UDN，必须先为 UDN 准备好相应的命名空间。
+- 此命名空间必须存在 `k8s.ovn.org/primary-user-defined-network` 标签（label）才能用于创建 UDN。
+- ⽆法将 UDN 标签添加到现有命名空间，OpenShift 管理员必须创建⼀个带有标签的命名空间。如果⽬标命名空间没有 UDN 标签，则创建 UDN 的操作将失败。
+
+UDN 实现主要网络接口：
+
+- 从 Web 控制台，只能为每个命名空间创建⼀个 UDN，OpenShift 会将该 UDN ⽤作 Pod 和虚拟机的 **主要⽹络接⼝**（primary）。
+- 当命名空间上设置 UDN 标签时，必须创建相应的 UDN。在创建 UDN 之前，OpenShift ⽆法在命名空间中创建任何 Pod 或虚拟机。
+- 创建带有 UDN 标签的命名空间后，该命名空间中的 Pod 和虚拟机不再使⽤集群 Pod ⽹络，⽽是使⽤该命名空间中的 UDN。如果命名空间中不存在 UDN，则 OpenShift ⽆法在该命名空间中启动任何 Pod。
+- ✅ 从 OpenShift 虚拟化 4.18 开始，只能创建 UDN 作为虚拟机的 **主要⽹络接⼝**。此外，只能使⽤ **第 2 层拓扑** 来创建 UDN。
+- ✅ 创建 UDN 后，OpenShift 会在命名空间中创建所有 Pod，并将 UDN 作为主要⽹络接⼝，⽽不是集群 Pod ⽹络。
+- ✅ 使⽤ YAML 定义创建虚拟机时，必须将 **l2bridge 绑定插件** ⽤于虚拟机的⽹络接⼝，以将 UDN ⽤作主要⽹络接⼝。
+
+## 🎉 KubeVirt 虚拟机组网方式
+
+## 🔥 OpenShift 集群网络类型
 
 | 网络类型 | 默认集成 | 实现方式 | 关键资源 / 配置 | 外部访问方式 |
 | ----- | ----- | ----- | ----- | ----- |
