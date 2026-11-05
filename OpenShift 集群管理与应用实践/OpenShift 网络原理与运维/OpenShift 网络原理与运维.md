@@ -1,8 +1,8 @@
-# 🌐 OpenShift 网络原理与运维
+# <img src="images/emoji/openshift-on-fire.gif" style="width:2%"> OpenShift 网络原理与运维
 
 ## 文档目录
 
-- [🌐 OpenShift 网络原理与运维](#-openshift-网络原理与运维)
+- [ OpenShift 网络原理与运维](#-openshift-网络原理与运维)
   - [文档目录](#文档目录)
   - [1. 文档说明](#1-文档说明)
   - [2. Service (svc) 资源对象](#2-service-svc-资源对象)
@@ -34,7 +34,7 @@
     - [🧬 5.2 **CRI、CNI 与 CNI 插件之间的调用时序图**](#-52-cricni-与-cni-插件之间的调用时序图)
     - [⚗️ 5.3 **OVN-Kubernetes 调用时序说明**](#️-53-ovn-kubernetes-调用时序说明)
   - [6. OVN-Kubernetes CNI 组件状态](#6-ovn-kubernetes-cni-组件状态)
-  - [7. Pod 或 KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件](#7-pod-或-kubevirt-虚拟机多网口实现multus-cni-元插件--cni-插件)
+  - [7. Pod \& KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件](#7-pod--kubevirt-虚拟机多网口实现multus-cni-元插件--cni-插件)
     - [7.1 Multus CNI 基础概述](#71-multus-cni-基础概述)
     - [7.2 CNI 插件：Macvlan 与 IPvlan 原理对比](#72-cni-插件macvlan-与-ipvlan-原理对比)
     - [7.3 CNI 插件：OVN-Kubernetes](#73-cni-插件ovn-kubernetes)
@@ -42,7 +42,7 @@
     - [7.5 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#75-networkattachmentdefinition-nad-资源网络附加定义)
     - [7.6 KubeVirt 虚拟机的网络模式](#76-kubevirt-虚拟机的网络模式)
     - [7.7 UserDefinedNetwork (UDN) 资源：用户定义网络](#77-userdefinednetwork-udn-资源用户定义网络)
-    - [⚗️ 7.8 KubeVirt 虚拟机组网方式分析](#️-78-kubevirt-虚拟机组网方式分析)
+    - [🧪 7.8 KubeVirt 虚拟机组网方式分析](#-78-kubevirt-虚拟机组网方式分析)
   - [🔥 8. OpenShift 集群网络类型](#-8-openshift-集群网络类型)
   - [参考链接](#参考链接)
   - [待完善问题](#待完善问题)
@@ -540,7 +540,9 @@ ovnkube-node-zj56j            8/8      Running  ...
 #查看 OVN-Kubernetes 组件部署 Pod 状态
 ```
 
-## 7. Pod 或 KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件
+## 7. Pod & KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件
+
+说明：用于 KubeVirt 虚拟机的组网方式同样可适配用于 Pod。
 
 ### 7.1 Multus CNI 基础概述
 
@@ -765,7 +767,7 @@ UDN 实现主要网络接口：
 - ✅ 创建 UDN 后，OpenShift 会在命名空间中创建所有 Pod，并将 UDN 作为主要⽹络接⼝，⽽不是集群 Pod ⽹络。
 - ✅ 使⽤ YAML 定义创建虚拟机时，必须将 **l2bridge 绑定插件** ⽤于虚拟机的⽹络接⼝，以将 UDN ⽤作主要⽹络接⼝。
 
-### ⚗️ 7.8 KubeVirt 虚拟机组网方式分析
+### 🧪 7.8 KubeVirt 虚拟机组网方式分析
 
 1️⃣ VM 视角下 3 种组网模式可供选择：
 
@@ -913,9 +915,5 @@ virt-launcher pod 的网络命名空间中通过 nftable 的 masquerade 完成�
   - internal 类型的 ovn-k8s-mp0 接口如何跨内核空间与用户空间的 OVS br-int 网桥？OVS 中的代码如何实现？
 - UDN 网络：
   - **UDN 作为 Primary 网络 + 独立 Pod 管理网络** 的双路径配置模式图？
-  - **UDN 作为 Secondary 网络 + VM 默认主网络 + 独立 Pod 管理网络** 的路径配置模式图？
-  - ovn-k8s-mpX 网口的功能？
-- Multus CNI + NNCP + NAD (ovn-k8s-cni-overlay CNI) 辅助网络：
-  - VM 默认主网络：OVN-Kubernetes
-  - 辅助网络流量：VM enp3s0 -> br-int (patch-port-to-br0) -> br0 (patch-port-to-br-int) -> ens3 (ovn-mappings: br0-network:ens3)
+- ovn-k8s-mpX 网口的功能？
 - OVS 中的 system/internal/patch 类型功能与内核的关系？

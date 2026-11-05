@@ -1,4 +1,4 @@
-# 🦃 OpenShift 虚拟化与实践
+# <img src="images/emoji/openshift.png" style="width:2%"> OpenShift 虚拟化与实践
 
 ## 文档说明
 
@@ -6,7 +6,7 @@ OpenShift 虚拟化基于 CNCF 项目 [KubeVirt](https://kubevirt.io/) 构建，
 
 ## 文档目录
 
-- [🦃 OpenShift 虚拟化与实践](#-openshift-虚拟化与实践)
+- [ OpenShift 虚拟化与实践](#-openshift-虚拟化与实践)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
   - [OpenShift Virtualization 相关的 Operator](#openshift-virtualization-相关的-operator)
@@ -23,6 +23,7 @@ OpenShift 虚拟化基于 CNCF 项目 [KubeVirt](https://kubevirt.io/) 构建，
   - [OpenShift 虚拟化的存储](#openshift-虚拟化的存储)
     - [NooBaa 对象存储调用](#noobaa-对象存储调用)
   - [OADP 备份 KubeVirt 虚拟机](#oadp-备份-kubevirt-虚拟机)
+    - [OADP 备份机制选型决策](#oadp-备份机制选型决策)
     - [核心概念解析](#核心概念解析)
     - [资源间的关系与协作流程](#资源间的关系与协作流程)
     - [OADP 备份关键概念](#oadp-备份关键概念)
@@ -297,7 +298,19 @@ sequenceDiagram
 
 <center>图示：OADP 备份 OpenShift 应⽤的流程</center>
 
+### OADP 备份机制选型决策
 
+| 场景 / 存储类型 | CSI 快照 | Kopia FSB | 说明 |
+| ----- | ----- | ----- | ----- |
+| 云厂商块存储（EBS / Azure Disk / GCE PD） | ✅ 首选 | ✅ 可用 | CSI 驱动原生支持快照 |
+| ODF / Ceph RBD（VM 根盘典型场景） | ✅ 首选 | ✅ 可用 | VolumeSnapshotClass 打 `velero.io/csi-volumesnapshot-class: "true"` 标签即可 |
+| ODF / CephFS | ✅ 可用 | ✅ 可用 | 支持快照，RWX 共享时按需求选 |
+| vSphere CSI | ✅ 首选 | ✅ 可用 | 注意快照保留在 datastore 内 |
+| **NFS（外部挂载）** | ❌ 不支持 | ✅ **唯一选项** | NFS CSI 驱动普遍不支持快照，只能走文件级备份 |
+| hostPath / Local Storage | ❌ 不支持 | ✅ **唯一选项** | hostPath 备份有限制，官方建议优先迁移到 PVC |
+| emptyDir | ❌ 不支持 | ✅ 可用（需 opt-in） | 需确认数据有备份价值 |
+| OpenShift Virtualization VM 根盘 | ✅ 首选 | ✅ 可用 | kubevirt 插件 + CSI；需 guest agent / fsfreeze 保证应用一致性 |
+| VM 内的 NFS 数据卷 | ❌ 不支持 | ✅ **唯一选项** | 上一轮讨论的场景，opt-in 注解指定卷 |
 
 ### 核心概念解析
 
