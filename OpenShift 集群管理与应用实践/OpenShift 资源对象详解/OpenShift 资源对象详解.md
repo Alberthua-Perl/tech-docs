@@ -633,6 +633,31 @@ $ oc rollout restart deployment <deployment_name>
 
   ![OCP3-internal-registry-pvc-3](images/ocp3-internal-registry-pvc-3.jpg)
 
+- OpenShift 虚拟化中定义的 pvc 示例：
+
+  ```yaml
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: dbdata
+  spec:
+    storageClassName: ocs-external-storagecluster-ceph-rbd- virtualization
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    volumeMode: Filesystem
+    # volumeMode: Filesystem 模式的具体过程：
+    # 1. 创建 RBD 镜像：StorageClass ocs-external-storagecluster-ceph-rbd-virtualization 
+    #    指定了 RBD 驱动，CSI 会在后端 Ceph 集群创建一个块设备（Image）。
+    # 2. 格式化为文件系统：对于 Filesystem 模式，CSI 驱动会在此块设备上创建文件系统。
+    #    根据 Red Hat 文档，RBD 的 Filesystem 模式默认且支持的文件系统类型是 ext4。
+    # 3. 挂载到节点：创建好文件系统后，该卷会以目录的形式挂载到节点上，供 Pod 通过 
+    #    volumeMounts 使用。如果指定 volumeMode: Block，则会跳过格式化步骤，
+    #    直接将裸块设备映射给容器（需使用 volumeDevices）。
+  ```
+
 ## 15. Secret 资源对象
 
 ### 15.1 基础概念

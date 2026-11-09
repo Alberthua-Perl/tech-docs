@@ -1,4 +1,4 @@
-# <img src="images/emoji/openshift-on-fire.gif" style="width:2%"> OpenShift 网络原理与运维
+# <img src="images/emoji/openshift.png" style="width:2%"> OpenShift 网络原理与运维
 
 ## 文档目录
 
@@ -32,17 +32,17 @@
   - [5. CNI 如何工作？](#5-cni-如何工作)
     - [5.1 CNI 请求的生命周期遵循特定的顺序](#51-cni-请求的生命周期遵循特定的顺序)
     - [🧬 5.2 **CRI、CNI 与 CNI 插件之间的调用时序图**](#-52-cricni-与-cni-插件之间的调用时序图)
-    - [⚗️ 5.3 **OVN-Kubernetes 调用时序说明**](#️-53-ovn-kubernetes-调用时序说明)
+    - [5.3 **OVN-Kubernetes 调用时序说明**](#53-ovn-kubernetes-调用时序说明)
   - [6. OVN-Kubernetes CNI 组件状态](#6-ovn-kubernetes-cni-组件状态)
-  - [7. Pod \& KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件](#7-pod--kubevirt-虚拟机多网口实现multus-cni-元插件--cni-插件)
+  - [7. **Pod \& KubeVirt 虚拟机多网口实现：Multus CNI 元插件  + CNI 插件**](#7-pod--kubevirt-虚拟机多网口实现multus-cni-元插件---cni-插件)
     - [7.1 Multus CNI 基础概述](#71-multus-cni-基础概述)
     - [7.2 CNI 插件：Macvlan 与 IPvlan 原理对比](#72-cni-插件macvlan-与-ipvlan-原理对比)
-    - [7.3 CNI 插件：OVN-Kubernetes](#73-cni-插件ovn-kubernetes)
-    - [7.4 Kubernetes NMstate Operator](#74-kubernetes-nmstate-operator)
+    - [7.3 CNI 插件：OVN-Kubernetes ](#73-cni-插件ovn-kubernetes-)
+    - [7.4 Kubernetes NMstate Operator ](#74-kubernetes-nmstate-operator-)
     - [7.5 NetworkAttachmentDefinition (NAD) 资源：网络附加定义](#75-networkattachmentdefinition-nad-资源网络附加定义)
-    - [7.6 KubeVirt 虚拟机的网络模式](#76-kubevirt-虚拟机的网络模式)
+    - [7.6 KubeVirt 虚拟机的网络模式 ](#76-kubevirt-虚拟机的网络模式-)
     - [7.7 UserDefinedNetwork (UDN) 资源：用户定义网络](#77-userdefinednetwork-udn-资源用户定义网络)
-    - [🧪 7.8 KubeVirt 虚拟机组网方式分析](#-78-kubevirt-虚拟机组网方式分析)
+    - [⚗️ 7.8 KubeVirt 虚拟机组网方式分析](#️-78-kubevirt-虚拟机组网方式分析)
   - [🔥 8. OpenShift 集群网络类型](#-8-openshift-集群网络类型)
   - [参考链接](#参考链接)
   - [待完善问题](#待完善问题)
@@ -452,7 +452,7 @@ sequenceDiagram
     C-->>K: Sandbox Ready
 ```
 
-### ⚗️ 5.3 **OVN-Kubernetes 调用时序说明**
+### 5.3 **OVN-Kubernetes 调用时序说明**
 
 OVN-Kubernetes 有个重要特点：**CNI 插件二进制（ovn-k8s-cni-overlay）本身不干活，它只是客户端** —— 解析 ADD 后通过 Unix socket 把请求转发给常驻的 ovnkube-node pod 里的 CNI Server（ovnkube-node 主进程里的一个 *goroutine*），它内部包含的 `setupInterface()` 与 `ConfigureOVS()` 均运行在特权模式中。`setupInterface()` 可创建 veth 对及配置 pod 网络命名空间；`ConfigureOVS()` 使用 external_ids 将主机侧 veth 接口添加到 br-int 集成网桥上，在特权模式中以 libovsdb 实现。
 
@@ -540,7 +540,7 @@ ovnkube-node-zj56j            8/8      Running  ...
 #查看 OVN-Kubernetes 组件部署 Pod 状态
 ```
 
-## 7. Pod & KubeVirt 虚拟机多网口实现：Multus CNI 元插件 + CNI 插件
+## 7. **Pod & KubeVirt 虚拟机多网口实现：Multus CNI 元插件 <img src="images/emoji/Multus.png" style="width:8%"> + CNI 插件**
 
 说明：用于 KubeVirt 虚拟机的组网方式同样可适配用于 Pod。
 
@@ -587,7 +587,7 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
 
 <center><img src="images/macvlan-ipvlan-contrast-4.png" style="width:50%"></center>
 
-### 7.3 CNI 插件：OVN-Kubernetes
+### 7.3 CNI 插件：OVN-Kubernetes <img src="images/emoji/ovn-inside-k8s.png" style="width:2%">
 
 - 默认集群 Pod 网络：大二层覆盖网络
   - OVN ⽀持多个覆盖⽹络的概念，即虚拟 L2 ⽹络。Pod 和 Service ⽹络是 OVN 覆盖⽹络。可以创建覆盖⽹络，将 Pod 连接到其他⽹络。
@@ -598,7 +598,7 @@ $ for CRD in $(oc get crd | grep network | awk '{print $1}'); do echo "--- $CRD 
   - localnet 拓扑需要⼀个⽹桥映射，将节点上的 OVS ⽹桥连接到物理⽹络接⼝。集群管理员可以使⽤ `NodeNetworkConfigurationPolicy` 资源来配置此⽹桥和映射。附加到 localnet ⽹络的虚拟机可以直接与物理⽹络上的外部设备通信。
   - **OVN-Kubernetes localnet 拓扑既⽀持东西向集群流量，也⽀持访问集群外部运⾏的服务。**
 
-### 7.4 Kubernetes NMstate Operator
+### 7.4 Kubernetes NMstate Operator <img src="images/emoji/nmstate.png" style="width:2%">
 
 - **Kubernetes NMstate Operator** 在 OpenShift 集群中提供⼀个集中的声明式主机⽹络配置⼯具。此 operator 可以通过 `NodeNetworkConfigurationPolicy` (NNCP) 与 `NodeNetworkConfigurationEnactment` (NNCE) 资源报告集群中每个节点⽹络配置，验证配置语法，并在不重新启动节点的情况下应⽤⽹络配置更改。借助 NMState Operator，集群管理员可以配置额外的节点⽹络设备（如 Linux ⽹桥），并在⽹络附加定义中使⽤它们。NNCP 可直接定义创建指定的节点网络设备，无需手动提前创建。
 - NMstate Operator 安装完毕后，集群管理员必须使⽤ **nmstate 名称** 来创建⼀个 NMState 实例，以在所有 OpenShift 节点上部署 NMState 控制器。
@@ -740,7 +740,7 @@ NMState operator 管理 OpenShift 集群中主机节点的⽹络配置。Multus 
   #查看指定项目中的网络附加定义状态
   ```
 
-### 7.6 KubeVirt 虚拟机的网络模式
+### 7.6 KubeVirt 虚拟机的网络模式 <img src="images/emoji/KubeVirt_icon.png" style="width:2%">
 
 在 OpenShift 虚拟化中，虚拟机在 `virt-launcher pod` 内运⾏。由于虚拟机在 pod 内， 因此它们默认位于 pod ⽹络中。virt-launcher pod 从 pod ⽹络获取 IP 地址，管理虚拟机的⽹络流量，将⼊站流量重定向到虚拟机，并路由来⾃虚拟机的出站流量。这种集成意味着虚拟机之间以及虚拟机与容器集之间的通信均通过集群 SDN 实现。
 
@@ -767,7 +767,7 @@ UDN 实现主要网络接口：
 - ✅ 创建 UDN 后，OpenShift 会在命名空间中创建所有 Pod，并将 UDN 作为主要⽹络接⼝，⽽不是集群 Pod ⽹络。
 - ✅ 使⽤ YAML 定义创建虚拟机时，必须将 **l2bridge 绑定插件** ⽤于虚拟机的⽹络接⼝，以将 UDN ⽤作主要⽹络接⼝。
 
-### 🧪 7.8 KubeVirt 虚拟机组网方式分析
+### ⚗️ 7.8 KubeVirt 虚拟机组网方式分析
 
 1️⃣ VM 视角下 3 种组网模式可供选择：
 
@@ -895,13 +895,15 @@ virt-launcher pod 的网络命名空间中通过 nftable 的 masquerade 完成�
 
 - [Headless Services | Kubernetes Docs](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
 - [DNS records | KubeVirt user guide](https://kubevirt.io/user-guide/network/dns/)
+- [**OpenShift 资源对象详解：Service | GitHub**](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3.md#-11-service-svc-%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1)
 - [CNI](https://www.cni.dev/)
 - [CNI - the Container Network Interface | GitHub](https://github.com/containernetworking/cni)
-- 🧬 [**Container Network Interface (CNI) Specification | GitHub**](https://github.com/containernetworking/cni/blob/spec-v1.0.0/SPEC.md)
+- [**Container Network Interface (CNI) Specification | GitHub**](https://github.com/containernetworking/cni/blob/spec-v1.0.0/SPEC.md)
 - [Multus-CNI | GitHub](https://github.com/k8snetworkplumbingwg/multus-cni)
-- 📚 [OVN-Kubernetes network plugin | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/ovn-kubernetes_network_plugin/index)
-- [OpenShift 资源对象详解：Service | GitHub](https://github.com/Alberthua-Perl/tech-docs/blob/master/OpenShift%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/OpenShift%20%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3.md#-11-service-svc-%E8%B5%84%E6%BA%90%E5%AF%B9%E8%B1%A1)
-- 🧪 [**Pod Creation Workflow | OVN-Kubernetes Docs**](https://ovn-kubernetes.io/master/design/pod-creation-workflow/)
+- [OVN-Kubernetes network plugin | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/ovn-kubernetes_network_plugin/index)
+- [**Pod Creation Workflow | OVN-Kubernetes Docs**](https://ovn-kubernetes.io/master/design/pod-creation-workflow/)
+- [MetalLB on OpenShift OCP | MetalLB Docs](https://metallb.universe.tf/installation/clouds/#metallb-on-openshift-ocp)
+- [Configuration | MetalLB Docs](https://metallb.universe.tf/configuration/)
 - [Networking overview | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/networking_overview/index)
 - [Multiple networks | Red Hat Docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/multiple_networks/index)
 - [Network Policies | Kubernetes Docs](https://kubernetes.io/docs/concepts/services-networking/network-policies/)

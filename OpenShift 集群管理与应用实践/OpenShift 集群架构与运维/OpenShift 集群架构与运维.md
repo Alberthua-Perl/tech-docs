@@ -1,4 +1,4 @@
-# ⭕ OpenShift 集群架构与运维
+# <img src="images/emoji/openshift.png" style="width:2%"> OpenShift 集群架构与运维
 
 ## 文档说明
 
@@ -8,7 +8,7 @@
 
 ## 文档目录
 
-- [⭕ OpenShift 集群架构与运维](#-openshift-集群架构与运维)
+- [ OpenShift 集群架构与运维](#-openshift-集群架构与运维)
   - [文档说明](#文档说明)
   - [文档目录](#文档目录)
   - [1. OpenShift 基础架构概述](#1-openshift-基础架构概述)
