@@ -2,7 +2,7 @@
 
 ## 文档说明
 
-- 此文档主要根据 `Red Hat OpenShift Container Platform v3.x`（OCP3）与 `v4.x`（OCP4）环境实践。
+- 此文档主要根据 Red Hat OpenShift Container Platform v3.x（OCP3）与 v4.x（OCP4）环境实践。
 - 其中涉及的选项与参数在绝大部分版本中适用，但部分版本可能略有不同，请参考实际使用版本。
 - OCP4 与 OCP4 在架构与资源对象概念上存在诸多相同点，若未特别说明，即两者均适用。
 

@@ -28,6 +28,7 @@ OpenShift 虚拟化基于 CNCF 项目 [KubeVirt](https://kubevirt.io/) 构建，
     - [7.1 OADP 备份机制选型决策](#71-oadp-备份机制选型决策)
     - [7.2 OADP 备份核心概念解析](#72-oadp-备份核心概念解析)
     - [7.3 OADP 实现虚拟机备份的主要流程](#73-oadp-实现虚拟机备份的主要流程)
+    - [7.4 OADP 虚拟机备份要点](#74-oadp-虚拟机备份要点)
   - [参考文档](#参考文档)
 
 ## 1. OpenShift 虚拟化相关的 Operator
@@ -387,8 +388,23 @@ sequenceDiagram
 - 定义 ObjectBucketClaim (OBC) 资源创建后端使用的 Bucket 资源作为备份存储位置。
 - openshift-adp 项目中创建 Secret，在此 Secret 中设置访问 Bucket 的 Access Key 与 Secret Key（OBC 资源中可见）。
 - openshift-adp 项目中创建 DataProtectionApplication (DPA) 资源，其中定义备份存储位置、访问用 Secret与 Bucket 等。
+
+  ```plaintext
+  ODF/NooBaa
+   └── 提供 OBC API
+         └── 创建 OBC（通常在 openshift-adp 命名空间）
+               ├── 自动生成 Secret（AWS_ACCESS_KEY_ID / SECRET）
+               └── 自动生成 ConfigMap（BUCKET_NAME / BUCKET_HOST / PORT）
+                     ↓ 被引用
+  OADP
+   └── DataProtectionApplication (DPA)
+         └── backupLocations 引用上述 Secret + bucket 名称 + S3 URL
+  ```
+
 - 为需要备份的虚拟机与其他资源添加标签（Label）。
 - openshift-adp 项目中定义 Backup 资源，利用标签完成资源备份。
+
+### 7.4 OADP 虚拟机备份要点
 
 如果虚拟机在备份创建前处于运⾏状态，Backup 资源会⾃动创建 pre 备份 hook，以在备份创建前冻结虚拟机；并创建 post 备份 hook，以在备份完成后解冻虚拟机。
 
